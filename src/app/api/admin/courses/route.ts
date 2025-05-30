@@ -1,46 +1,79 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { createClient } from '@/lib/supabase/server';
 
 // Force dynamic rendering for this API route
 export const dynamic = 'force-dynamic';
 
+async function getAuthenticatedUser(request: NextRequest) {
+  try {
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return null;
+    }
+
+    const token = authHeader.substring(7);
+    const supabase = createClient();
+    
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+    if (error || !user) {
+      return null;
+    }
+
+    // Get user data to check role
+    const { data: userData } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    return {
+      id: user.id,
+      email: user.email,
+      role: userData?.role || 'USER'
+    };
+  } catch (error) {
+    console.error('Auth error:', error);
+    return null;
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const user = await getAuthenticatedUser(request);
 
-    if (!session || session.user.role !== 'ADMIN') {
+    if (!user || user.role !== 'ADMIN') {
       return NextResponse.json(
         { message: 'Unauthorized' },
         { status: 401 }
       );
     }
 
-    const courses = await prisma.course.findMany({
-      orderBy: {
-        createdAt: 'desc',
-      },
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        category: true,
-        level: true,
-        status: true,
-        featured: true,
-        price: true,
-        createdAt: true,
-        _count: {
-          select: {
-            enrollments: true,
-            modules: true,
-          },
-        },
-      },
-    });
+    const supabase = createClient();
 
-    return NextResponse.json(courses);
+    const { data: courses, error } = await supabase
+      .from('courses')
+      .select(`
+        id,
+        title,
+        description,
+        category,
+        level,
+        status,
+        featured,
+        price,
+        created_at
+      `)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching courses:', error);
+      return NextResponse.json(
+        { message: 'Error fetching courses' },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json(courses || []);
   } catch (error) {
     console.error('Error fetching admin courses:', error);
     return NextResponse.json(

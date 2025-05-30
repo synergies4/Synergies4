@@ -1,45 +1,73 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { createClient } from '@/lib/supabase/server';
 
 // Force dynamic rendering for this API route
 export const dynamic = 'force-dynamic';
 
+async function getAuthenticatedUser(request: NextRequest) {
+  try {
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return null;
+    }
+
+    const token = authHeader.substring(7);
+    const supabase = createClient();
+    
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+    if (error || !user) {
+      return null;
+    }
+
+    return user;
+  } catch (error) {
+    console.error('Auth error:', error);
+    return null;
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const user = await getAuthenticatedUser(request);
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json(
-        { message: 'Unauthorized' },
+        { message: 'Authentication required' },
         { status: 401 }
       );
     }
 
-    const enrollments = await prisma.enrollment.findMany({
-      where: {
-        userId: session.user.id,
-      },
-      include: {
-        course: {
-          select: {
-            id: true,
-            title: true,
-            description: true,
-            image: true,
-            category: true,
-            level: true,
-            duration: true,
-          },
-        },
-      },
-      orderBy: {
-        enrolledAt: 'desc',
-      },
-    });
+    const supabase = createClient();
 
-    return NextResponse.json({ enrollments });
+    const { data: enrollments, error } = await supabase
+      .from('course_enrollments')
+      .select(`
+        id,
+        status,
+        enrolled_at,
+        progress,
+        courses (
+          id,
+          title,
+          description,
+          image,
+          category,
+          level,
+          duration
+        )
+      `)
+      .eq('user_id', user.id)
+      .order('enrolled_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching enrollments:', error);
+      return NextResponse.json(
+        { message: 'Error fetching enrollments' },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ enrollments: enrollments || [] });
   } catch (error) {
     console.error('Error fetching user enrollments:', error);
     return NextResponse.json(
