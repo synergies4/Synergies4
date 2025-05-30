@@ -1,0 +1,51 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
+
+// Force dynamic rendering for this API route
+export const dynamic = 'force-dynamic';
+
+export async function GET(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session || session.user.role !== 'ADMIN') {
+      return NextResponse.json(
+        { message: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    const courses = await prisma.course.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        category: true,
+        level: true,
+        status: true,
+        featured: true,
+        price: true,
+        createdAt: true,
+        _count: {
+          select: {
+            enrollments: true,
+            modules: true,
+          },
+        },
+      },
+    });
+
+    return NextResponse.json(courses);
+  } catch (error) {
+    console.error('Error fetching admin courses:', error);
+    return NextResponse.json(
+      { message: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+} 
