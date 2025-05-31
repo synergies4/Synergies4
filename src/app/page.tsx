@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { motion, useScroll, useTransform, useInView } from 'framer-motion';
+import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,7 +22,9 @@ import {
   Zap,
   Target,
   Brain,
-  Rocket
+  Rocket,
+  Menu,
+  X
 } from 'lucide-react';
 
 // Animation variants
@@ -58,6 +60,7 @@ export default function Home() {
   const heroY = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
   const { user, loading } = useAuth();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <main className="min-h-screen">
@@ -118,6 +121,7 @@ export default function Home() {
               </Link>
             </motion.div>
             
+            {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
               {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item, index) => (
                 <motion.div
@@ -143,8 +147,9 @@ export default function Home() {
               ))}
             </div>
             
+            {/* Desktop Auth */}
             <motion.div 
-              className="flex items-center space-x-3"
+              className="hidden md:flex items-center space-x-3"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.5, duration: 0.5 }}
@@ -162,12 +167,83 @@ export default function Home() {
                 </>
               )}
             </motion.div>
+
+            {/* Mobile Menu Button */}
+            <div className="md:hidden">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="p-2"
+              >
+                {mobileMenuOpen ? (
+                  <X className="h-6 w-6" />
+                ) : (
+                  <Menu className="h-6 w-6" />
+                )}
+              </Button>
+            </div>
           </div>
+
+          {/* Mobile Menu */}
+          <AnimatePresence>
+            {mobileMenuOpen && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="md:hidden border-t bg-white/95 backdrop-blur-md overflow-hidden"
+              >
+                <div className="px-4 py-4 space-y-4">
+                  {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item) => (
+                    <Link
+                      key={item}
+                      href={
+                        item === 'About Us' ? '/about-us' :
+                        item === 'Courses' ? '/courses' :
+                        item === 'Coaching' ? '/coaching' : 
+                        item === 'Consulting' ? '/consulting' : 
+                        item === 'Industry Insight' ? '/industry-insight' :
+                        `/${item.toLowerCase().replace(' ', '-')}`
+                      }
+                      className="block text-gray-600 hover:text-blue-600 transition-colors font-medium py-2 text-lg"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {item}
+                    </Link>
+                  ))}
+                  
+                  {/* Mobile Auth */}
+                  <div className="pt-4 border-t space-y-3">
+                    {user ? (
+                      <div className="flex items-center space-x-2">
+                        <UserAvatar />
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        <Button variant="ghost" className="w-full justify-start text-lg py-3" asChild>
+                          <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                            Login
+                          </Link>
+                        </Button>
+                        <Button className="w-full text-lg py-3" asChild>
+                          <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
+                            Sign Up
+                          </Link>
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </motion.nav>
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-20 overflow-hidden">
+      <section className="relative bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-12 md:py-20 overflow-hidden">
         <motion.div 
           className="container mx-auto px-4 text-center"
           style={{ y: heroY, opacity: heroOpacity }}
@@ -177,11 +253,11 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: [0.6, -0.05, 0.01, 0.99] }}
           >
-            <Badge className="mb-6 bg-blue-100 text-blue-700 hover:bg-blue-200">
+            <Badge className="mb-4 md:mb-6 bg-blue-100 text-blue-700 hover:bg-blue-200">
               <Zap className="w-4 h-4 mr-2" />
               AI-Powered Learning Platform
             </Badge>
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+            <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold text-gray-900 mb-4 md:mb-6 leading-tight">
               Build Skills That{' '}
               <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 Set You Apart
@@ -190,7 +266,7 @@ export default function Home() {
           </motion.div>
           
           <motion.p 
-            className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed"
+            className="text-lg md:text-xl text-gray-600 mb-6 md:mb-8 max-w-3xl mx-auto leading-relaxed"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4, ease: [0.6, -0.05, 0.01, 0.99] }}
@@ -203,10 +279,10 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6, ease: [0.6, -0.05, 0.01, 0.99] }}
           >
-            <Button size="lg" className="text-lg px-8 py-6" asChild>
+            <Button size="lg" className="text-base md:text-lg px-6 md:px-8 py-4 md:py-6 w-full sm:w-auto" asChild>
               <Link href="/courses">
                 Boost Your Career – Explore Courses
-                <ArrowRight className="ml-2 h-5 w-5" />
+                <ArrowRight className="ml-2 h-4 w-4 md:h-5 md:w-5" />
               </Link>
             </Button>
           </motion.div>
