@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar, Clock, User, Search, ArrowRight, Menu, X } from 'lucide-react';
+import { Calendar, Clock, User, Search, ArrowRight, Menu, X, FileText, Lightbulb } from 'lucide-react';
 import { UserAvatar } from '@/components/UserAvatar';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -115,7 +115,40 @@ export default function IndustryInsightPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen">
+      {/* Countdown Banner */}
+      <motion.div 
+        className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3"
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-center">
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+              className="text-sm md:text-base"
+            >
+              🚀 Expand your potential through learning. Offering earlybirds a discount of $295.00.
+            </motion.p>
+            <motion.div
+              className="flex gap-2"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.4, duration: 0.5 }}
+            >
+              {['00 Days', '00 Hours', '00 Minutes', '00 Seconds'].map((time, index) => (
+                <Badge key={index} variant="secondary" className="bg-white/20 text-white border-white/30">
+                  {time}
+                </Badge>
+              ))}
+            </motion.div>
+          </div>
+        </div>
+      </motion.div>
+
       {/* Navigation */}
       <motion.nav 
         className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b shadow-sm"
@@ -158,7 +191,9 @@ export default function IndustryInsightPage() {
                       item === 'Industry Insight' ? '/industry-insight' :
                       `/${item.toLowerCase().replace(' ', '-')}`
                     } 
-                    className="text-gray-600 hover:text-blue-600 transition-colors font-medium"
+                    className={`text-gray-600 hover:text-blue-600 transition-colors font-medium ${
+                      item === 'Industry Insight' ? 'text-blue-600 font-semibold' : ''
+                    }`}
                   >
                     {item}
                   </Link>
@@ -261,40 +296,61 @@ export default function IndustryInsightPage() {
         </div>
       </motion.nav>
 
-      {/* Header */}
-      <section className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-12 md:py-20">
-        <div className="container mx-auto px-4">
+      {/* Hero Section */}
+      <section className="relative bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-12 md:py-20 overflow-hidden">
+        <div className="container mx-auto px-4 text-center">
           <motion.div
-            className="text-center max-w-4xl mx-auto"
-            initial="initial"
-            animate="animate"
-            variants={staggerContainer}
+            initial={{ opacity: 0, y: 100 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2, ease: [0.6, -0.05, 0.01, 0.99] }}
           >
-            <motion.h1 
-              className="text-3xl md:text-4xl lg:text-6xl font-bold text-gray-900 mb-4 md:mb-6"
-              variants={fadeInUp}
-            >
-              Industry Insight
-            </motion.h1>
-            <motion.p 
-              className="text-lg md:text-xl text-gray-600 mb-6 md:mb-8"
-              variants={fadeInUp}
-            >
-              Stay ahead with Synergies4's Industry Insights — your go-to resource for expert analysis, 
-              market trends, emerging technologies, and strategic advice across key sectors.
-            </motion.p>
-            <motion.p 
-              className="text-base md:text-lg text-gray-500"
-              variants={fadeInUp}
-            >
-              Explore how innovation is reshaping industries and empowering businesses to thrive in a dynamic world.
-            </motion.p>
+            <Badge className="mb-4 md:mb-6 bg-blue-100 text-blue-700 hover:bg-blue-200">
+              <FileText className="w-4 h-4 mr-2" />
+              Industry Insights
+            </Badge>
+            <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold text-gray-900 mb-4 md:mb-6 leading-tight">
+              Stay Ahead with{' '}
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Industry Insights
+              </span>
+            </h1>
+          </motion.div>
+          
+          <motion.p 
+            className="text-lg md:text-xl text-gray-600 mb-4 md:mb-6 max-w-4xl mx-auto leading-relaxed"
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4, ease: [0.6, -0.05, 0.01, 0.99] }}
+          >
+            Your go-to resource for expert analysis, market trends, emerging technologies, and strategic advice across key sectors.
+          </motion.p>
+          
+          <motion.p 
+            className="text-base md:text-lg text-gray-500 mb-6 md:mb-8 max-w-3xl mx-auto"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6, ease: [0.6, -0.05, 0.01, 0.99] }}
+          >
+            Explore how innovation is reshaping industries and empowering businesses to thrive in a dynamic world.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.8, ease: [0.6, -0.05, 0.01, 0.99] }}
+          >
+            <Button size="lg" className="text-base md:text-lg px-6 md:px-8 py-4 md:py-6" asChild>
+              <Link href="#insights">
+                Explore Insights
+                <Lightbulb className="ml-2 h-4 w-4 md:h-5 md:w-5" />
+              </Link>
+            </Button>
           </motion.div>
         </div>
       </section>
 
       {/* Filters and Search */}
-      <section className="py-6 md:py-8 bg-white border-b">
+      <section id="insights" className="py-6 md:py-8 bg-white border-b">
         <div className="container mx-auto px-4">
           <div className="flex flex-col gap-4">
             <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
@@ -329,7 +385,7 @@ export default function IndustryInsightPage() {
       </section>
 
       {/* Blog Posts Grid */}
-      <section className="py-16">
+      <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -344,6 +400,7 @@ export default function IndustryInsightPage() {
             </div>
           ) : filteredPosts.length === 0 ? (
             <div className="text-center py-16">
+              <FileText className="mx-auto h-16 w-16 text-gray-400 mb-4" />
               <h3 className="text-2xl font-semibold text-gray-900 mb-4">No articles found</h3>
               <p className="text-gray-600 mb-8">Try adjusting your search or filter criteria.</p>
               <Button onClick={() => { setSearchTerm(''); setSelectedCategory('all'); }}>
