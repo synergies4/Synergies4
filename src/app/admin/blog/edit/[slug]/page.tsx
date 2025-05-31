@@ -20,13 +20,14 @@ interface BlogPost {
   slug: string;
   excerpt: string;
   content: string;
-  featured_image: string;
+  image: string;
   category: string;
   tags: string[];
   status: string;
   meta_title: string;
   meta_description: string;
   reading_time: number;
+  published_at?: string;
 }
 
 interface BlogCategory {
@@ -48,7 +49,7 @@ export default function EditBlogPostPage() {
     slug: '',
     excerpt: '',
     content: '',
-    featured_image: '',
+    image: '',
     category: '',
     tags: [] as string[],
     status: 'draft',
@@ -75,7 +76,7 @@ export default function EditBlogPostPage() {
           slug: data.post.slug,
           excerpt: data.post.excerpt || '',
           content: data.post.content,
-          featured_image: data.post.featured_image || '',
+          image: data.post.image || '',
           category: data.post.category,
           tags: data.post.tags || [],
           status: data.post.status,
@@ -468,19 +469,19 @@ export default function EditBlogPostPage() {
             </CardHeader>
             <CardContent>
               <div>
-                <Label htmlFor="featured_image">Image URL</Label>
+                <Label htmlFor="image">Image URL</Label>
                 <Input
-                  id="featured_image"
-                  value={formData.featured_image}
-                  onChange={(e) => setFormData(prev => ({ ...prev, featured_image: e.target.value }))}
+                  id="image"
+                  value={formData.image}
+                  onChange={(e) => setFormData(prev => ({ ...prev, image: e.target.value }))}
                   placeholder="https://example.com/image.jpg"
                   className="mt-1"
                 />
               </div>
-              {formData.featured_image && (
+              {formData.image && (
                 <div className="mt-4">
                   <img
-                    src={formData.featured_image}
+                    src={formData.image}
                     alt="Featured image preview"
                     className="w-full h-32 object-cover rounded-md"
                     onError={(e) => {

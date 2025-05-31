@@ -215,7 +215,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error in blog POST API:', error);
     return NextResponse.json(
-      { message: `Internal server error: ${error.message}` },
+      { message: `Internal server error: ${error instanceof Error ? error.message : 'Unknown error'}` },
       { status: 500 }
     );
   }
