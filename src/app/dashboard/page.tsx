@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,10 +16,14 @@ import {
   Play,
   CheckCircle,
   Calendar,
-  Target
+  Target,
+  Menu,
+  X
 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
+import { UserAvatar } from '@/components/UserAvatar';
 
 interface Enrollment {
   id: string;
@@ -55,6 +59,7 @@ export default function StudentDashboard() {
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [quizAttempts, setQuizAttempts] = useState<QuizAttempt[]>([]);
   const [loading, setLoading] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [stats, setStats] = useState({
     totalCourses: 0,
     completedCourses: 0,
@@ -157,17 +162,136 @@ export default function StudentDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="container mx-auto px-4 py-8">
+      {/* Navigation */}
+      <motion.nav 
+        className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b shadow-sm"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.1 }}
+      >
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            >
+              <Link href="/">
+                <Image 
+                  src="/synergies4_logo.jpeg" 
+                  alt="Synergies4 Logo" 
+                  width={150} 
+                  height={72} 
+                  className="h-10 w-auto"
+                />
+              </Link>
+            </motion.div>
+            
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-8">
+              {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item, index) => (
+                <motion.div
+                  key={item}
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 + index * 0.1, duration: 0.5 }}
+                >
+                  <Link 
+                    href={
+                      item === 'About Us' ? '/about-us' :
+                      item === 'Courses' ? '/courses' :
+                      item === 'Coaching' ? '/coaching' : 
+                      item === 'Consulting' ? '/consulting' : 
+                      item === 'Industry Insight' ? '/industry-insight' :
+                      `/${item.toLowerCase().replace(' ', '-')}`
+                    } 
+                    className="text-gray-600 hover:text-blue-600 transition-colors font-medium"
+                  >
+                    {item}
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+            
+            {/* Desktop Auth */}
+            <motion.div 
+              className="hidden md:flex items-center space-x-3"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.5, duration: 0.5 }}
+            >
+              <UserAvatar />
+            </motion.div>
+
+            {/* Mobile Menu Button */}
+            <div className="md:hidden">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="p-2"
+              >
+                {mobileMenuOpen ? (
+                  <X className="h-6 w-6" />
+                ) : (
+                  <Menu className="h-6 w-6" />
+                )}
+              </Button>
+            </div>
+          </div>
+
+          {/* Mobile Menu */}
+          <AnimatePresence>
+            {mobileMenuOpen && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="md:hidden border-t bg-white/95 backdrop-blur-md overflow-hidden"
+              >
+                <div className="px-4 py-4 space-y-4">
+                  {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item) => (
+                    <Link
+                      key={item}
+                      href={
+                        item === 'About Us' ? '/about-us' :
+                        item === 'Courses' ? '/courses' :
+                        item === 'Coaching' ? '/coaching' : 
+                        item === 'Consulting' ? '/consulting' : 
+                        item === 'Industry Insight' ? '/industry-insight' :
+                        `/${item.toLowerCase().replace(' ', '-')}`
+                      }
+                      className="block text-gray-600 hover:text-blue-600 transition-colors font-medium py-2 text-lg"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {item}
+                    </Link>
+                  ))}
+                  
+                  {/* Mobile Auth */}
+                  <div className="pt-4 border-t space-y-3">
+                    <div className="flex items-center space-x-2">
+                      <UserAvatar />
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </motion.nav>
+
+      <div className="container mx-auto px-4 py-6 md:py-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="mb-6 md:mb-8"
         >
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
             Welcome back, {userProfile?.name || user?.email}!
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 text-sm md:text-base">
             Continue your learning journey and track your progress.
           </p>
         </motion.div>
@@ -177,52 +301,52 @@ export default function StudentDashboard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8"
         >
           <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Total Courses</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.totalCourses}</p>
+            <CardContent className="p-4 md:p-6">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div className="mb-2 md:mb-0">
+                  <p className="text-xs md:text-sm font-medium text-gray-600">Total Courses</p>
+                  <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.totalCourses}</p>
                 </div>
-                <BookOpen className="h-8 w-8 text-blue-600" />
+                <BookOpen className="h-6 w-6 md:h-8 md:w-8 text-blue-600 self-end md:self-auto" />
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Completed</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.completedCourses}</p>
+            <CardContent className="p-4 md:p-6">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div className="mb-2 md:mb-0">
+                  <p className="text-xs md:text-sm font-medium text-gray-600">Completed</p>
+                  <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.completedCourses}</p>
                 </div>
-                <CheckCircle className="h-8 w-8 text-green-600" />
+                <CheckCircle className="h-6 w-6 md:h-8 md:w-8 text-green-600 self-end md:self-auto" />
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Learning Hours</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.totalHours}</p>
+            <CardContent className="p-4 md:p-6">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div className="mb-2 md:mb-0">
+                  <p className="text-xs md:text-sm font-medium text-gray-600">Learning Hours</p>
+                  <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.totalHours}</p>
                 </div>
-                <Clock className="h-8 w-8 text-orange-600" />
+                <Clock className="h-6 w-6 md:h-8 md:w-8 text-orange-600 self-end md:self-auto" />
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Avg. Score</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.averageScore}%</p>
+            <CardContent className="p-4 md:p-6">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div className="mb-2 md:mb-0">
+                  <p className="text-xs md:text-sm font-medium text-gray-600">Avg. Score</p>
+                  <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.averageScore}%</p>
                 </div>
-                <Target className="h-8 w-8 text-purple-600" />
+                <Target className="h-6 w-6 md:h-8 md:w-8 text-purple-600 self-end md:self-auto" />
               </div>
             </CardContent>
           </Card>
@@ -234,38 +358,38 @@ export default function StudentDashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <Tabs defaultValue="courses" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="courses">My Courses</TabsTrigger>
-              <TabsTrigger value="progress">Progress</TabsTrigger>
-              <TabsTrigger value="certificates">Certificates</TabsTrigger>
+          <Tabs defaultValue="courses" className="space-y-4 md:space-y-6">
+            <TabsList className="grid w-full grid-cols-3 h-auto">
+              <TabsTrigger value="courses" className="text-xs md:text-sm py-2 md:py-3">My Courses</TabsTrigger>
+              <TabsTrigger value="progress" className="text-xs md:text-sm py-2 md:py-3">Progress</TabsTrigger>
+              <TabsTrigger value="certificates" className="text-xs md:text-sm py-2 md:py-3">Certificates</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="courses" className="space-y-6">
-              <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold text-gray-900">My Courses</h2>
-                <Button asChild>
+            <TabsContent value="courses" className="space-y-4 md:space-y-6">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+                <h2 className="text-xl md:text-2xl font-bold text-gray-900">My Courses</h2>
+                <Button asChild size="sm" className="w-full sm:w-auto">
                   <Link href="/courses">Browse More Courses</Link>
                 </Button>
               </div>
 
               {enrollments.length === 0 ? (
                 <Card>
-                  <CardContent className="p-12 text-center">
-                    <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  <CardContent className="p-8 md:p-12 text-center">
+                    <BookOpen className="h-10 w-10 md:h-12 md:w-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-2">
                       No courses enrolled yet
                     </h3>
-                    <p className="text-gray-600 mb-6">
+                    <p className="text-sm md:text-base text-gray-600 mb-4 md:mb-6">
                       Start your learning journey by enrolling in a course.
                     </p>
-                    <Button asChild>
+                    <Button asChild size="sm" className="w-full sm:w-auto">
                       <Link href="/courses">Browse Courses</Link>
                     </Button>
                   </CardContent>
                 </Card>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
                   {enrollments.map((enrollment) => (
                     <motion.div
                       key={enrollment.id}
@@ -283,39 +407,39 @@ export default function StudentDashboard() {
                             />
                           ) : (
                             <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                              <BookOpen className="h-12 w-12 text-white" />
+                              <BookOpen className="h-8 w-8 md:h-12 md:w-12 text-white" />
                             </div>
                           )}
-                          <div className="absolute top-4 right-4">
-                            <Badge variant={enrollment.status === 'COMPLETED' ? 'default' : 'secondary'}>
+                          <div className="absolute top-2 md:top-4 right-2 md:right-4">
+                            <Badge variant={enrollment.status === 'COMPLETED' ? 'default' : 'secondary'} className="text-xs">
                               {enrollment.status}
                             </Badge>
                           </div>
                         </div>
                         
-                        <CardContent className="p-6">
-                          <div className="space-y-4">
+                        <CardContent className="p-4 md:p-6">
+                          <div className="space-y-3 md:space-y-4">
                             <div>
-                              <h3 className="font-semibold text-lg text-gray-900 mb-2">
+                              <h3 className="font-semibold text-base md:text-lg text-gray-900 mb-2">
                                 {enrollment.course.title}
                               </h3>
-                              <p className="text-sm text-gray-600 line-clamp-2">
+                              <p className="text-xs md:text-sm text-gray-600 line-clamp-2">
                                 {enrollment.course.description}
                               </p>
                             </div>
 
-                            <div className="flex items-center gap-4 text-sm text-gray-500">
+                            <div className="flex items-center gap-2 md:gap-4 text-xs md:text-sm text-gray-500">
                               <div className="flex items-center gap-1">
-                                <Badge variant="outline">{enrollment.course.level}</Badge>
+                                <Badge variant="outline" className="text-xs">{enrollment.course.level}</Badge>
                               </div>
                               <div className="flex items-center gap-1">
-                                <Clock className="h-4 w-4" />
+                                <Clock className="h-3 w-3 md:h-4 md:w-4" />
                                 {enrollment.course.duration}h
                               </div>
                             </div>
 
                             <div className="space-y-2">
-                              <div className="flex justify-between text-sm">
+                              <div className="flex justify-between text-xs md:text-sm">
                                 <span className="text-gray-600">Progress</span>
                                 <span className="font-medium">{enrollment.progress_percentage}%</span>
                               </div>
@@ -324,14 +448,14 @@ export default function StudentDashboard() {
 
                             <div className="flex gap-2">
                               {enrollment.status === 'COMPLETED' ? (
-                                <Button variant="outline" className="flex-1" disabled>
-                                  <CheckCircle className="mr-2 h-4 w-4" />
+                                <Button variant="outline" className="flex-1 text-xs md:text-sm py-2" disabled>
+                                  <CheckCircle className="mr-1 md:mr-2 h-3 w-3 md:h-4 md:w-4" />
                                   Completed
                                 </Button>
                               ) : (
-                                <Button asChild className="flex-1">
+                                <Button asChild className="flex-1 text-xs md:text-sm py-2">
                                   <Link href={`/learn/${createCourseSlug(enrollment.course.title)}`}>
-                                    <Play className="mr-2 h-4 w-4" />
+                                    <Play className="mr-1 md:mr-2 h-3 w-3 md:h-4 md:w-4" />
                                     Continue
                                   </Link>
                                 </Button>
@@ -346,23 +470,23 @@ export default function StudentDashboard() {
               )}
             </TabsContent>
 
-            <TabsContent value="progress" className="space-y-6">
-              <h2 className="text-2xl font-bold text-gray-900">Learning Progress</h2>
+            <TabsContent value="progress" className="space-y-4 md:space-y-6">
+              <h2 className="text-xl md:text-2xl font-bold text-gray-900">Learning Progress</h2>
               
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
                 <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <TrendingUp className="h-5 w-5" />
+                  <CardHeader className="pb-3 md:pb-6">
+                    <CardTitle className="flex items-center gap-2 text-base md:text-lg">
+                      <TrendingUp className="h-4 w-4 md:h-5 md:w-5" />
                       Course Progress
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-3 md:space-y-4">
                     {enrollments.map((enrollment) => (
                       <div key={enrollment.id} className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span className="font-medium">{enrollment.course.title}</span>
-                          <span>{enrollment.progress_percentage}%</span>
+                        <div className="flex justify-between text-xs md:text-sm">
+                          <span className="font-medium truncate pr-2">{enrollment.course.title}</span>
+                          <span className="flex-shrink-0">{enrollment.progress_percentage}%</span>
                         </div>
                         <Progress value={enrollment.progress_percentage} className="h-2" />
                       </div>
@@ -371,22 +495,22 @@ export default function StudentDashboard() {
                 </Card>
 
                 <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Award className="h-5 w-5" />
+                  <CardHeader className="pb-3 md:pb-6">
+                    <CardTitle className="flex items-center gap-2 text-base md:text-lg">
+                      <Award className="h-4 w-4 md:h-5 md:w-5" />
                       Recent Quiz Scores
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-3 md:space-y-4">
                     {quizAttempts.slice(0, 5).map((attempt) => (
                       <div key={attempt.id} className="flex justify-between items-center">
-                        <div>
-                          <p className="font-medium text-sm">{attempt.course.title}</p>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-xs md:text-sm truncate">{attempt.course.title}</p>
                           <p className="text-xs text-gray-500">
                             {new Date(attempt.completed_at).toLocaleDateString()}
                           </p>
                         </div>
-                        <Badge variant={attempt.percentage >= 80 ? 'default' : 'secondary'}>
+                        <Badge variant={attempt.percentage >= 80 ? 'default' : 'secondary'} className="text-xs ml-2">
                           {attempt.percentage}%
                         </Badge>
                       </div>
@@ -396,23 +520,23 @@ export default function StudentDashboard() {
               </div>
             </TabsContent>
 
-            <TabsContent value="certificates" className="space-y-6">
-              <h2 className="text-2xl font-bold text-gray-900">Certificates</h2>
+            <TabsContent value="certificates" className="space-y-4 md:space-y-6">
+              <h2 className="text-xl md:text-2xl font-bold text-gray-900">Certificates</h2>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
                 {enrollments
                   .filter(e => e.certificate_issued)
                   .map((enrollment) => (
                     <Card key={enrollment.id}>
-                      <CardContent className="p-6 text-center">
-                        <Award className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
-                        <h3 className="font-semibold text-lg mb-2">
+                      <CardContent className="p-4 md:p-6 text-center">
+                        <Award className="h-10 w-10 md:h-12 md:w-12 text-yellow-500 mx-auto mb-4" />
+                        <h3 className="font-semibold text-base md:text-lg mb-2">
                           {enrollment.course.title}
                         </h3>
-                        <p className="text-sm text-gray-600 mb-4">
+                        <p className="text-xs md:text-sm text-gray-600 mb-4">
                           Completed on {new Date(enrollment.completed_at!).toLocaleDateString()}
                         </p>
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" className="text-xs md:text-sm">
                           Download Certificate
                         </Button>
                       </CardContent>
@@ -422,12 +546,12 @@ export default function StudentDashboard() {
 
               {enrollments.filter(e => e.certificate_issued).length === 0 && (
                 <Card>
-                  <CardContent className="p-12 text-center">
-                    <Award className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  <CardContent className="p-8 md:p-12 text-center">
+                    <Award className="h-10 w-10 md:h-12 md:w-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-2">
                       No certificates yet
                     </h3>
-                    <p className="text-gray-600">
+                    <p className="text-sm md:text-base text-gray-600">
                       Complete courses to earn certificates.
                     </p>
                   </CardContent>

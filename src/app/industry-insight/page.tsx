@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -205,62 +205,64 @@ export default function IndustryInsightPage() {
           </div>
 
           {/* Mobile Menu */}
-          {mobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
-              className="md:hidden border-t bg-white/95 backdrop-blur-md"
-            >
-              <div className="px-4 py-4 space-y-4">
-                {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item) => (
-                  <Link
-                    key={item}
-                    href={
-                      item === 'About Us' ? '/about-us' :
-                      item === 'Courses' ? '/courses' :
-                      item === 'Coaching' ? '/coaching' : 
-                      item === 'Consulting' ? '/consulting' : 
-                      item === 'Industry Insight' ? '/industry-insight' :
-                      `/${item.toLowerCase().replace(' ', '-')}`
-                    }
-                    className="block text-gray-600 hover:text-blue-600 transition-colors font-medium py-2"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    {item}
-                  </Link>
-                ))}
-                
-                {/* Mobile Auth */}
-                <div className="pt-4 border-t space-y-2">
-                  {user ? (
-                    <div className="flex items-center space-x-2">
-                      <UserAvatar />
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      <Button variant="ghost" className="w-full justify-start" asChild>
-                        <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                          Login
-                        </Link>
-                      </Button>
-                      <Button className="w-full" asChild>
-                        <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
-                          Sign Up
-                        </Link>
-                      </Button>
-                    </div>
-                  )}
+          <AnimatePresence>
+            {mobileMenuOpen && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="md:hidden border-t bg-white/95 backdrop-blur-md overflow-hidden"
+              >
+                <div className="px-4 py-4 space-y-4">
+                  {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item) => (
+                    <Link
+                      key={item}
+                      href={
+                        item === 'About Us' ? '/about-us' :
+                        item === 'Courses' ? '/courses' :
+                        item === 'Coaching' ? '/coaching' : 
+                        item === 'Consulting' ? '/consulting' : 
+                        item === 'Industry Insight' ? '/industry-insight' :
+                        `/${item.toLowerCase().replace(' ', '-')}`
+                      }
+                      className="block text-gray-600 hover:text-blue-600 transition-colors font-medium py-2 text-lg"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {item}
+                    </Link>
+                  ))}
+                  
+                  {/* Mobile Auth */}
+                  <div className="pt-4 border-t space-y-3">
+                    {user ? (
+                      <div className="flex items-center space-x-2">
+                        <UserAvatar />
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        <Button variant="ghost" className="w-full justify-start text-lg py-3" asChild>
+                          <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                            Login
+                          </Link>
+                        </Button>
+                        <Button className="w-full text-lg py-3" asChild>
+                          <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
+                            Sign Up
+                          </Link>
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </motion.nav>
 
       {/* Header */}
-      <section className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-20">
+      <section className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-12 md:py-20">
         <div className="container mx-auto px-4">
           <motion.div
             className="text-center max-w-4xl mx-auto"
@@ -269,20 +271,20 @@ export default function IndustryInsightPage() {
             variants={staggerContainer}
           >
             <motion.h1 
-              className="text-4xl md:text-6xl font-bold text-gray-900 mb-6"
+              className="text-3xl md:text-4xl lg:text-6xl font-bold text-gray-900 mb-4 md:mb-6"
               variants={fadeInUp}
             >
               Industry Insight
             </motion.h1>
             <motion.p 
-              className="text-xl text-gray-600 mb-8"
+              className="text-lg md:text-xl text-gray-600 mb-6 md:mb-8"
               variants={fadeInUp}
             >
               Stay ahead with Synergies4's Industry Insights — your go-to resource for expert analysis, 
               market trends, emerging technologies, and strategic advice across key sectors.
             </motion.p>
             <motion.p 
-              className="text-lg text-gray-500"
+              className="text-base md:text-lg text-gray-500"
               variants={fadeInUp}
             >
               Explore how innovation is reshaping industries and empowering businesses to thrive in a dynamic world.
@@ -292,21 +294,21 @@ export default function IndustryInsightPage() {
       </section>
 
       {/* Filters and Search */}
-      <section className="py-8 bg-white border-b">
+      <section className="py-6 md:py-8 bg-white border-b">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-            <div className="flex flex-col sm:flex-row gap-4 items-center">
-              <div className="relative">
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
+              <div className="relative flex-1 max-w-md">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <Input
                   placeholder="Search articles..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 w-64"
+                  className="pl-10 w-full"
                 />
               </div>
               <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger className="w-48">
+                <SelectTrigger className="w-full sm:w-48">
                   <SelectValue placeholder="All Categories" />
                 </SelectTrigger>
                 <SelectContent>
@@ -319,7 +321,7 @@ export default function IndustryInsightPage() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-gray-500 text-center sm:text-left">
               {totalPosts} articles found
             </div>
           </div>
