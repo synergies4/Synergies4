@@ -12,7 +12,7 @@ async function getAuthenticatedUser(request: NextRequest) {
     }
 
     const token = authHeader.substring(7);
-    const supabase = createClient();
+    const supabase = await createClient();
     
     const { data: { user }, error } = await supabase.auth.getUser(token);
     if (error || !user) {
@@ -44,7 +44,7 @@ export async function GET(
   try {
     const params = await context.params;
     const { id: courseId, moduleId } = params;
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const { data: module, error } = await supabase
       .from('course_modules')
@@ -107,7 +107,7 @@ export async function PUT(
     const data = await request.json();
     const { title, description, order, contents } = data;
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Update the module
     const { error: moduleError } = await supabase
@@ -220,7 +220,7 @@ export async function DELETE(
     }
 
     const { id: courseId, moduleId } = params;
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Delete lessons first (due to foreign key constraint)
     const { error: lessonsError } = await supabase

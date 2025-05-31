@@ -12,7 +12,7 @@ async function getAuthenticatedUser(request: NextRequest) {
     }
 
     const token = authHeader.substring(7);
-    const supabase = createClient();
+    const supabase = await createClient();
     
     const { data: { user }, error } = await supabase.auth.getUser(token);
     if (error || !user) {
@@ -44,7 +44,7 @@ export async function GET(
   try {
     const params = await context.params;
     const { moduleId } = params;
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const { data: lessons, error } = await supabase
       .from('lessons')
@@ -89,7 +89,7 @@ export async function POST(
     const data = await request.json();
     const { title, content, video_url, duration } = data;
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Get the next order number
     const { data: existingLessons } = await supabase

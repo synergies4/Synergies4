@@ -12,7 +12,7 @@ async function getAuthenticatedUser(request: NextRequest) {
     }
 
     const token = authHeader.substring(7);
-    const supabase = createClient();
+    const supabase = await createClient();
     
     const { data: { user }, error } = await supabase.auth.getUser(token);
     if (error || !user) {
@@ -54,7 +54,7 @@ export async function POST(
     }
 
     const courseId = params.id;
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Check if course exists and is published
     const { data: course, error: courseError } = await supabase
@@ -205,7 +205,7 @@ export async function GET(
     }
 
     const courseId = params.id;
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Get user's enrollment status for this course
     const { data: enrollment, error } = await supabase

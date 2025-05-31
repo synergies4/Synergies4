@@ -342,11 +342,72 @@ export default function AdminDashboard() {
           </motion.div>
         </div>
 
+        {/* Additional Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+          >
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <FileText className="h-5 w-5 mr-2" />
+                  Blog Management
+                </CardTitle>
+                <CardDescription>
+                  Create and manage industry insights
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex gap-2">
+                  <Button variant="outline" className="flex-1" asChild>
+                    <Link href="/admin/blog">
+                      Manage Posts
+                    </Link>
+                  </Button>
+                  <Button className="flex-1" asChild>
+                    <Link href="/admin/blog/new">
+                      <Plus className="h-4 w-4 mr-2" />
+                      New Post
+                    </Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+          >
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Settings className="h-5 w-5 mr-2" />
+                  Platform Settings
+                </CardTitle>
+                <CardDescription>
+                  Configure platform settings
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button variant="outline" className="w-full" asChild>
+                  <Link href="/admin/settings">
+                    View Settings
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+
         {/* Courses Table */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
+          transition={{ delay: 0.9 }}
         >
           <Card>
             <CardHeader>

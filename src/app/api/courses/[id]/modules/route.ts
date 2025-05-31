@@ -12,7 +12,7 @@ async function getAuthenticatedUser(request: NextRequest) {
     }
 
     const token = authHeader.substring(7);
-    const supabase = createClient();
+    const supabase = await createClient();
     
     const { data: { user }, error } = await supabase.auth.getUser(token);
     if (error || !user) {
@@ -44,7 +44,7 @@ export async function GET(
   try {
     const params = await context.params;
     const courseId = params.id;
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const { data: modules, error } = await supabase
       .from('course_modules')
@@ -106,7 +106,7 @@ export async function POST(
     const data = await request.json();
     const { title, description, order, contents } = data;
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Create the module
     const { data: module, error: moduleError } = await supabase

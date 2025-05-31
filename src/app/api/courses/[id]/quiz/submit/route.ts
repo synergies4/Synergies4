@@ -12,7 +12,7 @@ async function getAuthenticatedUser(request: NextRequest) {
     }
 
     const token = authHeader.substring(7);
-    const supabase = createClient();
+    const supabase = await createClient();
     
     const { data: { user }, error } = await supabase.auth.getUser(token);
     if (error || !user) {
@@ -52,7 +52,7 @@ export async function POST(
       );
     }
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Verify enrollment
     const { data: enrollment } = await supabase

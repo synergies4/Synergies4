@@ -12,7 +12,7 @@ async function getAuthenticatedUser(request: NextRequest) {
     }
 
     const token = authHeader.substring(7);
-    const supabase = createClient();
+    const supabase = await createClient();
     
     const { data: { user }, error } = await supabase.auth.getUser(token);
     if (error || !user) {
@@ -42,7 +42,7 @@ export async function GET(
     }
 
     const courseId = params.id;
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // First, get all modules for this course
     const { data: modules } = await supabase

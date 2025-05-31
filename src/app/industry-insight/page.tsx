@@ -1,34 +1,37 @@
 'use client';
 
-import Image from 'next/image';
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { motion, useScroll, useTransform, useInView } from 'framer-motion';
-import { useRef, useState } from 'react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Separator } from '@/components/ui/separator';
-import { 
-  ArrowRight, 
-  BookOpen, 
-  Users, 
-  Award, 
-  TrendingUp, 
-  Star,
-  CheckCircle,
-  Zap,
-  Target,
-  Brain,
-  Rocket,
-  Lightbulb,
-  Clock,
-  Calendar,
-  Filter,
-  Search
-} from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Calendar, Clock, User, Search, ArrowRight, Menu, X } from 'lucide-react';
+import { UserAvatar } from '@/components/UserAvatar';
+import { useAuth } from '@/contexts/AuthContext';
 
-// Animation variants
+interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  image: string;
+  category: string;
+  tags: string[];
+  published_at: string;
+  reading_time: number;
+  author_id: string;
+}
+
+interface BlogCategory {
+  name: string;
+  slug: string;
+  color: string;
+}
+
 const fadeInUp = {
   initial: { opacity: 0, y: 60 },
   animate: { opacity: 1, y: 0 },
@@ -43,59 +46,76 @@ const staggerContainer = {
   }
 };
 
-const scaleIn = {
-  initial: { opacity: 0, scale: 0.8 },
-  animate: { opacity: 1, scale: 1 },
-  transition: { duration: 0.5, ease: [0.6, -0.05, 0.01, 0.99] }
-};
+export default function IndustryInsightPage() {
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [categories, setCategories] = useState<BlogCategory[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPosts, setTotalPosts] = useState(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const postsPerPage = 9;
+  const { user } = useAuth();
 
-// Scroll-triggered animation hook
-function useScrollAnimation() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-  return { ref, isInView };
-}
+  useEffect(() => {
+    fetchPosts();
+    fetchCategories();
+  }, [selectedCategory, currentPage]);
 
-export default function IndustryInsight() {
-  const { scrollYProgress } = useScroll();
-  const heroY = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
+  const fetchPosts = async () => {
+    try {
+      setLoading(true);
+      const offset = (currentPage - 1) * postsPerPage;
+      const categoryParam = selectedCategory !== 'all' ? `&category=${selectedCategory}` : '';
+      
+      const response = await fetch(`/api/blog?limit=${postsPerPage}&offset=${offset}${categoryParam}`);
+      if (response.ok) {
+        const data = await response.json();
+        setPosts(data.posts);
+        setTotalPosts(data.total);
+      }
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/blog/categories');
+      if (response.ok) {
+        const data = await response.json();
+        setCategories(data.categories);
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
+
+  const filteredPosts = posts.filter(post =>
+    post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    post.excerpt?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(totalPosts / postsPerPage);
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  const getCategoryColor = (categoryName: string) => {
+    const category = categories.find(cat => cat.name === categoryName);
+    return category?.color || '#3B82F6';
+  };
 
   return (
-    <main className="min-h-screen">
-      {/* Countdown Banner */}
-      <motion.div 
-        className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3"
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-center">
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              className="text-sm md:text-base"
-            >
-              🚀 Expand your potential through learning. Offering earlybirds a discount of $295.00.
-            </motion.p>
-            <motion.div
-              className="flex gap-2"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
-            >
-              {['00 Days', '00 Hours', '00 Minutes', '00 Seconds'].map((time, index) => (
-                <Badge key={index} variant="secondary" className="bg-white/20 text-white border-white/30">
-                  {time}
-                </Badge>
-              ))}
-            </motion.div>
-          </div>
-        </div>
-      </motion.div>
-
+    <main className="min-h-screen bg-gray-50">
       {/* Navigation */}
       <motion.nav 
         className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b shadow-sm"
@@ -120,6 +140,7 @@ export default function IndustryInsight() {
               </Link>
             </motion.div>
             
+            {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
               {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item, index) => (
                 <motion.div
@@ -137,9 +158,7 @@ export default function IndustryInsight() {
                       item === 'Industry Insight' ? '/industry-insight' :
                       `/${item.toLowerCase().replace(' ', '-')}`
                     } 
-                    className={`text-gray-600 hover:text-blue-600 transition-colors font-medium ${
-                      item === 'Industry Insight' ? 'text-blue-600 font-semibold' : ''
-                    }`}
+                    className="text-gray-600 hover:text-blue-600 transition-colors font-medium"
                   >
                     {item}
                   </Link>
@@ -147,307 +166,288 @@ export default function IndustryInsight() {
               ))}
             </div>
             
+            {/* Desktop Auth */}
             <motion.div 
-              className="flex items-center space-x-3"
+              className="hidden md:flex items-center space-x-3"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.5, duration: 0.5 }}
             >
-              <Button variant="ghost" asChild>
-                <Link href="/login">Login</Link>
-              </Button>
-              <Button asChild>
-                <Link href="/signup">Sign Up</Link>
-              </Button>
+              {user ? (
+                <UserAvatar />
+              ) : (
+                <>
+                  <Button variant="ghost" asChild>
+                    <Link href="/login">Login</Link>
+                  </Button>
+                  <Button asChild>
+                    <Link href="/signup">Sign Up</Link>
+                  </Button>
+                </>
+              )}
             </motion.div>
+
+            {/* Mobile Menu Button */}
+            <div className="md:hidden">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="p-2"
+              >
+                {mobileMenuOpen ? (
+                  <X className="h-6 w-6" />
+                ) : (
+                  <Menu className="h-6 w-6" />
+                )}
+              </Button>
+            </div>
           </div>
+
+          {/* Mobile Menu */}
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+              className="md:hidden border-t bg-white/95 backdrop-blur-md"
+            >
+              <div className="px-4 py-4 space-y-4">
+                {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item) => (
+                  <Link
+                    key={item}
+                    href={
+                      item === 'About Us' ? '/about-us' :
+                      item === 'Courses' ? '/courses' :
+                      item === 'Coaching' ? '/coaching' : 
+                      item === 'Consulting' ? '/consulting' : 
+                      item === 'Industry Insight' ? '/industry-insight' :
+                      `/${item.toLowerCase().replace(' ', '-')}`
+                    }
+                    className="block text-gray-600 hover:text-blue-600 transition-colors font-medium py-2"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {item}
+                  </Link>
+                ))}
+                
+                {/* Mobile Auth */}
+                <div className="pt-4 border-t space-y-2">
+                  {user ? (
+                    <div className="flex items-center space-x-2">
+                      <UserAvatar />
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <Button variant="ghost" className="w-full justify-start" asChild>
+                        <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                          Login
+                        </Link>
+                      </Button>
+                      <Button className="w-full" asChild>
+                        <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
+                          Sign Up
+                        </Link>
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          )}
         </div>
       </motion.nav>
 
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-20 overflow-hidden">
-        <motion.div 
-          className="container mx-auto px-4 text-center"
-          style={{ y: heroY, opacity: heroOpacity }}
-        >
+      {/* Header */}
+      <section className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-20">
+        <div className="container mx-auto px-4">
           <motion.div
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: [0.6, -0.05, 0.01, 0.99] }}
+            className="text-center max-w-4xl mx-auto"
+            initial="initial"
+            animate="animate"
+            variants={staggerContainer}
           >
-            <Badge className="mb-6 bg-blue-100 text-blue-700 hover:bg-blue-200">
-              <Lightbulb className="w-4 h-4 mr-2" />
-              Industry Insights
-            </Badge>
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-              Industry{' '}
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Insights
-              </span>
-            </h1>
-          </motion.div>
-          
-          <motion.p 
-            className="text-lg text-gray-700 max-w-4xl mx-auto mb-8"
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4, ease: [0.6, -0.05, 0.01, 0.99] }}
-          >
-            Stay ahead with Synergies4's Industry Insights — your go-to resource for expert analysis, market trends, emerging technologies, and strategic advice across key sectors. Explore how innovation is reshaping industries and empowering businesses to thrive in a dynamic world.
-          </motion.p>
-        </motion.div>
-      </section>
-
-      {/* Blog Posts Section */}
-      <BlogPostsSection />
-
-      {/* Footer */}
-      <FooterSection />
-    </main>
-  );
-}
-
-// Blog Posts Section Component
-function BlogPostsSection() {
-  const { ref, isInView } = useScrollAnimation();
-  const [activeFilter, setActiveFilter] = useState('All');
-
-  const categories = ['All', 'Technology & Innovation', 'AI & Machine Learning', 'Agile Transformation', 'Leadership', 'Business Strategy'];
-
-  const blogPosts = [
-    {
-      title: "Navigating the Future: Latest AI Trends and Emerging Technologies in 2025",
-      excerpt: "Discover the cutting-edge AI innovations and technological breakthroughs that are set to transform industries and reshape the business landscape in 2025.",
-      image: "https://placehold.co/600x400/1e3a8a/FFFFFF/png?text=AI+Trends+2025",
-      category: "Technology & Innovation",
-      date: "January 15, 2025",
-      readTime: "8 min read",
-      slug: "navigating-future-ai-trends-2025"
-    },
-    {
-      title: "The Rise of AI-Powered Agile Teams: Transforming Project Management",
-      excerpt: "Explore how artificial intelligence is revolutionizing agile methodologies and enabling teams to deliver better results faster than ever before.",
-      image: "https://placehold.co/600x400/15803d/FFFFFF/png?text=AI+Agile+Teams",
-      category: "AI & Machine Learning",
-      date: "January 12, 2025",
-      readTime: "6 min read",
-      slug: "ai-powered-agile-teams"
-    },
-    {
-      title: "Building Resilient Organizations: Leadership in the Digital Age",
-      excerpt: "Learn the essential leadership skills and strategies needed to guide organizations through digital transformation and uncertainty.",
-      image: "https://placehold.co/600x400/0ea5e9/FFFFFF/png?text=Digital+Leadership",
-      category: "Leadership",
-      date: "January 10, 2025",
-      readTime: "7 min read",
-      slug: "building-resilient-organizations"
-    },
-    {
-      title: "Scaling Agile: From Team Success to Enterprise Transformation",
-      excerpt: "Discover proven strategies for scaling agile practices across large organizations and overcoming common implementation challenges.",
-      image: "https://placehold.co/600x400/6366f1/FFFFFF/png?text=Scaling+Agile",
-      category: "Agile Transformation",
-      date: "January 8, 2025",
-      readTime: "9 min read",
-      slug: "scaling-agile-enterprise"
-    },
-    {
-      title: "The Future of Work: How AI is Reshaping Professional Skills",
-      excerpt: "Understand which skills will be most valuable in an AI-driven workplace and how professionals can prepare for the future.",
-      image: "https://placehold.co/600x400/8b5cf6/FFFFFF/png?text=Future+of+Work",
-      category: "Technology & Innovation",
-      date: "January 5, 2025",
-      readTime: "5 min read",
-      slug: "future-of-work-ai-skills"
-    },
-    {
-      title: "Strategic Innovation: Leveraging AI for Competitive Advantage",
-      excerpt: "Learn how forward-thinking companies are using AI strategically to create sustainable competitive advantages in their markets.",
-      image: "https://placehold.co/600x400/ec4899/FFFFFF/png?text=Strategic+AI",
-      category: "Business Strategy",
-      date: "January 3, 2025",
-      readTime: "10 min read",
-      slug: "strategic-innovation-ai-advantage"
-    }
-  ];
-
-  const filteredPosts = activeFilter === 'All' 
-    ? blogPosts 
-    : blogPosts.filter(post => post.category === activeFilter);
-
-  return (
-    <motion.section 
-      ref={ref}
-      className="py-20 bg-white"
-      initial="initial"
-      animate={isInView ? "animate" : "initial"}
-      variants={staggerContainer}
-    >
-      <div className="container mx-auto px-4">
-        {/* Filter Buttons */}
-        <motion.div 
-          className="flex flex-wrap gap-3 mb-12 justify-center"
-          variants={fadeInUp}
-        >
-          {categories.map((category, index) => (
-            <motion.div key={category} variants={scaleIn}>
-              <Button
-                onClick={() => setActiveFilter(category)}
-                variant={activeFilter === category ? "default" : "outline"}
-                className="rounded-full"
-              >
-                <Filter className="w-4 h-4 mr-2" />
-                {category}
-              </Button>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* Blog Posts Grid */}
-        <motion.div 
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-          variants={staggerContainer}
-        >
-          {filteredPosts.map((post, index) => (
-            <motion.div key={post.slug} variants={scaleIn}>
-              <Card className="h-full hover:shadow-xl transition-all duration-300 group overflow-hidden">
-                <div className="relative">
-                  <img 
-                    src={post.image}
-                    alt={post.title}
-                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <Badge className="absolute top-4 left-4 bg-white text-gray-900">
-                    {post.category}
-                  </Badge>
-                </div>
-                
-                <CardHeader>
-                  <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
-                    <div className="flex items-center gap-1">
-                      <Calendar className="w-4 h-4" />
-                      {post.date}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-4 h-4" />
-                      {post.readTime}
-                    </div>
-                  </div>
-                  <CardTitle className="text-xl text-blue-600 line-clamp-2 group-hover:text-blue-700 transition-colors">
-                    {post.title}
-                  </CardTitle>
-                </CardHeader>
-                
-                <CardContent>
-                  <CardDescription className="text-base leading-relaxed mb-4 line-clamp-3">
-                    {post.excerpt}
-                  </CardDescription>
-                  
-                  <Button asChild className="w-full">
-                    <Link href={`/industry-insight/${post.slug}`}>
-                      Read More
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* Load More Button */}
-        <motion.div
-          variants={fadeInUp}
-          className="flex justify-center mt-12"
-        >
-          <Button size="lg" variant="outline" className="text-lg px-8 py-6">
-            Load More Articles
-            <TrendingUp className="ml-2 h-5 w-5" />
-          </Button>
-        </motion.div>
-      </div>
-    </motion.section>
-  );
-}
-
-// Footer Section Component
-function FooterSection() {
-  const { ref, isInView } = useScrollAnimation();
-
-  return (
-    <motion.footer 
-      ref={ref}
-      className="bg-gray-900 text-white py-16"
-      initial="initial"
-      animate={isInView ? "animate" : "initial"}
-      variants={staggerContainer}
-    >
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-          <motion.div variants={fadeInUp}>
-            <Image 
-              src="/synergies4_logo.jpeg" 
-              alt="Synergies4 Logo" 
-              width={150} 
-              height={72} 
-              className="h-12 w-auto mb-4 brightness-0 invert"
-            />
-            <p className="text-gray-400 mb-4">
-              AI-powered learning tailored uniquely to you and your organization.
-            </p>
-            <div className="flex space-x-4">
-              {['Facebook', 'Twitter', 'LinkedIn', 'Instagram'].map((social) => (
-                <a key={social} href="#" className="text-gray-400 hover:text-white transition-colors">
-                  <span className="sr-only">{social}</span>
-                  <div className="w-6 h-6 bg-gray-400 rounded"></div>
-                </a>
-              ))}
-            </div>
-          </motion.div>
-
-          <motion.div variants={fadeInUp}>
-            <h3 className="text-lg font-semibold mb-4">Courses</h3>
-            <ul className="space-y-2 text-gray-400">
-              <li><a href="#" className="hover:text-white transition-colors">Agile & Scrum</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Product Management</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Leadership</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Business Analysis</a></li>
-            </ul>
-          </motion.div>
-
-          <motion.div variants={fadeInUp}>
-            <h3 className="text-lg font-semibold mb-4">Company</h3>
-            <ul className="space-y-2 text-gray-400">
-              <li><Link href="/about-us" className="hover:text-white transition-colors">About Us</Link></li>
-              <li><Link href="/coaching" className="hover:text-white transition-colors">Coaching</Link></li>
-              <li><Link href="/consulting" className="hover:text-white transition-colors">Consulting</Link></li>
-              <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
-            </ul>
-          </motion.div>
-
-          <motion.div variants={fadeInUp}>
-            <h3 className="text-lg font-semibold mb-4">Support</h3>
-            <ul className="space-y-2 text-gray-400">
-              <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Cookie Policy</a></li>
-            </ul>
+            <motion.h1 
+              className="text-4xl md:text-6xl font-bold text-gray-900 mb-6"
+              variants={fadeInUp}
+            >
+              Industry Insight
+            </motion.h1>
+            <motion.p 
+              className="text-xl text-gray-600 mb-8"
+              variants={fadeInUp}
+            >
+              Stay ahead with Synergies4's Industry Insights — your go-to resource for expert analysis, 
+              market trends, emerging technologies, and strategic advice across key sectors.
+            </motion.p>
+            <motion.p 
+              className="text-lg text-gray-500"
+              variants={fadeInUp}
+            >
+              Explore how innovation is reshaping industries and empowering businesses to thrive in a dynamic world.
+            </motion.p>
           </motion.div>
         </div>
+      </section>
 
-        <Separator className="bg-gray-800 mb-8" />
+      {/* Filters and Search */}
+      <section className="py-8 bg-white border-b">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div className="flex flex-col sm:flex-row gap-4 items-center">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input
+                  placeholder="Search articles..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 w-64"
+                />
+              </div>
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="All Categories" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  {categories.map((category) => (
+                    <SelectItem key={category.slug} value={category.name}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="text-sm text-gray-500">
+              {totalPosts} articles found
+            </div>
+          </div>
+        </div>
+      </section>
 
-        <motion.div 
-          className="text-center text-gray-400"
-          variants={fadeInUp}
-        >
-          <p>&copy; {new Date().getFullYear()} Synergies4 LLC. All rights reserved.</p>
-          <p className="mt-2 text-sm">
-            Synergies4™, PocketCoachAI™, Adaptive Content Pods™ are trademarks of Synergies4 LLC.
-          </p>
-        </motion.div>
-      </div>
-    </motion.footer>
+      {/* Blog Posts Grid */}
+      <section className="py-16">
+        <div className="container mx-auto px-4">
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="animate-pulse">
+                  <div className="bg-gray-200 h-48 rounded-lg mb-4"></div>
+                  <div className="bg-gray-200 h-4 rounded mb-2"></div>
+                  <div className="bg-gray-200 h-3 rounded mb-4"></div>
+                  <div className="bg-gray-200 h-8 rounded"></div>
+                </div>
+              ))}
+            </div>
+          ) : filteredPosts.length === 0 ? (
+            <div className="text-center py-16">
+              <h3 className="text-2xl font-semibold text-gray-900 mb-4">No articles found</h3>
+              <p className="text-gray-600 mb-8">Try adjusting your search or filter criteria.</p>
+              <Button onClick={() => { setSearchTerm(''); setSelectedCategory('all'); }}>
+                Clear Filters
+              </Button>
+            </div>
+          ) : (
+            <motion.div 
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+              initial="initial"
+              animate="animate"
+              variants={staggerContainer}
+            >
+              {filteredPosts.map((post, index) => (
+                <motion.div
+                  key={post.id}
+                  variants={fadeInUp}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Card className="h-full hover:shadow-xl transition-all duration-300 group">
+                    <div className="relative overflow-hidden rounded-t-lg">
+                      <img
+                        src={post.image || `https://placehold.co/400x250/3B82F6/FFFFFF/png?text=${encodeURIComponent(post.title)}`}
+                        alt={post.title}
+                        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <Badge 
+                        className="absolute top-4 left-4 text-white border-0"
+                        style={{ backgroundColor: getCategoryColor(post.category) }}
+                      >
+                        {post.category}
+                      </Badge>
+                    </div>
+                    <CardHeader>
+                      <CardTitle className="text-lg line-clamp-2 group-hover:text-blue-600 transition-colors">
+                        <Link href={`/industry-insight/${post.slug}`}>
+                          {post.title}
+                        </Link>
+                      </CardTitle>
+                      <CardDescription className="line-clamp-3">
+                        {post.excerpt}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                        <div className="flex items-center space-x-4">
+                          <div className="flex items-center space-x-1">
+                            <Calendar className="h-4 w-4" />
+                            <span>{formatDate(post.published_at)}</span>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <Clock className="h-4 w-4" />
+                            <span>{post.reading_time} min read</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <User className="h-4 w-4 text-gray-400" />
+                          <span className="text-sm text-gray-600">Author</span>
+                        </div>
+                        <Button variant="ghost" size="sm" asChild>
+                          <Link href={`/industry-insight/${post.slug}`}>
+                            Read More
+                            <ArrowRight className="ml-1 h-4 w-4" />
+                          </Link>
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-12 space-x-2">
+              <Button
+                variant="outline"
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </Button>
+              {[...Array(totalPages)].map((_, i) => (
+                <Button
+                  key={i + 1}
+                  variant={currentPage === i + 1 ? "default" : "outline"}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className="w-10"
+                >
+                  {i + 1}
+                </Button>
+              ))}
+              <Button
+                variant="outline"
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </Button>
+            </div>
+          )}
+        </div>
+      </section>
+    </main>
   );
 } 

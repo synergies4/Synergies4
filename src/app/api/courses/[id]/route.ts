@@ -12,7 +12,7 @@ async function getAuthenticatedUser(request: NextRequest) {
     }
 
     const token = authHeader.substring(7);
-    const supabase = createClient();
+    const supabase = await createClient();
     
     const { data: { user }, error } = await supabase.auth.getUser(token);
     if (error || !user) {
@@ -45,7 +45,7 @@ export async function GET(
     const params = await context.params;
     const courseId = params.id;
 
-    const supabase = createClient();
+    const supabase = await createClient();
     
     const { data: course, error } = await supabase
       .from('courses')
@@ -125,7 +125,7 @@ export async function PUT(
       status,
     } = data;
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const { data: course, error } = await supabase
       .from('courses')
@@ -178,7 +178,7 @@ export async function DELETE(
       );
     }
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const { error } = await supabase
       .from('courses')

@@ -19,7 +19,7 @@ async function getAuthenticatedUser(request: NextRequest) {
       return null;
     }
 
-    // Get user data to check role (role is stored in users table)
+    // Get user data to check role
     const { data: userData } = await supabase
       .from('users')
       .select('role')
@@ -28,7 +28,6 @@ async function getAuthenticatedUser(request: NextRequest) {
 
     return {
       id: user.id,
-      email: user.email,
       role: userData?.role || 'USER'
     };
   } catch (error) {
@@ -37,33 +36,39 @@ async function getAuthenticatedUser(request: NextRequest) {
   }
 }
 
+// GET /api/blog/[slug] - Get individual blog post
 export async function GET(
   request: NextRequest,
-  context: { params: Promise<{ id: string; moduleId: string; lessonId: string }> }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const params = await context.params;
-    const { moduleId, lessonId } = params;
+    const { slug } = await params;
     const supabase = await createClient();
 
-    const { data: lesson, error } = await supabase
-      .from('lessons')
+    const { data: post, error } = await supabase
+      .from('blog_posts')
       .select('*')
-      .eq('id', lessonId)
-      .eq('module_id', moduleId)
+      .eq('slug', slug)
       .single();
 
     if (error) {
-      console.error('Error fetching lesson:', error);
+      console.error('Error fetching blog post:', error);
+      if (error.code === 'PGRST116') {
+        return NextResponse.json(
+          { message: 'Blog post not found' },
+          { status: 404 }
+        );
+      }
       return NextResponse.json(
-        { message: 'Lesson not found' },
-        { status: 404 }
+        { message: 'Failed to fetch blog post' },
+        { status: 500 }
       );
     }
 
-    return NextResponse.json(lesson);
+    return NextResponse.json({ post });
+
   } catch (error) {
-    console.error('Error fetching lesson:', error);
+    console.error('Error in blog slug API:', error);
     return NextResponse.json(
       { message: 'Internal server error' },
       { status: 500 }
@@ -71,52 +76,44 @@ export async function GET(
   }
 }
 
-export async function PUT(
+// PATCH /api/blog/[slug] - Update blog post
+export async function PATCH(
   request: NextRequest,
-  context: { params: Promise<{ id: string; moduleId: string; lessonId: string }> }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const params = await context.params;
+    const { slug } = await params;
     const user = await getAuthenticatedUser(request);
 
     if (!user || user.role !== 'ADMIN') {
       return NextResponse.json(
-        { message: 'Unauthorized' },
-        { status: 401 }
+        { message: 'Admin access required' },
+        { status: 403 }
       );
     }
 
-    const { moduleId, lessonId } = params;
-    const data = await request.json();
-    const { title, content, video_url, duration } = data;
-
+    const body = await request.json();
     const supabase = await createClient();
 
-    // Update the lesson
-    const { data: lesson, error: lessonError } = await supabase
-      .from('lessons')
-      .update({
-        title,
-        content,
-        video_url,
-        duration,
-      })
-      .eq('id', lessonId)
-      .eq('module_id', moduleId)
+    const { data: post, error } = await supabase
+      .from('blog_posts')
+      .update(body)
+      .eq('slug', slug)
       .select()
       .single();
 
-    if (lessonError) {
-      console.error('Error updating lesson:', lessonError);
+    if (error) {
+      console.error('Error updating blog post:', error);
       return NextResponse.json(
-        { message: 'Error updating lesson: ' + lessonError.message },
+        { message: 'Failed to update blog post' },
         { status: 500 }
       );
     }
 
-    return NextResponse.json(lesson, { status: 200 });
+    return NextResponse.json({ post });
+
   } catch (error) {
-    console.error('Error updating lesson:', error);
+    console.error('Error in blog PATCH API:', error);
     return NextResponse.json(
       { message: 'Internal server error' },
       { status: 500 }
@@ -124,45 +121,41 @@ export async function PUT(
   }
 }
 
+// DELETE /api/blog/[slug] - Delete blog post
 export async function DELETE(
   request: NextRequest,
-  context: { params: Promise<{ id: string; moduleId: string; lessonId: string }> }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const params = await context.params;
+    const { slug } = await params;
     const user = await getAuthenticatedUser(request);
 
     if (!user || user.role !== 'ADMIN') {
       return NextResponse.json(
-        { message: 'Unauthorized' },
-        { status: 401 }
+        { message: 'Admin access required' },
+        { status: 403 }
       );
     }
 
-    const { moduleId, lessonId } = params;
     const supabase = await createClient();
 
-    // Delete the lesson
-    const { error: lessonError } = await supabase
-      .from('lessons')
+    const { error } = await supabase
+      .from('blog_posts')
       .delete()
-      .eq('id', lessonId)
-      .eq('module_id', moduleId);
+      .eq('slug', slug);
 
-    if (lessonError) {
-      console.error('Error deleting lesson:', lessonError);
+    if (error) {
+      console.error('Error deleting blog post:', error);
       return NextResponse.json(
-        { message: 'Error deleting lesson: ' + lessonError.message },
+        { message: 'Failed to delete blog post' },
         { status: 500 }
       );
     }
 
-    return NextResponse.json(
-      { message: 'Lesson deleted successfully' },
-      { status: 200 }
-    );
+    return NextResponse.json({ message: 'Blog post deleted successfully' });
+
   } catch (error) {
-    console.error('Error deleting lesson:', error);
+    console.error('Error in blog DELETE API:', error);
     return NextResponse.json(
       { message: 'Internal server error' },
       { status: 500 }
