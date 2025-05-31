@@ -3,7 +3,8 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import Image from 'next/image';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { UserAvatar } from '@/components/UserAvatar';
 import { Button } from '@/components/ui/button';
@@ -20,7 +21,9 @@ import {
   Settings,
   BarChart3,
   Shield,
-  TrendingUp
+  TrendingUp,
+  Menu,
+  X
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
@@ -39,6 +42,7 @@ export default function AdminDashboard() {
   const router = useRouter();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [stats, setStats] = useState({
     totalCourses: 0,
     publishedCourses: 0,
@@ -152,53 +156,171 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Mobile Navigation */}
+      <motion.nav 
+        className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b shadow-sm"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.1 }}
+      >
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            >
+              <Link href="/">
+                <Image 
+                  src="/synergies4_logo.jpeg" 
+                  alt="Synergies4 Logo" 
+                  width={150} 
+                  height={72} 
+                  className="h-10 w-auto"
+                />
+              </Link>
+            </motion.div>
+            
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-8">
+              {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item, index) => (
+                <motion.div
+                  key={item}
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 + index * 0.1, duration: 0.5 }}
+                >
+                  <Link 
+                    href={
+                      item === 'About Us' ? '/about-us' :
+                      item === 'Courses' ? '/courses' :
+                      item === 'Coaching' ? '/coaching' : 
+                      item === 'Consulting' ? '/consulting' : 
+                      item === 'Industry Insight' ? '/industry-insight' :
+                      `/${item.toLowerCase().replace(' ', '-')}`
+                    } 
+                    className="text-gray-600 hover:text-blue-600 transition-colors font-medium"
+                  >
+                    {item}
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+            
+            {/* Desktop Auth */}
+            <motion.div 
+              className="hidden md:flex items-center space-x-3"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.5, duration: 0.5 }}
+            >
+              <UserAvatar />
+            </motion.div>
+
+            {/* Mobile Menu Button */}
+            <div className="md:hidden">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="p-2"
+              >
+                {mobileMenuOpen ? (
+                  <X className="h-6 w-6" />
+                ) : (
+                  <Menu className="h-6 w-6" />
+                )}
+              </Button>
+            </div>
+          </div>
+
+          {/* Mobile Menu */}
+          <AnimatePresence>
+            {mobileMenuOpen && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="md:hidden border-t bg-white/95 backdrop-blur-md overflow-hidden"
+              >
+                <div className="px-4 py-4 space-y-4">
+                  {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item) => (
+                    <Link
+                      key={item}
+                      href={
+                        item === 'About Us' ? '/about-us' :
+                        item === 'Courses' ? '/courses' :
+                        item === 'Coaching' ? '/coaching' : 
+                        item === 'Consulting' ? '/consulting' : 
+                        item === 'Industry Insight' ? '/industry-insight' :
+                        `/${item.toLowerCase().replace(' ', '-')}`
+                      }
+                      className="block text-gray-600 hover:text-blue-600 transition-colors font-medium py-2 text-lg"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {item}
+                    </Link>
+                  ))}
+                  
+                  {/* Mobile Auth */}
+                  <div className="pt-4 border-t space-y-3">
+                    <div className="flex items-center space-x-2">
+                      <UserAvatar />
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </motion.nav>
+
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center space-x-3">
-              <Shield className="h-8 w-8 text-blue-600" />
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 md:py-6">
+            <div className="flex items-center space-x-3 mb-4 sm:mb-0">
+              <Shield className="h-6 w-6 md:h-8 md:w-8 text-blue-600" />
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-                <p className="text-gray-600">
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+                <p className="text-sm md:text-base text-gray-600">
                   Welcome back, {userProfile?.name || user.user_metadata?.name || user.email}
                 </p>
               </div>
             </div>
-            <div className="flex items-center space-x-3">
-              <Button variant="outline" asChild>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
+              <Button variant="outline" size="sm" className="w-full sm:w-auto" asChild>
                 <Link href="/">
                   <Home className="w-4 h-4 mr-2" />
                   View Site
                 </Link>
               </Button>
-              <Button variant="outline" asChild>
+              <Button variant="outline" size="sm" className="w-full sm:w-auto" asChild>
                 <Link href="/admin/settings">
                   <Settings className="w-4 h-4 mr-2" />
                   Settings
                 </Link>
               </Button>
-              <UserAvatar />
             </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <main className="max-w-7xl mx-auto py-4 md:py-6 px-4 sm:px-6 lg:px-8">
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Courses</CardTitle>
-                <BookOpen className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-xs md:text-sm font-medium">Total Courses</CardTitle>
+                <BookOpen className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stats.totalCourses}</div>
+                <div className="text-xl md:text-2xl font-bold">{stats.totalCourses}</div>
                 <p className="text-xs text-muted-foreground">
                   {stats.publishedCourses} published
                 </p>
@@ -213,11 +335,11 @@ export default function AdminDashboard() {
           >
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Students</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-xs md:text-sm font-medium">Total Students</CardTitle>
+                <Users className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stats.totalStudents}</div>
+                <div className="text-xl md:text-2xl font-bold">{stats.totalStudents}</div>
                 <p className="text-xs text-muted-foreground">
                   {stats.totalEnrollments} enrollments
                 </p>
@@ -232,11 +354,11 @@ export default function AdminDashboard() {
           >
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Revenue</CardTitle>
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-xs md:text-sm font-medium">Revenue</CardTitle>
+                <DollarSign className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">${stats.totalRevenue.toFixed(2)}</div>
+                <div className="text-xl md:text-2xl font-bold">${stats.totalRevenue.toFixed(2)}</div>
                 <p className="text-xs text-muted-foreground">
                   Total earnings
                 </p>
@@ -251,11 +373,11 @@ export default function AdminDashboard() {
           >
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Completion Rate</CardTitle>
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-xs md:text-sm font-medium">Completion Rate</CardTitle>
+                <TrendingUp className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stats.completionRate}%</div>
+                <div className="text-xl md:text-2xl font-bold">{stats.completionRate}%</div>
                 <p className="text-xs text-muted-foreground">
                   Avg quiz score: {stats.averageQuizScore}%
                 </p>
@@ -265,24 +387,24 @@ export default function AdminDashboard() {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
           >
             <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Plus className="h-5 w-5 mr-2" />
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center text-base md:text-lg">
+                  <Plus className="h-4 w-4 md:h-5 md:w-5 mr-2" />
                   Create Course
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-sm">
                   Add a new course to your platform
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button className="w-full" asChild>
+                <Button className="w-full text-sm" asChild>
                   <Link href="/admin/courses/new">
                     Create New Course
                   </Link>
@@ -297,17 +419,17 @@ export default function AdminDashboard() {
             transition={{ delay: 0.5 }}
           >
             <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Users className="h-5 w-5 mr-2" />
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center text-base md:text-lg">
+                  <Users className="h-4 w-4 md:h-5 md:w-5 mr-2" />
                   Manage Users
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-sm">
                   View and manage user accounts
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button variant="outline" className="w-full" asChild>
+                <Button variant="outline" className="w-full text-sm" asChild>
                   <Link href="/admin/users">
                     View Users
                   </Link>
@@ -322,17 +444,17 @@ export default function AdminDashboard() {
             transition={{ delay: 0.6 }}
           >
             <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <BarChart3 className="h-5 w-5 mr-2" />
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center text-base md:text-lg">
+                  <BarChart3 className="h-4 w-4 md:h-5 md:w-5 mr-2" />
                   Analytics
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-sm">
                   View detailed analytics and reports
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button variant="outline" className="w-full" asChild>
+                <Button variant="outline" className="w-full text-sm" asChild>
                   <Link href="/admin/analytics">
                     View Analytics
                   </Link>
@@ -343,30 +465,30 @@ export default function AdminDashboard() {
         </div>
 
         {/* Additional Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
           >
             <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <FileText className="h-5 w-5 mr-2" />
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center text-base md:text-lg">
+                  <FileText className="h-4 w-4 md:h-5 md:w-5 mr-2" />
                   Blog Management
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-sm">
                   Create and manage industry insights
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="flex gap-2">
-                  <Button variant="outline" className="flex-1" asChild>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <Button variant="outline" className="flex-1 text-sm" asChild>
                     <Link href="/admin/blog">
                       Manage Posts
                     </Link>
                   </Button>
-                  <Button className="flex-1" asChild>
+                  <Button className="flex-1 text-sm" asChild>
                     <Link href="/admin/blog/new">
                       <Plus className="h-4 w-4 mr-2" />
                       New Post
@@ -383,17 +505,17 @@ export default function AdminDashboard() {
             transition={{ delay: 0.8 }}
           >
             <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Settings className="h-5 w-5 mr-2" />
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center text-base md:text-lg">
+                  <Settings className="h-4 w-4 md:h-5 md:w-5 mr-2" />
                   Platform Settings
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-sm">
                   Configure platform settings
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button variant="outline" className="w-full" asChild>
+                <Button variant="outline" className="w-full text-sm" asChild>
                   <Link href="/admin/settings">
                     View Settings
                   </Link>
@@ -411,14 +533,14 @@ export default function AdminDashboard() {
         >
           <Card>
             <CardHeader>
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                 <div>
-                  <CardTitle>Courses</CardTitle>
-                  <CardDescription>
+                  <CardTitle className="text-lg md:text-xl">Courses</CardTitle>
+                  <CardDescription className="text-sm">
                     Manage your courses and content
                   </CardDescription>
                 </div>
-                <Button asChild>
+                <Button size="sm" className="w-full sm:w-auto" asChild>
                   <Link href="/admin/courses/new">
                     <Plus className="w-4 h-4 mr-2" />
                     Add Course
@@ -428,13 +550,13 @@ export default function AdminDashboard() {
             </CardHeader>
             <CardContent>
               {courses.length === 0 ? (
-                <div className="text-center py-12">
-                  <BookOpen className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No courses yet</h3>
-                  <p className="text-gray-500 mb-6">
+                <div className="text-center py-8 md:py-12">
+                  <BookOpen className="mx-auto h-10 w-10 md:h-12 md:w-12 text-gray-400 mb-4" />
+                  <h3 className="text-base md:text-lg font-medium text-gray-900 mb-2">No courses yet</h3>
+                  <p className="text-sm text-gray-500 mb-4 md:mb-6">
                     Get started by creating your first course.
                   </p>
-                  <Button asChild>
+                  <Button size="sm" className="w-full sm:w-auto" asChild>
                     <Link href="/admin/courses/new">
                       <Plus className="w-4 h-4 mr-2" />
                       Create Course
@@ -442,30 +564,30 @@ export default function AdminDashboard() {
                   </Button>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-3 md:space-y-4">
                   {courses.map((course) => (
-                    <div key={course.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                          <BookOpen className="h-6 w-6 text-blue-600" />
+                    <div key={course.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 md:p-4 border rounded-lg hover:bg-gray-50 transition-colors gap-3 sm:gap-4">
+                      <div className="flex items-center space-x-3 md:space-x-4">
+                        <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <BookOpen className="h-5 w-5 md:h-6 md:w-6 text-blue-600" />
                         </div>
-                        <div>
-                          <div className="flex items-center space-x-2">
-                            <h4 className="font-medium text-gray-900">{course.title}</h4>
-                            <Badge variant={course.status === 'PUBLISHED' ? 'default' : 'secondary'}>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 mb-1">
+                            <h4 className="font-medium text-gray-900 text-sm md:text-base truncate">{course.title}</h4>
+                            <Badge variant={course.status === 'PUBLISHED' ? 'default' : 'secondary'} className="text-xs w-fit">
                               {course.status}
                             </Badge>
                           </div>
-                          <p className="text-sm text-gray-500">
+                          <p className="text-xs md:text-sm text-gray-500">
                             {course.category} • {course.enrollments} enrollments
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center space-x-4">
-                        <span className="font-medium text-gray-900">
+                      <div className="flex items-center justify-between sm:justify-end sm:space-x-4">
+                        <span className="font-medium text-gray-900 text-sm md:text-base">
                           {course.price ? `$${course.price}` : 'Free'}
                         </span>
-                        <Button variant="outline" size="sm" asChild>
+                        <Button variant="outline" size="sm" className="text-xs" asChild>
                           <Link href={`/admin/courses/${course.id}`}>
                             Edit
                           </Link>
