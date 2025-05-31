@@ -309,41 +309,75 @@ function ValuePropositionsSection() {
 // Featured Courses Section
 function FeaturedCoursesSection() {
   const { ref, isInView } = useScrollAnimation();
+  const [courses, setCourses] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const courses = [
+  useEffect(() => {
+    async function fetchCourses() {
+      try {
+        const response = await fetch('/api/courses');
+        if (response.ok) {
+          const data = await response.json();
+          // Get first 4 courses for featured section
+          setCourses(data.courses.slice(0, 4));
+        }
+      } catch (error) {
+        console.error('Error fetching courses:', error);
+        // Fallback to empty array if fetch fails
+        setCourses([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchCourses();
+  }, []);
+
+  // Fallback courses if no real courses are available
+  const fallbackCourses = [
     {
+      id: 'fallback-1',
       title: "AI-Powered Executive",
       description: "AI strategy from an executive perspective",
+      short_desc: "AI strategy from an executive perspective",
       image: "https://placehold.co/400x250/1e3a8a/FFFFFF/png?text=AI+Executive",
       category: "Executive",
       rating: 4.9,
       students: 1250
     },
     {
+      id: 'fallback-2',
       title: "AI-Powered Scrum Master",
       description: "Master AI-enhanced Scrum methodologies and lead high-performing agile teams",
+      short_desc: "Master AI-enhanced Scrum methodologies and lead high-performing agile teams",
       image: "https://placehold.co/400x250/15803d/FFFFFF/png?text=Scrum+Master",
       category: "Agile",
       rating: 4.8,
       students: 2100
     },
     {
+      id: 'fallback-3',
       title: "AI Product Owner",
       description: "Drive product excellence using AI-enhanced strategies",
+      short_desc: "Drive product excellence using AI-enhanced strategies",
       image: "https://placehold.co/400x250/0ea5e9/FFFFFF/png?text=Product+Owner",
       category: "Product",
       rating: 4.9,
       students: 1800
     },
     {
+      id: 'fallback-4',
       title: "PQ Series: Advanced Intelligence",
       description: "Strengthen your mental fitness with our comprehensive PQ program",
+      short_desc: "Strengthen your mental fitness with our comprehensive PQ program",
       image: "https://placehold.co/400x250/8b5cf6/FFFFFF/png?text=PQ+Series",
       category: "PQ Skills",
       rating: 4.7,
       students: 950
     }
   ];
+
+  const displayCourses = courses.length > 0 ? courses : fallbackCourses;
 
   return (
     <motion.section 
@@ -363,42 +397,57 @@ function FeaturedCoursesSection() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {courses.map((course, index) => (
-            <motion.div key={index} variants={scaleIn}>
-              <Card className="h-full hover:shadow-xl transition-all duration-300 group">
-                <div className="relative overflow-hidden rounded-t-lg">
-                  <img 
-                    src={course.image}
-                    alt={course.title}
-                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <Badge className="absolute top-4 left-4 bg-white text-gray-900">
-                    {course.category}
-                  </Badge>
-                </div>
-                <CardHeader>
-                  <CardTitle className="text-lg line-clamp-2">{course.title}</CardTitle>
-                  <CardDescription className="line-clamp-2">
-                    {course.description}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-1">
-                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                      <span className="text-sm font-medium">{course.rating}</span>
-                    </div>
-                    <span className="text-sm text-gray-500">{course.students} students</span>
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="animate-pulse">
+                <div className="bg-gray-200 h-48 rounded-t-lg mb-4"></div>
+                <div className="bg-gray-200 h-4 rounded mb-2"></div>
+                <div className="bg-gray-200 h-3 rounded mb-4"></div>
+                <div className="bg-gray-200 h-8 rounded"></div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {displayCourses.map((course, index) => (
+              <motion.div key={course.id || index} variants={scaleIn}>
+                <Card className="h-full hover:shadow-xl transition-all duration-300 group">
+                  <div className="relative overflow-hidden rounded-t-lg">
+                    <img 
+                      src={course.image || `https://placehold.co/400x250/1e3a8a/FFFFFF/png?text=${encodeURIComponent(course.title)}`}
+                      alt={course.title}
+                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <Badge className="absolute top-4 left-4 bg-white text-gray-900">
+                      {course.category || 'Course'}
+                    </Badge>
                   </div>
-                  <Button className="w-full" variant="outline">
-                    Learn More
-                  </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
+                  <CardHeader>
+                    <CardTitle className="text-lg line-clamp-2">{course.title}</CardTitle>
+                    <CardDescription className="line-clamp-2">
+                      {course.description || course.short_desc || 'Learn valuable skills with this comprehensive course.'}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center space-x-1">
+                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                        <span className="text-sm font-medium">{course.rating || '4.8'}</span>
+                      </div>
+                      <span className="text-sm text-gray-500">{course.students || '0'} students</span>
+                    </div>
+                    <Button className="w-full" variant="outline" asChild>
+                      <Link href={`/courses/${course.id}`}>
+                        Learn More
+                      </Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        )}
 
         <motion.div className="text-center mt-12" variants={fadeInUp}>
           <Button size="lg" variant="outline" asChild>
