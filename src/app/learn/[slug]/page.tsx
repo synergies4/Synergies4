@@ -19,7 +19,15 @@ import {
   Download,
   MessageSquare,
   Menu,
-  X
+  X,
+  FileText,
+  SkipForward,
+  LinkIcon,
+  Unlock,
+  Lock,
+  Video,
+  Target,
+  Award
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
