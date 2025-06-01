@@ -1041,9 +1041,12 @@ export default function SynergizeAgile() {
   useEffect(() => {
     if (messages.length > 0 && hasInitialized) {
       const lastMessage = messages[messages.length - 1];
-      // Only scroll for new AI messages, not for config changes
-      if (lastMessage.type === 'ai' && lastMessage.id !== 'welcome') {
-        scrollToBottom();
+      // Only scroll for new AI messages, not for config changes or welcome messages
+      if (lastMessage.type === 'ai' && lastMessage.id !== 'welcome' && !lastMessage.content.includes('"slides"')) {
+        // Add a small delay to ensure the message is rendered before scrolling
+        setTimeout(() => {
+          scrollToBottom();
+        }, 100);
       }
     }
   }, [messages, hasInitialized]);
@@ -1086,9 +1089,36 @@ export default function SynergizeAgile() {
       };
       
       setMessages([welcomeMessage]);
-      // Don't scroll when changing configurations
+      // Explicitly prevent any scrolling when changing configurations
     }
   }, [selectedRole, selectedMode, selectedProvider, hasInitialized]);
+
+  // Prevent page scroll when dropdowns are interacted with
+  useEffect(() => {
+    const preventScroll = (e: Event) => {
+      // Check if the event target is within a dropdown
+      const target = e.target as HTMLElement;
+      if (target && (
+        target.closest('[role="combobox"]') || 
+        target.closest('[data-radix-select-trigger]') ||
+        target.closest('[data-radix-select-content]') ||
+        target.closest('.select-trigger') ||
+        target.closest('.select-content')
+      )) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    };
+
+    // Add event listeners for mobile touch events
+    document.addEventListener('touchstart', preventScroll, { passive: false });
+    document.addEventListener('touchmove', preventScroll, { passive: false });
+    
+    return () => {
+      document.removeEventListener('touchstart', preventScroll);
+      document.removeEventListener('touchmove', preventScroll);
+    };
+  }, []);
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim() && files.length === 0) return;
@@ -1219,11 +1249,35 @@ export default function SynergizeAgile() {
     setHasInitialized(false);
   };
 
-  // Type-safe handler for provider selection
+  // Type-safe handler for provider selection with scroll prevention
   const handleProviderChange = (value: string) => {
     if (value === 'anthropic' || value === 'openai' || value === 'google') {
+      // Prevent any scrolling during provider change
+      const currentScrollPosition = window.pageYOffset;
       setSelectedProvider(value);
+      // Restore scroll position after state update
+      setTimeout(() => {
+        window.scrollTo(0, currentScrollPosition);
+      }, 0);
     }
+  };
+
+  // Role change handler with scroll prevention
+  const handleRoleChange = (value: string) => {
+    const currentScrollPosition = window.pageYOffset;
+    setSelectedRole(value);
+    setTimeout(() => {
+      window.scrollTo(0, currentScrollPosition);
+    }, 0);
+  };
+
+  // Mode change handler with scroll prevention
+  const handleModeChange = (value: string) => {
+    const currentScrollPosition = window.pageYOffset;
+    setSelectedMode(value);
+    setTimeout(() => {
+      window.scrollTo(0, currentScrollPosition);
+    }, 0);
   };
 
   const currentRole = AGILE_ROLES[selectedRole as keyof typeof AGILE_ROLES];
@@ -1355,76 +1409,82 @@ export default function SynergizeAgile() {
             </div>
 
             {/* Configuration Panel */}
-            <Card className="mb-8 bg-gradient-to-r from-blue-50 to-purple-50 border-0 shadow-lg">
+            <Card className="mb-8 bg-gradient-to-r from-blue-50 to-purple-50 border-0 shadow-lg sticky top-4 z-10">
               <CardHeader>
                 <CardTitle className="text-center text-xl">Configure Your Training Session</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div>
+                  <div className="relative">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Select Your Agile Role
                     </label>
-                    <Select value={selectedRole} onValueChange={setSelectedRole}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(AGILE_ROLES).map(([key, role]) => (
-                          <SelectItem key={key} value={key}>
-                            <div className="flex items-center">
-                              {role.icon}
-                              <span className="ml-2">{role.name}</span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="relative">
+                      <Select value={selectedRole} onValueChange={handleRoleChange}>
+                        <SelectTrigger className="w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="z-50 max-h-60 overflow-y-auto">
+                          {Object.entries(AGILE_ROLES).map(([key, role]) => (
+                            <SelectItem key={key} value={key} className="focus:bg-blue-50">
+                              <div className="flex items-center">
+                                {role.icon}
+                                <span className="ml-2">{role.name}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                     <p className="text-sm text-gray-600 mt-1">{currentRole.description}</p>
                   </div>
 
-                  <div>
+                  <div className="relative">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Choose Interaction Mode
                     </label>
-                    <Select value={selectedMode} onValueChange={setSelectedMode}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(INTERACTION_MODES).map(([key, mode]) => (
-                          <SelectItem key={key} value={key}>
-                            <div className="flex items-center">
-                              {mode.icon}
-                              <span className="ml-2">{mode.name}</span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="relative">
+                      <Select value={selectedMode} onValueChange={handleModeChange}>
+                        <SelectTrigger className="w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="z-50 max-h-60 overflow-y-auto">
+                          {Object.entries(INTERACTION_MODES).map(([key, mode]) => (
+                            <SelectItem key={key} value={key} className="focus:bg-blue-50">
+                              <div className="flex items-center">
+                                {mode.icon}
+                                <span className="ml-2">{mode.name}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                     <p className="text-sm text-gray-600 mt-1">{currentMode.description}</p>
                   </div>
 
-                  <div>
+                  <div className="relative">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Select AI Provider
                     </label>
-                    <Select value={selectedProvider} onValueChange={handleProviderChange}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(AI_PROVIDERS).map(([key, provider]) => (
-                          <SelectItem key={key} value={key}>
-                            <div className="flex items-center">
-                              {provider.icon}
-                              <span className="ml-2">{provider.name}</span>
-                              <span className="ml-1 text-xs text-gray-500">({provider.badge})</span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="relative">
+                      <Select value={selectedProvider} onValueChange={handleProviderChange}>
+                        <SelectTrigger className="w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="z-50 max-h-60 overflow-y-auto">
+                          {Object.entries(AI_PROVIDERS).map(([key, provider]) => (
+                            <SelectItem key={key} value={key} className="focus:bg-blue-50">
+                              <div className="flex items-center">
+                                {provider.icon}
+                                <span className="ml-2">{provider.name}</span>
+                                <span className="ml-1 text-xs text-gray-500">({provider.badge})</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                     <p className="text-sm text-gray-600 mt-1">Powered by {currentProvider.badge}</p>
                   </div>
                 </div>
