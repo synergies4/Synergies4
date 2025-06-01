@@ -25,7 +25,8 @@ import {
   Rocket,
   UserCheck,
   Lightbulb,
-  Compass
+  Compass,
+  MessageSquare
 } from 'lucide-react';
 
 // Animation variants

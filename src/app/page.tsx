@@ -26,7 +26,8 @@ import {
   Menu,
   X,
   Clock,
-  ChevronUp
+  ChevronUp,
+  MessageSquare
 } from 'lucide-react';
 
 // Animation variants
@@ -266,6 +267,38 @@ export default function Home() {
                   </Link>
                 </motion.div>
               ))}
+              
+              {/* Distinctive Contact Button */}
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7, duration: 0.5 }}
+              >
+                <motion.div
+                  whileHover={{ scale: 1.02, y: -1 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                >
+                  <Button 
+                    asChild 
+                    className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
+                  >
+                    <Link href="/contact">
+                      {/* Subtle shine effect */}
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                        initial={{ x: '-100%' }}
+                        whileHover={{ x: '100%' }}
+                        transition={{ duration: 0.6, ease: "easeInOut" }}
+                      />
+                      <span className="relative z-10 flex items-center">
+                        <MessageSquare className="w-4 h-4 mr-2" />
+                        Contact
+                      </span>
+                    </Link>
+                  </Button>
+                </motion.div>
+              </motion.div>
             </div>
             
             {/* Desktop Auth */}
@@ -317,7 +350,7 @@ export default function Home() {
                 className="md:hidden border-t bg-white/95 backdrop-blur-md overflow-hidden"
               >
                 <div className="px-4 py-4 space-y-4">
-                  {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item) => (
+                  {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight', 'Contact'].map((item) => (
                     <Link
                       key={item}
                       href={
@@ -326,6 +359,7 @@ export default function Home() {
                         item === 'Coaching' ? '/coaching' : 
                         item === 'Consulting' ? '/consulting' : 
                         item === 'Industry Insight' ? '/industry-insight' :
+                        item === 'Contact' ? '/contact' :
                         `/${item.toLowerCase().replace(' ', '-')}`
                       }
                       className="block text-gray-600 hover:text-blue-600 transition-colors font-medium py-2 text-lg"
@@ -1566,8 +1600,36 @@ function FooterSection() {
               <li><Link href="/about-us" className="hover:text-white transition-colors">About Us</Link></li>
               <li><Link href="/coaching" className="hover:text-white transition-colors">Coaching</Link></li>
               <li><Link href="/consulting" className="hover:text-white transition-colors">Consulting</Link></li>
-              <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
             </ul>
+            
+            {/* Distinctive Contact Button in Footer */}
+            <div className="mt-6">
+              <motion.div
+                whileHover={{ scale: 1.02, y: -1 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+              >
+                <Button 
+                  asChild 
+                  size="sm"
+                  className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group w-full"
+                >
+                  <Link href="/contact">
+                    {/* Subtle shine effect */}
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                      initial={{ x: '-100%' }}
+                      whileHover={{ x: '100%' }}
+                      transition={{ duration: 0.6, ease: "easeInOut" }}
+                    />
+                    <span className="relative z-10 flex items-center justify-center">
+                      <MessageSquare className="w-4 h-4 mr-2" />
+                      Contact Us
+                    </span>
+                  </Link>
+                </Button>
+              </motion.div>
+            </div>
           </motion.div>
 
           <motion.div variants={fadeInUp}>
