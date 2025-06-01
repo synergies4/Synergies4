@@ -1622,7 +1622,7 @@ export default function SynergizeAgile() {
             </div>
 
             {/* Configuration Panel */}
-            <Card className="mb-8 bg-gradient-to-r from-blue-50 to-purple-50 border-0 shadow-lg sticky top-4 z-[100]">
+            <Card className="mb-8 bg-gradient-to-r from-blue-50 to-purple-50 border-0 shadow-lg sticky top-4 z-[9999]">
               <CardHeader>
                 <CardTitle className="text-center text-xl">Configure Your Training Session</CardTitle>
               </CardHeader>
