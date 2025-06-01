@@ -24,7 +24,9 @@ import {
   Brain,
   Rocket,
   Menu,
-  X
+  X,
+  Clock,
+  ChevronUp
 } from 'lucide-react';
 
 // Animation variants
@@ -55,6 +57,49 @@ function useScrollAnimation() {
   return { ref, isInView };
 }
 
+// Scroll to top component
+function ScrollToTop() {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const toggleVisibility = () => {
+      if (window.pageYOffset > 300) {
+        setIsVisible(true);
+      } else {
+        setIsVisible(false);
+      }
+    };
+
+    window.addEventListener('scroll', toggleVisibility);
+    return () => window.removeEventListener('scroll', toggleVisibility);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
+  return (
+    <AnimatePresence>
+      {isVisible && (
+        <motion.button
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          onClick={scrollToTop}
+          className="fixed bottom-8 right-8 z-50 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+        >
+          <ChevronUp className="h-6 w-6" />
+        </motion.button>
+      )}
+    </AnimatePresence>
+  );
+}
+
 export default function Home() {
   const { scrollYProgress } = useScroll();
   const heroY = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
@@ -62,8 +107,19 @@ export default function Home() {
   const { user, loading } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // Add smooth scroll behavior to the document
+  useEffect(() => {
+    document.documentElement.style.scrollBehavior = 'smooth';
+    return () => {
+      document.documentElement.style.scrollBehavior = 'auto';
+    };
+  }, []);
+
   return (
     <main className="min-h-screen">
+      {/* Scroll to Top Button */}
+      <ScrollToTop />
+
       {/* Countdown Banner */}
       <motion.div 
         className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3"
@@ -418,6 +474,9 @@ export default function Home() {
       {/* Value Propositions */}
       <ValuePropositionsSection />
 
+      {/* Stats Section */}
+      <StatsSection />
+
       {/* Featured Courses */}
       <FeaturedCoursesSection />
 
@@ -426,6 +485,9 @@ export default function Home() {
 
       {/* Testimonials */}
       <TestimonialsSection />
+
+      {/* Newsletter Section */}
+      <NewsletterSection />
 
       {/* Partners */}
       <PartnersSection />
@@ -508,11 +570,70 @@ function ValuePropositionsSection() {
   );
 }
 
+// Stats Section
+function StatsSection() {
+  const { ref, isInView } = useScrollAnimation();
+  
+  const stats = [
+    { number: "10,000+", label: "Students Trained", icon: <Users className="h-6 w-6" /> },
+    { number: "95%", label: "Success Rate", icon: <TrendingUp className="h-6 w-6" /> },
+    { number: "50+", label: "Expert Instructors", icon: <Award className="h-6 w-6" /> },
+    { number: "24/7", label: "Learning Support", icon: <CheckCircle className="h-6 w-6" /> }
+  ];
+
+  return (
+    <motion.section 
+      ref={ref}
+      className="py-16 bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+      initial="initial"
+      animate={isInView ? "animate" : "initial"}
+      variants={staggerContainer}
+    >
+      <div className="container mx-auto px-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          {stats.map((stat, index) => (
+            <motion.div 
+              key={index} 
+              className="text-center"
+              variants={fadeInUp}
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            >
+              <div className="flex justify-center mb-3 text-blue-200">
+                {stat.icon}
+              </div>
+              <motion.div 
+                className="text-3xl md:text-4xl font-bold mb-2"
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.5 }}
+                transition={{ delay: 0.2 + index * 0.1, duration: 0.6 }}
+              >
+                {stat.number}
+              </motion.div>
+              <div className="text-blue-100 text-sm md:text-base">{stat.label}</div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </motion.section>
+  );
+}
+
 // Featured Courses Section
 function FeaturedCoursesSection() {
   const { ref, isInView } = useScrollAnimation();
   const [courses, setCourses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Function to create course slug from title (matching the one in course page)
+  const createCourseSlug = (title: string) => {
+    return title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim();
+  };
 
   useEffect(() => {
     async function fetchCourses() {
@@ -539,13 +660,16 @@ function FeaturedCoursesSection() {
   const fallbackCourses = [
     {
       id: 'fallback-1',
-      title: "AI-Powered Executive",
-      description: "AI strategy from an executive perspective",
-      short_desc: "AI strategy from an executive perspective",
+      title: "AI-Powered Executive Leadership",
+      description: "Master AI strategy from an executive perspective and lead digital transformation",
+      short_desc: "Master AI strategy from an executive perspective and lead digital transformation",
       image: "https://placehold.co/400x250/1e3a8a/FFFFFF/png?text=AI+Executive",
       category: "Executive",
+      level: "Advanced",
+      duration: "8 weeks",
       rating: 4.9,
-      students: 1250
+      students: 1250,
+      price: 299
     },
     {
       id: 'fallback-2',
@@ -554,32 +678,55 @@ function FeaturedCoursesSection() {
       short_desc: "Master AI-enhanced Scrum methodologies and lead high-performing agile teams",
       image: "https://placehold.co/400x250/15803d/FFFFFF/png?text=Scrum+Master",
       category: "Agile",
+      level: "Intermediate",
+      duration: "6 weeks",
       rating: 4.8,
-      students: 2100
+      students: 2100,
+      price: 199
     },
     {
       id: 'fallback-3',
-      title: "AI Product Owner",
-      description: "Drive product excellence using AI-enhanced strategies",
-      short_desc: "Drive product excellence using AI-enhanced strategies",
+      title: "AI Product Owner Mastery",
+      description: "Drive product excellence using AI-enhanced strategies and data-driven decisions",
+      short_desc: "Drive product excellence using AI-enhanced strategies and data-driven decisions",
       image: "https://placehold.co/400x250/0ea5e9/FFFFFF/png?text=Product+Owner",
       category: "Product",
+      level: "Intermediate",
+      duration: "7 weeks",
       rating: 4.9,
-      students: 1800
+      students: 1800,
+      price: 249
     },
     {
       id: 'fallback-4',
-      title: "PQ Series: Advanced Intelligence",
-      description: "Strengthen your mental fitness with our comprehensive PQ program",
-      short_desc: "Strengthen your mental fitness with our comprehensive PQ program",
+      title: "PQ Series: Advanced Mental Fitness",
+      description: "Strengthen your mental fitness with our comprehensive PQ program for peak performance",
+      short_desc: "Strengthen your mental fitness with our comprehensive PQ program for peak performance",
       image: "https://placehold.co/400x250/8b5cf6/FFFFFF/png?text=PQ+Series",
       category: "PQ Skills",
+      level: "Beginner",
+      duration: "4 weeks",
       rating: 4.7,
-      students: 950
+      students: 950,
+      price: 149
     }
   ];
 
   const displayCourses = courses.length > 0 ? courses : fallbackCourses;
+
+  const getLevelColor = (level: string) => {
+    switch (level?.toLowerCase()) {
+      case 'beginner': return 'bg-green-100 text-green-700';
+      case 'intermediate': return 'bg-yellow-100 text-yellow-700';
+      case 'advanced': return 'bg-red-100 text-red-700';
+      default: return 'bg-gray-100 text-gray-700';
+    }
+  };
+
+  const formatPrice = (price?: number) => {
+    if (!price) return 'Free';
+    return `$${price}`;
+  };
 
   return (
     <motion.section 
@@ -602,46 +749,114 @@ function FeaturedCoursesSection() {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="animate-pulse">
-                <div className="bg-gray-200 h-48 rounded-t-lg mb-4"></div>
-                <div className="bg-gray-200 h-4 rounded mb-2"></div>
-                <div className="bg-gray-200 h-3 rounded mb-4"></div>
-                <div className="bg-gray-200 h-8 rounded"></div>
-              </div>
+              <motion.div 
+                key={i} 
+                className="animate-pulse"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+              >
+                <Card className="h-full">
+                  <div className="bg-gray-200 h-48 rounded-t-lg mb-4"></div>
+                  <CardHeader>
+                    <div className="bg-gray-200 h-4 rounded mb-2"></div>
+                    <div className="bg-gray-200 h-3 rounded mb-4"></div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="bg-gray-200 h-8 rounded"></div>
+                  </CardContent>
+                </Card>
+              </motion.div>
             ))}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {displayCourses.map((course, index) => (
               <motion.div key={course.id || index} variants={scaleIn}>
-                <Card className="h-full hover:shadow-xl transition-all duration-300 group">
-                  <div className="relative overflow-hidden rounded-t-lg">
+                <Card className="h-full hover:shadow-2xl transition-all duration-500 group cursor-pointer border-0 shadow-lg overflow-hidden">
+                  <div className="relative overflow-hidden">
                     <img 
                       src={course.image || `https://placehold.co/400x250/1e3a8a/FFFFFF/png?text=${encodeURIComponent(course.title)}`}
                       alt={course.title}
-                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
                     />
-                    <Badge className="absolute top-4 left-4 bg-white text-gray-900">
-                      {course.category || 'Course'}
-                    </Badge>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    
+                    {/* Badges */}
+                    <div className="absolute top-4 left-4 flex flex-col gap-2">
+                      <Badge className="bg-white/90 backdrop-blur-sm text-gray-900 shadow-sm">
+                        {course.category || 'Course'}
+                      </Badge>
+                      {course.level && (
+                        <Badge className={`${getLevelColor(course.level)} shadow-sm`}>
+                          {course.level}
+                        </Badge>
+                      )}
+                    </div>
+
+                    {/* Price Badge */}
+                    <div className="absolute top-4 right-4">
+                      <Badge className="bg-blue-600 text-white shadow-sm">
+                        {formatPrice(course.price)}
+                      </Badge>
+                    </div>
+
+                    {/* Hover Overlay */}
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <Button 
+                        size="sm" 
+                        className="bg-white text-gray-900 hover:bg-gray-100 shadow-lg"
+                        asChild
+                      >
+                        <Link href={`/courses/${createCourseSlug(course.title)}`}>
+                          View Course
+                        </Link>
+                      </Button>
+                    </div>
                   </div>
-                  <CardHeader>
-                    <CardTitle className="text-lg line-clamp-2">{course.title}</CardTitle>
-                    <CardDescription className="line-clamp-2">
+
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg line-clamp-2 group-hover:text-blue-600 transition-colors duration-300">
+                      {course.title}
+                    </CardTitle>
+                    <CardDescription className="line-clamp-2 text-sm">
                       {course.description || course.short_desc || 'Learn valuable skills with this comprehensive course.'}
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
+
+                  <CardContent className="pt-0">
+                    {/* Course Meta */}
+                    <div className="flex items-center justify-between mb-4 text-sm text-gray-500">
+                      {course.duration && (
+                        <div className="flex items-center">
+                          <Clock className="h-3 w-3 mr-1" />
+                          {course.duration}
+                        </div>
+                      )}
+                      <div className="flex items-center">
+                        <Users className="h-3 w-3 mr-1" />
+                        {course.students || '0'} students
+                      </div>
+                    </div>
+
+                    {/* Rating */}
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center space-x-1">
                         <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                         <span className="text-sm font-medium">{course.rating || '4.8'}</span>
+                        <span className="text-xs text-gray-500">({course.students || '0'})</span>
                       </div>
-                      <span className="text-sm text-gray-500">{course.students || '0'} students</span>
                     </div>
-                    <Button className="w-full" variant="outline" asChild>
-                      <Link href={`/courses/${course.id}`}>
+
+                    {/* CTA Button */}
+                    <Button 
+                      className="w-full group-hover:bg-blue-600 group-hover:text-white transition-all duration-300" 
+                      variant="outline" 
+                      asChild
+                    >
+                      <Link href={`/courses/${createCourseSlug(course.title)}`}>
                         Learn More
+                        <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
                       </Link>
                     </Button>
                   </CardContent>
@@ -652,7 +867,7 @@ function FeaturedCoursesSection() {
         )}
 
         <motion.div className="text-center mt-12" variants={fadeInUp}>
-          <Button size="lg" variant="outline" asChild>
+          <Button size="lg" variant="outline" className="hover:bg-blue-600 hover:text-white transition-all duration-300" asChild>
             <Link href="/courses">
               View All Courses
               <ArrowRight className="ml-2 h-5 w-5" />
@@ -669,13 +884,71 @@ function CertificationsSection() {
   const { ref, isInView } = useScrollAnimation();
 
   const categories = [
-    { title: "Agile", image: "https://placehold.co/300x200/1e3a8a/FFFFFF/png?text=Agile", courses: 12 },
-    { title: "Business Analysis", image: "https://placehold.co/300x200/15803d/FFFFFF/png?text=Business+Analysis", courses: 8 },
-    { title: "Product Management", image: "https://placehold.co/300x200/0ea5e9/FFFFFF/png?text=Product+Management", courses: 15 },
-    { title: "Business Strategy", image: "https://placehold.co/300x200/8b5cf6/FFFFFF/png?text=Business+Strategy", courses: 10 },
-    { title: "PQ Skills", image: "https://placehold.co/300x200/ec4899/FFFFFF/png?text=PQ+Skills", courses: 6 },
-    { title: "Leadership", image: "https://placehold.co/300x200/f59e0b/FFFFFF/png?text=Leadership", courses: 9 }
+    { 
+      title: "Agile & Scrum", 
+      image: "https://placehold.co/300x200/1e3a8a/FFFFFF/png?text=Agile", 
+      courses: 12,
+      description: "Master agile methodologies and scrum frameworks",
+      level: "All Levels",
+      duration: "4-8 weeks",
+      popular: true
+    },
+    { 
+      title: "Business Analysis", 
+      image: "https://placehold.co/300x200/15803d/FFFFFF/png?text=Business+Analysis", 
+      courses: 8,
+      description: "Learn to analyze business requirements and processes",
+      level: "Intermediate",
+      duration: "6-10 weeks",
+      popular: false
+    },
+    { 
+      title: "Product Management", 
+      image: "https://placehold.co/300x200/0ea5e9/FFFFFF/png?text=Product+Management", 
+      courses: 15,
+      description: "Drive product strategy and development",
+      level: "All Levels",
+      duration: "8-12 weeks",
+      popular: true
+    },
+    { 
+      title: "Business Strategy", 
+      image: "https://placehold.co/300x200/8b5cf6/FFFFFF/png?text=Business+Strategy", 
+      courses: 10,
+      description: "Develop strategic thinking and planning skills",
+      level: "Advanced",
+      duration: "6-8 weeks",
+      popular: false
+    },
+    { 
+      title: "PQ Skills", 
+      image: "https://placehold.co/300x200/ec4899/FFFFFF/png?text=PQ+Skills", 
+      courses: 6,
+      description: "Build mental fitness and emotional intelligence",
+      level: "Beginner",
+      duration: "4-6 weeks",
+      popular: false
+    },
+    { 
+      title: "Leadership", 
+      image: "https://placehold.co/300x200/f59e0b/FFFFFF/png?text=Leadership", 
+      courses: 9,
+      description: "Develop leadership and team management skills",
+      level: "Intermediate",
+      duration: "8-10 weeks",
+      popular: true
+    }
   ];
+
+  const getLevelColor = (level: string) => {
+    switch (level) {
+      case 'Beginner': return 'bg-green-100 text-green-700';
+      case 'Intermediate': return 'bg-yellow-100 text-yellow-700';
+      case 'Advanced': return 'bg-red-100 text-red-700';
+      case 'All Levels': return 'bg-blue-100 text-blue-700';
+      default: return 'bg-gray-100 text-gray-700';
+    }
+  };
 
   return (
     <motion.section 
@@ -698,29 +971,106 @@ function CertificationsSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {categories.map((category, index) => (
             <motion.div key={index} variants={scaleIn}>
-              <Card className="h-full hover:shadow-xl transition-all duration-300 group cursor-pointer">
-                <div className="relative overflow-hidden rounded-t-lg">
+              <Card className="h-full hover:shadow-2xl transition-all duration-500 group cursor-pointer border-0 shadow-lg overflow-hidden">
+                <div className="relative overflow-hidden">
                   <img 
                     src={category.image}
                     alt={category.title}
-                    className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-40 object-cover group-hover:scale-110 transition-transform duration-500"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  
+                  {/* Popular Badge */}
+                  {category.popular && (
+                    <Badge className="absolute top-4 left-4 bg-yellow-500 text-white shadow-lg">
+                      <Star className="w-3 h-3 mr-1" />
+                      Popular
+                    </Badge>
+                  )}
+
+                  {/* Level Badge */}
+                  <Badge className={`absolute top-4 right-4 ${getLevelColor(category.level)} shadow-lg`}>
+                    {category.level}
+                  </Badge>
+
+                  {/* Hover Overlay */}
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <Button 
+                      size="sm" 
+                      className="bg-white text-gray-900 hover:bg-gray-100 shadow-lg"
+                    >
+                      Explore Courses
+                    </Button>
+                  </div>
                 </div>
-                <CardHeader>
-                  <CardTitle className="text-xl">{category.title}</CardTitle>
-                  <CardDescription>
-                    {category.courses} courses available
+
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <CardTitle className="text-xl group-hover:text-blue-600 transition-colors duration-300">
+                      {category.title}
+                    </CardTitle>
+                    <Badge variant="outline" className="text-xs">
+                      {category.courses} courses
+                    </Badge>
+                  </div>
+                  <CardDescription className="text-sm leading-relaxed">
+                    {category.description}
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <Button className="w-full" variant="outline">
+
+                <CardContent className="pt-0">
+                  {/* Course Meta */}
+                  <div className="flex items-center justify-between mb-4 text-sm text-gray-500">
+                    <div className="flex items-center">
+                      <Clock className="h-3 w-3 mr-1" />
+                      {category.duration}
+                    </div>
+                    <div className="flex items-center">
+                      <BookOpen className="h-3 w-3 mr-1" />
+                      {category.courses} courses
+                    </div>
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div className="mb-4">
+                    <div className="flex justify-between text-xs text-gray-500 mb-1">
+                      <span>Course Completion</span>
+                      <span>{Math.floor(Math.random() * 40) + 60}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <motion.div 
+                        className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full"
+                        initial={{ width: 0 }}
+                        animate={isInView ? { width: `${Math.floor(Math.random() * 40) + 60}%` } : { width: 0 }}
+                        transition={{ delay: 0.5 + index * 0.1, duration: 1 }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* CTA Button */}
+                  <Button 
+                    className="w-full group-hover:bg-blue-600 group-hover:text-white transition-all duration-300" 
+                    variant="outline"
+                  >
                     Explore Courses
+                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
                   </Button>
                 </CardContent>
               </Card>
             </motion.div>
           ))}
         </div>
+
+        {/* Bottom CTA */}
+        <motion.div className="text-center mt-12" variants={fadeInUp}>
+          <p className="text-gray-600 mb-6">
+            Can't find what you're looking for? We offer custom training programs.
+          </p>
+          <Button size="lg" variant="outline" className="hover:bg-blue-600 hover:text-white transition-all duration-300">
+            Request Custom Training
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </Button>
+        </motion.div>
       </div>
     </motion.section>
   );
@@ -806,6 +1156,92 @@ function TestimonialsSection() {
   );
 }
 
+// Newsletter Section
+function NewsletterSection() {
+  const { ref, isInView } = useScrollAnimation();
+  const [email, setEmail] = useState('');
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    
+    setIsLoading(true);
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setIsSubscribed(true);
+    setIsLoading(false);
+    setEmail('');
+  };
+
+  return (
+    <motion.section 
+      ref={ref}
+      className="py-20 bg-gradient-to-br from-gray-50 to-blue-50"
+      initial="initial"
+      animate={isInView ? "animate" : "initial"}
+      variants={staggerContainer}
+    >
+      <div className="container mx-auto px-4">
+        <motion.div className="max-w-2xl mx-auto text-center" variants={fadeInUp}>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            Stay Ahead of the Curve
+          </h2>
+          <p className="text-xl text-gray-600 mb-8">
+            Get the latest insights on AI, leadership, and career development delivered to your inbox.
+          </p>
+          
+          {isSubscribed ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-green-50 border border-green-200 rounded-lg p-6"
+            >
+              <CheckCircle className="h-12 w-12 text-green-600 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-green-800 mb-2">Thank you for subscribing!</h3>
+              <p className="text-green-600">You'll receive our latest updates and exclusive content.</p>
+            </motion.div>
+          ) : (
+            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email address"
+                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              />
+              <Button 
+                type="submit" 
+                disabled={isLoading}
+                className="px-6 py-3 bg-blue-600 hover:bg-blue-700"
+              >
+                {isLoading ? (
+                  <>
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      className="w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"
+                    />
+                    Subscribing...
+                  </>
+                ) : (
+                  'Subscribe'
+                )}
+              </Button>
+            </form>
+          )}
+          
+          <p className="text-sm text-gray-500 mt-4">
+            No spam, unsubscribe at any time. We respect your privacy.
+          </p>
+        </motion.div>
+      </div>
+    </motion.section>
+  );
+}
+
 // Partners Section
 function PartnersSection() {
   const { ref, isInView } = useScrollAnimation();
@@ -850,33 +1286,144 @@ function CTASection() {
   return (
     <motion.section 
       ref={ref}
-      className="py-20 bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+      className="py-20 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white relative overflow-hidden"
       initial="initial"
       animate={isInView ? "animate" : "initial"}
       variants={staggerContainer}
     >
-      <div className="container mx-auto px-4 text-center">
+      {/* Background Effects */}
+      <div className="absolute inset-0">
+        <div className="absolute top-10 left-10 w-32 h-32 bg-white/10 rounded-full blur-xl animate-pulse" />
+        <div className="absolute bottom-10 right-10 w-40 h-40 bg-white/5 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-white/15 rounded-full blur-lg animate-pulse" style={{ animationDelay: '2s' }} />
+      </div>
+
+      <div className="container mx-auto px-4 text-center relative z-10">
         <motion.div variants={fadeInUp}>
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Ready to Transform Your Career?
+          {/* Social Proof Badge */}
+          <motion.div 
+            className="inline-flex items-center bg-white/20 backdrop-blur-sm rounded-full px-6 py-2 mb-6"
+            whileHover={{ scale: 1.05 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          >
+            <div className="flex -space-x-2 mr-3">
+              {[1, 2, 3, 4].map((i) => (
+                <div 
+                  key={i} 
+                  className="w-6 h-6 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full border-2 border-white"
+                />
+              ))}
+            </div>
+            <span className="text-sm font-medium">Join 10,000+ professionals already learning</span>
+          </motion.div>
+
+          <h2 className="text-3xl md:text-5xl font-bold mb-6 leading-tight">
+            Ready to{' '}
+            <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
+              Transform
+            </span>{' '}
+            Your Career?
           </h2>
-          <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
+          
+          <p className="text-xl md:text-2xl mb-4 max-w-3xl mx-auto opacity-90 leading-relaxed">
             Join thousands of professionals who have accelerated their growth with our AI-powered learning platform.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" variant="secondary" className="text-lg px-8 py-6" asChild>
-              <Link href="/courses">
-                Explore Courses
-                <BookOpen className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-white text-white hover:bg-white hover:text-blue-600" asChild>
-              <Link href="/signup">
-                Start Free Trial
-                <Rocket className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
+          
+          {/* Urgency Indicator */}
+          <motion.div 
+            className="inline-flex items-center bg-red-500/20 backdrop-blur-sm rounded-full px-4 py-2 mb-8"
+            animate={{ scale: [1, 1.05, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            <div className="w-2 h-2 bg-red-400 rounded-full mr-2 animate-pulse" />
+            <span className="text-sm font-medium">Limited time: $295 early bird discount</span>
+          </motion.div>
+
+          {/* Benefits List */}
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 max-w-4xl mx-auto"
+            variants={staggerContainer}
+          >
+            {[
+              { icon: <CheckCircle className="h-5 w-5" />, text: "Lifetime access to all courses" },
+              { icon: <Users className="h-5 w-5" />, text: "Expert mentorship included" },
+              { icon: <Award className="h-5 w-5" />, text: "Industry-recognized certificates" }
+            ].map((benefit, index) => (
+              <motion.div 
+                key={index}
+                className="flex items-center justify-center space-x-2 text-white/90"
+                variants={fadeInUp}
+                whileHover={{ scale: 1.05 }}
+              >
+                <div className="text-green-300">{benefit.icon}</div>
+                <span className="text-sm md:text-base">{benefit.text}</span>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Button 
+                size="lg" 
+                className="text-lg px-8 py-6 bg-white text-blue-600 hover:bg-gray-100 shadow-xl hover:shadow-2xl transition-all duration-300 font-semibold" 
+                asChild
+              >
+                <Link href="/courses">
+                  <Rocket className="mr-2 h-5 w-5" />
+                  Start Learning Today
+                </Link>
+              </Button>
+            </motion.div>
+            
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="text-lg px-8 py-6 border-white/30 text-white hover:bg-white/10 backdrop-blur-sm transition-all duration-300" 
+                asChild
+              >
+                <Link href="/signup">
+                  <BookOpen className="mr-2 h-5 w-5" />
+                  Try Free Course
+                </Link>
+              </Button>
+            </motion.div>
           </div>
+
+          {/* Trust Indicators */}
+          <motion.div 
+            className="mt-10 pt-8 border-t border-white/20"
+            variants={fadeInUp}
+          >
+            <p className="text-white/70 text-sm mb-4">Trusted by professionals at</p>
+            <div className="flex flex-wrap justify-center items-center gap-6 opacity-60">
+              {['Microsoft', 'Google', 'Amazon', 'Apple', 'Meta'].map((company, index) => (
+                <motion.div 
+                  key={index} 
+                  className="text-lg font-semibold text-white/80 hover:text-white transition-colors"
+                  whileHover={{ scale: 1.1 }}
+                >
+                  {company}
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Money Back Guarantee */}
+          <motion.div 
+            className="mt-8 inline-flex items-center bg-green-500/20 backdrop-blur-sm rounded-full px-4 py-2"
+            variants={fadeInUp}
+          >
+            <CheckCircle className="h-4 w-4 text-green-300 mr-2" />
+            <span className="text-sm">30-day money-back guarantee</span>
+          </motion.div>
         </motion.div>
       </div>
     </motion.section>
