@@ -94,6 +94,37 @@ const INTERACTION_MODES = {
   }
 };
 
+// AI Provider configurations
+const AI_PROVIDERS = {
+  anthropic: {
+    name: 'Claude',
+    color: 'from-orange-500 to-red-500',
+    bgColor: 'bg-orange-50',
+    textColor: 'text-orange-700',
+    badge: 'Anthropic',
+    badgeColor: 'bg-orange-100 text-orange-800',
+    icon: <Brain className="w-4 h-4" />
+  },
+  openai: {
+    name: 'GPT',
+    color: 'from-green-500 to-emerald-500',
+    bgColor: 'bg-green-50',
+    textColor: 'text-green-700',
+    badge: 'OpenAI',
+    badgeColor: 'bg-green-100 text-green-800',
+    icon: <Zap className="w-4 h-4" />
+  },
+  google: {
+    name: 'Gemini',
+    color: 'from-blue-500 to-purple-500',
+    bgColor: 'bg-blue-50',
+    textColor: 'text-blue-700',
+    badge: 'Google',
+    badgeColor: 'bg-blue-100 text-blue-800',
+    icon: <Sparkles className="w-4 h-4" />
+  }
+};
+
 interface Message {
   id: string;
   type: 'user' | 'ai';
@@ -101,6 +132,7 @@ interface Message {
   timestamp: Date;
   mode?: string;
   role?: string;
+  provider?: keyof typeof AI_PROVIDERS;
 }
 
 export default function SynergizeAgile() {
@@ -108,6 +140,7 @@ export default function SynergizeAgile() {
   const [inputMessage, setInputMessage] = useState('');
   const [selectedRole, setSelectedRole] = useState<string>('scrum-master');
   const [selectedMode, setSelectedMode] = useState<string>('chat');
+  const [selectedProvider, setSelectedProvider] = useState<keyof typeof AI_PROVIDERS>('anthropic');
   const [isLoading, setIsLoading] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [hasInitialized, setHasInitialized] = useState(false);
@@ -156,7 +189,8 @@ export default function SynergizeAgile() {
       content: inputMessage,
       timestamp: new Date(),
       mode: selectedMode,
-      role: selectedRole
+      role: selectedRole,
+      provider: selectedProvider
     };
 
     setMessages(prev => [...prev, userMessage]);
@@ -166,6 +200,7 @@ export default function SynergizeAgile() {
     try {
       const role = AGILE_ROLES[selectedRole as keyof typeof AGILE_ROLES];
       const mode = INTERACTION_MODES[selectedMode as keyof typeof INTERACTION_MODES];
+      const provider = AI_PROVIDERS[selectedProvider];
 
       // Enhanced prompt based on role and mode
       let systemPrompt = `You are an expert Agile AI assistant specialized in ${role.name} responsibilities. 
@@ -192,7 +227,7 @@ export default function SynergizeAgile() {
             { role: 'system', content: systemPrompt },
             { role: 'user', content: inputMessage }
           ],
-          provider: 'anthropic' // Use Claude for Agile expertise
+          provider: selectedProvider
         }),
       });
 
@@ -206,7 +241,8 @@ export default function SynergizeAgile() {
         content: data.content,
         timestamp: new Date(),
         mode: selectedMode,
-        role: selectedRole
+        role: selectedRole,
+        provider: selectedProvider
       };
 
       setMessages(prev => [...prev, aiMessage]);
@@ -218,7 +254,8 @@ export default function SynergizeAgile() {
         content: 'Sorry, I encountered an error. Please try again.',
         timestamp: new Date(),
         mode: selectedMode,
-        role: selectedRole
+        role: selectedRole,
+        provider: selectedProvider
       };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
@@ -247,6 +284,7 @@ export default function SynergizeAgile() {
 
   const currentRole = AGILE_ROLES[selectedRole as keyof typeof AGILE_ROLES];
   const currentMode = INTERACTION_MODES[selectedMode as keyof typeof INTERACTION_MODES];
+  const currentProvider = AI_PROVIDERS[selectedProvider];
 
   return (
     <PageLayout>
@@ -378,7 +416,7 @@ export default function SynergizeAgile() {
                 <CardTitle className="text-center text-xl">Configure Your Training Session</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Select Your Agile Role
@@ -421,6 +459,29 @@ export default function SynergizeAgile() {
                       </SelectContent>
                     </Select>
                     <p className="text-sm text-gray-600 mt-1">{currentMode.description}</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Select AI Provider
+                    </label>
+                    <Select value={selectedProvider} onValueChange={setSelectedProvider}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(AI_PROVIDERS).map(([key, provider]) => (
+                          <SelectItem key={key} value={key}>
+                            <div className="flex items-center">
+                              {provider.icon}
+                              <span className="ml-2">{provider.name}</span>
+                              <span className="ml-1 text-xs text-gray-500">({provider.badge})</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <p className="text-sm text-gray-600 mt-1">Powered by {currentProvider.badge}</p>
                   </div>
                 </div>
               </CardContent>
@@ -490,9 +551,16 @@ export default function SynergizeAgile() {
                               {message.content}
                             </p>
                             <div className="flex items-center justify-between mt-2">
-                              <span className={`text-xs ${message.type === 'user' ? 'text-blue-100' : 'text-gray-500'}`}>
-                                {message.timestamp.toLocaleTimeString()}
-                              </span>
+                              <div className="flex items-center space-x-2">
+                                <span className={`text-xs ${message.type === 'user' ? 'text-blue-100' : 'text-gray-500'}`}>
+                                  {message.timestamp.toLocaleTimeString()}
+                                </span>
+                                {message.type === 'ai' && message.provider && (
+                                  <Badge className={AI_PROVIDERS[message.provider].badgeColor}>
+                                    {AI_PROVIDERS[message.provider].badge}
+                                  </Badge>
+                                )}
+                              </div>
                               {message.type === 'ai' && (
                                 <Button
                                   variant="ghost"
