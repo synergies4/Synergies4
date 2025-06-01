@@ -27,32 +27,6 @@ import {
   MessageSquare
 } from 'lucide-react';
 
-// Counter animation hook
-function useCounter(end: number, duration: number = 2000) {
-  const [count, setCount] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    if (!isVisible) return;
-
-    let startTime: number;
-    const animate = (currentTime: number) => {
-      if (!startTime) startTime = currentTime;
-      const progress = Math.min((currentTime - startTime) / duration, 1);
-      
-      setCount(Math.floor(progress * end));
-      
-      if (progress < 1) {
-        requestAnimationFrame(animate);
-      }
-    };
-    
-    requestAnimationFrame(animate);
-  }, [isVisible, end, duration]);
-
-  return { count, setIsVisible };
-}
-
 export default function AboutUs() {
   return (
     <PageLayout>
@@ -396,4 +370,30 @@ function TestimonialsSection() {
       </div>
     </section>
   );
+}
+
+// Counter animation hook
+function useCounter(end: number, duration: number = 2000) {
+  const [count, setCount] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    if (!isVisible) return;
+
+    let startTime: number;
+    const animate = (currentTime: number) => {
+      if (!startTime) startTime = currentTime;
+      const progress = Math.min((currentTime - startTime) / duration, 1);
+      
+      setCount(Math.floor(progress * end));
+      
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      }
+    };
+    
+    requestAnimationFrame(animate);
+  }, [isVisible, end, duration]);
+
+  return { count, setIsVisible };
 } 

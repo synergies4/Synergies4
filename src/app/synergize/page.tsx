@@ -282,6 +282,13 @@ export default function SynergizeAgile() {
     setHasInitialized(false);
   };
 
+  // Type-safe handler for provider selection
+  const handleProviderChange = (value: string) => {
+    if (value === 'anthropic' || value === 'openai' || value === 'google') {
+      setSelectedProvider(value);
+    }
+  };
+
   const currentRole = AGILE_ROLES[selectedRole as keyof typeof AGILE_ROLES];
   const currentMode = INTERACTION_MODES[selectedMode as keyof typeof INTERACTION_MODES];
   const currentProvider = AI_PROVIDERS[selectedProvider];
@@ -465,7 +472,7 @@ export default function SynergizeAgile() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Select AI Provider
                     </label>
-                    <Select value={selectedProvider} onValueChange={setSelectedProvider}>
+                    <Select value={selectedProvider} onValueChange={handleProviderChange}>
                       <SelectTrigger className="w-full">
                         <SelectValue />
                       </SelectTrigger>

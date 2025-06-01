@@ -7,7 +7,7 @@ import { PerformanceOptimizer } from "@/components/PerformanceOptimizer";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Synergies4 - AI-Powered Learning",
+  title: "Synergies4 - AI-Powered Professional Development",
   description: "AI-powered learning tailored uniquely to you and your organization. Master Agile, leadership, and mental fitness with our comprehensive training programs.",
   keywords: ["AI learning", "Agile training", "Leadership development", "Professional development", "Scrum training", "Product management", "Mental fitness"],
   authors: [{ name: "Synergies4" }],
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://synergies4.com",
     siteName: "Synergies4",
-    title: "Synergies4 - AI-Powered Learning Platform",
+    title: "Synergies4 - AI-Powered Professional Development",
     description: "Transform your career with AI-powered learning. Master Agile, leadership, and mental fitness with expert-led training programs."
   },
   
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     card: "summary",
     site: "@synergies4",
     creator: "@synergies4",
-    title: "Synergies4 - AI-Powered Learning Platform",
+    title: "Synergies4 - AI-Powered Professional Development",
     description: "Transform your career with AI-powered learning. Master Agile, leadership, and mental fitness with expert-led training programs."
   },
   
