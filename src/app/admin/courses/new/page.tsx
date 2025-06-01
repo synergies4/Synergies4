@@ -109,7 +109,7 @@ export default function CreateCourse() {
   
   // AI Assistant State
   const [showAIAssistant, setShowAIAssistant] = useState(false);
-  const [aiMode, setAiMode] = useState('description');
+  const [aiMode, setAiMode] = useState<'title' | 'description' | 'modules' | 'quiz' | 'content' | 'pricing' | 'marketing' | 'imageIdeas'>('description');
   const [aiContext, setAiContext] = useState('');
   const [aiSuggestions, setAiSuggestions] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
@@ -117,20 +117,23 @@ export default function CreateCourse() {
   const [moduleAiSuggestions, setModuleAiSuggestions] = useState<{[key: string]: any}>({});
   const [showModuleAI, setShowModuleAI] = useState<{[key: string]: boolean}>({});
 
+  // Define AI mode type
+  type AiModeType = 'title' | 'description' | 'modules' | 'quiz' | 'content' | 'pricing' | 'marketing' | 'imageIdeas';
+
   // Memoized AI mode options for performance
   const aiModeOptions = useMemo(() => [
-    { mode: 'title', icon: Sparkles, label: 'Title Ideas', shortLabel: 'Title' },
-    { mode: 'description', icon: FileText, label: 'Description', shortLabel: 'Description' },
-    { mode: 'modules', icon: BookOpen, label: 'Modules', shortLabel: 'Modules' },
-    { mode: 'quiz', icon: HelpCircle, label: 'Quiz', shortLabel: 'Quiz' },
-    { mode: 'content', icon: Lightbulb, label: 'Content Ideas', shortLabel: 'Content' },
-    { mode: 'pricing', icon: DollarSign, label: 'Pricing', shortLabel: 'Pricing' },
-    { mode: 'marketing', icon: TrendingUp, label: 'Marketing', shortLabel: 'Marketing' },
-    { mode: 'imageIdeas', icon: ImageIcon, label: 'Image Ideas', shortLabel: 'Images' }
+    { mode: 'title' as AiModeType, icon: Sparkles, label: 'Title Ideas', shortLabel: 'Title' },
+    { mode: 'description' as AiModeType, icon: FileText, label: 'Description', shortLabel: 'Description' },
+    { mode: 'modules' as AiModeType, icon: BookOpen, label: 'Modules', shortLabel: 'Modules' },
+    { mode: 'quiz' as AiModeType, icon: HelpCircle, label: 'Quiz', shortLabel: 'Quiz' },
+    { mode: 'content' as AiModeType, icon: Lightbulb, label: 'Content Ideas', shortLabel: 'Content' },
+    { mode: 'pricing' as AiModeType, icon: DollarSign, label: 'Pricing', shortLabel: 'Pricing' },
+    { mode: 'marketing' as AiModeType, icon: TrendingUp, label: 'Marketing', shortLabel: 'Marketing' },
+    { mode: 'imageIdeas' as AiModeType, icon: ImageIcon, label: 'Image Ideas', shortLabel: 'Images' }
   ], []);
 
   // Memoized AI mode descriptions
-  const aiModeDescriptions = useMemo(() => ({
+  const aiModeDescriptions = useMemo((): Record<AiModeType, { title: string; description: string }> => ({
     title: {
       title: 'Generate Course Title Ideas',
       description: 'Get 5 compelling, SEO-friendly course title suggestions based on your category and level.'
@@ -166,15 +169,15 @@ export default function CreateCourse() {
   }), []);
 
   // Optimized AI mode change handler
-  const handleAiModeChange = useCallback((mode: string) => {
+  const handleAiModeChange = useCallback((mode: AiModeType) => {
     setAiMode(mode);
     setAiError(''); // Clear any previous errors
   }, []);
 
   // Enhanced error handling for AI operations
-  const handleAiError = useCallback((error: any, operation: string) => {
+  const handleAiError = useCallback((error: unknown, operation: string) => {
     console.error(`AI ${operation} Error:`, error);
-    const errorMessage = error?.message || `Failed to ${operation.toLowerCase()}. Please try again.`;
+    const errorMessage = error instanceof Error ? error.message : `Failed to ${operation.toLowerCase()}. Please try again.`;
     setAiError(errorMessage);
     
     // Auto-clear error after 5 seconds
