@@ -118,8 +118,8 @@ export default function HomePage() {
             </Button>
           </div>
 
-          {/* Enhanced Stats with Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+          {/* Enhanced Stats with Cards - Fixed Spacing */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto mb-24">
             {[
               { number: "10K+", label: "Learners", icon: <Users className="w-5 h-5" /> },
               { number: "95%", label: "Success Rate", icon: <TrendingUp className="w-5 h-5" /> },
@@ -137,14 +137,14 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Enhanced Scroll Indicator */}
+        {/* Enhanced Scroll Indicator - Fixed Positioning */}
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
           <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center relative group hover:border-white/50 transition-colors">
             <div className="w-1 h-3 bg-gradient-to-b from-white/60 to-transparent rounded-full mt-2 animate-pulse group-hover:from-cyan-400/80 transition-colors"></div>
           </div>
         </div>
 
-        {/* Floating Action Hint */}
+        {/* Floating Action Hint - Fixed Positioning */}
         <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 text-white/60 text-sm font-medium animate-pulse">
           Scroll to explore
         </div>
@@ -201,12 +201,12 @@ function ValuePropositionsSection() {
       <div className="container mx-auto px-4 relative z-10">
         {/* Enhanced Header */}
         <div className="text-center mb-20">
-          <div className="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 mb-6">
+          <div className="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 mb-8">
             <span className="w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full mr-3 animate-pulse"></span>
             <span className="text-white/90 text-sm font-medium">Why Choose Synergies4?</span>
           </div>
           
-          <h2 className="text-4xl md:text-6xl font-bold mb-8 leading-tight">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-8 leading-tight">
             <span className="bg-gradient-to-r from-white via-blue-100 to-cyan-200 bg-clip-text text-transparent">
               Your AI-Powered
             </span>
@@ -216,7 +216,7 @@ function ValuePropositionsSection() {
             </span>
           </h2>
           
-          <p className="text-xl md:text-2xl text-blue-100/90 max-w-4xl mx-auto leading-relaxed font-light">
+          <p className="text-lg md:text-xl lg:text-2xl text-blue-100/90 max-w-4xl mx-auto leading-relaxed font-light">
             We're not just another training company. We're your intelligent partners in creating 
             <span className="text-cyan-300 font-medium"> personalized learning journeys </span>
             that adapt to your unique goals and accelerate your professional growth.
@@ -310,13 +310,14 @@ function ValuePropositionsSection() {
             
             <Button 
               size="lg" 
-              variant="outline"
-              className="border-2 border-white/30 text-white hover:bg-white/10 px-8 py-4 rounded-xl backdrop-blur-sm hover:border-white/50 transition-all duration-300 hover:scale-105"
+              className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 rounded-xl shadow-2xl hover:shadow-white/25 transition-all duration-300 hover:scale-105 border-0 font-semibold"
               asChild
             >
               <Link href="/synergize">
-                Try AI Assistant
-                <Brain className="ml-2 h-5 w-5" />
+                <span className="flex items-center">
+                  <Brain className="mr-2 h-5 w-5" />
+                  Try AI Assistant
+                </span>
               </Link>
             </Button>
           </div>
