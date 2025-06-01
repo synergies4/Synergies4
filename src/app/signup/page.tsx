@@ -119,22 +119,22 @@ export default function Signup() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 relative overflow-hidden">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 relative overflow-hidden">
         {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-40 -right-32 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute top-1/2 -left-32 w-80 h-80 bg-purple-300/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-          <div className="absolute -bottom-40 right-1/3 w-80 h-80 bg-blue-300/20 rounded-full blur-3xl animate-pulse delay-500"></div>
+          <div className="absolute top-1/2 -left-32 w-80 h-80 bg-teal-300/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute -bottom-40 right-1/3 w-80 h-80 bg-emerald-300/20 rounded-full blur-3xl animate-pulse delay-500"></div>
         </div>
 
         <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
           <div className="w-full max-w-md">
             <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur-xl text-center">
               <CardContent className="pt-8 pb-6">
-                <div className="w-20 h-20 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
+                <div className="w-20 h-20 bg-gradient-to-r from-emerald-400 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
                   <CheckCircle className="w-10 h-10 text-white" />
                 </div>
-                <h2 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-4">
+                <h2 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent mb-4">
                   Welcome Aboard!
                 </h2>
                 <p className="text-gray-600 mb-6 leading-relaxed">
@@ -153,12 +153,12 @@ export default function Signup() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-32 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-1/2 -left-32 w-80 h-80 bg-purple-300/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute -bottom-40 right-1/3 w-80 h-80 bg-blue-300/20 rounded-full blur-3xl animate-pulse delay-500"></div>
+        <div className="absolute top-1/2 -left-32 w-80 h-80 bg-teal-300/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute -bottom-40 right-1/3 w-80 h-80 bg-emerald-300/20 rounded-full blur-3xl animate-pulse delay-500"></div>
       </div>
 
       <div className="relative z-10 min-h-screen flex">
@@ -167,47 +167,47 @@ export default function Signup() {
           <div className="max-w-md">
             <div className="flex items-center space-x-3 mb-8">
               <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                <Sparkles className="w-6 h-6 text-white" />
+                <Sparkles className="w-6 h-6 text-teal-400" />
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-white">Synergies4</h1>
-                <p className="text-blue-100 text-sm">AI-Powered Learning Platform</p>
+                <p className="text-gray-100 text-sm">AI-Powered Learning Platform</p>
               </div>
             </div>
             
             <h2 className="text-4xl font-bold text-white mb-6 leading-tight">
-              Transform Your Career with <span className="text-yellow-300">AI-Driven</span> Learning
+              Transform Your Career with <span className="text-teal-300">AI-Driven</span> Learning
             </h2>
             
-            <p className="text-blue-100 text-lg mb-8 leading-relaxed">
+            <p className="text-gray-100 text-lg mb-8 leading-relaxed">
               Join the next generation of Agile professionals. Get personalized training, expert guidance, and industry-recognized certifications.
             </p>
 
             {/* Benefits */}
             <div className="space-y-4 mb-8">
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-green-400/20 rounded-full flex items-center justify-center">
-                  <CheckCircle className="w-4 h-4 text-green-300" />
+                <div className="w-8 h-8 bg-emerald-400/20 rounded-full flex items-center justify-center">
+                  <CheckCircle className="w-4 h-4 text-emerald-300" />
                 </div>
-                <span className="text-blue-100">Personalized AI-powered learning paths</span>
+                <span className="text-gray-100">Personalized AI-powered learning paths</span>
               </div>
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-green-400/20 rounded-full flex items-center justify-center">
-                  <CheckCircle className="w-4 h-4 text-green-300" />
+                <div className="w-8 h-8 bg-emerald-400/20 rounded-full flex items-center justify-center">
+                  <CheckCircle className="w-4 h-4 text-emerald-300" />
                 </div>
-                <span className="text-blue-100">Expert mentorship and guidance</span>
+                <span className="text-gray-100">Expert mentorship and guidance</span>
               </div>
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-green-400/20 rounded-full flex items-center justify-center">
-                  <CheckCircle className="w-4 h-4 text-green-300" />
+                <div className="w-8 h-8 bg-emerald-400/20 rounded-full flex items-center justify-center">
+                  <CheckCircle className="w-4 h-4 text-emerald-300" />
                 </div>
-                <span className="text-blue-100">Industry-recognized certifications</span>
+                <span className="text-gray-100">Industry-recognized certifications</span>
               </div>
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-green-400/20 rounded-full flex items-center justify-center">
-                  <CheckCircle className="w-4 h-4 text-green-300" />
+                <div className="w-8 h-8 bg-emerald-400/20 rounded-full flex items-center justify-center">
+                  <CheckCircle className="w-4 h-4 text-emerald-300" />
                 </div>
-                <span className="text-blue-100">30-day money-back guarantee</span>
+                <span className="text-gray-100">30-day money-back guarantee</span>
               </div>
             </div>
 
@@ -233,11 +233,11 @@ export default function Signup() {
               <Link href="/" className="inline-block">
                 <div className="flex items-center justify-center space-x-3">
                   <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                    <Sparkles className="w-6 h-6 text-white" />
+                    <Sparkles className="w-6 h-6 text-teal-400" />
                   </div>
                   <div>
                     <h1 className="text-2xl font-bold text-white">Synergies4</h1>
-                    <p className="text-blue-100 text-xs">AI-Powered Learning</p>
+                    <p className="text-gray-100 text-xs">AI-Powered Learning</p>
                   </div>
                 </div>
               </Link>
@@ -245,7 +245,7 @@ export default function Signup() {
 
             <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur-xl">
               <CardHeader className="space-y-1 text-center pb-6">
-                <CardTitle className="text-2xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                <CardTitle className="text-2xl font-bold tracking-tight bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent">
                   Create your account
                 </CardTitle>
                 <CardDescription className="text-gray-600">
@@ -266,7 +266,7 @@ export default function Signup() {
                         placeholder="Enter your full name"
                         value={formData.name}
                         onChange={handleChange}
-                        className="pl-10 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500 transition-colors"
+                        className="pl-10 h-12 border-gray-200 focus:border-teal-500 focus:ring-teal-500 transition-colors bg-white text-gray-900 placeholder:text-gray-500"
                         required
                       />
                     </div>
@@ -283,7 +283,7 @@ export default function Signup() {
                         placeholder="Enter your email address"
                         value={formData.email}
                         onChange={handleChange}
-                        className="pl-10 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500 transition-colors"
+                        className="pl-10 h-12 border-gray-200 focus:border-teal-500 focus:ring-teal-500 transition-colors bg-white text-gray-900 placeholder:text-gray-500"
                         required
                       />
                     </div>
@@ -300,7 +300,7 @@ export default function Signup() {
                         placeholder="Create a password"
                         value={formData.password}
                         onChange={handleChange}
-                        className="pl-10 pr-12 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500 transition-colors"
+                        className="pl-10 pr-12 h-12 border-gray-200 focus:border-teal-500 focus:ring-teal-500 transition-colors bg-white text-gray-900 placeholder:text-gray-500"
                         required
                       />
                       <Button
@@ -330,7 +330,7 @@ export default function Signup() {
                         placeholder="Confirm your password"
                         value={formData.confirmPassword}
                         onChange={handleChange}
-                        className="pl-10 pr-12 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500 transition-colors"
+                        className="pl-10 pr-12 h-12 border-gray-200 focus:border-teal-500 focus:ring-teal-500 transition-colors bg-white text-gray-900 placeholder:text-gray-500"
                         required
                       />
                       <Button
@@ -357,7 +357,7 @@ export default function Signup() {
 
                   <Button
                     type="submit"
-                    className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold text-base transition-all duration-200 transform hover:scale-[1.02] shadow-lg hover:shadow-xl"
+                    className="w-full h-12 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-semibold text-base transition-all duration-200 transform hover:scale-[1.02] shadow-lg hover:shadow-xl"
                     disabled={isLoading}
                   >
                     {isLoading ? (
@@ -414,9 +414,9 @@ export default function Signup() {
 
                 <div className="text-xs text-center text-gray-500 bg-gray-50 p-3 rounded-lg">
                   By creating an account, you agree to our{' '}
-                  <Link href="/terms" className="text-blue-600 hover:underline">Terms of Service</Link>
+                  <Link href="/terms" className="text-teal-600 hover:underline">Terms of Service</Link>
                   {' '}and{' '}
-                  <Link href="/privacy" className="text-blue-600 hover:underline">Privacy Policy</Link>
+                  <Link href="/privacy" className="text-teal-600 hover:underline">Privacy Policy</Link>
                 </div>
               </CardContent>
 
@@ -425,7 +425,7 @@ export default function Signup() {
                   Already have an account?{' '}
                   <Link
                     href="/login"
-                    className="font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+                    className="font-semibold text-teal-600 hover:text-teal-700 transition-colors"
                   >
                     Sign in
                   </Link>

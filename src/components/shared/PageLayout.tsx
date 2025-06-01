@@ -156,7 +156,7 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
               {user ? (
                 <div className="flex items-center space-x-2">
                   <Link href="/dashboard">
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" className="text-gray-700 hover:text-gray-900 border-gray-300 hover:border-gray-400">
                       Dashboard
                     </Button>
                   </Link>
@@ -164,7 +164,7 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                     variant="outline"
                     size="sm"
                     onClick={() => signOut()}
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-300 hover:border-red-400"
                   >
                     <LogOut className="w-4 h-4" />
                   </Button>
@@ -172,12 +172,12 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
               ) : (
                 <>
                   <Link href="/login">
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" className="text-gray-700 hover:text-gray-900 border-gray-300 hover:border-gray-400 font-medium">
                       Login
                     </Button>
                   </Link>
                   <Link href="/signup">
-                    <Button size="sm" className="bg-teal-600 hover:bg-teal-700 text-white">
+                    <Button size="sm" className="bg-teal-600 hover:bg-teal-700 text-white font-medium">
                       Sign Up
                     </Button>
                   </Link>

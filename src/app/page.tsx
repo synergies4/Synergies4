@@ -642,31 +642,31 @@ function CertificationsSection() {
   };
 
   return (
-    <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50 relative overflow-hidden">
+    <section className="py-20 bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden">
       {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-20 right-10 w-32 h-32 bg-gradient-to-br from-blue-200/30 to-purple-200/30 rounded-full blur-xl"></div>
-        <div className="absolute bottom-20 left-10 w-24 h-24 bg-gradient-to-br from-purple-200/30 to-pink-200/30 rounded-lg blur-lg"></div>
-        <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-gradient-to-br from-cyan-200/30 to-blue-200/30 rounded-full blur-lg"></div>
+        <div className="absolute top-20 right-10 w-32 h-32 bg-gradient-to-br from-teal-200/30 to-emerald-200/30 rounded-full blur-xl"></div>
+        <div className="absolute bottom-20 left-10 w-24 h-24 bg-gradient-to-br from-emerald-200/30 to-cyan-200/30 rounded-lg blur-lg"></div>
+        <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-gradient-to-br from-cyan-200/30 to-teal-200/30 rounded-full blur-lg"></div>
       </div>
 
       {/* Grid Pattern */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute inset-0" style={{
-          backgroundImage: `linear-gradient(90deg, #3B82F6 1px, transparent 1px),
-                           linear-gradient(180deg, #3B82F6 1px, transparent 1px)`,
+          backgroundImage: `linear-gradient(90deg, #14B8A6 1px, transparent 1px),
+                           linear-gradient(180deg, #14B8A6 1px, transparent 1px)`,
           backgroundSize: '50px 50px'
         }} />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-16">
-          <Badge className="mb-4 bg-purple-100 text-purple-700 hover:bg-purple-200 border-purple-200">
+          <Badge className="mb-4 bg-teal-100 text-teal-700 hover:bg-teal-200 border-teal-200">
             <Award className="w-4 h-4 mr-2" />
             Professional Certifications
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-            <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent">
               Advance Your Career
             </span>
             <br />
@@ -718,7 +718,7 @@ function CertificationsSection() {
           ].map((cert, index) => (
             <Card key={index} className="group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white/90 backdrop-blur-sm border-0 shadow-lg overflow-hidden rounded-xl flex flex-col h-full">
               {/* Header with Icon */}
-              <div className="relative bg-gradient-to-br from-gray-50 to-blue-50 p-6 border-b flex-shrink-0">
+              <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 p-6 border-b flex-shrink-0">
                 <div className="flex items-start justify-between mb-4">
                   <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${getProgressColor(cert.level)} flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300`}>
                     {getIcon(cert.title)}
@@ -728,7 +728,7 @@ function CertificationsSection() {
                   </Badge>
                 </div>
                 
-                <CardTitle className="text-xl font-bold group-hover:text-blue-600 transition-colors mb-2 min-h-[3rem] flex items-center">
+                <CardTitle className="text-xl font-bold group-hover:text-teal-600 transition-colors mb-2 min-h-[3rem] flex items-center">
                   {cert.title}
                 </CardTitle>
                 <CardDescription className="text-gray-600 leading-relaxed min-h-[4.5rem]">
@@ -741,11 +741,11 @@ function CertificationsSection() {
                 {/* Stats Grid */}
                 <div className="grid grid-cols-2 gap-4 mb-6 flex-shrink-0">
                   <div className="text-center p-3 bg-gray-50 rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600">{cert.duration}</div>
+                    <div className="text-2xl font-bold text-teal-600">{cert.duration}</div>
                     <div className="text-sm text-gray-500">Duration</div>
                   </div>
                   <div className="text-center p-3 bg-gray-50 rounded-lg">
-                    <div className="text-2xl font-bold text-purple-600">{cert.modules}</div>
+                    <div className="text-2xl font-bold text-emerald-600">{cert.modules}</div>
                     <div className="text-sm text-gray-500">Modules</div>
                   </div>
                 </div>
@@ -824,7 +824,7 @@ function CertificationsSection() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
                 size="lg" 
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                 asChild
               >
                 <Link href="/courses">
@@ -925,12 +925,12 @@ function NewsletterSection() {
   };
 
   return (
-    <section className="py-20 bg-blue-600">
+    <section className="py-20 bg-teal-600">
       <div className="container mx-auto px-4 text-center">
         <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
           Stay Updated
         </h2>
-        <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+        <p className="text-xl text-teal-100 mb-8 max-w-2xl mx-auto">
           Get the latest insights on AI, leadership, and professional development
         </p>
         
@@ -946,7 +946,7 @@ function NewsletterSection() {
           <Button 
             type="submit" 
             disabled={isSubmitting}
-            className="bg-white text-blue-600 hover:bg-gray-100"
+            className="bg-white text-teal-600 hover:bg-gray-100"
           >
             {isSubmitting ? 'Subscribing...' : 'Subscribe'}
           </Button>

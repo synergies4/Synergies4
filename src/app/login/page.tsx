@@ -80,10 +80,10 @@ export default function Login() {
   // Show loading if auth is loading, or user exists but no profile yet
   if (loading || (user && !userProfile)) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 flex items-center justify-center p-4">
         <div className="text-center">
           <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-            <Sparkles className="h-8 w-8 text-white animate-spin" />
+            <Sparkles className="h-8 w-8 text-teal-400 animate-spin" />
           </div>
           <p className="text-white text-lg font-medium">Loading your experience...</p>
         </div>
@@ -92,12 +92,12 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-32 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-1/2 -left-32 w-80 h-80 bg-purple-300/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute -bottom-40 right-1/3 w-80 h-80 bg-blue-300/20 rounded-full blur-3xl animate-pulse delay-500"></div>
+        <div className="absolute top-1/2 -left-32 w-80 h-80 bg-teal-300/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute -bottom-40 right-1/3 w-80 h-80 bg-emerald-300/20 rounded-full blur-3xl animate-pulse delay-500"></div>
       </div>
 
       <div className="relative z-10 min-h-screen flex">
@@ -106,19 +106,19 @@ export default function Login() {
           <div className="max-w-md">
             <div className="flex items-center space-x-3 mb-8">
               <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                <Sparkles className="w-6 h-6 text-white" />
+                <Sparkles className="w-6 h-6 text-teal-400" />
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-white">Synergies4</h1>
-                <p className="text-blue-100 text-sm">AI-Powered Learning Platform</p>
+                <p className="text-gray-100 text-sm">AI-Powered Learning Platform</p>
               </div>
             </div>
             
             <h2 className="text-4xl font-bold text-white mb-6 leading-tight">
-              Accelerate Your <span className="text-yellow-300">Agile Journey</span> with AI
+              Accelerate Your <span className="text-teal-300">Agile Journey</span> with AI
             </h2>
             
-            <p className="text-blue-100 text-lg mb-8 leading-relaxed">
+            <p className="text-gray-100 text-lg mb-8 leading-relaxed">
               Join thousands of professionals mastering Agile methodologies through personalized, AI-driven learning experiences.
             </p>
 
@@ -126,18 +126,18 @@ export default function Login() {
             <div className="grid grid-cols-2 gap-6 mb-8">
               <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
                 <div className="flex items-center space-x-2 mb-2">
-                  <Users className="w-5 h-5 text-yellow-300" />
+                  <Users className="w-5 h-5 text-teal-300" />
                   <span className="text-white font-semibold">10,000+</span>
                 </div>
-                <p className="text-blue-100 text-sm">Active Learners</p>
+                <p className="text-gray-100 text-sm">Active Learners</p>
               </div>
               
               <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
                 <div className="flex items-center space-x-2 mb-2">
-                  <Award className="w-5 h-5 text-yellow-300" />
+                  <Award className="w-5 h-5 text-emerald-300" />
                   <span className="text-white font-semibold">95%</span>
                 </div>
-                <p className="text-blue-100 text-sm">Success Rate</p>
+                <p className="text-gray-100 text-sm">Success Rate</p>
               </div>
             </div>
 
@@ -163,11 +163,11 @@ export default function Login() {
               <Link href="/" className="inline-block">
                 <div className="flex items-center justify-center space-x-3">
                   <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                    <Sparkles className="w-6 h-6 text-white" />
+                    <Sparkles className="w-6 h-6 text-teal-400" />
                   </div>
                   <div>
                     <h1 className="text-2xl font-bold text-white">Synergies4</h1>
-                    <p className="text-blue-100 text-xs">AI-Powered Learning</p>
+                    <p className="text-gray-100 text-xs">AI-Powered Learning</p>
                   </div>
                 </div>
               </Link>
@@ -175,7 +175,7 @@ export default function Login() {
 
             <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur-xl">
               <CardHeader className="space-y-1 text-center pb-6">
-                <CardTitle className="text-2xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                <CardTitle className="text-2xl font-bold tracking-tight bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent">
                   Welcome back
                 </CardTitle>
                 <CardDescription className="text-gray-600">
@@ -195,7 +195,7 @@ export default function Login() {
                         placeholder="Enter your email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="pl-10 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500 transition-colors"
+                        className="pl-10 h-12 border-gray-200 focus:border-teal-500 focus:ring-teal-500 transition-colors bg-white text-gray-900 placeholder:text-gray-500"
                         required
                       />
                     </div>
@@ -211,7 +211,7 @@ export default function Login() {
                         placeholder="Enter your password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="pl-10 pr-12 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500 transition-colors"
+                        className="pl-10 pr-12 h-12 border-gray-200 focus:border-teal-500 focus:ring-teal-500 transition-colors bg-white text-gray-900 placeholder:text-gray-500"
                         required
                       />
                       <Button
@@ -238,7 +238,7 @@ export default function Login() {
 
                   <Button
                     type="submit"
-                    className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold text-base transition-all duration-200 transform hover:scale-[1.02] shadow-lg hover:shadow-xl"
+                    className="w-full h-12 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-semibold text-base transition-all duration-200 transform hover:scale-[1.02] shadow-lg hover:shadow-xl"
                     disabled={isLoading}
                   >
                     {isLoading ? (
@@ -299,7 +299,7 @@ export default function Login() {
                   Don't have an account?{' '}
                   <Link
                     href="/signup"
-                    className="font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+                    className="font-semibold text-teal-600 hover:text-teal-700 transition-colors"
                   >
                     Sign up for free
                   </Link>
