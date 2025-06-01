@@ -1,16 +1,13 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
-import { motion, useScroll, useTransform, useInView } from 'framer-motion';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Separator } from '@/components/ui/separator';
-import { UserAvatar } from '@/components/UserAvatar';
-import { useAuth } from '@/contexts/AuthContext';
+import PageLayout from '@/components/shared/PageLayout';
+import HeroSection from '@/components/shared/HeroSection';
 import { 
   ArrowRight, 
   BookOpen, 
@@ -25,955 +22,343 @@ import {
   Rocket,
   Building,
   Lightbulb,
-  Settings,
-  BarChart3,
+  Compass,
   MessageSquare,
-  Menu,
-  X
+  BarChart3,
+  Settings,
+  Globe
 } from 'lucide-react';
-import { AnimatePresence } from 'framer-motion';
-
-// Animation variants
-const fadeInUp = {
-  initial: { opacity: 0, y: 60 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.6, ease: [0.6, -0.05, 0.01, 0.99] }
-};
-
-const staggerContainer = {
-  animate: {
-    transition: {
-      staggerChildren: 0.1
-    }
-  }
-};
-
-const scaleIn = {
-  initial: { opacity: 0, scale: 0.8 },
-  animate: { opacity: 1, scale: 1 },
-  transition: { duration: 0.5, ease: [0.6, -0.05, 0.01, 0.99] }
-};
-
-// Enhanced button animation variants
-const buttonHover = {
-  scale: 1.02,
-  transition: { type: "spring", stiffness: 400, damping: 25 }
-};
-
-const buttonTap = {
-  scale: 0.98,
-  transition: { type: "spring", stiffness: 400, damping: 25 }
-};
-
-// Scroll-triggered animation hook
-function useScrollAnimation() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-  return { ref, isInView };
-}
 
 export default function Consulting() {
-  const { scrollYProgress } = useScroll();
-  const heroY = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
-  const { user } = useAuth();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
   return (
-    <main className="min-h-screen">
-      {/* Countdown Banner */}
-      <motion.div 
-        className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3"
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-center">
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              className="text-sm md:text-base"
-            >
-              🚀 Expand your potential through learning. Offering earlybirds a discount of $295.00.
-            </motion.p>
-            <motion.div
-              className="flex gap-2"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
-            >
-              {['00 Days', '00 Hours', '00 Minutes', '00 Seconds'].map((time, index) => (
-                <Badge key={index} variant="secondary" className="bg-white/20 text-white border-white/30">
-                  {time}
-                </Badge>
-              ))}
-            </motion.div>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Navigation */}
-      <motion.nav 
-        className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b shadow-sm"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-      >
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
-            >
-              <Link href="/" className="flex items-center">
-                <motion.span 
-                  className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover:from-blue-700 hover:to-purple-700 transition-all duration-300"
-                  whileHover={{ 
-                    scale: 1.02,
-                    textShadow: "0 0 8px rgba(59, 130, 246, 0.5)"
-                  }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                >
-                  Synergies4
-                </motion.span>
-              </Link>
-            </motion.div>
-            
-            <div className="hidden md:flex items-center space-x-8">
-              {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item, index) => (
-                <motion.div
-                  key={item}
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 + index * 0.1, duration: 0.5 }}
-                >
-                  <Link 
-                    href={
-                      item === 'About Us' ? '/about-us' :
-                      item === 'Courses' ? '/courses' :
-                      item === 'Coaching' ? '/coaching' : 
-                      item === 'Consulting' ? '/consulting' : 
-                      item === 'Industry Insight' ? '/industry-insight' :
-                      `/${item.toLowerCase().replace(' ', '-')}`
-                    } 
-                    className={`text-gray-600 hover:text-blue-600 transition-colors font-medium ${
-                      item === 'Consulting' ? 'text-blue-600 font-semibold' : ''
-                    }`}
-                  >
-                    {item}
-                  </Link>
-                </motion.div>
-              ))}
-              
-              {/* Synergize Button */}
-              <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7, duration: 0.5 }}
-              >
-                <motion.div
-                  whileHover={{ scale: 1.02, y: -1 }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                >
-                  <Button 
-                    asChild 
-                    className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
-                  >
-                    <Link href="/synergize">
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                        initial={{ x: '-100%' }}
-                        whileHover={{ x: '100%' }}
-                        transition={{ duration: 0.6, ease: "easeInOut" }}
-                      />
-                      <span className="relative z-10 flex items-center">
-                        <Brain className="w-4 h-4 mr-2" />
-                        Synergize
-                      </span>
-                    </Link>
-                  </Button>
-                </motion.div>
-              </motion.div>
-              
-              {/* Distinctive Contact Button */}
-              <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8, duration: 0.5 }}
-              >
-                <motion.div
-                  whileHover={{ scale: 1.02, y: -1 }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                >
-                  <Button 
-                    asChild 
-                    className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
-                  >
-                    <Link href="/contact">
-                      {/* Subtle shine effect */}
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                        initial={{ x: '-100%' }}
-                        whileHover={{ x: '100%' }}
-                        transition={{ duration: 0.6, ease: "easeInOut" }}
-                      />
-                      <span className="relative z-10 flex items-center">
-                        <MessageSquare className="w-4 h-4 mr-2" />
-                        Contact
-                      </span>
-                    </Link>
-                  </Button>
-                </motion.div>
-              </motion.div>
-            </div>
-            
-            <motion.div 
-              className="flex items-center space-x-3"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.5, duration: 0.5 }}
-            >
-              {user ? (
-                <UserAvatar />
-              ) : (
-                <>
-                  <Button variant="ghost" asChild className="hover:bg-blue-50 hover:text-blue-600 transition-colors">
-                    <Link href="/login">Login</Link>
-                  </Button>
-                  <Button asChild className="bg-blue-600 hover:bg-blue-700 transition-colors">
-                    <Link href="/signup">Sign Up</Link>
-                  </Button>
-                </>
-              )}
-            </motion.div>
-
-            {/* Mobile Menu Button */}
-            <div className="md:hidden">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2"
-              >
-                {mobileMenuOpen ? (
-                  <X className="h-6 w-6" />
-                ) : (
-                  <Menu className="h-6 w-6" />
-                )}
-              </Button>
-            </div>
-          </div>
-
-          {/* Mobile Menu */}
-          <AnimatePresence>
-            {mobileMenuOpen && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
-                className="md:hidden border-t bg-white/95 backdrop-blur-md overflow-hidden"
-              >
-                <div className="px-4 py-4 space-y-4">
-                  {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item) => (
-                    <Link
-                      key={item}
-                      href={
-                        item === 'About Us' ? '/about-us' :
-                        item === 'Courses' ? '/courses' :
-                        item === 'Coaching' ? '/coaching' : 
-                        item === 'Consulting' ? '/consulting' : 
-                        item === 'Industry Insight' ? '/industry-insight' :
-                        `/${item.toLowerCase().replace(' ', '-')}`
-                      }
-                      className={`block text-gray-600 hover:text-blue-600 transition-colors font-medium py-2 text-lg ${
-                        item === 'Consulting' ? 'text-blue-600 font-semibold' : ''
-                      }`}
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      {item}
-                    </Link>
-                  ))}
-                  
-                  {/* Mobile Buttons */}
-                  <div className="pt-2 space-y-3">
-                    {/* Synergize Button for Mobile */}
-                    <motion.div
-                      whileHover={{ scale: 1.02, y: -1 }}
-                      whileTap={{ scale: 0.98 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                    >
-                      <Button 
-                        asChild 
-                        className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group text-lg py-3"
-                      >
-                        <Link href="/synergize" onClick={() => setMobileMenuOpen(false)}>
-                          <span className="relative z-10 flex items-center justify-center">
-                            <Brain className="w-4 h-4 mr-2" />
-                            Synergize
-                          </span>
-                        </Link>
-                      </Button>
-                    </motion.div>
-                    
-                    {/* Contact Button for Mobile */}
-                    <motion.div
-                      whileHover={{ scale: 1.02, y: -1 }}
-                      whileTap={{ scale: 0.98 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                    >
-                      <Button 
-                        asChild 
-                        className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group text-lg py-3"
-                      >
-                        <Link href="/contact" onClick={() => setMobileMenuOpen(false)}>
-                          <motion.div
-                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                            initial={{ x: '-100%' }}
-                            whileHover={{ x: '100%' }}
-                            transition={{ duration: 0.6, ease: "easeInOut" }}
-                          />
-                          <span className="relative z-10 flex items-center justify-center">
-                            <MessageSquare className="w-4 h-4 mr-2" />
-                            Contact Us
-                          </span>
-                        </Link>
-                      </Button>
-                    </motion.div>
-                  </div>
-                  
-                  {/* Mobile Auth */}
-                  <div className="pt-4 border-t space-y-3">
-                    {user ? (
-                      <div className="flex items-center space-x-2">
-                        <UserAvatar />
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        <Button variant="ghost" className="w-full justify-start text-lg py-3" asChild>
-                          <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                            Login
-                          </Link>
-                        </Button>
-                        <Button className="w-full text-lg py-3" asChild>
-                          <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
-                            Sign Up
-                          </Link>
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </motion.nav>
-
+    <PageLayout>
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-20 overflow-hidden">
-        {/* Animated Background */}
-        <div className="absolute inset-0 overflow-hidden">
-          {/* Floating Gradient Shapes */}
-          <motion.div
-            className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-lg blur-xl"
-            animate={{
-              x: [0, 30, 0],
-              y: [0, -20, 0],
-              rotate: [0, 180, 360],
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-          <motion.div
-            className="absolute top-32 right-20 w-24 h-24 bg-gradient-to-br from-purple-400/25 to-pink-400/25 rounded-full blur-lg"
-            animate={{
-              x: [0, -25, 0],
-              y: [0, 15, 0],
-              scale: [1, 1.2, 1],
-            }}
-            transition={{
-              duration: 6,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 1
-            }}
-          />
-          <motion.div
-            className="absolute bottom-20 left-1/4 w-40 h-40 bg-gradient-to-br from-indigo-400/15 to-blue-400/15 rounded-2xl blur-2xl"
-            animate={{
-              x: [0, 40, 0],
-              y: [0, -30, 0],
-              rotate: [0, -90, 0],
-            }}
-            transition={{
-              duration: 10,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 2
-            }}
-          />
-          <motion.div
-            className="absolute top-1/2 right-10 w-28 h-28 bg-gradient-to-br from-cyan-400/20 to-blue-400/20 rounded-lg blur-xl"
-            animate={{
-              x: [0, -20, 0],
-              y: [0, 25, 0],
-              rotate: [0, 270, 360],
-            }}
-            transition={{
-              duration: 7,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 0.5
-            }}
-          />
-          <motion.div
-            className="absolute bottom-32 right-1/3 w-36 h-36 bg-gradient-to-br from-violet-400/18 to-purple-400/18 rounded-full blur-2xl"
-            animate={{
-              x: [0, 35, 0],
-              y: [0, -40, 0],
-              scale: [1, 0.8, 1],
-            }}
-            transition={{
-              duration: 9,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 1.5
-            }}
-          />
-          
-          {/* Pixelated Grid Overlay */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="grid grid-cols-12 md:grid-cols-20 lg:grid-cols-32 h-full gap-1">
-              {Array.from({ length: 384 }).map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="bg-gradient-to-br from-blue-500/30 to-purple-500/30 rounded-sm"
-                  initial={{ opacity: 0 }}
-                  animate={{ 
-                    opacity: [0, 0.3, 0],
-                    scale: [0.8, 1, 0.8]
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    delay: i * 0.01,
-                    ease: "easeInOut"
-                  }}
-                />
-              ))}
-            </div>
-          </div>
+      <HeroSection
+        badge={{
+          icon: <Building className="w-4 h-4" />,
+          text: "Enterprise Consulting"
+        }}
+        title="Transform Your"
+        highlightText="Organization"
+        description="Drive enterprise-wide transformation with our expert consulting services. From AI integration to Agile adoption, we help organizations build the capabilities needed for future success."
+        primaryCTA={{
+          text: "Schedule Consultation",
+          href: "/contact"
+        }}
+        secondaryCTA={{
+          text: "Our Services",
+          href: "#consulting-services",
+          icon: <ArrowRight className="w-4 h-4" />
+        }}
+        backgroundVariant="pattern"
+        size="large"
+      />
 
-          {/* Floating Particles - Mobile Optimized */}
-          <div className="hidden md:block">
-            {Array.from({ length: 20 }).map((_, i) => (
-              <motion.div
-                key={`particle-${i}`}
-                className="absolute w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-40"
-                style={{
-                  left: `${(i * 5) % 100}%`,
-                  top: `${(i * 7) % 100}%`,
-                }}
-                animate={{
-                  y: [0, -100, 0],
-                  x: [0, (i % 2 === 0 ? 25 : -25), 0],
-                  opacity: [0.4, 0.8, 0.4],
-                }}
-                transition={{
-                  duration: 4 + (i % 4),
-                  repeat: Infinity,
-                  delay: i * 0.1,
-                  ease: "easeInOut"
-                }}
-              />
-            ))}
-          </div>
-          
-          {/* Mobile-optimized particles */}
-          <div className="block md:hidden">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <motion.div
-                key={`mobile-particle-${i}`}
-                className="absolute w-1 h-1 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-30"
-                style={{
-                  left: `${(i * 20) % 100}%`,
-                  top: `${(i * 25) % 100}%`,
-                }}
-                animate={{
-                  y: [0, -30, 0],
-                  opacity: [0.2, 0.4, 0.2],
-                }}
-                transition={{
-                  duration: 8,
-                  repeat: Infinity,
-                  delay: i * 0.5,
-                  ease: "easeInOut"
-                }}
-              />
-            ))}
-          </div>
-
-          {/* Gradient Mesh - Simplified for mobile */}
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/3 via-purple-500/3 to-pink-500/3" />
-        </div>
-
-        <motion.div 
-          className="container mx-auto px-4 text-center relative z-10"
-          style={{ y: heroY, opacity: heroOpacity }}
-        >
-          <motion.div
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: [0.6, -0.05, 0.01, 0.99] }}
-          >
-            <Badge className="mb-6 bg-blue-100 text-blue-700 hover:bg-blue-200">
-              <Building className="w-4 h-4 mr-2" />
-              Business Consulting
-            </Badge>
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-              Transform Your{' '}
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Business
-              </span>
-            </h1>
-            <h2 className="text-2xl md:text-3xl font-semibold text-gray-700 mb-6">
-              with Synergies4 Consulting
-            </h2>
-          </motion.div>
-          
-          <motion.p 
-            className="text-lg text-gray-700 max-w-4xl mx-auto space-y-4 mb-8"
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4, ease: [0.6, -0.05, 0.01, 0.99] }}
-          >
-            At Synergies4, we don't just provide solutions — we partner with you to transform your business, streamline operations, and create lasting impact. Whether you're seeking to integrate cutting-edge AI, implement agile transformation, or develop positive intelligence (PQ) within your teams, our consulting services offer actionable strategies and hands-on support to make it happen.
-          </motion.p>
-          
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6, ease: [0.6, -0.05, 0.01, 0.99] }}
-          >
-            <motion.div
-              whileHover={{ 
-                scale: 1.02,
-                y: -2
-              }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ type: "spring", stiffness: 400, damping: 25 }}
-            >
-              <Button 
-                size="lg" 
-                className="text-lg px-8 py-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group" 
-                asChild
-              >
-                <Link href="/contact">
-                  {/* Subtle shine effect */}
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                    initial={{ x: '-100%' }}
-                    whileHover={{ x: '100%' }}
-                    transition={{ duration: 0.6, ease: "easeInOut" }}
-                  />
-                  
-                  <span className="relative z-10 flex items-center">
-                    Request Consultation
-                    <ArrowRight className="h-5 w-5 ml-2 transition-transform group-hover:translate-x-1" />
-                  </span>
-                </Link>
-              </Button>
-            </motion.div>
-          </motion.div>
-        </motion.div>
-      </section>
+      {/* Services Section */}
+      <ServicesSection />
 
       {/* Why Choose Section */}
       <WhyChooseSection />
 
-      {/* Our Approach Section */}
-      <OurApproachSection />
-
-      {/* Testimonials Section */}
-      <TestimonialsSection />
+      {/* Case Studies */}
+      <CaseStudiesSection />
 
       {/* CTA Section */}
       <CTASection />
-
-      {/* Footer */}
-      <motion.footer 
-        className="bg-gray-900 text-white py-16"
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-      >
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
-            >
-              <motion.span 
-                className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-4 block"
-              >
-                Synergies4
-              </motion.span>
-              <p className="text-gray-400 mb-4">
-                AI-powered learning tailored uniquely to you and your organization.
-              </p>
-              <div className="flex space-x-4">
-                {['Facebook', 'Twitter', 'LinkedIn', 'Instagram'].map((social) => (
-                  <a key={social} href="#" className="text-gray-400 hover:text-white transition-colors">
-                    <span className="sr-only">{social}</span>
-                    <div className="w-6 h-6 bg-gray-400 rounded"></div>
-                  </a>
-                ))}
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
-            >
-              <h3 className="text-lg font-semibold mb-4">Courses</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Agile & Scrum</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Product Management</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Leadership</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Business Analysis</a></li>
-              </ul>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.5 }}
-            >
-              <h3 className="text-lg font-semibold mb-4">Company</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link href="/about-us" className="hover:text-white transition-colors">About Us</Link></li>
-                <li><Link href="/coaching" className="hover:text-white transition-colors">Coaching</Link></li>
-                <li><Link href="/consulting" className="hover:text-white transition-colors">Consulting</Link></li>
-              </ul>
-              
-              {/* Distinctive Contact Button in Footer */}
-              <div className="mt-6">
-                <motion.div
-                  whileHover={{ scale: 1.02, y: -1 }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                >
-                  <Button 
-                    asChild 
-                    size="sm"
-                    className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group w-full"
-                  >
-                    <Link href="/contact">
-                      {/* Subtle shine effect */}
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                        initial={{ x: '-100%' }}
-                        whileHover={{ x: '100%' }}
-                        transition={{ duration: 0.6, ease: "easeInOut" }}
-                      />
-                      <span className="relative z-10 flex items-center justify-center">
-                        <MessageSquare className="w-4 h-4 mr-2" />
-                        Contact Us
-                      </span>
-                    </Link>
-                  </Button>
-                </motion.div>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6, duration: 0.5 }}
-            >
-              <h3 className="text-lg font-semibold mb-4">Support</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Cookie Policy</a></li>
-              </ul>
-            </motion.div>
-          </div>
-
-          <Separator className="bg-gray-800 mb-8" />
-
-          <motion.div 
-            className="text-center text-gray-400"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.7, duration: 0.5 }}
-          >
-            <p>&copy; {new Date().getFullYear()} Synergies4 LLC. All rights reserved.</p>
-            <p className="mt-2 text-sm">
-              Synergies4™, PocketCoachAI™, Adaptive Content Pods™ are trademarks of Synergies4 LLC.
-            </p>
-          </motion.div>
-        </div>
-      </motion.footer>
-    </main>
+    </PageLayout>
   );
 }
 
-// Why Choose Section Component
-function WhyChooseSection() {
-  const { ref, isInView } = useScrollAnimation();
-
-  const benefits = [
-    {
-      title: "Tailored Strategies for Real-World Impact",
-      description: "We understand that every business is unique. That's why our consulting approach is customized to align with your specific goals, culture, and challenges. We dive deep into your business, crafting solutions that fit seamlessly into your existing operations.",
-      icon: <Target className="h-8 w-8" />
-    },
-    {
-      title: "Scalable Solutions",
-      description: "Whether you are a startup, mid-sized business, or enterprise-level organization, our consulting services scale to meet your needs. We empower your teams to adopt new technologies, practices, and mindsets, driving innovation and transformation at every level.",
-      icon: <BarChart3 className="h-8 w-8" />
-    },
-    {
-      title: "Certified Experts & Proven Frameworks",
-      description: "Our consultants are seasoned experts with deep industry knowledge in AI, Agile, and PQ. With years of hands-on experience, we apply proven methodologies and frameworks that guarantee tangible results.",
-      icon: <Award className="h-8 w-8" />
-    },
-    {
-      title: "Sustainable Transformation",
-      description: "We don't just focus on short-term gains. Our consulting is designed to help you achieve long-term sustainability, ensuring that your organization is equipped for the future — resilient, agile, and adaptive to change.",
-      icon: <Rocket className="h-8 w-8" />
-    }
-  ];
-
+// Services Section
+function ServicesSection() {
   return (
-    <motion.section 
-      ref={ref}
-      className="py-20 bg-white"
-      initial="initial"
-      animate={isInView ? "animate" : "initial"}
-      variants={staggerContainer}
-    >
-      <div className="container mx-auto px-4">
-        <motion.div className="text-center mb-16" variants={fadeInUp}>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Why Choose Synergies4 Consulting?
-          </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Experience personalized consulting that transforms challenges into opportunities.
-          </p>
-        </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {benefits.map((benefit, index) => (
-            <motion.div key={index} variants={scaleIn}>
-              <Card className="h-full text-center hover:shadow-lg transition-shadow duration-300">
-                <CardHeader>
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600">
-                    {benefit.icon}
-                  </div>
-                  <CardTitle className="text-xl">{benefit.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-base">
-                    {benefit.description}
-                  </CardDescription>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
+    <section id="consulting-services" className="py-20 bg-white relative overflow-hidden">
+      {/* Simple Background Pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `radial-gradient(circle at 25% 25%, #3B82F6 2px, transparent 2px),
+                           radial-gradient(circle at 75% 75%, #8B5CF6 2px, transparent 2px)`,
+          backgroundSize: '60px 60px'
+        }} />
       </div>
-    </motion.section>
-  );
-}
 
-// Our Approach Section Component
-function OurApproachSection() {
-  const { ref, isInView } = useScrollAnimation();
-
-  const steps = [
-    {
-      number: "1",
-      title: "Discovery & Assessment",
-      description: "We start with a thorough assessment of your business needs, challenges, and goals. Through interviews, workshops, and data analysis, we uncover the key areas for transformation and define the strategic direction.",
-      icon: <Lightbulb className="h-8 w-8" />
-    },
-    {
-      number: "2",
-      title: "Strategy Development",
-      description: "Based on our insights, we design a tailored strategy and roadmap that outlines the actions required to achieve your business objectives. Whether it's AI integration, Agile transformation, or PQ development, our strategies are designed to deliver measurable results.",
-      icon: <Settings className="h-8 w-8" />
-    },
-    {
-      number: "3",
-      title: "Execution & Support",
-      description: "We don't just give advice — we roll up our sleeves and help you implement the solutions. Our consultants work alongside your teams, providing guidance, training, and hands-on support to ensure the successful execution of your strategy.",
-      icon: <Users className="h-8 w-8" />
-    }
-  ];
-
-  return (
-    <motion.section 
-      ref={ref}
-      className="py-20 bg-gray-50"
-      initial="initial"
-      animate={isInView ? "animate" : "initial"}
-      variants={staggerContainer}
-    >
-      <div className="container mx-auto px-4">
-        <motion.div className="text-center mb-16" variants={fadeInUp}>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Our Approach: A Proven 3-Step Process
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="text-center mb-16">
+          <Badge className="mb-4 bg-blue-100 text-blue-700 hover:bg-blue-200 border-blue-200">
+            <Settings className="w-4 h-4 mr-2" />
+            Our Services
+          </Badge>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+            Comprehensive Consulting Solutions
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            A systematic approach to transformation that delivers measurable results.
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            From strategy development to implementation, we provide end-to-end consulting services tailored to your organization's needs
           </p>
-        </motion.div>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {steps.map((step, index) => (
-            <motion.div key={index} variants={scaleIn}>
-              <Card className="h-full hover:shadow-xl transition-all duration-300 group relative">
-                <CardHeader className="text-center">
-                  <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold group-hover:scale-110 transition-transform duration-300">
-                    {step.number}
-                  </div>
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600">
-                    {step.icon}
-                  </div>
-                  <CardTitle className="text-xl text-blue-600">{step.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 leading-relaxed">{step.description}</p>
-                </CardContent>
-              </Card>
-            </motion.div>
+          {[
+            {
+              icon: <Brain className="h-8 w-8" />,
+              title: "AI Integration Strategy",
+              description: "Develop comprehensive AI adoption strategies that align with your business objectives and drive measurable results.",
+              features: ["AI Readiness Assessment", "Technology Roadmap", "Implementation Planning", "Change Management"]
+            },
+            {
+              icon: <Zap className="h-8 w-8" />,
+              title: "Agile Transformation",
+              description: "Transform your organization with proven Agile methodologies that improve efficiency and team collaboration.",
+              features: ["Agile Assessment", "Process Optimization", "Team Training", "Cultural Change"]
+            },
+            {
+              icon: <Target className="h-8 w-8" />,
+              title: "Organizational Development",
+              description: "Build high-performing teams with positive intelligence and leadership development programs.",
+              features: ["Leadership Coaching", "Team Dynamics", "Performance Optimization", "Culture Building"]
+            }
+          ].map((service, index) => (
+            <Card key={index} className="h-full text-center hover:shadow-xl transition-all duration-300 group border-0 shadow-lg bg-white/80 backdrop-blur-sm hover:scale-105">
+              <CardHeader>
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 group-hover:scale-110 transition-transform duration-300">
+                  {service.icon}
+                </div>
+                <CardTitle className="text-xl group-hover:text-blue-600 transition-colors">
+                  {service.title}
+                </CardTitle>
+                <CardDescription className="text-base leading-relaxed">
+                  {service.description}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2 mb-6">
+                  {service.features.map((feature, idx) => (
+                    <div key={idx} className="flex items-center text-sm text-gray-600">
+                      <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
+                      <span>{feature}</span>
+                    </div>
+                  ))}
+                </div>
+                <Button 
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-105"
+                  asChild
+                >
+                  <Link href="/contact">
+                    <span className="flex items-center justify-center">
+                      Learn More
+                      <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                    </span>
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>
-    </motion.section>
+    </section>
   );
 }
 
-// Testimonials Section Component
-function TestimonialsSection() {
-  const { ref, isInView } = useScrollAnimation();
-
-  const testimonials = [
-    {
-      quote: "Synergies4's consulting helped us integrate AI into our operations, improving efficiency and customer experience. Their deep understanding of both the technology and our business needs made all the difference.",
-      author: "VP of Operations",
-      company: "Global Tech Firm",
-      avatar: "VO"
-    },
-    {
-      quote: "Our organization's Agile transformation journey was challenging, but with Synergies4's expertise, we've built a more collaborative and high-performing team. We're seeing faster delivery times and greater innovation.",
-      author: "CTO",
-      company: "Fortune 500",
-      avatar: "CT"
-    }
-  ];
-
+// Why Choose Section
+function WhyChooseSection() {
   return (
-    <motion.section 
-      ref={ref}
-      className="py-20 bg-white"
-      initial="initial"
-      animate={isInView ? "animate" : "initial"}
-      variants={staggerContainer}
-    >
-      <div className="container mx-auto px-4">
-        <motion.div className="text-center mb-16" variants={fadeInUp}>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            What Our Clients Say
-          </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Real transformations from organizations that experienced our consulting services.
-          </p>
-        </motion.div>
+    <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50 relative overflow-hidden">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `radial-gradient(circle at 20% 80%, #3B82F6 2px, transparent 2px),
+                           radial-gradient(circle at 80% 20%, #8B5CF6 2px, transparent 2px),
+                           radial-gradient(circle at 40% 40%, #06B6D4 2px, transparent 2px)`,
+          backgroundSize: '100px 100px'
+        }} />
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          {testimonials.map((testimonial, index) => (
-            <motion.div key={index} variants={scaleIn}>
-              <Card className="h-full">
-                <CardContent className="pt-6">
-                  <div className="flex mb-4">
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="text-center mb-16">
+          <Badge className="mb-4 bg-purple-100 text-purple-700 hover:bg-purple-200 border-purple-200">
+            <Award className="w-4 h-4 mr-2" />
+            Why Choose Us
+          </Badge>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+            Proven Expertise, Measurable Results
+          </h2>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Partner with consultants who understand both technology and business transformation
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {[
+            {
+              icon: <BarChart3 className="h-8 w-8" />,
+              title: "Data-Driven Approach",
+              description: "Every recommendation is backed by thorough analysis and measurable metrics."
+            },
+            {
+              icon: <Globe className="h-8 w-8" />,
+              title: "Global Experience",
+              description: "Proven track record with organizations across industries and continents."
+            },
+            {
+              icon: <Rocket className="h-8 w-8" />,
+              title: "Rapid Implementation",
+              description: "Accelerated timelines without compromising quality or sustainability."
+            },
+            {
+              icon: <Users className="h-8 w-8" />,
+              title: "Team Empowerment",
+              description: "We build internal capabilities to ensure long-term success and independence."
+            }
+          ].map((item, index) => (
+            <Card key={index} className="h-full text-center hover:shadow-xl transition-all duration-300 group border-0 shadow-lg bg-white/80 backdrop-blur-sm hover:scale-105">
+              <CardHeader>
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 group-hover:scale-110 transition-transform duration-300">
+                  {item.icon}
+                </div>
+                <CardTitle className="text-xl group-hover:text-blue-600 transition-colors">
+                  {item.title}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-base leading-relaxed">
+                  {item.description}
+                </CardDescription>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// Case Studies Section
+function CaseStudiesSection() {
+  return (
+    <section className="py-20 bg-white">
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-16">
+          <Badge className="mb-4 bg-yellow-100 text-yellow-700 hover:bg-yellow-200 border-yellow-200">
+            <Star className="w-4 h-4 mr-2" />
+            Success Stories
+          </Badge>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+            Transformations That Deliver Results
+          </h2>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            Real outcomes from organizations that partnered with us for their transformation journey
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+          {[
+            {
+              company: "Global Manufacturing Corp",
+              industry: "Manufacturing",
+              challenge: "Legacy processes hindering digital transformation",
+              solution: "Comprehensive AI integration and Agile transformation",
+              results: ["40% increase in operational efficiency", "60% faster time-to-market", "25% reduction in costs"],
+              testimonial: "Synergies4's consulting transformed our entire operation. We're now a truly digital-first organization.",
+              author: "Chief Technology Officer"
+            },
+            {
+              company: "Financial Services Leader",
+              industry: "Financial Services",
+              challenge: "Scaling agile practices across multiple teams",
+              solution: "Enterprise Agile transformation with leadership coaching",
+              results: ["50% improvement in delivery speed", "90% employee satisfaction increase", "35% boost in innovation metrics"],
+              testimonial: "The cultural transformation was remarkable. Our teams are more collaborative and innovative than ever.",
+              author: "VP of Digital Transformation"
+            }
+          ].map((study, index) => (
+            <Card key={index} className="hover:shadow-xl transition-all duration-300 group border-0 shadow-lg bg-white/90 backdrop-blur-sm">
+              <CardHeader>
+                <div className="flex items-center justify-between mb-4">
+                  <Badge variant="outline" className="text-xs">
+                    {study.industry}
+                  </Badge>
+                  <div className="flex">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                      <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
                     ))}
                   </div>
-                  <blockquote className="text-gray-600 mb-6 italic leading-relaxed text-lg">
-                    "{testimonial.quote}"
-                  </blockquote>
-                  <div className="flex items-center space-x-3">
-                    <Avatar>
-                      <AvatarFallback className="bg-blue-100 text-blue-600">
-                        {testimonial.avatar}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-semibold text-gray-900">{testimonial.author}</p>
-                      <p className="text-sm text-gray-500">{testimonial.company}</p>
-                    </div>
+                </div>
+                <CardTitle className="text-xl group-hover:text-blue-600 transition-colors">
+                  {study.company}
+                </CardTitle>
+                <CardDescription className="text-base leading-relaxed">
+                  <strong>Challenge:</strong> {study.challenge}
+                </CardDescription>
+                <CardDescription className="text-base leading-relaxed">
+                  <strong>Solution:</strong> {study.solution}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="mb-6">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3">Key Results:</h4>
+                  <div className="space-y-2">
+                    {study.results.map((result, idx) => (
+                      <div key={idx} className="flex items-center text-sm text-gray-600">
+                        <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
+                        <span>{result}</span>
+                      </div>
+                    ))}
                   </div>
-                </CardContent>
-              </Card>
-            </motion.div>
+                </div>
+                <blockquote className="text-gray-600 italic leading-relaxed mb-4">
+                  "{study.testimonial}"
+                </blockquote>
+                <p className="text-sm font-semibold text-gray-900">— {study.author}</p>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>
-    </motion.section>
+    </section>
   );
 }
 
-// CTA Section Component
+// CTA Section
 function CTASection() {
-  const { ref, isInView } = useScrollAnimation();
-
   return (
-    <motion.section 
-      ref={ref}
-      className="py-20 bg-gradient-to-r from-blue-600 to-purple-600 text-white"
-      initial="initial"
-      animate={isInView ? "animate" : "initial"}
-      variants={staggerContainer}
-    >
-      <div className="container mx-auto px-4 text-center">
-        <motion.div variants={fadeInUp}>
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Is Your Business Ready for Transformation?
-          </h2>
-          <p className="text-xl mb-4 opacity-90">
-            It's about changing mindsets, behaviors, and results.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
-            <Button size="lg" variant="secondary" className="text-lg px-8 py-6" asChild>
-              <Link href="/contact">
-                Request Consultation
-                <MessageSquare className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-white text-white hover:bg-white hover:text-blue-600" asChild>
-              <Link href="/courses">
-                View Our Programs
-                <BookOpen className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-          </div>
-        </motion.div>
+    <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600 text-white relative overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-20 right-10 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
+        <div className="absolute bottom-20 left-10 w-24 h-24 bg-white/10 rounded-lg blur-lg"></div>
       </div>
-    </motion.section>
+
+      <div className="container mx-auto px-4 text-center relative z-10">
+        <h2 className="text-3xl md:text-4xl font-bold mb-6">
+          Ready to Transform Your Organization?
+        </h2>
+        <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
+          Let's discuss how our consulting services can help you achieve your transformation goals and drive sustainable growth.
+        </p>
+        
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button 
+            size="lg" 
+            className="text-lg px-8 py-6 bg-white text-blue-600 hover:bg-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+            asChild
+          >
+            <Link href="/contact">
+              Schedule Consultation
+              <MessageSquare className="h-5 w-5 ml-2" />
+            </Link>
+          </Button>
+          <Button 
+            size="lg" 
+            variant="outline" 
+            className="text-lg px-8 py-6 border-2 border-white text-white hover:bg-white hover:text-blue-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+            asChild
+          >
+            <Link href="/courses">
+              Explore Our Programs
+              <BookOpen className="h-5 w-5 ml-2" />
+            </Link>
+          </Button>
+        </div>
+      </div>
+    </section>
   );
 } 

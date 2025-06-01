@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { UserAvatar } from '@/components/UserAvatar';
 import { useAuth } from '@/contexts/AuthContext';
+import PageLayout, { StatsSection } from '@/components/shared/PageLayout';
 import { 
   ArrowRight, 
   BookOpen, 
@@ -23,708 +23,65 @@ import {
   Target,
   Brain,
   Rocket,
-  Menu,
-  X,
   Clock,
-  ChevronUp,
   MessageSquare,
   GraduationCap
 } from 'lucide-react';
 
-// Animation variants
-const fadeInUp = {
-  initial: { opacity: 0, y: 60 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.6, ease: [0.6, -0.05, 0.01, 0.99] }
-};
-
-const staggerContainer = {
-  animate: {
-    transition: {
-      staggerChildren: 0.1
-    }
-  }
-};
-
-const scaleIn = {
-  initial: { opacity: 0, scale: 0.8 },
-  animate: { opacity: 1, scale: 1 },
-  transition: { duration: 0.5, ease: [0.6, -0.05, 0.01, 0.99] }
-};
-
-// Enhanced button animation variants
-const buttonHover = {
-  scale: 1.02,
-  transition: { type: "spring", stiffness: 400, damping: 25 }
-};
-
-const buttonTap = {
-  scale: 0.98,
-  transition: { type: "spring", stiffness: 400, damping: 25 }
-};
-
-// Enhanced Button Component with contained animations
-function AnimatedButton({ 
-  children, 
-  className = "", 
-  variant = "default", 
-  size = "default", 
-  asChild = false, 
-  href = "", 
-  onClick,
-  disabled = false,
-  ...props 
-}: any) {
-  const [isHovered, setIsHovered] = useState(false);
-
-  const buttonContent = (
-    <motion.button
-      className={`relative overflow-hidden ${className}`}
-      whileHover={!disabled ? buttonHover : {}}
-      whileTap={!disabled ? buttonTap : {}}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
-      onClick={onClick}
-      disabled={disabled}
-      {...props}
-    >
-      {/* Subtle background shine effect */}
-      <motion.div
-        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
-        initial={{ x: '-100%' }}
-        animate={isHovered ? { x: '100%' } : { x: '-100%' }}
-        transition={{ duration: 0.6, ease: "easeInOut" }}
-      />
-      
-      {/* Button content */}
-      <span className="relative z-10 flex items-center justify-center">
-        {children}
-      </span>
-    </motion.button>
-  );
-
-  if (asChild && href) {
-    return (
-      <Link href={href}>
-        {buttonContent}
-      </Link>
-    );
-  }
-
-  return buttonContent;
-}
-
-// Scroll-triggered animation hook
-function useScrollAnimation() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-  return { ref, isInView };
-}
-
-// Scroll to top component
-function ScrollToTop() {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const toggleVisibility = () => {
-      if (window.pageYOffset > 300) {
-        setIsVisible(true);
-      } else {
-        setIsVisible(false);
-      }
-    };
-
-    window.addEventListener('scroll', toggleVisibility);
-    return () => window.removeEventListener('scroll', toggleVisibility);
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  };
-
-  return (
-    <AnimatePresence>
-      {isVisible && (
-        <motion.button
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.8 }}
-          onClick={scrollToTop}
-          className="fixed bottom-8 right-8 z-50 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-        >
-          <ChevronUp className="h-6 w-6" />
-        </motion.button>
-      )}
-    </AnimatePresence>
-  );
-}
-
 export default function Home() {
-  const { scrollYProgress } = useScroll();
-  const heroY = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
-  const { user, loading } = useAuth();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  // Add smooth scroll behavior to the document
-  useEffect(() => {
-    document.documentElement.style.scrollBehavior = 'smooth';
-    return () => {
-      document.documentElement.style.scrollBehavior = 'auto';
-    };
-  }, []);
-
   return (
-    <main className="min-h-screen">
-      {/* Scroll to Top Button */}
-      <ScrollToTop />
-
-      {/* Countdown Banner */}
-      <motion.div 
-        className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3"
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-center">
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              className="text-sm md:text-base"
-            >
-              🚀 Expand your potential through learning. Offering earlybirds a discount of $295.00.
-            </motion.p>
-            <motion.div
-              className="flex gap-2"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
-            >
-              {['00 Days', '00 Hours', '00 Minutes', '00 Seconds'].map((time, index) => (
-                <Badge key={index} variant="secondary" className="bg-white/20 text-white border-white/30">
-                  {time}
-                </Badge>
-              ))}
-            </motion.div>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Navigation */}
-      <motion.nav 
-        className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b shadow-sm"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-      >
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
-            >
-              <Link href="/" className="flex items-center">
-                <motion.span 
-                  className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover:from-blue-700 hover:to-purple-700 transition-all duration-300"
-                  whileHover={{ 
-                    scale: 1.02,
-                    textShadow: "0 0 8px rgba(59, 130, 246, 0.5)"
-                  }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                >
-                  Synergies4
-                </motion.span>
-              </Link>
-            </motion.div>
-            
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
-              {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item, index) => (
-                <motion.div
-                  key={item}
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 + index * 0.1, duration: 0.5 }}
-                >
-                  <Link 
-                    href={
-                      item === 'About Us' ? '/about-us' :
-                      item === 'Courses' ? '/courses' :
-                      item === 'Coaching' ? '/coaching' : 
-                      item === 'Consulting' ? '/consulting' : 
-                      item === 'Industry Insight' ? '/industry-insight' :
-                      `/${item.toLowerCase().replace(' ', '-')}`
-                    } 
-                    className="text-gray-600 hover:text-blue-600 transition-colors font-medium"
-                  >
-                    {item}
-                  </Link>
-                </motion.div>
-              ))}
-              
-              {/* Synergize Button */}
-              <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7, duration: 0.5 }}
-              >
-                <motion.div
-                  whileHover={{ scale: 1.02, y: -1 }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                >
-                  <Button 
-                    asChild 
-                    className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
-                  >
-                    <Link href="/synergize">
-                      {/* Subtle shine effect */}
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                        initial={{ x: '-100%' }}
-                        whileHover={{ x: '100%' }}
-                        transition={{ duration: 0.6, ease: "easeInOut" }}
-                      />
-                      <span className="relative z-10 flex items-center">
-                        <Brain className="w-4 h-4 mr-2" />
-                        Synergize
-                      </span>
-                    </Link>
-                  </Button>
-                </motion.div>
-              </motion.div>
-              
-              {/* Distinctive Contact Button */}
-              <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8, duration: 0.5 }}
-              >
-                <motion.div
-                  whileHover={{ scale: 1.02, y: -1 }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                >
-                  <Button 
-                    asChild 
-                    className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
-                  >
-                    <Link href="/contact">
-                      {/* Subtle shine effect */}
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                        initial={{ x: '-100%' }}
-                        whileHover={{ x: '100%' }}
-                        transition={{ duration: 0.6, ease: "easeInOut" }}
-                      />
-                      <span className="relative z-10 flex items-center">
-                        <MessageSquare className="w-4 h-4 mr-2" />
-                        Contact
-                      </span>
-                    </Link>
-                  </Button>
-                </motion.div>
-              </motion.div>
-            </div>
-            
-            {/* Desktop Auth */}
-            <motion.div 
-              className="hidden md:flex items-center space-x-3"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.5, duration: 0.5 }}
-            >
-              {user ? (
-                <UserAvatar />
-              ) : (
-                <>
-                  <Button variant="ghost" asChild className="hover:bg-blue-50 hover:text-blue-600 transition-colors">
-                    <Link href="/login">Login</Link>
-                  </Button>
-                  <Button asChild className="bg-blue-600 hover:bg-blue-700 transition-colors">
-                    <Link href="/signup">Sign Up</Link>
-                  </Button>
-                </>
-              )}
-            </motion.div>
-
-            {/* Mobile Menu Button */}
-            <div className="md:hidden">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2"
-              >
-                {mobileMenuOpen ? (
-                  <X className="h-6 w-6" />
-                ) : (
-                  <Menu className="h-6 w-6" />
-                )}
-              </Button>
-            </div>
-          </div>
-
-          {/* Mobile Menu */}
-          <AnimatePresence>
-            {mobileMenuOpen && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
-                className="md:hidden border-t bg-white/95 backdrop-blur-md overflow-hidden"
-              >
-                <div className="px-4 py-4 space-y-4">
-                  {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item) => (
-                    <Link
-                      key={item}
-                      href={
-                        item === 'About Us' ? '/about-us' :
-                        item === 'Courses' ? '/courses' :
-                        item === 'Coaching' ? '/coaching' : 
-                        item === 'Consulting' ? '/consulting' : 
-                        item === 'Industry Insight' ? '/industry-insight' :
-                        `/${item.toLowerCase().replace(' ', '-')}`
-                      }
-                      className="block text-gray-600 hover:text-blue-600 transition-colors font-medium py-2 text-lg"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      {item}
-                    </Link>
-                  ))}
-                  
-                  {/* Mobile Buttons */}
-                  <div className="pt-2 space-y-3">
-                    <motion.div
-                      whileHover={{ scale: 1.02, y: -1 }}
-                      whileTap={{ scale: 0.98 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                    >
-                      <Button 
-                        asChild 
-                        className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group text-lg py-3"
-                      >
-                        <Link href="/synergize" onClick={() => setMobileMenuOpen(false)}>
-                          <span className="relative z-10 flex items-center justify-center">
-                            <Brain className="w-4 h-4 mr-2" />
-                            Synergize
-                          </span>
-                        </Link>
-                      </Button>
-                    </motion.div>
-                    
-                    {/* Distinctive Contact Button for Mobile */}
-                    <motion.div
-                      whileHover={{ scale: 1.02, y: -1 }}
-                      whileTap={{ scale: 0.98 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                    >
-                      <Button 
-                        asChild 
-                        className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group text-lg py-3"
-                      >
-                        <Link href="/contact" onClick={() => setMobileMenuOpen(false)}>
-                          {/* Subtle shine effect */}
-                          <motion.div
-                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                            initial={{ x: '-100%' }}
-                            whileHover={{ x: '100%' }}
-                            transition={{ duration: 0.6, ease: "easeInOut" }}
-                          />
-                          <span className="relative z-10 flex items-center justify-center">
-                            <MessageSquare className="w-4 h-4 mr-2" />
-                            Contact Us
-                          </span>
-                        </Link>
-                      </Button>
-                    </motion.div>
-                  </div>
-                  
-                  {/* Mobile Auth */}
-                  <div className="pt-4 border-t space-y-3">
-                    {user ? (
-                      <div className="flex items-center space-x-2">
-                        <UserAvatar />
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        <Button variant="ghost" className="w-full justify-start text-lg py-3" asChild>
-                          <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                            Login
-                          </Link>
-                        </Button>
-                        <Button className="w-full text-lg py-3" asChild>
-                          <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
-                            Sign Up
-                          </Link>
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </motion.nav>
-
+    <PageLayout>
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-12 md:py-20 overflow-hidden">
-        {/* Animated Background */}
-        <div className="absolute inset-0 overflow-hidden">
-          {/* Floating Gradient Shapes */}
-          <motion.div
-            className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-lg blur-xl"
-            animate={{
-              x: [0, 30, 0],
-              y: [0, -20, 0],
-              rotate: [0, 180, 360],
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-          <motion.div
-            className="absolute top-32 right-20 w-24 h-24 bg-gradient-to-br from-purple-400/25 to-pink-400/25 rounded-full blur-lg"
-            animate={{
-              x: [0, -25, 0],
-              y: [0, 15, 0],
-              scale: [1, 1.2, 1],
-            }}
-            transition={{
-              duration: 6,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 1
-            }}
-          />
-          <motion.div
-            className="absolute bottom-20 left-1/4 w-40 h-40 bg-gradient-to-br from-indigo-400/15 to-blue-400/15 rounded-2xl blur-2xl"
-            animate={{
-              x: [0, 40, 0],
-              y: [0, -30, 0],
-              rotate: [0, -90, 0],
-            }}
-            transition={{
-              duration: 10,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 2
-            }}
-          />
-          <motion.div
-            className="absolute top-1/2 right-10 w-28 h-28 bg-gradient-to-br from-cyan-400/20 to-blue-400/20 rounded-lg blur-xl"
-            animate={{
-              x: [0, -20, 0],
-              y: [0, 25, 0],
-              rotate: [0, 270, 360],
-            }}
-            transition={{
-              duration: 7,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 0.5
-            }}
-          />
-          <motion.div
-            className="absolute bottom-32 right-1/3 w-36 h-36 bg-gradient-to-br from-violet-400/18 to-purple-400/18 rounded-full blur-2xl"
-            animate={{
-              x: [0, 35, 0],
-              y: [0, -40, 0],
-              scale: [1, 0.8, 1],
-            }}
-            transition={{
-              duration: 9,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 1.5
-            }}
-          />
-          
-          {/* Pixelated Grid Overlay */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="grid grid-cols-12 md:grid-cols-20 lg:grid-cols-32 h-full gap-1">
-              {Array.from({ length: 384 }).map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="bg-gradient-to-br from-blue-500/30 to-purple-500/30 rounded-sm"
-                  initial={{ opacity: 0 }}
-                  animate={{ 
-                    opacity: [0, 0.3, 0],
-                    scale: [0.8, 1, 0.8]
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    delay: i * 0.01,
-                    ease: "easeInOut"
-                  }}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Floating Particles - Reduced for mobile performance */}
-          <div className="hidden md:block">
-            {Array.from({ length: 20 }).map((_, i) => (
-              <motion.div
-                key={`particle-${i}`}
-                className="absolute w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-40"
-                style={{
-                  left: `${(i * 12) % 100}%`,
-                  top: `${(i * 15) % 100}%`,
-                }}
-                animate={{
-                  y: [0, -50, 0],
-                  x: [0, (i % 2 === 0 ? 15 : -15), 0],
-                  opacity: [0.3, 0.6, 0.3],
-                }}
-                transition={{
-                  duration: 6 + (i % 3),
-                  repeat: Infinity,
-                  delay: i * 0.2,
-                  ease: "easeInOut"
-                }}
-              />
-            ))}
-          </div>
-          
-          {/* Mobile-optimized particles */}
-          <div className="block md:hidden">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <motion.div
-                key={`mobile-particle-${i}`}
-                className="absolute w-1 h-1 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-30"
-                style={{
-                  left: `${(i * 20) % 100}%`,
-                  top: `${(i * 25) % 100}%`,
-                }}
-                animate={{
-                  y: [0, -30, 0],
-                  opacity: [0.2, 0.4, 0.2],
-                }}
-                transition={{
-                  duration: 8,
-                  repeat: Infinity,
-                  delay: i * 0.5,
-                  ease: "easeInOut"
-                }}
-              />
-            ))}
-          </div>
-
-          {/* Gradient Mesh - Simplified for mobile */}
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/3 via-purple-500/3 to-pink-500/3" />
+      <section className="relative bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-12 md:py-20">
+        {/* Simple Background Pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `radial-gradient(circle at 25% 25%, #3B82F6 2px, transparent 2px)`,
+            backgroundSize: '60px 60px'
+          }} />
         </div>
 
-        <motion.div 
-          className="container mx-auto px-4 text-center relative z-10"
-          style={{ y: heroY, opacity: heroOpacity }}
-        >
-          <motion.div
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: [0.6, -0.05, 0.01, 0.99] }}
-          >
-            <Badge className="mb-4 md:mb-6 bg-blue-100/90 backdrop-blur-sm text-blue-700 hover:bg-blue-200/90 border border-blue-200/50">
-              <Zap className="w-4 h-4 mr-2" />
-              AI-Powered Learning Platform
-            </Badge>
-            <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold text-gray-900 mb-4 md:mb-6 leading-tight">
-              Build Skills That{' '}
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Set You Apart
-              </span>
-            </h1>
-          </motion.div>
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <Badge className="mb-4 md:mb-6 bg-blue-100/90 backdrop-blur-sm text-blue-700 hover:bg-blue-200/90 border border-blue-200/50">
+            <Zap className="w-4 h-4 mr-2" />
+            AI-Powered Learning Platform
+          </Badge>
+          <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold text-gray-900 mb-4 md:mb-6 leading-tight">
+            Build Skills That{' '}
+            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Set You Apart
+            </span>
+          </h1>
           
-          <motion.p 
-            className="text-lg md:text-xl text-gray-600 mb-6 md:mb-8 max-w-3xl mx-auto leading-relaxed"
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4, ease: [0.6, -0.05, 0.01, 0.99] }}
-          >
+          <p className="text-lg md:text-xl text-gray-600 mb-6 md:mb-8 max-w-3xl mx-auto leading-relaxed">
             Learn practical frameworks in Agile, leadership, and mental fitness that teams and leaders actually use.
-          </motion.p>
+          </p>
           
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6, ease: [0.6, -0.05, 0.01, 0.99] }}
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
-          >
-            <motion.div
-              whileHover={{ 
-                scale: 1.02,
-                y: -2
-              }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ type: "spring", stiffness: 400, damping: 25 }}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Button 
+              size="lg" 
+              className="text-base md:text-lg px-6 md:px-8 py-4 md:py-6 w-full sm:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105" 
+              asChild
             >
-              <Button 
-                size="lg" 
-                className="text-base md:text-lg px-6 md:px-8 py-4 md:py-6 w-full sm:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group" 
-                asChild
-              >
-                <Link href="/courses">
-                  {/* Subtle shine effect */}
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                    initial={{ x: '-100%' }}
-                    whileHover={{ x: '100%' }}
-                    transition={{ duration: 0.6, ease: "easeInOut" }}
-                  />
-                  
-                  <span className="relative z-10 flex items-center">
-                    Boost Your Career – Explore Courses
-                    <ArrowRight className="h-4 w-4 md:h-5 md:w-5 ml-2 transition-transform group-hover:translate-x-1" />
-                  </span>
-                </Link>
-              </Button>
-            </motion.div>
+              <Link href="/courses">
+                Boost Your Career – Explore Courses
+                <ArrowRight className="h-4 w-4 md:h-5 md:w-5 ml-2" />
+              </Link>
+            </Button>
 
-            <motion.div
-              whileHover={{ 
-                scale: 1.02,
-                y: -2
-              }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ type: "spring", stiffness: 400, damping: 25 }}
+            <Button 
+              size="lg" 
+              variant="outline"
+              className="text-base md:text-lg px-6 md:px-8 py-4 md:py-6 w-full sm:w-auto border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105" 
+              asChild
             >
-              <Button 
-                size="lg" 
-                variant="outline"
-                className="text-base md:text-lg px-6 md:px-8 py-4 md:py-6 w-full sm:w-auto border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group" 
-                asChild
-              >
-                <Link href="/synergize">
-                  {/* Subtle shine effect */}
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-600/20 to-transparent"
-                    initial={{ x: '-100%' }}
-                    whileHover={{ x: '100%' }}
-                    transition={{ duration: 0.6, ease: "easeInOut" }}
-                  />
-                  
-                  <span className="relative z-10 flex items-center">
-                    <Brain className="h-4 w-4 md:h-5 md:w-5 mr-2" />
-                    Try Synergize AI
-                  </span>
-                </Link>
-              </Button>
-            </motion.div>
-          </motion.div>
-        </motion.div>
+              <Link href="/synergize">
+                <Brain className="h-4 w-4 md:h-5 md:w-5 mr-2" />
+                Try Synergize AI
+              </Link>
+            </Button>
+          </div>
+        </div>
       </section>
 
       {/* Value Propositions */}
@@ -750,26 +107,15 @@ export default function Home() {
 
       {/* CTA Section */}
       <CTASection />
-
-      {/* Footer */}
-      <FooterSection />
-    </main>
+    </PageLayout>
   );
 }
 
 // Value Propositions Section
 function ValuePropositionsSection() {
-  const { ref, isInView } = useScrollAnimation();
-
   return (
-    <motion.section 
-      ref={ref}
-      className="py-20 bg-white relative overflow-hidden"
-      initial="initial"
-      animate={isInView ? "animate" : "initial"}
-      variants={staggerContainer}
-    >
-      {/* Subtle Background Pattern */}
+    <section className="py-20 bg-white relative overflow-hidden">
+      {/* Simple Background Pattern */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute inset-0" style={{
           backgroundImage: `radial-gradient(circle at 25% 25%, #3B82F6 2px, transparent 2px),
@@ -777,56 +123,16 @@ function ValuePropositionsSection() {
           backgroundSize: '60px 60px'
         }} />
       </div>
-      
-      {/* Floating Geometric Shapes */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          className="absolute top-20 right-10 w-20 h-20 border border-blue-200 rounded-full opacity-20"
-          animate={{
-            rotate: [0, 360],
-            scale: [1, 1.1, 1],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "linear"
-          }}
-        />
-        <motion.div
-          className="absolute bottom-20 left-10 w-16 h-16 bg-gradient-to-br from-purple-200 to-blue-200 rounded-lg opacity-20"
-          animate={{
-            rotate: [0, -360],
-            y: [0, -20, 0],
-          }}
-          transition={{
-            duration: 15,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-        <motion.div
-          className="absolute top-1/2 left-1/4 w-12 h-12 border-2 border-indigo-200 rotate-45 opacity-20"
-          animate={{
-            rotate: [45, 405],
-            x: [0, 30, 0],
-          }}
-          transition={{
-            duration: 18,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-      </div>
 
       <div className="container mx-auto px-4 relative z-10">
-        <motion.div className="text-center mb-16" variants={fadeInUp}>
+        <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
             Why Choose Synergies4?
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
             We're not just another training company. We're your AI-powered partners in creating personalized learning journeys.
           </p>
-        </motion.div>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {[
@@ -851,86 +157,33 @@ function ValuePropositionsSection() {
               description: "Earn certificates that are valued by employers and industry professionals."
             }
           ].map((item, index) => (
-            <motion.div key={index} variants={scaleIn}>
-              <Card className="h-full text-center hover:shadow-xl transition-all duration-300 group border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-                <CardHeader>
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 group-hover:scale-110 transition-transform duration-300">
-                    {item.icon}
-                  </div>
-                  <CardTitle className="text-xl group-hover:text-blue-600 transition-colors">
-                    {item.title}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-base leading-relaxed">
-                    {item.description}
-                  </CardDescription>
-                </CardContent>
-              </Card>
-            </motion.div>
+            <Card key={index} className="h-full text-center hover:shadow-xl transition-all duration-300 group border-0 shadow-lg bg-white/80 backdrop-blur-sm hover:scale-105">
+              <CardHeader>
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 group-hover:scale-110 transition-transform duration-300">
+                  {item.icon}
+                </div>
+                <CardTitle className="text-xl group-hover:text-blue-600 transition-colors">
+                  {item.title}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-base leading-relaxed">
+                  {item.description}
+                </CardDescription>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>
-    </motion.section>
-  );
-}
-
-// Stats Section
-function StatsSection() {
-  const { ref, isInView } = useScrollAnimation();
-  
-  const stats = [
-    { number: "10,000+", label: "Students Trained", icon: <Users className="h-6 w-6" /> },
-    { number: "95%", label: "Success Rate", icon: <TrendingUp className="h-6 w-6" /> },
-    { number: "50+", label: "Expert Instructors", icon: <Award className="h-6 w-6" /> },
-    { number: "24/7", label: "Learning Support", icon: <CheckCircle className="h-6 w-6" /> }
-  ];
-
-  return (
-    <motion.section 
-      ref={ref}
-      className="py-16 bg-gradient-to-r from-blue-600 to-purple-600 text-white"
-      initial="initial"
-      animate={isInView ? "animate" : "initial"}
-      variants={staggerContainer}
-    >
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          {stats.map((stat, index) => (
-            <motion.div 
-              key={index} 
-              className="text-center"
-              variants={fadeInUp}
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            >
-              <div className="flex justify-center mb-3 text-blue-200">
-                {stat.icon}
-              </div>
-              <motion.div 
-                className="text-3xl md:text-4xl font-bold mb-2"
-                initial={{ opacity: 0, scale: 0.5 }}
-                animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.5 }}
-                transition={{ delay: 0.2 + index * 0.1, duration: 0.6 }}
-              >
-                {stat.number}
-              </motion.div>
-              <div className="text-blue-100 text-sm md:text-base">{stat.label}</div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </motion.section>
+    </section>
   );
 }
 
 // Featured Courses Section
 function FeaturedCoursesSection() {
-  const { ref, isInView } = useScrollAnimation();
   const [courses, setCourses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Function to create course slug from title (matching the one in course page)
   const createCourseSlug = (title: string) => {
     return title
       .toLowerCase()
@@ -940,18 +193,30 @@ function FeaturedCoursesSection() {
       .trim();
   };
 
+  const getLevelColor = (level: string) => {
+    switch (level?.toLowerCase()) {
+      case 'beginner': return 'bg-green-100 text-green-800 border-green-200';
+      case 'intermediate': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'advanced': return 'bg-purple-100 text-purple-800 border-purple-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
+  const formatPrice = (price?: number) => {
+    if (!price) return 'Free';
+    return `$${price}`;
+  };
+
   useEffect(() => {
     async function fetchCourses() {
       try {
         const response = await fetch('/api/courses');
         if (response.ok) {
           const data = await response.json();
-          // Get first 4 courses for featured section
           setCourses(data.courses.slice(0, 4));
         }
       } catch (error) {
         console.error('Error fetching courses:', error);
-        // Fallback to empty array if fetch fails
         setCourses([]);
       } finally {
         setLoading(false);
@@ -961,890 +226,587 @@ function FeaturedCoursesSection() {
     fetchCourses();
   }, []);
 
-  // Fallback courses if no real courses are available
+  // Fallback courses with better styling
   const fallbackCourses = [
     {
       id: 'fallback-1',
       title: "AI-Powered Executive Leadership",
-      description: "Master AI strategy from an executive perspective and lead digital transformation",
       short_desc: "Master AI strategy from an executive perspective and lead digital transformation",
-      image: "https://placehold.co/400x250/1e3a8a/FFFFFF/png?text=AI+Executive",
-      category: "Executive",
       level: "Advanced",
       duration: "8 weeks",
       rating: 4.9,
       students: 1250,
-      price: 299
+      price: 299,
+      image: "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=250&fit=crop&auto=format"
     },
     {
       id: 'fallback-2',
       title: "AI-Powered Scrum Master",
-      description: "Master AI-enhanced Scrum methodologies and lead high-performing agile teams",
       short_desc: "Master AI-enhanced Scrum methodologies and lead high-performing agile teams",
-      image: "https://placehold.co/400x250/15803d/FFFFFF/png?text=Scrum+Master",
-      category: "Agile",
       level: "Intermediate",
       duration: "6 weeks",
       rating: 4.8,
       students: 2100,
-      price: 199
+      price: 199,
+      image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=250&fit=crop&auto=format"
     },
     {
       id: 'fallback-3',
       title: "AI Product Owner Mastery",
-      description: "Drive product excellence using AI-enhanced strategies and data-driven decisions",
       short_desc: "Drive product excellence using AI-enhanced strategies and data-driven decisions",
-      image: "https://placehold.co/400x250/0ea5e9/FFFFFF/png?text=Product+Owner",
-      category: "Product",
       level: "Intermediate",
       duration: "7 weeks",
-      rating: 4.9,
+      rating: 4.7,
       students: 1800,
-      price: 249
+      price: 249,
+      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=250&fit=crop&auto=format"
     },
     {
       id: 'fallback-4',
-      title: "PQ Series: Advanced Mental Fitness",
-      description: "Strengthen your mental fitness with our comprehensive PQ program for peak performance",
-      short_desc: "Strengthen your mental fitness with our comprehensive PQ program for peak performance",
-      image: "https://placehold.co/400x250/8b5cf6/FFFFFF/png?text=PQ+Series",
-      category: "PQ Skills",
+      title: "Mental Fitness for Leaders",
+      short_desc: "Build resilience and mental agility for high-performance leadership",
       level: "Beginner",
       duration: "4 weeks",
-      rating: 4.7,
+      rating: 4.9,
       students: 950,
-      price: 149
+      price: 149,
+      image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop&auto=format"
     }
   ];
 
   const displayCourses = courses.length > 0 ? courses : fallbackCourses;
 
-  const getLevelColor = (level: string) => {
-    switch (level?.toLowerCase()) {
-      case 'beginner': return 'bg-green-100 text-green-700';
-      case 'intermediate': return 'bg-yellow-100 text-yellow-700';
-      case 'advanced': return 'bg-red-100 text-red-700';
-      default: return 'bg-gray-100 text-gray-700';
-    }
-  };
-
-  const formatPrice = (price?: number) => {
-    if (!price) return 'Free';
-    return `$${price}`;
-  };
-
   return (
-    <motion.section 
-      ref={ref}
-      className="py-20 bg-gray-50"
-      initial="initial"
-      animate={isInView ? "animate" : "initial"}
-      variants={staggerContainer}
-    >
-      <div className="container mx-auto px-4">
-        <motion.div className="text-center mb-16" variants={fadeInUp}>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Featured Courses
+    <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50 relative overflow-hidden">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `radial-gradient(circle at 20% 80%, #3B82F6 2px, transparent 2px),
+                           radial-gradient(circle at 80% 20%, #8B5CF6 2px, transparent 2px),
+                           radial-gradient(circle at 40% 40%, #06B6D4 2px, transparent 2px)`,
+          backgroundSize: '100px 100px'
+        }} />
+      </div>
+
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="text-center mb-16">
+          <Badge className="mb-4 bg-blue-100 text-blue-700 hover:bg-blue-200 border-blue-200">
+            <BookOpen className="w-4 h-4 mr-2" />
+            Featured Learning
+          </Badge>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+            Start Your Learning Journey
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Discover our most popular AI-powered courses designed to accelerate your career growth.
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            Discover our most popular courses designed by industry experts to accelerate your career growth
           </p>
-        </motion.div>
+        </div>
 
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[1, 2, 3, 4].map((i) => (
-              <motion.div 
-                key={i} 
-                className="animate-pulse"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-              >
-                <Card className="h-full">
-                  <div className="bg-gray-200 h-48 rounded-t-lg mb-4"></div>
-                  <CardHeader>
-                    <div className="bg-gray-200 h-4 rounded mb-2"></div>
-                    <div className="bg-gray-200 h-3 rounded mb-4"></div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="bg-gray-200 h-8 rounded"></div>
-                  </CardContent>
-                </Card>
-              </motion.div>
+              <div key={i} className="bg-white rounded-xl shadow-lg overflow-hidden animate-pulse">
+                <div className="h-48 bg-gray-200"></div>
+                <div className="p-6">
+                  <div className="h-4 bg-gray-200 rounded mb-3"></div>
+                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
+                  <div className="flex justify-between items-center mb-4">
+                    <div className="h-6 bg-gray-200 rounded w-20"></div>
+                    <div className="h-6 bg-gray-200 rounded w-16"></div>
+                  </div>
+                  <div className="h-10 bg-gray-200 rounded"></div>
+                </div>
+              </div>
             ))}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {displayCourses.map((course, index) => (
-              <motion.div key={course.id || index} variants={scaleIn}>
-                <Card className="h-full hover:shadow-2xl transition-all duration-500 group cursor-pointer border-0 shadow-lg overflow-hidden">
-                  <div className="relative overflow-hidden">
-                    <img 
-                      src={course.image || `https://placehold.co/400x250/1e3a8a/FFFFFF/png?text=${encodeURIComponent(course.title)}`}
-                      alt={course.title}
-                      className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    
-                    {/* Badges */}
-                    <div className="absolute top-4 left-4 flex flex-col gap-2">
-                      <Badge className="bg-white/90 backdrop-blur-sm text-gray-900 shadow-sm">
-                        {course.category || 'Course'}
-                      </Badge>
-                      {course.level && (
-                        <Badge className={`${getLevelColor(course.level)} shadow-sm`}>
-                          {course.level}
-                        </Badge>
-                      )}
-                    </div>
-
-                    {/* Price Badge */}
-                    <div className="absolute top-4 right-4">
-                      <Badge className="bg-blue-600 text-white shadow-sm">
-                        {formatPrice(course.price)}
-                      </Badge>
-                    </div>
-
-                    {/* Hover Overlay */}
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <Button 
-                        size="sm" 
-                        className="bg-white text-gray-900 hover:bg-gray-100 shadow-lg"
-                        asChild
-                      >
-                        <Link href={`/courses/${createCourseSlug(course.title)}`}>
-                          View Course
-                        </Link>
-                      </Button>
-                    </div>
+              <Card key={course.id} className="group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white/90 backdrop-blur-sm border-0 shadow-lg overflow-hidden rounded-xl flex flex-col h-full">
+                {/* Course Image */}
+                <div className="relative h-48 overflow-hidden flex-shrink-0">
+                  <img 
+                    src={course.image || `https://images.unsplash.com/photo-${1560472354 + index}?w=400&h=250&fit=crop&auto=format`}
+                    alt={course.title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute top-4 left-4">
+                    <Badge className={`${getLevelColor(course.level)} border font-medium`}>
+                      {course.level}
+                    </Badge>
                   </div>
+                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 text-sm font-semibold text-gray-700">
+                    {course.duration || '6 weeks'}
+                  </div>
+                </div>
 
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-lg line-clamp-2 group-hover:text-blue-600 transition-colors duration-300">
+                {/* Card Content - Flexible */}
+                <div className="flex flex-col flex-1 p-6">
+                  <CardHeader className="p-0 mb-4 flex-shrink-0">
+                    <CardTitle className="text-lg font-bold group-hover:text-blue-600 transition-colors line-clamp-2 min-h-[3.5rem] flex items-center">
                       {course.title}
                     </CardTitle>
-                    <CardDescription className="line-clamp-2 text-sm">
-                      {course.description || course.short_desc || 'Learn valuable skills with this comprehensive course.'}
+                    <CardDescription className="text-gray-600 line-clamp-3 leading-relaxed min-h-[4.5rem]">
+                      {course.short_desc}
                     </CardDescription>
                   </CardHeader>
 
-                  <CardContent className="pt-0">
-                    {/* Course Meta */}
-                    <div className="flex items-center justify-between mb-4 text-sm text-gray-500">
-                      {course.duration && (
-                        <div className="flex items-center">
-                          <Clock className="h-3 w-3 mr-1" />
-                          {course.duration}
-                        </div>
-                      )}
-                      <div className="flex items-center">
-                        <Users className="h-3 w-3 mr-1" />
-                        {course.students || '0'} students
+                  {/* Rating and Students - Fixed Height */}
+                  <div className="flex items-center justify-between mb-4 text-sm flex-shrink-0">
+                    <div className="flex items-center space-x-1">
+                      <div className="flex">
+                        {[...Array(5)].map((_, i) => (
+                          <Star 
+                            key={i} 
+                            className={`h-4 w-4 ${i < Math.floor(course.rating || 4.8) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} 
+                          />
+                        ))}
                       </div>
+                      <span className="text-gray-600 font-medium">{course.rating || '4.8'}</span>
                     </div>
+                    <div className="flex items-center text-gray-500">
+                      <Users className="h-4 w-4 mr-1" />
+                      <span>{course.students || '1,200'}+</span>
+                    </div>
+                  </div>
 
-                    {/* Rating */}
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center space-x-1">
-                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                        <span className="text-sm font-medium">{course.rating || '4.8'}</span>
-                        <span className="text-xs text-gray-500">({course.students || '0'})</span>
+                  {/* Price - Fixed Height */}
+                  <div className="flex items-center justify-between mb-4 flex-shrink-0">
+                    <div className="text-2xl font-bold text-blue-600">
+                      {formatPrice(course.price)}
+                    </div>
+                    {course.price && course.price > 0 && (
+                      <div className="text-sm text-gray-500 line-through">
+                        ${Math.round(course.price * 1.4)}
                       </div>
-                    </div>
+                    )}
+                  </div>
 
-                    {/* CTA Button */}
+                  {/* CTA Button - Always at bottom */}
+                  <div className="mt-auto">
                     <Button 
-                      className="w-full group-hover:bg-blue-600 group-hover:text-white transition-all duration-300" 
-                      variant="outline" 
-                      asChild
+                      asChild 
+                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-105"
                     >
                       <Link href={`/courses/${createCourseSlug(course.title)}`}>
-                        Learn More
-                        <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
+                        <span className="flex items-center justify-center">
+                          Start Learning
+                          <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                        </span>
                       </Link>
                     </Button>
-                  </CardContent>
-                </Card>
-              </motion.div>
+                  </div>
+                </div>
+              </Card>
             ))}
           </div>
         )}
 
-        <motion.div className="text-center mt-12" variants={fadeInUp}>
-          <Button size="lg" variant="outline" className="hover:bg-blue-600 hover:text-white transition-all duration-300" asChild>
+        {/* View All Courses CTA */}
+        <div className="text-center mt-12">
+          <Button 
+            size="lg" 
+            variant="outline" 
+            className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+            asChild
+          >
             <Link href="/courses">
               View All Courses
-              <ArrowRight className="ml-2 h-5 w-5" />
+              <ArrowRight className="h-5 w-5 ml-2" />
             </Link>
           </Button>
-        </motion.div>
+        </div>
       </div>
-    </motion.section>
+    </section>
   );
 }
 
 // Certifications Section
 function CertificationsSection() {
-  const { ref, isInView } = useScrollAnimation();
-
-  const certifications = [
-    {
-      title: "AI-Powered Scrum Master",
-      level: "Professional",
-      duration: "8 weeks",
-      students: "2,500+",
-      rating: 4.9,
-      progress: 85,
-      color: "from-blue-500 to-cyan-500"
-    },
-    {
-      title: "Agile Product Owner",
-      level: "Advanced",
-      duration: "6 weeks", 
-      students: "1,800+",
-      rating: 4.8,
-      progress: 92,
-      color: "from-green-500 to-emerald-500"
-    },
-    {
-      title: "Digital Transformation Leader",
-      level: "Executive",
-      duration: "12 weeks",
-      students: "950+", 
-      rating: 4.9,
-      progress: 78,
-      color: "from-purple-500 to-violet-500"
-    }
-  ];
-
   const getLevelColor = (level: string) => {
-    switch (level) {
-      case 'Beginner': return 'bg-green-100 text-green-800';
-      case 'Intermediate': return 'bg-yellow-100 text-yellow-800';
-      case 'Advanced': return 'bg-orange-100 text-orange-800';
-      case 'Professional': return 'bg-blue-100 text-blue-800';
-      case 'Executive': return 'bg-purple-100 text-purple-800';
-      default: return 'bg-gray-100 text-gray-800';
+    switch (level?.toLowerCase()) {
+      case 'beginner': return 'bg-green-100 text-green-800 border-green-200';
+      case 'intermediate': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'advanced': return 'bg-purple-100 text-purple-800 border-purple-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
+  const getProgressColor = (level: string) => {
+    switch (level?.toLowerCase()) {
+      case 'beginner': return 'from-green-400 to-green-600';
+      case 'intermediate': return 'from-blue-400 to-blue-600';
+      case 'advanced': return 'from-purple-400 to-purple-600';
+      default: return 'from-gray-400 to-gray-600';
+    }
+  };
+
+  const getIcon = (title: string) => {
+    if (title.includes('Scrum')) return <Users className="h-8 w-8" />;
+    if (title.includes('Product')) return <Target className="h-8 w-8" />;
+    if (title.includes('Leadership')) return <Award className="h-8 w-8" />;
+    return <GraduationCap className="h-8 w-8" />;
+  };
+
   return (
-    <motion.section 
-      ref={ref}
-      className="py-20 bg-gradient-to-br from-gray-50 to-blue-50 relative overflow-hidden"
-      initial="initial"
-      animate={isInView ? "animate" : "initial"}
-      variants={staggerContainer}
-    >
-      {/* Enhanced Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {/* Subtle Grid Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
-                             linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px)`,
-            backgroundSize: '40px 40px'
-          }} />
-        </div>
-        
-        {/* Floating Certificate Icons */}
-        <motion.div
-          className="absolute top-16 right-16 w-16 h-16 opacity-10"
-          animate={{
-            rotate: [0, 360],
-            scale: [1, 1.2, 1],
-          }}
-          transition={{
-            duration: 25,
-            repeat: Infinity,
-            ease: "linear"
-          }}
-        >
-          <Award className="w-full h-full text-blue-600" />
-        </motion.div>
-        
-        <motion.div
-          className="absolute bottom-16 left-16 w-12 h-12 opacity-10"
-          animate={{
-            rotate: [0, -360],
-            y: [0, -15, 0],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        >
-          <GraduationCap className="w-full h-full text-purple-600" />
-        </motion.div>
-        
-        <motion.div
-          className="absolute top-1/3 left-1/3 w-8 h-8 opacity-10"
-          animate={{
-            rotate: [0, 180, 360],
-            x: [0, 20, 0],
-          }}
-          transition={{
-            duration: 15,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        >
-          <Star className="w-full h-full text-yellow-600" />
-        </motion.div>
+    <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50 relative overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-20 right-10 w-32 h-32 bg-gradient-to-br from-blue-200/30 to-purple-200/30 rounded-full blur-xl"></div>
+        <div className="absolute bottom-20 left-10 w-24 h-24 bg-gradient-to-br from-purple-200/30 to-pink-200/30 rounded-lg blur-lg"></div>
+        <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-gradient-to-br from-cyan-200/30 to-blue-200/30 rounded-full blur-lg"></div>
+      </div>
+
+      {/* Grid Pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `linear-gradient(90deg, #3B82F6 1px, transparent 1px),
+                           linear-gradient(180deg, #3B82F6 1px, transparent 1px)`,
+          backgroundSize: '50px 50px'
+        }} />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
-        <motion.div className="text-center mb-16" variants={fadeInUp}>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+        <div className="text-center mb-16">
+          <Badge className="mb-4 bg-purple-100 text-purple-700 hover:bg-purple-200 border-purple-200">
+            <Award className="w-4 h-4 mr-2" />
             Professional Certifications
+          </Badge>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+            <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              Advance Your Career
+            </span>
+            <br />
+            with Industry Certifications
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Earn industry-recognized certifications that validate your expertise and accelerate your career growth.
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Earn globally recognized certifications that validate your expertise and open doors to new opportunities
           </p>
-        </motion.div>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {certifications.map((cert, index) => (
-            <motion.div key={index} variants={scaleIn}>
-              <Card className="h-full hover:shadow-2xl transition-all duration-300 group border-0 shadow-lg bg-white/90 backdrop-blur-sm overflow-hidden">
-                {/* Gradient Header */}
-                <div className={`h-2 bg-gradient-to-r ${cert.color}`} />
+          {[
+            {
+              title: "Certified Scrum Master",
+              description: "Master Agile methodologies and lead high-performing teams with confidence",
+              level: "Intermediate",
+              duration: "6 weeks",
+              modules: 12,
+              projects: 3,
+              completion: 85,
+              students: "2,400+",
+              rating: 4.8,
+              features: ["Live Sessions", "Hands-on Projects", "Peer Learning", "Industry Mentorship"]
+            },
+            {
+              title: "AI Product Manager",
+              description: "Drive product excellence using AI-enhanced strategies and data-driven decisions",
+              level: "Advanced",
+              duration: "8 weeks",
+              modules: 16,
+              projects: 4,
+              completion: 78,
+              students: "1,800+",
+              rating: 4.9,
+              features: ["AI Tools Training", "Case Studies", "Portfolio Building", "Expert Reviews"]
+            },
+            {
+              title: "Leadership Excellence",
+              description: "Develop executive leadership skills for the modern workplace and digital age",
+              level: "Advanced",
+              duration: "10 weeks",
+              modules: 20,
+              projects: 5,
+              completion: 92,
+              students: "1,200+",
+              rating: 4.7,
+              features: ["360° Feedback", "Leadership Coaching", "Team Simulations", "Executive Mentoring"]
+            }
+          ].map((cert, index) => (
+            <Card key={index} className="group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white/90 backdrop-blur-sm border-0 shadow-lg overflow-hidden rounded-xl flex flex-col h-full">
+              {/* Header with Icon */}
+              <div className="relative bg-gradient-to-br from-gray-50 to-blue-50 p-6 border-b flex-shrink-0">
+                <div className="flex items-start justify-between mb-4">
+                  <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${getProgressColor(cert.level)} flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                    {getIcon(cert.title)}
+                  </div>
+                  <Badge className={`${getLevelColor(cert.level)} border font-medium`}>
+                    {cert.level}
+                  </Badge>
+                </div>
                 
-                <CardHeader className="relative">
-                  <div className="flex items-center justify-between mb-4">
-                    <Badge className={getLevelColor(cert.level)}>
-                      {cert.level}
-                    </Badge>
-                    <div className="flex items-center space-x-1">
-                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                      <span className="text-sm font-medium">{cert.rating}</span>
-                    </div>
-                  </div>
-                  
-                  <CardTitle className="text-xl group-hover:text-blue-600 transition-colors">
-                    {cert.title}
-                  </CardTitle>
-                  
-                  <div className="flex items-center justify-between text-sm text-gray-600 mt-4">
-                    <div className="flex items-center space-x-1">
-                      <Clock className="h-4 w-4" />
-                      <span>{cert.duration}</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Users className="h-4 w-4" />
-                      <span>{cert.students}</span>
-                    </div>
-                  </div>
-                </CardHeader>
-                
-                <CardContent>
-                  {/* Progress Bar */}
-                  <div className="mb-4">
-                    <div className="flex justify-between text-xs text-gray-500 mb-1">
-                      <span>Course Completion</span>
-                      <span>{cert.progress}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <motion.div 
-                        className={`bg-gradient-to-r ${cert.color} h-2 rounded-full`}
-                        initial={{ width: 0 }}
-                        animate={isInView ? { width: `${cert.progress}%` } : { width: 0 }}
-                        transition={{ delay: 0.5 + index * 0.1, duration: 1 }}
-                      />
-                    </div>
-                  </div>
+                <CardTitle className="text-xl font-bold group-hover:text-blue-600 transition-colors mb-2 min-h-[3rem] flex items-center">
+                  {cert.title}
+                </CardTitle>
+                <CardDescription className="text-gray-600 leading-relaxed min-h-[4.5rem]">
+                  {cert.description}
+                </CardDescription>
+              </div>
 
-                  {/* CTA Button */}
+              {/* Card Content - Flexible */}
+              <div className="p-6 flex flex-col flex-1">
+                {/* Stats Grid */}
+                <div className="grid grid-cols-2 gap-4 mb-6 flex-shrink-0">
+                  <div className="text-center p-3 bg-gray-50 rounded-lg">
+                    <div className="text-2xl font-bold text-blue-600">{cert.duration}</div>
+                    <div className="text-sm text-gray-500">Duration</div>
+                  </div>
+                  <div className="text-center p-3 bg-gray-50 rounded-lg">
+                    <div className="text-2xl font-bold text-purple-600">{cert.modules}</div>
+                    <div className="text-sm text-gray-500">Modules</div>
+                  </div>
+                </div>
+
+                {/* Progress Bar */}
+                <div className="mb-6 flex-shrink-0">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium text-gray-700">Completion Rate</span>
+                    <span className="text-sm font-bold text-gray-900">{cert.completion}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className={`bg-gradient-to-r ${getProgressColor(cert.level)} h-2 rounded-full transition-all duration-1000 ease-out`}
+                      style={{ width: `${cert.completion}%` }}
+                    ></div>
+                  </div>
+                </div>
+
+                {/* Rating and Students */}
+                <div className="flex items-center justify-between mb-6 text-sm flex-shrink-0">
+                  <div className="flex items-center space-x-1">
+                    <div className="flex">
+                      {[...Array(5)].map((_, i) => (
+                        <Star 
+                          key={i} 
+                          className={`h-4 w-4 ${i < Math.floor(cert.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} 
+                        />
+                      ))}
+                    </div>
+                    <span className="text-gray-600 font-medium">{cert.rating}</span>
+                  </div>
+                  <div className="flex items-center text-gray-500">
+                    <Users className="h-4 w-4 mr-1" />
+                    <span>{cert.students}</span>
+                  </div>
+                </div>
+
+                {/* Features */}
+                <div className="mb-6 flex-1">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3">What's Included:</h4>
+                  <div className="grid grid-cols-2 gap-2">
+                    {cert.features.map((feature, idx) => (
+                      <div key={idx} className="flex items-center text-sm text-gray-600">
+                        <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
+                        <span>{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* CTA Button - Always at bottom */}
+                <div className="mt-auto">
                   <Button 
-                    className="w-full group-hover:bg-blue-600 group-hover:text-white transition-all duration-300" 
-                    variant="outline"
+                    className={`w-full bg-gradient-to-r ${getProgressColor(cert.level)} hover:shadow-lg text-white shadow-md transition-all duration-300 group-hover:scale-105`}
                   >
-                    Explore Courses
-                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
+                    <span className="flex items-center justify-center">
+                      Start Certification
+                      <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                    </span>
                   </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
+                </div>
+              </div>
+            </Card>
           ))}
         </div>
 
         {/* Bottom CTA */}
-        <motion.div className="text-center mt-12" variants={fadeInUp}>
-          <p className="text-gray-600 mb-6">
-            Can't find what you're looking for? We offer custom training programs.
-          </p>
-          <Button size="lg" variant="outline" className="hover:bg-blue-600 hover:text-white transition-all duration-300">
-            Request Custom Training
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
-        </motion.div>
+        <div className="text-center mt-16">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-gray-200/50">
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              Ready to Get Certified?
+            </h3>
+            <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
+              Join thousands of professionals who have advanced their careers with our industry-recognized certifications
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button 
+                size="lg" 
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                asChild
+              >
+                <Link href="/courses">
+                  Browse All Certifications
+                  <ArrowRight className="h-5 w-5 ml-2" />
+                </Link>
+              </Button>
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                asChild
+              >
+                <Link href="/contact">
+                  Talk to an Advisor
+                  <MessageSquare className="h-5 w-5 ml-2" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
-    </motion.section>
+    </section>
   );
 }
 
 // Testimonials Section
 function TestimonialsSection() {
-  const { ref, isInView } = useScrollAnimation();
-
-  const testimonials = [
-    {
-      quote: "Synergies4's Agile Mastery course completely transformed how our team manages projects. The hands-on approach and real-world simulations made all the difference.",
-      author: "Sarah Johnson",
-      role: "Project Manager",
-      company: "TechCorp",
-      avatar: "SJ"
-    },
-    {
-      quote: "The AI-powered learning paths adapted to my pace perfectly. I gained practical skills that I could immediately apply in my role as a product owner.",
-      author: "Michael Chen",
-      role: "Product Owner",
-      company: "InnovateLabs",
-      avatar: "MC"
-    },
-    {
-      quote: "The coaching sessions were invaluable. Not just learning theory, but getting personalized guidance on real challenges I was facing at work.",
-      author: "Emily Rodriguez",
-      role: "Team Lead",
-      company: "StartupXYZ",
-      avatar: "ER"
-    }
-  ];
-
   return (
-    <motion.section 
-      ref={ref}
-      className="py-20 bg-gray-50"
-      initial="initial"
-      animate={isInView ? "animate" : "initial"}
-      variants={staggerContainer}
-    >
+    <section className="py-20 bg-gray-50">
       <div className="container mx-auto px-4">
-        <motion.div className="text-center mb-16" variants={fadeInUp}>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
             What Our Students Say
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Join thousands of professionals who have transformed their careers with Synergies4.
-          </p>
-        </motion.div>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {testimonials.map((testimonial, index) => (
-            <motion.div key={index} variants={scaleIn}>
-              <Card className="h-full">
-                <CardContent className="pt-6">
-                  <div className="flex mb-4">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    ))}
-                  </div>
-                  <blockquote className="text-gray-600 mb-6 italic">
-                    "{testimonial.quote}"
-                  </blockquote>
-                  <div className="flex items-center space-x-3">
-                    <Avatar>
-                      <AvatarFallback className="bg-blue-100 text-blue-600">
-                        {testimonial.avatar}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-semibold text-gray-900">{testimonial.author}</p>
-                      <p className="text-sm text-gray-500">{testimonial.role} at {testimonial.company}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
+          {[
+            {
+              name: "Sarah Johnson",
+              role: "Product Manager",
+              content: "The AI-powered learning approach helped me advance my career faster than I ever imagined.",
+              rating: 5
+            },
+            {
+              name: "Michael Chen",
+              role: "Scrum Master",
+              content: "Excellent practical training that I could immediately apply in my daily work.",
+              rating: 5
+            },
+            {
+              name: "Emily Davis",
+              role: "Team Lead",
+              content: "The personalized learning path was exactly what I needed to develop my leadership skills.",
+              rating: 5
+            }
+          ].map((testimonial, index) => (
+            <Card key={index} className="hover:shadow-xl transition-all duration-300">
+              <CardContent className="pt-6">
+                <div className="flex mb-4">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                  ))}
+                </div>
+                <p className="text-gray-600 mb-4">"{testimonial.content}"</p>
+                <div>
+                  <p className="font-semibold">{testimonial.name}</p>
+                  <p className="text-sm text-gray-500">{testimonial.role}</p>
+                </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>
-    </motion.section>
+    </section>
   );
 }
 
 // Newsletter Section
 function NewsletterSection() {
-  const { ref, isInView } = useScrollAnimation();
   const [email, setEmail] = useState('');
-  const [isSubscribed, setIsSubscribed] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
+    setIsSubmitting(true);
     
-    setIsLoading(true);
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
-    setIsSubscribed(true);
-    setIsLoading(false);
+    
+    setIsSubmitting(false);
+    setIsSubmitted(true);
     setEmail('');
+    
+    setTimeout(() => setIsSubmitted(false), 3000);
   };
 
   return (
-    <motion.section 
-      ref={ref}
-      className="py-20 bg-gradient-to-br from-gray-50 to-blue-50"
-      initial="initial"
-      animate={isInView ? "animate" : "initial"}
-      variants={staggerContainer}
-    >
-      <div className="container mx-auto px-4">
-        <motion.div className="max-w-2xl mx-auto text-center" variants={fadeInUp}>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Stay Ahead of the Curve
-          </h2>
-          <p className="text-xl text-gray-600 mb-8">
-            Get the latest insights on AI, leadership, and career development delivered to your inbox.
-          </p>
-          
-          {isSubscribed ? (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="bg-green-50 border border-green-200 rounded-lg p-6"
-            >
-              <CheckCircle className="h-12 w-12 text-green-600 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-green-800 mb-2">Thank you for subscribing!</h3>
-              <p className="text-green-600">You'll receive our latest updates and exclusive content.</p>
-            </motion.div>
-          ) : (
-            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email address"
-                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
-              />
-              <Button 
-                type="submit" 
-                disabled={isLoading}
-                className="px-6 py-3 bg-blue-600 hover:bg-blue-700"
-              >
-                {isLoading ? (
-                  <>
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                      className="w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"
-                    />
-                    Subscribing...
-                  </>
-                ) : (
-                  'Subscribe'
-                )}
-              </Button>
-            </form>
-          )}
-          
-          <p className="text-sm text-gray-500 mt-4">
-            No spam, unsubscribe at any time. We respect your privacy.
-          </p>
-        </motion.div>
+    <section className="py-20 bg-blue-600">
+      <div className="container mx-auto px-4 text-center">
+        <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+          Stay Updated
+        </h2>
+        <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+          Get the latest insights on AI, leadership, and professional development
+        </p>
+        
+        <form onSubmit={handleSubmit} className="max-w-md mx-auto flex gap-4">
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter your email"
+            className="flex-1 px-4 py-3 rounded-lg"
+            required
+          />
+          <Button 
+            type="submit" 
+            disabled={isSubmitting}
+            className="bg-white text-blue-600 hover:bg-gray-100"
+          >
+            {isSubmitting ? 'Subscribing...' : 'Subscribe'}
+          </Button>
+        </form>
+        
+        {isSubmitted && (
+          <p className="text-green-200 mt-4">Thanks for subscribing!</p>
+        )}
       </div>
-    </motion.section>
+    </section>
   );
 }
 
 // Partners Section
 function PartnersSection() {
-  const { ref, isInView } = useScrollAnimation();
-
   return (
-    <motion.section 
-      ref={ref}
-      className="py-16 bg-white"
-      initial="initial"
-      animate={isInView ? "animate" : "initial"}
-      variants={staggerContainer}
-    >
-      <div className="container mx-auto px-4">
-        <motion.div className="text-center mb-12" variants={fadeInUp}>
-          <h3 className="text-2xl font-bold text-gray-900 mb-4">
-            Trusted by Leading Organizations
-          </h3>
-          <p className="text-gray-600">
-            Join companies worldwide that trust Synergies4 for their learning and development needs.
-          </p>
-        </motion.div>
-
-        <motion.div 
-          className="flex flex-wrap justify-center items-center gap-8 opacity-60"
-          variants={fadeInUp}
-        >
-          {['Microsoft', 'Google', 'Amazon', 'Apple', 'Meta', 'Netflix'].map((company, index) => (
-            <div key={index} className="text-2xl font-bold text-gray-400 hover:text-gray-600 transition-colors">
+    <section className="py-16 bg-white">
+      <div className="container mx-auto px-4 text-center">
+        <h2 className="text-2xl font-bold text-gray-900 mb-8">
+          Trusted by Leading Organizations
+        </h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center opacity-60">
+          {['Microsoft', 'Google', 'Amazon', 'Apple'].map((company) => (
+            <div key={company} className="text-xl font-semibold text-gray-400">
               {company}
             </div>
           ))}
-        </motion.div>
+        </div>
       </div>
-    </motion.section>
+    </section>
   );
 }
 
 // CTA Section
 function CTASection() {
-  const { ref, isInView } = useScrollAnimation();
-
   return (
-    <motion.section 
-      ref={ref}
-      className="py-20 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white relative overflow-hidden"
-      initial="initial"
-      animate={isInView ? "animate" : "initial"}
-      variants={staggerContainer}
-    >
-      {/* Background Effects */}
-      <div className="absolute inset-0">
-        <div className="absolute top-10 left-10 w-32 h-32 bg-white/10 rounded-full blur-xl animate-pulse" />
-        <div className="absolute bottom-10 right-10 w-40 h-40 bg-white/5 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-white/15 rounded-full blur-lg animate-pulse" style={{ animationDelay: '2s' }} />
-      </div>
-
-      <div className="container mx-auto px-4 text-center relative z-10">
-        <motion.div variants={fadeInUp}>
-          {/* Social Proof Badge */}
-          <motion.div 
-            className="inline-flex items-center bg-white/20 backdrop-blur-sm rounded-full px-6 py-2 mb-6"
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
-          >
-            <div className="flex -space-x-2 mr-3">
-              {[1, 2, 3, 4].map((i) => (
-                <div 
-                  key={i} 
-                  className="w-6 h-6 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full border-2 border-white"
-                />
-              ))}
-            </div>
-            <span className="text-sm font-medium">Join 10,000+ professionals already learning</span>
-          </motion.div>
-
-          <h2 className="text-3xl md:text-5xl font-bold mb-6 leading-tight">
-            Ready to{' '}
-            <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
-              Transform
-            </span>{' '}
-            Your Career?
-          </h2>
-          
-          <p className="text-xl md:text-2xl mb-4 max-w-3xl mx-auto opacity-90 leading-relaxed">
-            Join thousands of professionals who have accelerated their growth with our AI-powered learning platform.
-          </p>
-          
-          {/* Urgency Indicator */}
-          <motion.div 
-            className="inline-flex items-center bg-red-500/20 backdrop-blur-sm rounded-full px-4 py-2 mb-8"
-            animate={{ scale: [1, 1.05, 1] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            <div className="w-2 h-2 bg-red-400 rounded-full mr-2 animate-pulse" />
-            <span className="text-sm font-medium">Limited time: $295 early bird discount</span>
-          </motion.div>
-
-          {/* Benefits List */}
-          <motion.div 
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 max-w-4xl mx-auto"
-            variants={staggerContainer}
-          >
-            {[
-              { icon: <CheckCircle className="h-5 w-5" />, text: "Lifetime access to all courses" },
-              { icon: <Users className="h-5 w-5" />, text: "Expert mentorship included" },
-              { icon: <Award className="h-5 w-5" />, text: "Industry-recognized certificates" }
-            ].map((benefit, index) => (
-              <motion.div 
-                key={index}
-                className="flex items-center justify-center space-x-2 text-white/90"
-                variants={fadeInUp}
-                whileHover={{ scale: 1.05 }}
-              >
-                <div className="text-green-300">{benefit.icon}</div>
-                <span className="text-sm md:text-base">{benefit.text}</span>
-              </motion.div>
-            ))}
-          </motion.div>
-
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Button 
-                size="lg" 
-                className="text-lg px-8 py-6 bg-white text-blue-600 hover:bg-gray-100 shadow-xl hover:shadow-2xl transition-all duration-300 font-semibold" 
-                asChild
-              >
-                <Link href="/courses">
-                  <Rocket className="mr-2 h-5 w-5" />
-                  Start Learning Today
-                </Link>
-              </Button>
-            </motion.div>
-            
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="text-lg px-8 py-6 border-white/30 text-white hover:bg-white/10 backdrop-blur-sm transition-all duration-300" 
-                asChild
-              >
-                <Link href="/signup">
-                  <BookOpen className="mr-2 h-5 w-5" />
-                  Try Free Course
-                </Link>
-              </Button>
-            </motion.div>
-          </div>
-
-          {/* Trust Indicators */}
-          <motion.div 
-            className="mt-10 pt-8 border-t border-white/20"
-            variants={fadeInUp}
-          >
-            <p className="text-white/70 text-sm mb-4">Trusted by professionals at</p>
-            <div className="flex flex-wrap justify-center items-center gap-6 opacity-60">
-              {['Microsoft', 'Google', 'Amazon', 'Apple', 'Meta'].map((company, index) => (
-                <motion.div 
-                  key={index} 
-                  className="text-lg font-semibold text-white/80 hover:text-white transition-colors"
-                  whileHover={{ scale: 1.1 }}
-                >
-                  {company}
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Money Back Guarantee */}
-          <motion.div 
-            className="mt-8 inline-flex items-center bg-green-500/20 backdrop-blur-sm rounded-full px-4 py-2"
-            variants={fadeInUp}
-          >
-            <CheckCircle className="h-4 w-4 text-green-300 mr-2" />
-            <span className="text-sm">30-day money-back guarantee</span>
-          </motion.div>
-        </motion.div>
-      </div>
-    </motion.section>
-  );
-}
-
-// Footer Section
-function FooterSection() {
-  const { ref, isInView } = useScrollAnimation();
-
-  return (
-    <motion.footer 
-      ref={ref}
-      className="bg-gray-900 text-white py-16"
-      initial="initial"
-      animate={isInView ? "animate" : "initial"}
-      variants={staggerContainer}
-    >
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-          <motion.div variants={fadeInUp}>
-            <Image 
-              src="/synergies4_logo.jpeg" 
-              alt="Synergies4 Logo" 
-              width={150} 
-              height={72} 
-              className="h-12 w-auto mb-4 brightness-0 invert"
-            />
-            <p className="text-gray-400 mb-4">
-              AI-powered learning tailored uniquely to you and your organization.
-            </p>
-            <div className="flex space-x-4">
-              {['Facebook', 'Twitter', 'LinkedIn', 'Instagram'].map((social) => (
-                <a key={social} href="#" className="text-gray-400 hover:text-white transition-colors">
-                  <span className="sr-only">{social}</span>
-                  <div className="w-6 h-6 bg-gray-400 rounded"></div>
-                </a>
-              ))}
-            </div>
-          </motion.div>
-
-          <motion.div variants={fadeInUp}>
-            <h3 className="text-lg font-semibold mb-4">Courses</h3>
-            <ul className="space-y-2 text-gray-400">
-              <li><a href="#" className="hover:text-white transition-colors">Agile & Scrum</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Product Management</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Leadership</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Business Analysis</a></li>
-            </ul>
-          </motion.div>
-
-          <motion.div variants={fadeInUp}>
-            <h3 className="text-lg font-semibold mb-4">Company</h3>
-            <ul className="space-y-2 text-gray-400">
-              <li><Link href="/about-us" className="hover:text-white transition-colors">About Us</Link></li>
-              <li><Link href="/coaching" className="hover:text-white transition-colors">Coaching</Link></li>
-              <li><Link href="/consulting" className="hover:text-white transition-colors">Consulting</Link></li>
-            </ul>
-            
-            {/* Distinctive Contact Button in Footer */}
-            <div className="mt-6">
-              <motion.div
-                whileHover={{ scale: 1.02, y: -1 }}
-                whileTap={{ scale: 0.98 }}
-                transition={{ type: "spring", stiffness: 400, damping: 25 }}
-              >
-                <Button 
-                  asChild 
-                  size="sm"
-                  className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group w-full"
-                >
-                  <Link href="/contact">
-                    {/* Subtle shine effect */}
-                    <motion.div
-                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                      initial={{ x: '-100%' }}
-                      whileHover={{ x: '100%' }}
-                      transition={{ duration: 0.6, ease: "easeInOut" }}
-                    />
-                    <span className="relative z-10 flex items-center justify-center">
-                      <MessageSquare className="w-4 h-4 mr-2" />
-                      Contact Us
-                    </span>
-                  </Link>
-                </Button>
-              </motion.div>
-            </div>
-          </motion.div>
-
-          <motion.div variants={fadeInUp}>
-            <h3 className="text-lg font-semibold mb-4">Support</h3>
-            <ul className="space-y-2 text-gray-400">
-              <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Cookie Policy</a></li>
-            </ul>
-          </motion.div>
+    <section className="py-20 bg-gradient-to-r from-purple-600 to-blue-600 text-white">
+      <div className="container mx-auto px-4 text-center">
+        <h2 className="text-3xl md:text-4xl font-bold mb-6">
+          Ready to Transform Your Career?
+        </h2>
+        <p className="text-xl mb-8 max-w-2xl mx-auto">
+          Join thousands of professionals who have accelerated their growth with our AI-powered learning platform
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button size="lg" className="bg-white text-purple-600 hover:bg-gray-100" asChild>
+            <Link href="/courses">Start Learning Today</Link>
+          </Button>
+          <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-purple-600" asChild>
+            <Link href="/contact">Talk to an Expert</Link>
+          </Button>
         </div>
-
-        <Separator className="bg-gray-800 mb-8" />
-
-        <motion.div 
-          className="text-center text-gray-400"
-          variants={fadeInUp}
-        >
-          <p>&copy; {new Date().getFullYear()} Synergies4 LLC. All rights reserved.</p>
-          <p className="mt-2 text-sm">
-            Synergies4™, PocketCoachAI™, Adaptive Content Pods™ are trademarks of Synergies4 LLC.
-          </p>
-        </motion.div>
       </div>
-    </motion.footer>
+    </section>
   );
 }

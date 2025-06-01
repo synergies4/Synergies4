@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { UserAvatar } from '@/components/UserAvatar';
 import { useAuth } from '@/contexts/AuthContext';
+import PageLayout from '@/components/shared/PageLayout';
 import { 
   ArrowLeft,
   ArrowRight, 
@@ -102,7 +103,6 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
     enrollment: any;
   } | null>(null);
   const [enrolling, setEnrolling] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const { scrollYProgress } = useScroll();
   const heroY = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);
@@ -311,396 +311,182 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
-          <p className="text-gray-600">Loading course...</p>
+      <PageLayout>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="text-center">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
+            <p className="text-gray-600">Loading course...</p>
+          </div>
         </div>
-      </div>
+      </PageLayout>
     );
   }
 
   if (error || !course) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle className="text-center">Course Not Found</CardTitle>
-            <CardDescription className="text-center">
-              {error || "The course you're looking for doesn't exist."}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="text-center">
-            <Button asChild>
-              <Link href="/courses">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Courses
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+      <PageLayout>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle className="text-center">Course Not Found</CardTitle>
+              <CardDescription className="text-center">
+                {error || "The course you're looking for doesn't exist."}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-center">
+              <Button asChild>
+                <Link href="/courses">
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back to Courses
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </PageLayout>
     );
   }
 
   return (
-    <main className="min-h-screen">
-      {/* Navigation */}
-      <motion.nav 
-        className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b shadow-sm"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-      >
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
-            >
-              <Link href="/" className="flex items-center">
-                <motion.span 
-                  className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover:from-blue-700 hover:to-purple-700 transition-all duration-300"
-                  whileHover={{ 
-                    scale: 1.02,
-                    textShadow: "0 0 8px rgba(59, 130, 246, 0.5)"
-                  }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                >
-                  Synergies4
-                </motion.span>
-              </Link>
-            </motion.div>
-            
-            <div className="hidden md:flex items-center space-x-8">
-              {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item, index) => (
-                <motion.div
-                  key={item}
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 + index * 0.1, duration: 0.5 }}
-                >
-                  <Link 
-                    href={
-                      item === 'About Us' ? '/about-us' :
-                      item === 'Courses' ? '/courses' :
-                      item === 'Coaching' ? '/coaching' : 
-                      item === 'Consulting' ? '/consulting' : 
-                      item === 'Industry Insight' ? '/industry-insight' :
-                      `/${item.toLowerCase().replace(' ', '-')}`
-                    } 
-                    className={`text-gray-600 hover:text-blue-600 transition-colors font-medium ${
-                      item === 'Courses' ? 'text-blue-600 font-semibold' : ''
-                    }`}
-                  >
-                    {item}
-                  </Link>
-                </motion.div>
-              ))}
-              
-              {/* Distinctive Contact Button */}
-              <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7, duration: 0.5 }}
-              >
-                <motion.div
-                  whileHover={{ scale: 1.02, y: -1 }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                >
-                  <Button 
-                    asChild 
-                    className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
-                  >
-                    <Link href="/contact">
-                      {/* Subtle shine effect */}
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                        initial={{ x: '-100%' }}
-                        whileHover={{ x: '100%' }}
-                        transition={{ duration: 0.6, ease: "easeInOut" }}
-                      />
-                      <span className="relative z-10 flex items-center">
-                        <MessageSquare className="w-4 h-4 mr-2" />
-                        Contact
-                      </span>
-                    </Link>
-                  </Button>
-                </motion.div>
-              </motion.div>
-            </div>
-            
-            <motion.div 
-              className="hidden md:flex items-center space-x-3"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.5, duration: 0.5 }}
-            >
-              {user ? (
-                <UserAvatar />
-              ) : (
-                <>
-                  <Button variant="ghost" asChild className="hover:bg-blue-50 hover:text-blue-600 transition-colors">
-                    <Link href="/login">Login</Link>
-                  </Button>
-                  <Button asChild className="bg-blue-600 hover:bg-blue-700 transition-colors">
-                    <Link href="/signup">Sign Up</Link>
-                  </Button>
-                </>
-              )}
-            </motion.div>
-
-            {/* Mobile Menu Button */}
-            <div className="md:hidden">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2"
-              >
-                {mobileMenuOpen ? (
-                  <X className="h-6 w-6" />
-                ) : (
-                  <Menu className="h-6 w-6" />
-                )}
-              </Button>
-            </div>
-          </div>
-
-          {/* Mobile Menu */}
-          <AnimatePresence>
-            {mobileMenuOpen && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
-                className="md:hidden border-t bg-white/95 backdrop-blur-md overflow-hidden"
-              >
-                <div className="px-4 py-4 space-y-4">
-                  {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item) => (
-                    <Link
-                      key={item}
-                      href={
-                        item === 'About Us' ? '/about-us' :
-                        item === 'Courses' ? '/courses' :
-                        item === 'Coaching' ? '/coaching' : 
-                        item === 'Consulting' ? '/consulting' : 
-                        item === 'Industry Insight' ? '/industry-insight' :
-                        `/${item.toLowerCase().replace(' ', '-')}`
-                      }
-                      className={`block text-gray-600 hover:text-blue-600 transition-colors font-medium py-2 text-lg ${
-                        item === 'Courses' ? 'text-blue-600 font-semibold' : ''
-                      }`}
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      {item}
-                    </Link>
-                  ))}
-                  
-                  {/* Distinctive Contact Button for Mobile */}
-                  <div className="pt-2">
-                    <motion.div
-                      whileHover={{ scale: 1.02, y: -1 }}
-                      whileTap={{ scale: 0.98 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                    >
-                      <Button 
-                        asChild 
-                        className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group text-lg py-3"
-                      >
-                        <Link href="/contact" onClick={() => setMobileMenuOpen(false)}>
-                          {/* Subtle shine effect */}
-                          <motion.div
-                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                            initial={{ x: '-100%' }}
-                            whileHover={{ x: '100%' }}
-                            transition={{ duration: 0.6, ease: "easeInOut" }}
-                          />
-                          <span className="relative z-10 flex items-center justify-center">
-                            <MessageSquare className="w-4 h-4 mr-2" />
-                            Contact Us
-                          </span>
-                        </Link>
-                      </Button>
-                    </motion.div>
-                  </div>
-                  
-                  {/* Mobile Auth */}
-                  <div className="pt-4 border-t space-y-3">
-                    {user ? (
-                      <div className="flex items-center space-x-2">
-                        <UserAvatar />
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        <Button variant="ghost" className="w-full justify-start text-lg py-3" asChild>
-                          <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                            Login
-                          </Link>
-                        </Button>
-                        <Button className="w-full text-lg py-3" asChild>
-                          <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
-                            Sign Up
-                          </Link>
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </motion.nav>
-
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-20 overflow-hidden">
-        <motion.div 
-          className="container mx-auto px-4"
+    <PageLayout>
+      <main className="min-h-screen">
+        {/* Hero Section */}
+        <motion.section 
+          className="relative bg-gradient-to-br from-blue-900 via-blue-800 to-purple-900 text-white overflow-hidden"
           style={{ y: heroY }}
         >
-          <motion.div
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
-            <Button variant="ghost" asChild className="mb-6">
-              <Link href="/courses">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Courses
-              </Link>
-            </Button>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              <div>
-                <Badge className="mb-4 bg-blue-100 text-blue-700">
-                  {course.category}
-                </Badge>
-                {course.featured && (
-                  <Badge className="ml-2 mb-4 bg-yellow-100 text-yellow-700">
-                    Featured Course
+          {/* Background Elements */}
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute top-20 right-10 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
+            <div className="absolute bottom-20 left-10 w-24 h-24 bg-white/10 rounded-lg blur-lg"></div>
+          </div>
+
+          <div className="container mx-auto px-4 py-20 relative z-10">
+            <motion.div
+              initial="initial"
+              animate="animate"
+              variants={staggerContainer}
+              className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
+            >
+              {/* Course Info */}
+              <motion.div variants={fadeInUp} className="space-y-6">
+                <div className="flex items-center space-x-4 mb-4">
+                  <Button variant="outline" size="sm" asChild className="text-white border-white/30 hover:bg-white/10">
+                    <Link href="/courses">
+                      <ArrowLeft className="w-4 h-4 mr-2" />
+                      Back to Courses
+                    </Link>
+                  </Button>
+                  <Badge className="bg-white/20 text-white border-white/30">
+                    {course.category}
                   </Badge>
-                )}
-                
-                <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+                </div>
+
+                <h1 className="text-4xl md:text-5xl font-bold leading-tight">
                   {course.title}
                 </h1>
                 
-                <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+                <p className="text-xl text-blue-100 leading-relaxed">
                   {course.short_desc || course.description}
                 </p>
-                
-                <div className="flex flex-wrap gap-4 mb-8">
+
+                <div className="flex flex-wrap gap-4 text-sm">
+                  <div className="flex items-center">
+                    <Target className="w-4 h-4 mr-2" />
+                    <span>{course.level}</span>
+                  </div>
                   {course.duration && (
-                    <div className="flex items-center text-gray-600">
-                      <Clock className="w-5 h-5 mr-2" />
+                    <div className="flex items-center">
+                      <Clock className="w-4 h-4 mr-2" />
                       <span>{course.duration}</span>
                     </div>
                   )}
-                  <div className="flex items-center text-gray-600">
-                    <Target className="w-5 h-5 mr-2" />
-                    <span>{course.level}</span>
-                  </div>
-                  <div className="flex items-center text-gray-600">
-                    <BookOpen className="w-5 h-5 mr-2" />
-                    <span>{modules.length} Modules</span>
+                  <div className="flex items-center">
+                    <Award className="w-4 h-4 mr-2" />
+                    <span>Certificate Included</span>
                   </div>
                 </div>
-                
-                <div className="flex items-center gap-6">
-                  <div className="text-3xl font-bold text-blue-600">
+
+                <div className="flex items-center space-x-4">
+                  <div className="text-3xl font-bold">
                     {formatPrice(course.price)}
                   </div>
                   {getEnrollmentButton()}
                 </div>
-              </div>
-              
-              <div className="relative">
-                <img 
-                  src={course.image || getDefaultImage(course.category)}
-                  alt={course.title}
-                  className="w-full h-96 object-cover rounded-lg shadow-2xl"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = getDefaultImage(course.category);
-                  }}
-                />
-              </div>
-            </div>
-          </motion.div>
-        </motion.div>
-      </section>
+              </motion.div>
 
-      {/* Course Content */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            {/* Main Content */}
-            <div className="lg:col-span-2">
-              <motion.div
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-              >
-                <h2 className="text-3xl font-bold text-gray-900 mb-6">Course Overview</h2>
-                <div className="prose prose-lg max-w-none text-gray-600 mb-12">
-                  <p>{course.description}</p>
+              {/* Course Image */}
+              <motion.div variants={fadeInUp} className="relative">
+                <div className="relative overflow-hidden rounded-2xl shadow-2xl">
+                  <img 
+                    src={course.image || getDefaultImage(course.category)}
+                    alt={course.title}
+                    className="w-full h-80 object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = getDefaultImage(course.category);
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                 </div>
+              </motion.div>
+            </motion.div>
+          </div>
+        </motion.section>
+
+        {/* Course Content */}
+        <section className="py-20 bg-white">
+          <div className="container mx-auto px-4">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+              {/* Main Content */}
+              <div className="lg:col-span-2 space-y-12">
+                {/* Description */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <h2 className="text-3xl font-bold text-gray-900 mb-6">Course Overview</h2>
+                  <div className="prose prose-lg max-w-none text-gray-700">
+                    <p>{course.description}</p>
+                  </div>
+                </motion.div>
 
                 {/* Course Modules */}
                 {modules.length > 0 && (
-                  <div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-8">Course Curriculum</h3>
-                    <div className="space-y-6">
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                  >
+                    <h2 className="text-3xl font-bold text-gray-900 mb-6">Course Curriculum</h2>
+                    <div className="space-y-4">
                       {modules.map((module, index) => (
                         <Card key={module.id} className="border-l-4 border-l-blue-500">
                           <CardHeader>
-                            <div className="flex items-center justify-between">
-                              <CardTitle className="flex items-center space-x-3">
-                                <span className="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded">
-                                  Module {module.order_num}
-                                </span>
-                                <span>{module.title}</span>
-                              </CardTitle>
+                            <CardTitle className="flex items-center justify-between">
+                              <span>Module {module.order_num}: {module.title}</span>
                               {module.duration && (
                                 <Badge variant="outline">
                                   <Clock className="w-3 h-3 mr-1" />
                                   {module.duration}
                                 </Badge>
                               )}
-                            </div>
-                            <CardDescription className="mt-2">
-                              {module.description}
-                            </CardDescription>
+                            </CardTitle>
+                            <CardDescription>{module.description}</CardDescription>
                           </CardHeader>
-                          
                           {module.lessons.length > 0 && (
                             <CardContent>
-                              <div className="space-y-3">
-                                <h4 className="font-medium text-gray-900 mb-3">
-                                  Lessons ({module.lessons.length})
-                                </h4>
+                              <div className="space-y-2">
                                 {module.lessons.map((lesson) => (
-                                  <div
-                                    key={lesson.id}
-                                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-                                  >
+                                  <div key={lesson.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                                     <div className="flex items-center space-x-3">
-                                      <div className={`p-2 rounded ${getContentTypeColor(lesson.content)}`}>
-                                        {getContentTypeIcon(lesson.content)}
-                                      </div>
-                                      <div>
-                                        <p className="font-medium text-gray-900">{lesson.title}</p>
-                                        {lesson.duration && (
-                                          <p className="text-sm text-gray-600">{lesson.duration}</p>
-                                        )}
-                                      </div>
+                                      {getContentTypeIcon(lesson.content)}
+                                      <span className="font-medium">{lesson.title}</span>
                                     </div>
-                                    <Button variant="ghost" size="sm">
-                                      <Play className="w-4 h-4" />
-                                    </Button>
+                                    {lesson.duration && (
+                                      <span className="text-sm text-gray-500">{lesson.duration}</span>
+                                    )}
                                   </div>
                                 ))}
                               </div>
@@ -709,181 +495,86 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                         </Card>
                       ))}
                     </div>
-                  </div>
+                  </motion.div>
                 )}
-              </motion.div>
-            </div>
-
-            {/* Sidebar */}
-            <div className="lg:col-span-1">
-              <motion.div
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="sticky top-24"
-              >
-                <Card className="p-6">
-                  <div className="text-center mb-6">
-                    <div className="text-3xl font-bold text-blue-600 mb-2">
-                      {formatPrice(course.price)}
-                    </div>
-                    {getEnrollmentButton()}
-                  </div>
-                  
-                  <Separator className="my-6" />
-                  
-                  <div className="space-y-4">
-                    <h4 className="font-semibold text-gray-900">Course Includes:</h4>
-                    <ul className="space-y-3">
-                      <li className="flex items-center text-gray-600">
-                        <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                        Lifetime access
-                      </li>
-                      <li className="flex items-center text-gray-600">
-                        <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                        Certificate of completion
-                      </li>
-                      <li className="flex items-center text-gray-600">
-                        <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                        Expert instructor support
-                      </li>
-                      <li className="flex items-center text-gray-600">
-                        <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                        Mobile and desktop access
-                      </li>
-                      {modules.length > 0 && (
-                        <li className="flex items-center text-gray-600">
-                          <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                          {modules.length} comprehensive modules
-                        </li>
-                      )}
-                    </ul>
-                  </div>
-                </Card>
-              </motion.div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <motion.footer 
-        className="bg-gray-900 text-white py-16"
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-      >
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
-            >
-              <motion.span 
-                className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-4 block"
-              >
-                Synergies4
-              </motion.span>
-              <p className="text-gray-400 mb-4">
-                AI-powered learning tailored uniquely to you and your organization.
-              </p>
-              <div className="flex space-x-4">
-                {['Facebook', 'Twitter', 'LinkedIn', 'Instagram'].map((social) => (
-                  <a key={social} href="#" className="text-gray-400 hover:text-white transition-colors">
-                    <span className="sr-only">{social}</span>
-                    <div className="w-6 h-6 bg-gray-400 rounded"></div>
-                  </a>
-                ))}
               </div>
-            </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
-            >
-              <h3 className="text-lg font-semibold mb-4">Courses</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Agile & Scrum</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Product Management</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Leadership</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Business Analysis</a></li>
-              </ul>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.5 }}
-            >
-              <h3 className="text-lg font-semibold mb-4">Company</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link href="/about-us" className="hover:text-white transition-colors">About Us</Link></li>
-                <li><Link href="/coaching" className="hover:text-white transition-colors">Coaching</Link></li>
-                <li><Link href="/consulting" className="hover:text-white transition-colors">Consulting</Link></li>
-              </ul>
-              
-              {/* Distinctive Contact Button in Footer */}
-              <div className="mt-6">
+              {/* Sidebar */}
+              <div className="space-y-8">
+                {/* Course Stats */}
                 <motion.div
-                  whileHover={{ scale: 1.02, y: -1 }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.4 }}
                 >
-                  <Button 
-                    asChild 
-                    size="sm"
-                    className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group w-full"
-                  >
-                    <Link href="/contact">
-                      {/* Subtle shine effect */}
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                        initial={{ x: '-100%' }}
-                        whileHover={{ x: '100%' }}
-                        transition={{ duration: 0.6, ease: "easeInOut" }}
-                      />
-                      <span className="relative z-10 flex items-center justify-center">
-                        <MessageSquare className="w-4 h-4 mr-2" />
-                        Contact Us
-                      </span>
-                    </Link>
-                  </Button>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Course Details</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-600">Level</span>
+                        <Badge variant="outline">{course.level}</Badge>
+                      </div>
+                      {course.duration && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-600">Duration</span>
+                          <span className="font-medium">{course.duration}</span>
+                        </div>
+                      )}
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-600">Category</span>
+                        <span className="font-medium">{course.category}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-600">Certificate</span>
+                        <CheckCircle className="w-5 h-5 text-green-500" />
+                      </div>
+                      <Separator />
+                      <div className="flex items-center justify-between text-lg font-bold">
+                        <span>Price</span>
+                        <span className="text-blue-600">{formatPrice(course.price)}</span>
+                      </div>
+                      <div className="pt-4">
+                        {getEnrollmentButton()}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+
+                {/* What You'll Learn */}
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>What You'll Learn</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        {[
+                          'Master the fundamentals and advanced concepts',
+                          'Apply knowledge through practical exercises',
+                          'Gain industry-recognized certification',
+                          'Access to exclusive resources and community',
+                          'Lifetime access to course materials'
+                        ].map((item, index) => (
+                          <div key={index} className="flex items-start space-x-3">
+                            <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                            <span className="text-gray-700">{item}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
                 </motion.div>
               </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6, duration: 0.5 }}
-            >
-              <h3 className="text-lg font-semibold mb-4">Support</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Cookie Policy</a></li>
-              </ul>
-            </motion.div>
+            </div>
           </div>
-
-          <Separator className="bg-gray-800 mb-8" />
-
-          <motion.div 
-            className="text-center text-gray-400"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.7, duration: 0.5 }}
-          >
-            <p>&copy; {new Date().getFullYear()} Synergies4 LLC. All rights reserved.</p>
-            <p className="mt-2 text-sm">
-              Synergies4™, PocketCoachAI™, Adaptive Content Pods™ are trademarks of Synergies4 LLC.
-            </p>
-          </motion.div>
-        </div>
-      </motion.footer>
-    </main>
+        </section>
+      </main>
+    </PageLayout>
   );
 } 

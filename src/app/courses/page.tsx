@@ -1,71 +1,27 @@
 'use client';
 
-import Image from 'next/image';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { motion, useScroll, useTransform, useInView } from 'framer-motion';
-import { useRef, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { UserAvatar } from '@/components/UserAvatar';
-import { useAuth } from '@/contexts/AuthContext';
+import PageLayout from '@/components/shared/PageLayout';
+import HeroSection from '@/components/shared/HeroSection';
 import { 
   ArrowRight, 
   BookOpen, 
   Users, 
-  Award, 
-  TrendingUp, 
-  Star,
-  CheckCircle,
-  Zap,
   Target,
-  Brain,
-  Rocket,
-  GraduationCap,
   Clock,
   Download,
   Loader2,
-  MessageSquare,
-  Menu,
-  X
+  GraduationCap,
+  Star,
+  Search,
+  Filter
 } from 'lucide-react';
-import { AnimatePresence } from 'framer-motion';
-
-// Animation variants
-const fadeInUp = {
-  initial: { opacity: 0, y: 60 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.6, ease: [0.6, -0.05, 0.01, 0.99] }
-};
-
-const staggerContainer = {
-  animate: {
-    transition: {
-      staggerChildren: 0.1
-    }
-  }
-};
-
-const scaleIn = {
-  initial: { opacity: 0, scale: 0.8 },
-  animate: { opacity: 1, scale: 1 },
-  transition: { duration: 0.5, ease: [0.6, -0.05, 0.01, 0.99] }
-};
-
-// Enhanced button animation variants
-const buttonHover = {
-  scale: 1.02,
-  transition: { type: "spring", stiffness: 400, damping: 25 }
-};
-
-const buttonTap = {
-  scale: 0.98,
-  transition: { type: "spring", stiffness: 400, damping: 25 }
-};
 
 // Course interface
 interface Course {
@@ -82,631 +38,37 @@ interface Course {
   created_at: string;
 }
 
-// Scroll-triggered animation hook
-function useScrollAnimation() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-  return { ref, isInView };
-}
-
 export default function Courses() {
-  const { scrollYProgress } = useScroll();
-  const heroY = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
-  const { user } = useAuth();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
   return (
-    <main className="min-h-screen">
-      {/* Countdown Banner */}
-      <motion.div 
-        className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3"
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-center">
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              className="text-sm md:text-base"
-            >
-              🚀 Expand your potential through learning. Offering earlybirds a discount of $295.00.
-            </motion.p>
-            <motion.div
-              className="flex gap-2"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
-            >
-              {['00 Days', '00 Hours', '00 Minutes', '00 Seconds'].map((time, index) => (
-                <Badge key={index} variant="secondary" className="bg-white/20 text-white border-white/30">
-                  {time}
-                </Badge>
-              ))}
-            </motion.div>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Navigation */}
-      <motion.nav 
-        className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b shadow-sm"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-      >
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
-            >
-              <Link href="/" className="flex items-center">
-                <motion.span 
-                  className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover:from-blue-700 hover:to-purple-700 transition-all duration-300"
-                  whileHover={{ 
-                    scale: 1.02,
-                    textShadow: "0 0 8px rgba(59, 130, 246, 0.5)"
-                  }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                >
-                  Synergies4
-                </motion.span>
-              </Link>
-            </motion.div>
-            
-            <div className="hidden md:flex items-center space-x-8">
-              {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item, index) => (
-                <motion.div
-                  key={item}
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 + index * 0.1, duration: 0.5 }}
-                >
-                  <Link 
-                    href={
-                      item === 'About Us' ? '/about-us' :
-                      item === 'Courses' ? '/courses' :
-                      item === 'Coaching' ? '/coaching' : 
-                      item === 'Consulting' ? '/consulting' : 
-                      item === 'Industry Insight' ? '/industry-insight' :
-                      `/${item.toLowerCase().replace(' ', '-')}`
-                    } 
-                    className={`text-gray-600 hover:text-blue-600 transition-colors font-medium ${
-                      item === 'Courses' ? 'text-blue-600 font-semibold' : ''
-                    }`}
-                  >
-                    {item}
-                  </Link>
-                </motion.div>
-              ))}
-              
-              {/* Synergize Button */}
-              <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7, duration: 0.5 }}
-              >
-                <motion.div
-                  whileHover={{ scale: 1.02, y: -1 }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                >
-                  <Button 
-                    asChild 
-                    className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
-                  >
-                    <Link href="/synergize">
-                      {/* Subtle shine effect */}
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                        initial={{ x: '-100%' }}
-                        whileHover={{ x: '100%' }}
-                        transition={{ duration: 0.6, ease: "easeInOut" }}
-                      />
-                      <span className="relative z-10 flex items-center">
-                        <Brain className="w-4 h-4 mr-2" />
-                        Synergize
-                      </span>
-                    </Link>
-                  </Button>
-                </motion.div>
-              </motion.div>
-              
-              {/* Distinctive Contact Button */}
-              <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8, duration: 0.5 }}
-              >
-                <motion.div
-                  whileHover={{ scale: 1.02, y: -1 }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                >
-                  <Button 
-                    asChild 
-                    className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
-                  >
-                    <Link href="/contact">
-                      {/* Subtle shine effect */}
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                        initial={{ x: '-100%' }}
-                        whileHover={{ x: '100%' }}
-                        transition={{ duration: 0.6, ease: "easeInOut" }}
-                      />
-                      <span className="relative z-10 flex items-center">
-                        <MessageSquare className="w-4 h-4 mr-2" />
-                        Contact
-                      </span>
-                    </Link>
-                  </Button>
-                </motion.div>
-              </motion.div>
-            </div>
-            
-            <motion.div 
-              className="flex items-center space-x-3"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.5, duration: 0.5 }}
-            >
-              {user ? (
-                <UserAvatar />
-              ) : (
-                <>
-                  <Button variant="ghost" asChild className="hover:bg-blue-50 hover:text-blue-600 transition-colors">
-                    <Link href="/login">Login</Link>
-                  </Button>
-                  <Button asChild className="bg-blue-600 hover:bg-blue-700 transition-colors">
-                    <Link href="/signup">Sign Up</Link>
-                  </Button>
-                </>
-              )}
-            </motion.div>
-
-            {/* Mobile Menu Button */}
-            <div className="md:hidden">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2"
-              >
-                {mobileMenuOpen ? (
-                  <X className="h-6 w-6" />
-                ) : (
-                  <Menu className="h-6 w-6" />
-                )}
-              </Button>
-            </div>
-          </div>
-
-          {/* Mobile Menu */}
-          <AnimatePresence>
-            {mobileMenuOpen && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
-                className="md:hidden border-t bg-white/95 backdrop-blur-md overflow-hidden"
-              >
-                <div className="px-4 py-4 space-y-4">
-                  {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item) => (
-                    <Link
-                      key={item}
-                      href={
-                        item === 'About Us' ? '/about-us' :
-                        item === 'Courses' ? '/courses' :
-                        item === 'Coaching' ? '/coaching' : 
-                        item === 'Consulting' ? '/consulting' : 
-                        item === 'Industry Insight' ? '/industry-insight' :
-                        `/${item.toLowerCase().replace(' ', '-')}`
-                      }
-                      className="block text-gray-600 hover:text-blue-600 transition-colors font-medium py-2 text-lg"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      {item}
-                    </Link>
-                  ))}
-                  
-                  {/* Mobile Buttons */}
-                  <div className="pt-2 space-y-3">
-                    <motion.div
-                      whileHover={{ scale: 1.02, y: -1 }}
-                      whileTap={{ scale: 0.98 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                    >
-                      <Button 
-                        asChild 
-                        className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group text-lg py-3"
-                      >
-                        <Link href="/synergize" onClick={() => setMobileMenuOpen(false)}>
-                          <span className="relative z-10 flex items-center justify-center">
-                            <Brain className="w-4 h-4 mr-2" />
-                            Synergize
-                          </span>
-                        </Link>
-                      </Button>
-                    </motion.div>
-                    
-                    {/* Distinctive Contact Button for Mobile */}
-                    <motion.div
-                      whileHover={{ scale: 1.02, y: -1 }}
-                      whileTap={{ scale: 0.98 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                    >
-                      <Button 
-                        asChild 
-                        className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group text-lg py-3"
-                      >
-                        <Link href="/contact" onClick={() => setMobileMenuOpen(false)}>
-                          {/* Subtle shine effect */}
-                          <motion.div
-                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                            initial={{ x: '-100%' }}
-                            whileHover={{ x: '100%' }}
-                            transition={{ duration: 0.6, ease: "easeInOut" }}
-                          />
-                          <span className="relative z-10 flex items-center justify-center">
-                            <MessageSquare className="w-4 h-4 mr-2" />
-                            Contact Us
-                          </span>
-                        </Link>
-                      </Button>
-                    </motion.div>
-                  </div>
-                  
-                  {/* Mobile Auth */}
-                  <div className="pt-4 border-t space-y-3">
-                    {user ? (
-                      <div className="flex items-center space-x-2">
-                        <UserAvatar />
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        <Button variant="ghost" className="w-full justify-start text-lg py-3" asChild>
-                          <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                            Login
-                          </Link>
-                        </Button>
-                        <Button className="w-full text-lg py-3" asChild>
-                          <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
-                            Sign Up
-                          </Link>
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </motion.nav>
-
+    <PageLayout showStats={true}>
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-20 overflow-hidden">
-        {/* Animated Background */}
-        <div className="absolute inset-0 overflow-hidden">
-          {/* Floating Gradient Shapes */}
-          <motion.div
-            className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-lg blur-xl"
-            animate={{
-              x: [0, 30, 0],
-              y: [0, -20, 0],
-              rotate: [0, 180, 360],
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-          <motion.div
-            className="absolute top-32 right-20 w-24 h-24 bg-gradient-to-br from-purple-400/25 to-pink-400/25 rounded-full blur-lg"
-            animate={{
-              x: [0, -25, 0],
-              y: [0, 15, 0],
-              scale: [1, 1.2, 1],
-            }}
-            transition={{
-              duration: 6,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 1
-            }}
-          />
-          <motion.div
-            className="absolute bottom-20 left-1/4 w-40 h-40 bg-gradient-to-br from-indigo-400/15 to-blue-400/15 rounded-2xl blur-2xl"
-            animate={{
-              x: [0, 40, 0],
-              y: [0, -30, 0],
-              rotate: [0, -90, 0],
-            }}
-            transition={{
-              duration: 10,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 2
-            }}
-          />
-          <motion.div
-            className="absolute top-1/2 right-10 w-28 h-28 bg-gradient-to-br from-cyan-400/20 to-blue-400/20 rounded-lg blur-xl"
-            animate={{
-              x: [0, -20, 0],
-              y: [0, 25, 0],
-              rotate: [0, 270, 360],
-            }}
-            transition={{
-              duration: 7,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 0.5
-            }}
-          />
-          <motion.div
-            className="absolute bottom-32 right-1/3 w-36 h-36 bg-gradient-to-br from-violet-400/18 to-purple-400/18 rounded-full blur-2xl"
-            animate={{
-              x: [0, 35, 0],
-              y: [0, -40, 0],
-              scale: [1, 0.8, 1],
-            }}
-            transition={{
-              duration: 9,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 1.5
-            }}
-          />
-          
-          {/* Pixelated Grid Overlay */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="grid grid-cols-12 md:grid-cols-20 lg:grid-cols-32 h-full gap-1">
-              {Array.from({ length: 384 }).map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="bg-gradient-to-br from-blue-500/30 to-purple-500/30 rounded-sm"
-                  initial={{ opacity: 0 }}
-                  animate={{ 
-                    opacity: [0, 0.3, 0],
-                    scale: [0.8, 1, 0.8]
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    delay: i * 0.01,
-                    ease: "easeInOut"
-                  }}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Floating Particles - Mobile Optimized */}
-          <div className="hidden md:block">
-            {Array.from({ length: 20 }).map((_, i) => (
-              <motion.div
-                key={`particle-${i}`}
-                className="absolute w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-40"
-                style={{
-                  left: `${(i * 5) % 100}%`,
-                  top: `${(i * 7) % 100}%`,
-                }}
-                animate={{
-                  y: [0, -100, 0],
-                  x: [0, (i % 2 === 0 ? 25 : -25), 0],
-                  opacity: [0.4, 0.8, 0.4],
-                }}
-                transition={{
-                  duration: 4 + (i % 4),
-                  repeat: Infinity,
-                  delay: i * 0.1,
-                  ease: "easeInOut"
-                }}
-              />
-            ))}
-          </div>
-          
-          {/* Mobile-optimized particles */}
-          <div className="block md:hidden">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <motion.div
-                key={`mobile-particle-${i}`}
-                className="absolute w-1 h-1 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-30"
-                style={{
-                  left: `${(i * 20) % 100}%`,
-                  top: `${(i * 25) % 100}%`,
-                }}
-                animate={{
-                  y: [0, -30, 0],
-                  opacity: [0.2, 0.4, 0.2],
-                }}
-                transition={{
-                  duration: 8,
-                  repeat: Infinity,
-                  delay: i * 0.5,
-                  ease: "easeInOut"
-                }}
-              />
-            ))}
-          </div>
-
-          {/* Gradient Mesh - Simplified for mobile */}
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/3 via-purple-500/3 to-pink-500/3" />
-        </div>
-
-        <motion.div 
-          className="container mx-auto px-4 text-center relative z-10"
-          style={{ y: heroY, opacity: heroOpacity }}
-        >
-          <motion.div
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: [0.6, -0.05, 0.01, 0.99] }}
-          >
-            <Badge className="mb-6 bg-blue-100/90 backdrop-blur-sm text-blue-700 hover:bg-blue-200/90 border border-blue-200/50">
-              <GraduationCap className="w-4 h-4 mr-2" />
-              Course Directory
-            </Badge>
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-              AI-Powered{' '}
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Learning Paths
-              </span>
-            </h1>
-          </motion.div>
-          
-          <motion.p 
-            className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed"
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4, ease: [0.6, -0.05, 0.01, 0.99] }}
-          >
-            Discover our comprehensive collection of AI-powered, role-based training programs designed to accelerate your professional growth.
-          </motion.p>
-        </motion.div>
-      </section>
+      <HeroSection
+        badge={{
+          icon: <GraduationCap className="w-4 h-4" />,
+          text: "Course Directory"
+        }}
+        title="AI-Powered"
+        highlightText="Learning Paths"
+        description="Discover our comprehensive collection of AI-powered, role-based training programs designed to accelerate your professional growth."
+        backgroundVariant="pattern"
+      />
 
       {/* Course Directory Section */}
       <CourseDirectorySection />
 
       {/* Get Your Brochure Section */}
       <BrochureSection />
-
-      {/* Footer */}
-      <motion.footer 
-        className="bg-gray-900 text-white py-16"
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-      >
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
-            >
-              <motion.span 
-                className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-4 block"
-              >
-                Synergies4
-              </motion.span>
-              <p className="text-gray-400 mb-4">
-                AI-powered learning tailored uniquely to you and your organization.
-              </p>
-              <div className="flex space-x-4">
-                {['Facebook', 'Twitter', 'LinkedIn', 'Instagram'].map((social) => (
-                  <a key={social} href="#" className="text-gray-400 hover:text-white transition-colors">
-                    <span className="sr-only">{social}</span>
-                    <div className="w-6 h-6 bg-gray-400 rounded"></div>
-                  </a>
-                ))}
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
-            >
-              <h3 className="text-lg font-semibold mb-4">Courses</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Agile & Scrum</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Product Management</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Leadership</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Business Analysis</a></li>
-              </ul>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.5 }}
-            >
-              <h3 className="text-lg font-semibold mb-4">Company</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link href="/about-us" className="hover:text-white transition-colors">About Us</Link></li>
-                <li><Link href="/coaching" className="hover:text-white transition-colors">Coaching</Link></li>
-                <li><Link href="/consulting" className="hover:text-white transition-colors">Consulting</Link></li>
-              </ul>
-              
-              {/* Distinctive Contact Button in Footer */}
-              <div className="mt-6">
-                <motion.div
-                  whileHover={{ scale: 1.02, y: -1 }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                >
-                  <Button 
-                    asChild 
-                    size="sm"
-                    className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group w-full"
-                  >
-                    <Link href="/contact">
-                      {/* Subtle shine effect */}
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                        initial={{ x: '-100%' }}
-                        whileHover={{ x: '100%' }}
-                        transition={{ duration: 0.6, ease: "easeInOut" }}
-                      />
-                      <span className="relative z-10 flex items-center justify-center">
-                        <MessageSquare className="w-4 h-4 mr-2" />
-                        Contact Us
-                      </span>
-                    </Link>
-                  </Button>
-                </motion.div>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6, duration: 0.5 }}
-            >
-              <h3 className="text-lg font-semibold mb-4">Support</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Cookie Policy</a></li>
-              </ul>
-            </motion.div>
-          </div>
-
-          <Separator className="bg-gray-800 mb-8" />
-
-          <motion.div 
-            className="text-center text-gray-400"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.7, duration: 0.5 }}
-          >
-            <p>&copy; {new Date().getFullYear()} Synergies4 LLC. All rights reserved.</p>
-            <p className="mt-2 text-sm">
-              Synergies4™, PocketCoachAI™, Adaptive Content Pods™ are trademarks of Synergies4 LLC.
-            </p>
-          </motion.div>
-        </div>
-      </motion.footer>
-    </main>
+    </PageLayout>
   );
 }
 
 // Course Directory Section Component
 function CourseDirectorySection() {
-  const { ref, isInView } = useScrollAnimation();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
 
   useEffect(() => {
     fetchCourses();
@@ -722,7 +84,6 @@ function CourseDirectorySection() {
       }
       
       const data = await response.json();
-      // The API returns { courses: [...], pagination: {...} }
       setCourses(data.courses || []);
     } catch (error) {
       console.error('Error fetching courses:', error);
@@ -757,223 +118,318 @@ function CourseDirectorySection() {
   const createCourseSlug = (title: string) => {
     return title
       .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, '') // Remove special characters except spaces and hyphens
-      .replace(/\s+/g, '-') // Replace spaces with hyphens
-      .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
       .trim();
   };
 
+  const getLevelColor = (level: string) => {
+    switch (level?.toLowerCase()) {
+      case 'beginner': return 'bg-green-100 text-green-800 border-green-200';
+      case 'intermediate': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'advanced': return 'bg-purple-100 text-purple-800 border-purple-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
+  // Filter courses based on search and category
+  const filteredCourses = courses.filter(course => {
+    const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         course.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'All' || course.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  // Get unique categories
+  const categories = ['All', ...Array.from(new Set(courses.map(course => course.category)))];
+
   return (
-    <motion.section 
-      ref={ref}
-      className="py-20 bg-white"
-      initial="initial"
-      animate={isInView ? "animate" : "initial"}
-      variants={staggerContainer}
-    >
+    <section className="py-20 bg-white">
       <div className="container mx-auto px-4">
-        <motion.div className="text-center mb-16" variants={fadeInUp}>
+        <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             Professional Training Programs
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Choose from our expertly designed courses that combine AI innovation with proven methodologies.
           </p>
-        </motion.div>
+        </div>
+
+        {/* Search and Filter */}
+        <div className="max-w-4xl mx-auto mb-12">
+          <div className="flex flex-col md:flex-row gap-4 mb-6">
+            {/* Search */}
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input
+                placeholder="Search courses..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            
+            {/* Category Filter */}
+            <div className="md:w-48">
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                {categories.map(category => (
+                  <option key={category} value={category}>{category}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Results count */}
+          {!loading && (
+            <p className="text-gray-600 text-center">
+              {filteredCourses.length} course{filteredCourses.length !== 1 ? 's' : ''} found
+            </p>
+          )}
+        </div>
 
         {loading && (
-          <motion.div 
-            className="flex justify-center items-center py-20"
-            variants={fadeInUp}
-          >
+          <div className="flex justify-center items-center py-20">
             <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
             <span className="ml-2 text-gray-600">Loading courses...</span>
-          </motion.div>
+          </div>
         )}
 
         {error && (
-          <motion.div 
-            className="text-center py-20"
-            variants={fadeInUp}
-          >
+          <div className="text-center py-20">
             <div className="text-red-600 mb-4">{error}</div>
             <Button onClick={fetchCourses} variant="outline">
               Try Again
             </Button>
-          </motion.div>
-        )}
-
-        {!loading && !error && courses.length === 0 && (
-          <motion.div 
-            className="text-center py-20"
-            variants={fadeInUp}
-          >
-            <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No courses available</h3>
-            <p className="text-gray-600">Check back soon for new courses!</p>
-          </motion.div>
-        )}
-
-        {!loading && !error && courses.length > 0 && (
-          <div className="space-y-8 max-w-6xl mx-auto">
-            {courses.map((course, index) => (
-              <motion.div key={course.id} variants={scaleIn}>
-                <Card className="hover:shadow-xl transition-all duration-300 group">
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6">
-                    {/* Course Image */}
-                    <div className="relative overflow-hidden rounded-lg">
-                      <img 
-                        src={course.image || getDefaultImage(course.category)}
-                        alt={course.title}
-                        className="w-full h-48 lg:h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.src = getDefaultImage(course.category);
-                        }}
-                      />
-                      <Badge className="absolute top-4 left-4 bg-white text-gray-900">
-                        {course.category}
-                      </Badge>
-                      {course.featured && (
-                        <Badge className="absolute top-4 right-4 bg-yellow-500 text-white">
-                          Featured
-                        </Badge>
-                      )}
-                    </div>
-                    
-                    {/* Course Content */}
-                    <div className="lg:col-span-2 flex flex-col justify-between">
-                      <div>
-                        <CardHeader className="p-0 mb-4">
-                          <CardTitle className="text-2xl text-blue-600 mb-2">{course.title}</CardTitle>
-                          <div className="flex flex-wrap gap-2 mb-3">
-                            {course.duration && (
-                              <Badge variant="outline" className="text-xs">
-                                <Clock className="w-3 h-3 mr-1" />
-                                {course.duration}
-                              </Badge>
-                            )}
-                            <Badge variant="outline" className="text-xs">
-                              <Target className="w-3 h-3 mr-1" />
-                              {course.level}
-                            </Badge>
-                          </div>
-                          <CardDescription className="text-base leading-relaxed">
-                            {course.short_desc || course.description}
-                          </CardDescription>
-                        </CardHeader>
-                      </div>
-                      
-                      {/* Course Actions */}
-                      <div className="flex items-center justify-between pt-4 border-t">
-                        <div className="text-2xl font-bold text-blue-600">
-                          {formatPrice(course.price)}
-                        </div>
-                        <Button asChild>
-                          <Link href={`/courses/${createCourseSlug(course.title)}`}>
-                            Learn More
-                            <ArrowRight className="ml-2 h-4 w-4" />
-                          </Link>
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              </motion.div>
-            ))}
           </div>
         )}
 
-        {/* Pagination - Only show if there are courses */}
-        {!loading && !error && courses.length > 0 && (
-          <motion.div
-            variants={fadeInUp}
-            className="flex justify-center items-center gap-2 mt-12"
-          >
-            {[1, 2, 3, 4].map((page, index) => (
-              <Button
-                key={page}
-                variant={index === 0 ? "default" : "outline"}
-                size="sm"
-                className="w-10 h-10 rounded-full"
-                disabled
-              >
-                {page}
-              </Button>
+        {!loading && !error && filteredCourses.length === 0 && (
+          <div className="text-center py-20">
+            <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              {searchTerm || selectedCategory !== 'All' ? 'No matching courses found' : 'No courses available'}
+            </h3>
+            <p className="text-gray-600">
+              {searchTerm || selectedCategory !== 'All' 
+                ? 'Try adjusting your search or filter criteria' 
+                : 'Check back soon for new courses!'}
+            </p>
+          </div>
+        )}
+
+        {!loading && !error && filteredCourses.length > 0 && (
+          <div className="space-y-8 max-w-6xl mx-auto">
+            {filteredCourses.map((course, index) => (
+              <Card key={course.id} className="hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 bg-white/90 backdrop-blur-sm border-0 shadow-lg overflow-hidden rounded-xl group">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6 h-full">
+                  {/* Course Image */}
+                  <div className="relative overflow-hidden rounded-lg flex-shrink-0">
+                    <img 
+                      src={course.image || getDefaultImage(course.category)}
+                      alt={course.title}
+                      className="w-full h-48 lg:h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = getDefaultImage(course.category);
+                      }}
+                    />
+                    <div className="absolute top-4 left-4">
+                      <Badge className="bg-white/90 text-gray-900 border font-medium">
+                        {course.category}
+                      </Badge>
+                    </div>
+                    {course.featured && (
+                      <div className="absolute top-4 right-4">
+                        <Badge className="bg-yellow-500 text-white border-yellow-600 font-medium">
+                          <Star className="w-3 h-3 mr-1 fill-current" />
+                          Featured
+                        </Badge>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Course Content */}
+                  <div className="lg:col-span-2 flex flex-col justify-between">
+                    <div className="flex-1">
+                      <CardHeader className="p-0 mb-4">
+                        <CardTitle className="text-2xl text-blue-600 mb-2 group-hover:text-blue-700 transition-colors min-h-[3rem] flex items-center">
+                          {course.title}
+                        </CardTitle>
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          {course.duration && (
+                            <Badge variant="outline" className="text-xs border-gray-300">
+                              <Clock className="w-3 h-3 mr-1" />
+                              {course.duration}
+                            </Badge>
+                          )}
+                          <Badge className={`text-xs border ${getLevelColor(course.level)}`}>
+                            <Target className="w-3 h-3 mr-1" />
+                            {course.level}
+                          </Badge>
+                        </div>
+                        <CardDescription className="text-base leading-relaxed text-gray-600 min-h-[4.5rem]">
+                          {course.short_desc || course.description}
+                        </CardDescription>
+                      </CardHeader>
+                    </div>
+                    
+                    {/* Course Actions - Always at bottom */}
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-200 mt-auto">
+                      <div className="text-2xl font-bold text-blue-600">
+                        {formatPrice(course.price)}
+                      </div>
+                      <Button 
+                        asChild 
+                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                      >
+                        <Link href={`/courses/${createCourseSlug(course.title)}`}>
+                          Learn More
+                          <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                        </Link>
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </Card>
             ))}
-          </motion.div>
+          </div>
         )}
       </div>
-    </motion.section>
+    </section>
   );
 }
 
 // Brochure Section Component
 function BrochureSection() {
-  const { ref, isInView } = useScrollAnimation();
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    setIsSubmitting(false);
+    setIsSubmitted(true);
+    setFormData({ firstName: '', lastName: '', email: '' });
+    
+    setTimeout(() => setIsSubmitted(false), 3000);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
+  };
 
   return (
-    <motion.section 
-      ref={ref}
-      className="py-20 bg-gradient-to-r from-blue-600 to-purple-600 text-white"
-      initial="initial"
-      animate={isInView ? "animate" : "initial"}
-      variants={staggerContainer}
-    >
-      <div className="container mx-auto px-4">
-        <motion.div className="text-center mb-12" variants={fadeInUp}>
+    <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600 text-white relative overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-20 right-10 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
+        <div className="absolute bottom-20 left-10 w-24 h-24 bg-white/10 rounded-lg blur-lg"></div>
+      </div>
+
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Get Your Course Brochure
           </h2>
           <p className="text-xl opacity-90 max-w-2xl mx-auto">
             Download our comprehensive course catalog and discover the perfect learning path for your career goals.
           </p>
-        </motion.div>
+        </div>
 
-        <motion.div
-          variants={fadeInUp}
-          className="max-w-4xl mx-auto"
-        >
-          <Card className="bg-white/10 backdrop-blur-md border-white/20">
+        <div className="max-w-4xl mx-auto">
+          <Card className="bg-white/10 backdrop-blur-md border-white/20 shadow-2xl">
             <CardContent className="p-8">
-              <form className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName" className="text-white">First Name</Label>
-                  <Input
-                    id="firstName"
-                    placeholder="Enter your first name"
-                    className="bg-white/20 border-white/30 text-white placeholder:text-white/70"
-                  />
+              {isSubmitted ? (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Download className="h-8 w-8 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-2">Brochure Sent!</h3>
+                  <p className="text-white/80">Check your email for the download link.</p>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName" className="text-white">Last Name</Label>
-                  <Input
-                    id="lastName"
-                    placeholder="Enter your last name"
-                    className="bg-white/20 border-white/30 text-white placeholder:text-white/70"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-white">Email Address</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="Enter your email"
-                    className="bg-white/20 border-white/30 text-white placeholder:text-white/70"
-                  />
-                </div>
-              </form>
-              
-              <div className="flex justify-center mt-8">
-                <Button size="lg" variant="secondary" className="text-lg px-8 py-6">
-                  <Download className="mr-2 h-5 w-5" />
-                  Download Brochure
-                </Button>
-              </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName" className="text-white">First Name</Label>
+                    <Input
+                      id="firstName"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleInputChange}
+                      placeholder="Enter your first name"
+                      className="bg-white/20 border-white/30 text-white placeholder:text-white/70 focus:bg-white/30"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName" className="text-white">Last Name</Label>
+                    <Input
+                      id="lastName"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleInputChange}
+                      placeholder="Enter your last name"
+                      className="bg-white/20 border-white/30 text-white placeholder:text-white/70 focus:bg-white/30"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-white">Email Address</Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      placeholder="Enter your email"
+                      className="bg-white/20 border-white/30 text-white placeholder:text-white/70 focus:bg-white/30"
+                      required
+                    />
+                  </div>
+                  
+                  <div className="md:col-span-3 flex justify-center mt-4">
+                    <Button 
+                      type="submit"
+                      size="lg" 
+                      disabled={isSubmitting}
+                      className="text-lg px-8 py-6 bg-white text-blue-600 hover:bg-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          Sending...
+                        </>
+                      ) : (
+                        <>
+                          <Download className="mr-2 h-5 w-5" />
+                          Download Brochure
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              )}
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
       </div>
-    </motion.section>
+    </section>
   );
 } 

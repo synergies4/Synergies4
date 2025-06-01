@@ -10,6 +10,7 @@ import { UserAvatar } from '@/components/UserAvatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import PageLayout from '@/components/shared/PageLayout';
 import { 
   Loader2, 
   BookOpen, 
@@ -42,7 +43,6 @@ export default function AdminDashboard() {
   const router = useRouter();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [stats, setStats] = useState({
     totalCourses: 0,
     publishedCourses: 0,
@@ -137,473 +137,353 @@ export default function AdminDashboard() {
 
   if (authLoading || loading || !userProfile) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
-          <p className="text-gray-600">
-            {authLoading ? 'Loading authentication...' : 
-             !userProfile ? 'Loading user profile...' : 
-             'Loading admin dashboard...'}
-          </p>
+      <PageLayout>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="text-center">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
+            <p className="text-gray-600">
+              {authLoading ? 'Loading authentication...' : 
+               !userProfile ? 'Loading user profile...' : 
+               'Loading admin dashboard...'}
+            </p>
+          </div>
         </div>
-      </div>
+      </PageLayout>
     );
   }
 
   if (!user || userProfile?.role !== 'ADMIN') {
-    return null;
+    return (
+      <PageLayout>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle className="text-center">Access Denied</CardTitle>
+              <CardDescription className="text-center">
+                You need admin privileges to access this page.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-center">
+              <Button asChild>
+                <Link href="/">Go Home</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </PageLayout>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Mobile Navigation */}
-      <motion.nav 
-        className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b shadow-sm"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-      >
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
-            >
-              <Link href="/" className="flex items-center">
-                <motion.span 
-                  className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover:from-blue-700 hover:to-purple-700 transition-all duration-300"
-                  whileHover={{ 
-                    scale: 1.02,
-                    textShadow: "0 0 8px rgba(59, 130, 246, 0.5)"
-                  }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                >
-                  Synergies4
-                </motion.span>
-              </Link>
-            </motion.div>
-            
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
-              {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item, index) => (
-                <motion.div
-                  key={item}
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 + index * 0.1, duration: 0.5 }}
-                >
-                  <Link 
-                    href={
-                      item === 'About Us' ? '/about-us' :
-                      item === 'Courses' ? '/courses' :
-                      item === 'Coaching' ? '/coaching' : 
-                      item === 'Consulting' ? '/consulting' : 
-                      item === 'Industry Insight' ? '/industry-insight' :
-                      `/${item.toLowerCase().replace(' ', '-')}`
-                    } 
-                    className="text-gray-600 hover:text-blue-600 transition-colors font-medium"
-                  >
-                    {item}
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
-            
-            {/* Desktop Auth */}
-            <motion.div 
-              className="hidden md:flex items-center space-x-3"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.5, duration: 0.5 }}
-            >
-              <UserAvatar />
-            </motion.div>
-
-            {/* Mobile Menu Button */}
-            <div className="md:hidden">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2"
-              >
-                {mobileMenuOpen ? (
-                  <X className="h-6 w-6" />
-                ) : (
-                  <Menu className="h-6 w-6" />
-                )}
-              </Button>
-            </div>
-          </div>
-
-          {/* Mobile Menu */}
-          <AnimatePresence>
-            {mobileMenuOpen && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
-                className="md:hidden border-t bg-white/95 backdrop-blur-md overflow-hidden"
-              >
-                <div className="px-4 py-4 space-y-4">
-                  {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item) => (
-                    <Link
-                      key={item}
-                      href={
-                        item === 'About Us' ? '/about-us' :
-                        item === 'Courses' ? '/courses' :
-                        item === 'Coaching' ? '/coaching' : 
-                        item === 'Consulting' ? '/consulting' : 
-                        item === 'Industry Insight' ? '/industry-insight' :
-                        `/${item.toLowerCase().replace(' ', '-')}`
-                      }
-                      className="block text-gray-600 hover:text-blue-600 transition-colors font-medium py-2 text-lg"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      {item}
-                    </Link>
-                  ))}
-                  
-                  {/* Mobile Auth */}
-                  <div className="pt-4 border-t space-y-3">
-                    <div className="flex items-center space-x-2">
-                      <UserAvatar />
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </motion.nav>
-
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 md:py-6">
-            <div className="flex items-center space-x-3 mb-4 sm:mb-0">
-              <Shield className="h-6 w-6 md:h-8 md:w-8 text-blue-600" />
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-                <p className="text-sm md:text-base text-gray-600">
-                  Welcome back, {userProfile?.name || user.user_metadata?.name || user.email}
-                </p>
-              </div>
-            </div>
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
-              <Button variant="outline" size="sm" className="w-full sm:w-auto" asChild>
-                <Link href="/">
-                  <Home className="w-4 h-4 mr-2" />
-                  View Site
-                </Link>
-              </Button>
-              <Button variant="outline" size="sm" className="w-full sm:w-auto" asChild>
-                <Link href="/admin/settings">
-                  <Settings className="w-4 h-4 mr-2" />
-                  Settings
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto py-4 md:py-6 px-4 sm:px-6 lg:px-8">
-        {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-xs md:text-sm font-medium">Total Courses</CardTitle>
-                <BookOpen className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-xl md:text-2xl font-bold">{stats.totalCourses}</div>
-                <p className="text-xs text-muted-foreground">
-                  {stats.publishedCourses} published
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-xs md:text-sm font-medium">Total Students</CardTitle>
-                <Users className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-xl md:text-2xl font-bold">{stats.totalStudents}</div>
-                <p className="text-xs text-muted-foreground">
-                  {stats.totalEnrollments} enrollments
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-xs md:text-sm font-medium">Revenue</CardTitle>
-                <DollarSign className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-xl md:text-2xl font-bold">${stats.totalRevenue.toFixed(2)}</div>
-                <p className="text-xs text-muted-foreground">
-                  Total earnings
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-xs md:text-sm font-medium">Completion Rate</CardTitle>
-                <TrendingUp className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-xl md:text-2xl font-bold">{stats.completionRate}%</div>
-                <p className="text-xs text-muted-foreground">
-                  Avg quiz score: {stats.averageQuizScore}%
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center text-base md:text-lg">
-                  <Plus className="h-4 w-4 md:h-5 md:w-5 mr-2" />
-                  Create Course
-                </CardTitle>
-                <CardDescription className="text-sm">
-                  Add a new course to your platform
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button className="w-full text-sm" asChild>
-                  <Link href="/admin/courses/new">
-                    Create New Course
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-          >
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center text-base md:text-lg">
-                  <Users className="h-4 w-4 md:h-5 md:w-5 mr-2" />
-                  Manage Users
-                </CardTitle>
-                <CardDescription className="text-sm">
-                  View and manage user accounts
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="outline" className="w-full text-sm" asChild>
-                  <Link href="/admin/users">
-                    View Users
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-          >
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center text-base md:text-lg">
-                  <BarChart3 className="h-4 w-4 md:h-5 md:w-5 mr-2" />
-                  Analytics
-                </CardTitle>
-                <CardDescription className="text-sm">
-                  View detailed analytics and reports
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="outline" className="w-full text-sm" asChild>
-                  <Link href="/admin/analytics">
-                    View Analytics
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
-
-        {/* Additional Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
-          >
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center text-base md:text-lg">
-                  <FileText className="h-4 w-4 md:h-5 md:w-5 mr-2" />
-                  Blog Management
-                </CardTitle>
-                <CardDescription className="text-sm">
-                  Create and manage industry insights
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <Button variant="outline" className="flex-1 text-sm" asChild>
-                    <Link href="/admin/blog">
-                      Manage Posts
-                    </Link>
-                  </Button>
-                  <Button className="flex-1 text-sm" asChild>
-                    <Link href="/admin/blog/new">
-                      <Plus className="h-4 w-4 mr-2" />
-                      New Post
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-          >
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center text-base md:text-lg">
-                  <Settings className="h-4 w-4 md:h-5 md:w-5 mr-2" />
-                  Platform Settings
-                </CardTitle>
-                <CardDescription className="text-sm">
-                  Configure platform settings
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="outline" className="w-full text-sm" asChild>
-                  <Link href="/admin/settings">
-                    View Settings
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
-
-        {/* Courses Table */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.9 }}
-        >
-          <Card>
-            <CardHeader>
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+    <PageLayout>
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <header className="bg-white shadow-sm border-b">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 md:py-6">
+              <div className="flex items-center space-x-3 mb-4 sm:mb-0">
+                <Shield className="h-6 w-6 md:h-8 md:w-8 text-blue-600" />
                 <div>
-                  <CardTitle className="text-lg md:text-xl">Courses</CardTitle>
-                  <CardDescription className="text-sm">
-                    Manage your courses and content
-                  </CardDescription>
+                  <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+                  <p className="text-sm md:text-base text-gray-600">
+                    Welcome back, {userProfile?.name || user.user_metadata?.name || user.email}
+                  </p>
                 </div>
-                <Button size="sm" className="w-full sm:w-auto" asChild>
-                  <Link href="/admin/courses/new">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Course
+              </div>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
+                <Button variant="outline" size="sm" className="w-full sm:w-auto" asChild>
+                  <Link href="/">
+                    <Home className="w-4 h-4 mr-2" />
+                    View Site
+                  </Link>
+                </Button>
+                <Button variant="outline" size="sm" className="w-full sm:w-auto" asChild>
+                  <Link href="/admin/settings">
+                    <Settings className="w-4 h-4 mr-2" />
+                    Settings
                   </Link>
                 </Button>
               </div>
-            </CardHeader>
-            <CardContent>
-              {courses.length === 0 ? (
-                <div className="text-center py-8 md:py-12">
-                  <BookOpen className="mx-auto h-10 w-10 md:h-12 md:w-12 text-gray-400 mb-4" />
-                  <h3 className="text-base md:text-lg font-medium text-gray-900 mb-2">No courses yet</h3>
-                  <p className="text-sm text-gray-500 mb-4 md:mb-6">
-                    Get started by creating your first course.
+            </div>
+          </div>
+        </header>
+
+        {/* Main Content */}
+        <main className="max-w-7xl mx-auto py-4 md:py-6 px-4 sm:px-6 lg:px-8">
+          {/* Stats */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-xs md:text-sm font-medium">Total Courses</CardTitle>
+                  <BookOpen className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-xl md:text-2xl font-bold">{stats.totalCourses}</div>
+                  <p className="text-xs text-muted-foreground">
+                    {stats.publishedCourses} published
                   </p>
-                  <Button size="sm" className="w-full sm:w-auto" asChild>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-xs md:text-sm font-medium">Total Students</CardTitle>
+                  <Users className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-xl md:text-2xl font-bold">{stats.totalStudents}</div>
+                  <p className="text-xs text-muted-foreground">
+                    {stats.totalEnrollments} enrollments
+                  </p>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-xs md:text-sm font-medium">Revenue</CardTitle>
+                  <DollarSign className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-xl md:text-2xl font-bold">${stats.totalRevenue.toFixed(2)}</div>
+                  <p className="text-xs text-muted-foreground">
+                    Total earnings
+                  </p>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-xs md:text-sm font-medium">Completion Rate</CardTitle>
+                  <TrendingUp className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-xl md:text-2xl font-bold">{stats.completionRate}%</div>
+                  <p className="text-xs text-muted-foreground">
+                    Avg quiz score: {stats.averageQuizScore}%
+                  </p>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center text-base md:text-lg">
+                    <Plus className="h-4 w-4 md:h-5 md:w-5 mr-2" />
+                    Create Course
+                  </CardTitle>
+                  <CardDescription className="text-sm">
+                    Add a new course to your platform
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button className="w-full text-sm" asChild>
                     <Link href="/admin/courses/new">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Create Course
+                      Create New Course
                     </Link>
                   </Button>
-                </div>
-              ) : (
-                <div className="space-y-3 md:space-y-4">
-                  {courses.map((course) => (
-                    <div key={course.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 md:p-4 border rounded-lg hover:bg-gray-50 transition-colors gap-3 sm:gap-4">
-                      <div className="flex items-center space-x-3 md:space-x-4">
-                        <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <BookOpen className="h-5 w-5 md:h-6 md:w-6 text-blue-600" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 mb-1">
-                            <h4 className="font-medium text-gray-900 text-sm md:text-base truncate">{course.title}</h4>
-                            <Badge variant={course.status === 'PUBLISHED' ? 'default' : 'secondary'} className="text-xs w-fit">
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center text-base md:text-lg">
+                    <Users className="h-4 w-4 md:h-5 md:w-5 mr-2" />
+                    Manage Users
+                  </CardTitle>
+                  <CardDescription className="text-sm">
+                    View and manage user accounts
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button variant="outline" className="w-full text-sm" asChild>
+                    <Link href="/admin/users">
+                      View Users
+                    </Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+            >
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center text-base md:text-lg">
+                    <BarChart3 className="h-4 w-4 md:h-5 md:w-5 mr-2" />
+                    Analytics
+                  </CardTitle>
+                  <CardDescription className="text-sm">
+                    View detailed analytics and reports
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button variant="outline" className="w-full text-sm" asChild>
+                    <Link href="/admin/analytics">
+                      View Analytics
+                    </Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+
+          {/* Additional Actions */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 }}
+            >
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center text-base md:text-lg">
+                    <FileText className="h-4 w-4 md:h-5 md:w-5 mr-2" />
+                    Blog Management
+                  </CardTitle>
+                  <CardDescription className="text-sm">
+                    Create and manage industry insights
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Button variant="outline" className="flex-1 text-sm" asChild>
+                      <Link href="/admin/blog">
+                        Manage Posts
+                      </Link>
+                    </Button>
+                    <Button className="flex-1 text-sm" asChild>
+                      <Link href="/admin/blog/new">
+                        <Plus className="h-4 w-4 mr-2" />
+                        New Post
+                      </Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+            >
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center text-base md:text-lg">
+                    <Settings className="h-4 w-4 md:h-5 md:w-5 mr-2" />
+                    System Settings
+                  </CardTitle>
+                  <CardDescription className="text-sm">
+                    Configure platform settings
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button variant="outline" className="w-full text-sm" asChild>
+                    <Link href="/admin/settings">
+                      Open Settings
+                    </Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+
+          {/* Recent Courses */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.9 }}
+          >
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle className="text-lg md:text-xl">Recent Courses</CardTitle>
+                <Button variant="outline" size="sm" asChild>
+                  <Link href="/admin/courses">View All</Link>
+                </Button>
+              </CardHeader>
+              <CardContent>
+                {courses.length === 0 ? (
+                  <div className="text-center py-8">
+                    <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-600 mb-4">No courses created yet</p>
+                    <Button asChild>
+                      <Link href="/admin/courses/new">Create Your First Course</Link>
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {courses.slice(0, 5).map((course) => (
+                      <div key={course.id} className="flex items-center justify-between p-4 border rounded-lg">
+                        <div className="flex-1">
+                          <h3 className="font-medium text-gray-900">{course.title}</h3>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Badge variant="outline" className="text-xs">
+                              {course.category}
+                            </Badge>
+                            <Badge 
+                              variant={course.status === 'PUBLISHED' ? 'default' : 'secondary'}
+                              className="text-xs"
+                            >
                               {course.status}
                             </Badge>
                           </div>
-                          <p className="text-xs md:text-sm text-gray-500">
-                            {course.category} • {course.enrollments} enrollments
+                        </div>
+                        <div className="text-right">
+                          <p className="font-medium text-gray-900">
+                            {course.price ? `$${course.price}` : 'Free'}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            {course.enrollments || 0} enrolled
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center justify-between sm:justify-end sm:space-x-4">
-                        <span className="font-medium text-gray-900 text-sm md:text-base">
-                          {course.price ? `$${course.price}` : 'Free'}
-                        </span>
-                        <Button variant="outline" size="sm" className="text-xs" asChild>
-                          <Link href={`/admin/courses/${course.id}`}>
-                            Edit
-                          </Link>
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
-      </main>
-    </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+        </main>
+      </div>
+    </PageLayout>
   );
 } 

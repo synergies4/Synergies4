@@ -2,15 +2,13 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { motion, useScroll, useTransform, useInView } from 'framer-motion';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Separator } from '@/components/ui/separator';
-import { UserAvatar } from '@/components/UserAvatar';
-import { useAuth } from '@/contexts/AuthContext';
+import PageLayout from '@/components/shared/PageLayout';
+import HeroSection from '@/components/shared/HeroSection';
 import { 
   ArrowRight, 
   BookOpen, 
@@ -26,581 +24,33 @@ import {
   UserCheck,
   Lightbulb,
   Compass,
-  MessageSquare,
-  Menu,
-  X
+  MessageSquare
 } from 'lucide-react';
-import { AnimatePresence } from 'framer-motion';
-
-// Animation variants
-const fadeInUp = {
-  initial: { opacity: 0, y: 60 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.6, ease: [0.6, -0.05, 0.01, 0.99] }
-};
-
-const staggerContainer = {
-  animate: {
-    transition: {
-      staggerChildren: 0.1
-    }
-  }
-};
-
-const scaleIn = {
-  initial: { opacity: 0, scale: 0.8 },
-  animate: { opacity: 1, scale: 1 },
-  transition: { duration: 0.5, ease: [0.6, -0.05, 0.01, 0.99] }
-};
-
-// Enhanced button animation variants
-const buttonHover = {
-  scale: 1.02,
-  transition: { type: "spring", stiffness: 400, damping: 25 }
-};
-
-const buttonTap = {
-  scale: 0.98,
-  transition: { type: "spring", stiffness: 400, damping: 25 }
-};
-
-// Scroll-triggered animation hook
-function useScrollAnimation() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-  return { ref, isInView };
-}
 
 export default function Coaching() {
-  const { scrollYProgress } = useScroll();
-  const heroY = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
-  const { user } = useAuth();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
   return (
-    <main className="min-h-screen">
-      {/* Countdown Banner */}
-      <motion.div 
-        className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3"
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-center">
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              className="text-sm md:text-base"
-            >
-              🚀 Expand your potential through learning. Offering earlybirds a discount of $295.00.
-            </motion.p>
-            <motion.div
-              className="flex gap-2"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
-            >
-              {['00 Days', '00 Hours', '00 Minutes', '00 Seconds'].map((time, index) => (
-                <Badge key={index} variant="secondary" className="bg-white/20 text-white border-white/30">
-                  {time}
-                </Badge>
-              ))}
-            </motion.div>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Navigation */}
-      <motion.nav 
-        className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b shadow-sm"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-      >
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
-            >
-              <Link href="/" className="flex items-center">
-                <motion.span 
-                  className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover:from-blue-700 hover:to-purple-700 transition-all duration-300"
-                  whileHover={{ 
-                    scale: 1.02,
-                    textShadow: "0 0 8px rgba(59, 130, 246, 0.5)"
-                  }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                >
-                  Synergies4
-                </motion.span>
-              </Link>
-            </motion.div>
-            
-            <div className="hidden md:flex items-center space-x-8">
-              {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item, index) => (
-                <motion.div
-                  key={item}
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 + index * 0.1, duration: 0.5 }}
-                >
-                  <Link 
-                    href={
-                      item === 'About Us' ? '/about-us' :
-                      item === 'Courses' ? '/courses' :
-                      item === 'Coaching' ? '/coaching' : 
-                      item === 'Consulting' ? '/consulting' : 
-                      item === 'Industry Insight' ? '/industry-insight' :
-                      `/${item.toLowerCase().replace(' ', '-')}`
-                    } 
-                    className={`text-gray-600 hover:text-blue-600 transition-colors font-medium ${
-                      item === 'Coaching' ? 'text-blue-600 font-semibold' : ''
-                    }`}
-                  >
-                    {item}
-                  </Link>
-                </motion.div>
-              ))}
-              
-              {/* Synergize Button */}
-              <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7, duration: 0.5 }}
-              >
-                <motion.div
-                  whileHover={{ scale: 1.02, y: -1 }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                >
-                  <Button 
-                    asChild 
-                    className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
-                  >
-                    <Link href="/synergize">
-                      {/* Subtle shine effect */}
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                        initial={{ x: '-100%' }}
-                        whileHover={{ x: '100%' }}
-                        transition={{ duration: 0.6, ease: "easeInOut" }}
-                      />
-                      <span className="relative z-10 flex items-center">
-                        <Brain className="w-4 h-4 mr-2" />
-                        Synergize
-                      </span>
-                    </Link>
-                  </Button>
-                </motion.div>
-              </motion.div>
-              
-              {/* Distinctive Contact Button */}
-              <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8, duration: 0.5 }}
-              >
-                <motion.div
-                  whileHover={{ scale: 1.02, y: -1 }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                >
-                  <Button 
-                    asChild 
-                    className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
-                  >
-                    <Link href="/contact">
-                      {/* Subtle shine effect */}
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                        initial={{ x: '-100%' }}
-                        whileHover={{ x: '100%' }}
-                        transition={{ duration: 0.6, ease: "easeInOut" }}
-                      />
-                      <span className="relative z-10 flex items-center">
-                        <MessageSquare className="w-4 h-4 mr-2" />
-                        Contact
-                      </span>
-                    </Link>
-                  </Button>
-                </motion.div>
-              </motion.div>
-            </div>
-            
-            <motion.div 
-              className="flex items-center space-x-3"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.5, duration: 0.5 }}
-            >
-              {user ? (
-                <UserAvatar />
-              ) : (
-                <>
-                  <Button variant="ghost" asChild className="hover:bg-blue-50 hover:text-blue-600 transition-colors">
-                    <Link href="/login">Login</Link>
-                  </Button>
-                  <Button asChild className="bg-blue-600 hover:bg-blue-700 transition-colors">
-                    <Link href="/signup">Sign Up</Link>
-                  </Button>
-                </>
-              )}
-            </motion.div>
-
-            {/* Mobile Menu Button */}
-            <div className="md:hidden">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2"
-              >
-                {mobileMenuOpen ? (
-                  <X className="h-6 w-6" />
-                ) : (
-                  <Menu className="h-6 w-6" />
-                )}
-              </Button>
-            </div>
-          </div>
-
-          {/* Mobile Menu */}
-          <AnimatePresence>
-            {mobileMenuOpen && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
-                className="md:hidden border-t bg-white/95 backdrop-blur-md overflow-hidden"
-              >
-                <div className="px-4 py-4 space-y-4">
-                  {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item) => (
-                    <Link
-                      key={item}
-                      href={
-                        item === 'About Us' ? '/about-us' :
-                        item === 'Courses' ? '/courses' :
-                        item === 'Coaching' ? '/coaching' : 
-                        item === 'Consulting' ? '/consulting' : 
-                        item === 'Industry Insight' ? '/industry-insight' :
-                        `/${item.toLowerCase().replace(' ', '-')}`
-                      }
-                      className={`block text-gray-600 hover:text-blue-600 transition-colors font-medium py-2 text-lg ${
-                        item === 'Coaching' ? 'text-blue-600 font-semibold' : ''
-                      }`}
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      {item}
-                    </Link>
-                  ))}
-                  
-                  {/* Mobile Buttons */}
-                  <div className="pt-2 space-y-3">
-                    {/* Synergize Button for Mobile */}
-                    <motion.div
-                      whileHover={{ scale: 1.02, y: -1 }}
-                      whileTap={{ scale: 0.98 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                    >
-                      <Button 
-                        asChild 
-                        className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group text-lg py-3"
-                      >
-                        <Link href="/synergize" onClick={() => setMobileMenuOpen(false)}>
-                          <span className="relative z-10 flex items-center justify-center">
-                            <Brain className="w-4 h-4 mr-2" />
-                            Synergize
-                          </span>
-                        </Link>
-                      </Button>
-                    </motion.div>
-                    
-                    {/* Contact Button for Mobile */}
-                    <motion.div
-                      whileHover={{ scale: 1.02, y: -1 }}
-                      whileTap={{ scale: 0.98 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                    >
-                      <Button 
-                        asChild 
-                        className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group text-lg py-3"
-                      >
-                        <Link href="/contact" onClick={() => setMobileMenuOpen(false)}>
-                          {/* Subtle shine effect */}
-                          <motion.div
-                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                            initial={{ x: '-100%' }}
-                            whileHover={{ x: '100%' }}
-                            transition={{ duration: 0.6, ease: "easeInOut" }}
-                          />
-                          <span className="relative z-10 flex items-center justify-center">
-                            <MessageSquare className="w-4 h-4 mr-2" />
-                            Contact Us
-                          </span>
-                        </Link>
-                      </Button>
-                    </motion.div>
-                  </div>
-                  
-                  {/* Mobile Auth */}
-                  <div className="pt-4 border-t space-y-3">
-                    {user ? (
-                      <div className="flex items-center space-x-2">
-                        <UserAvatar />
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        <Button variant="ghost" className="w-full justify-start text-lg py-3" asChild>
-                          <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                            Login
-                          </Link>
-                        </Button>
-                        <Button className="w-full text-lg py-3" asChild>
-                          <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
-                            Sign Up
-                          </Link>
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </motion.nav>
-
+    <PageLayout>
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-20 overflow-hidden">
-        {/* Animated Background */}
-        <div className="absolute inset-0 overflow-hidden">
-          {/* Floating Gradient Shapes */}
-          <motion.div
-            className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-lg blur-xl"
-            animate={{
-              x: [0, 30, 0],
-              y: [0, -20, 0],
-              rotate: [0, 180, 360],
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-          <motion.div
-            className="absolute top-32 right-20 w-24 h-24 bg-gradient-to-br from-purple-400/25 to-pink-400/25 rounded-full blur-lg"
-            animate={{
-              x: [0, -25, 0],
-              y: [0, 15, 0],
-              scale: [1, 1.2, 1],
-            }}
-            transition={{
-              duration: 6,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 1
-            }}
-          />
-          <motion.div
-            className="absolute bottom-20 left-1/4 w-40 h-40 bg-gradient-to-br from-indigo-400/15 to-blue-400/15 rounded-2xl blur-2xl"
-            animate={{
-              x: [0, 40, 0],
-              y: [0, -30, 0],
-              rotate: [0, -90, 0],
-            }}
-            transition={{
-              duration: 10,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 2
-            }}
-          />
-          <motion.div
-            className="absolute top-1/2 right-10 w-28 h-28 bg-gradient-to-br from-cyan-400/20 to-blue-400/20 rounded-lg blur-xl"
-            animate={{
-              x: [0, -20, 0],
-              y: [0, 25, 0],
-              rotate: [0, 270, 360],
-            }}
-            transition={{
-              duration: 7,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 0.5
-            }}
-          />
-          <motion.div
-            className="absolute bottom-32 right-1/3 w-36 h-36 bg-gradient-to-br from-violet-400/18 to-purple-400/18 rounded-full blur-2xl"
-            animate={{
-              x: [0, 35, 0],
-              y: [0, -40, 0],
-              scale: [1, 0.8, 1],
-            }}
-            transition={{
-              duration: 9,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 1.5
-            }}
-          />
-          
-          {/* Pixelated Grid Overlay */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="grid grid-cols-12 md:grid-cols-20 lg:grid-cols-32 h-full gap-1">
-              {Array.from({ length: 384 }).map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="bg-gradient-to-br from-blue-500/30 to-purple-500/30 rounded-sm"
-                  initial={{ opacity: 0 }}
-                  animate={{ 
-                    opacity: [0, 0.3, 0],
-                    scale: [0.8, 1, 0.8]
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    delay: i * 0.01,
-                    ease: "easeInOut"
-                  }}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Floating Particles - Mobile Optimized */}
-          <div className="hidden md:block">
-            {Array.from({ length: 20 }).map((_, i) => (
-              <motion.div
-                key={`particle-${i}`}
-                className="absolute w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-40"
-                style={{
-                  left: `${(i * 5) % 100}%`,
-                  top: `${(i * 7) % 100}%`,
-                }}
-                animate={{
-                  y: [0, -100, 0],
-                  x: [0, (i % 2 === 0 ? 25 : -25), 0],
-                  opacity: [0.4, 0.8, 0.4],
-                }}
-                transition={{
-                  duration: 4 + (i % 4),
-                  repeat: Infinity,
-                  delay: i * 0.1,
-                  ease: "easeInOut"
-                }}
-              />
-            ))}
-          </div>
-          
-          {/* Mobile-optimized particles */}
-          <div className="block md:hidden">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <motion.div
-                key={`mobile-particle-${i}`}
-                className="absolute w-1 h-1 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-30"
-                style={{
-                  left: `${(i * 20) % 100}%`,
-                  top: `${(i * 25) % 100}%`,
-                }}
-                animate={{
-                  y: [0, -30, 0],
-                  opacity: [0.2, 0.4, 0.2],
-                }}
-                transition={{
-                  duration: 8,
-                  repeat: Infinity,
-                  delay: i * 0.5,
-                  ease: "easeInOut"
-                }}
-              />
-            ))}
-          </div>
-
-          {/* Gradient Mesh - Simplified for mobile */}
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/3 via-purple-500/3 to-pink-500/3" />
-        </div>
-
-        <motion.div 
-          className="container mx-auto px-4 text-center relative z-10"
-          style={{ y: heroY, opacity: heroOpacity }}
-        >
-          <motion.div
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: [0.6, -0.05, 0.01, 0.99] }}
-          >
-            <Badge className="mb-6 bg-blue-100 text-blue-700 hover:bg-blue-200">
-              <UserCheck className="w-4 h-4 mr-2" />
-              Professional Coaching
-            </Badge>
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-              Elevate Your{' '}
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Potential
-              </span>
-            </h1>
-            <h2 className="text-2xl md:text-3xl font-semibold text-gray-700 mb-6">
-              Elite Performance Through Personalized Coaching
-            </h2>
-          </motion.div>
-          
-          <motion.div 
-            className="text-lg text-gray-700 max-w-4xl mx-auto space-y-4 mb-8"
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4, ease: [0.6, -0.05, 0.01, 0.99] }}
-          >
-            <p>
-              At <strong>Synergies4</strong>, we believe that true transformation happens not just through courses — but through personalized guidance, real-world application, and unwavering support.
-            </p>
-            <p>
-              Our coaching programs are designed to bridge the gap between learning and mastery, empowering both <strong>individual professionals</strong> and <strong>corporate teams</strong> to lead confidently in the new era of <strong>AI Integration</strong>, <strong>Agile Excellence</strong>, and <strong>Positive Intelligence (PQ®)</strong>.
-            </p>
-          </motion.div>
-          
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6, ease: [0.6, -0.05, 0.01, 0.99] }}
-          >
-            <motion.div
-              whileHover={{ 
-                scale: 1.02,
-                y: -2
-              }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ type: "spring", stiffness: 400, damping: 25 }}
-            >
-              <Button 
-                size="lg" 
-                className="text-lg px-8 py-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group" 
-                asChild
-              >
-                <Link href="/courses">
-                  {/* Subtle shine effect */}
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                    initial={{ x: '-100%' }}
-                    whileHover={{ x: '100%' }}
-                    transition={{ duration: 0.6, ease: "easeInOut" }}
-                  />
-                  
-                  <span className="relative z-10 flex items-center">
-                    View Our Courses
-                    <ArrowRight className="h-5 w-5 ml-2 transition-transform group-hover:translate-x-1" />
-                  </span>
-                </Link>
-              </Button>
-            </motion.div>
-          </motion.div>
-        </motion.div>
-      </section>
+      <HeroSection
+        badge={{
+          icon: <UserCheck className="w-4 h-4" />,
+          text: "Professional Coaching"
+        }}
+        title="Unlock Your"
+        highlightText="Leadership Potential"
+        description="Transform your career with personalized coaching from industry experts. Develop the skills and mindset needed to lead with confidence and drive meaningful change."
+        primaryCTA={{
+          text: "Start Your Coaching Journey",
+          href: "/contact"
+        }}
+        secondaryCTA={{
+          text: "Learn More",
+          href: "#coaching-programs",
+          icon: <ArrowRight className="w-4 h-4" />
+        }}
+        backgroundVariant="gradient"
+        size="large"
+      />
 
       {/* Why Choose Section */}
       <WhyChooseSection />
@@ -608,377 +58,308 @@ export default function Coaching() {
       {/* Focus Areas Section */}
       <FocusAreasSection />
 
-      {/* Testimonials Section */}
+      {/* Testimonials */}
       <TestimonialsSection />
 
       {/* CTA Section */}
       <CTASection />
+    </PageLayout>
+  );
+}
 
-      {/* Footer */}
-      <motion.footer 
-        className="bg-gray-900 text-white py-16"
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-      >
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
-            >
-              <motion.span 
-                className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-4 block"
-              >
-                Synergies4
-              </motion.span>
-              <p className="text-gray-400 mb-4">
-                AI-powered learning tailored uniquely to you and your organization.
-              </p>
-              <div className="flex space-x-4">
-                {['Facebook', 'Twitter', 'LinkedIn', 'Instagram'].map((social) => (
-                  <a key={social} href="#" className="text-gray-400 hover:text-white transition-colors">
-                    <span className="sr-only">{social}</span>
-                    <div className="w-6 h-6 bg-gray-400 rounded"></div>
-                  </a>
-                ))}
-              </div>
-            </motion.div>
+// Why Choose Section
+function WhyChooseSection() {
+  return (
+    <section className="py-20 bg-white relative overflow-hidden">
+      {/* Simple Background Pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `radial-gradient(circle at 25% 25%, #3B82F6 2px, transparent 2px),
+                           radial-gradient(circle at 75% 75%, #8B5CF6 2px, transparent 2px)`,
+          backgroundSize: '60px 60px'
+        }} />
+      </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
-            >
-              <h3 className="text-lg font-semibold mb-4">Courses</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Agile & Scrum</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Product Management</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Leadership</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Business Analysis</a></li>
-              </ul>
-            </motion.div>
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="text-center mb-16">
+          <Badge className="mb-4 bg-blue-100 text-blue-700 hover:bg-blue-200 border-blue-200">
+            <Lightbulb className="w-4 h-4 mr-2" />
+            Why Choose Our Coaching
+          </Badge>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+            Personalized Growth That Delivers Results
+          </h2>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Our coaching approach combines proven methodologies with AI-powered insights to accelerate your professional development
+          </p>
+        </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.5 }}
-            >
-              <h3 className="text-lg font-semibold mb-4">Company</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link href="/about-us" className="hover:text-white transition-colors">About Us</Link></li>
-                <li><Link href="/coaching" className="hover:text-white transition-colors">Coaching</Link></li>
-                <li><Link href="/consulting" className="hover:text-white transition-colors">Consulting</Link></li>
-              </ul>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {[
+            {
+              icon: <Brain className="h-8 w-8" />,
+              title: "AI-Enhanced Coaching",
+              description: "Leverage cutting-edge AI tools to identify growth opportunities and track your progress with precision."
+            },
+            {
+              icon: <Target className="h-8 w-8" />,
+              title: "Goal-Oriented Approach",
+              description: "Set clear, measurable objectives and receive personalized strategies to achieve your career aspirations."
+            },
+            {
+              icon: <Users className="h-8 w-8" />,
+              title: "Expert Mentorship",
+              description: "Work with industry leaders who have successfully navigated the challenges you're facing."
+            },
+            {
+              icon: <Rocket className="h-8 w-8" />,
+              title: "Accelerated Growth",
+              description: "Fast-track your development with proven frameworks and real-world application opportunities."
+            },
+            {
+              icon: <CheckCircle className="h-8 w-8" />,
+              title: "Measurable Results",
+              description: "Track your progress with data-driven insights and celebrate meaningful achievements."
+            },
+            {
+              icon: <Award className="h-8 w-8" />,
+              title: "Industry Recognition",
+              description: "Gain credentials and recognition that advance your career and open new opportunities."
+            }
+          ].map((item, index) => (
+            <Card key={index} className="h-full text-center hover:shadow-xl transition-all duration-300 group border-0 shadow-lg bg-white/80 backdrop-blur-sm hover:scale-105">
+              <CardHeader>
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 group-hover:scale-110 transition-transform duration-300">
+                  {item.icon}
+                </div>
+                <CardTitle className="text-xl group-hover:text-blue-600 transition-colors">
+                  {item.title}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-base leading-relaxed">
+                  {item.description}
+                </CardDescription>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// Focus Areas Section
+function FocusAreasSection() {
+  return (
+    <section id="coaching-programs" className="py-20 bg-gradient-to-br from-gray-50 to-blue-50 relative overflow-hidden">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `radial-gradient(circle at 20% 80%, #3B82F6 2px, transparent 2px),
+                           radial-gradient(circle at 80% 20%, #8B5CF6 2px, transparent 2px),
+                           radial-gradient(circle at 40% 40%, #06B6D4 2px, transparent 2px)`,
+          backgroundSize: '100px 100px'
+        }} />
+      </div>
+
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="text-center mb-16">
+          <Badge className="mb-4 bg-purple-100 text-purple-700 hover:bg-purple-200 border-purple-200">
+            <Compass className="w-4 h-4 mr-2" />
+            Coaching Focus Areas
+          </Badge>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+            Specialized Coaching Programs
+          </h2>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Choose from our targeted coaching programs designed to address specific professional development needs
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {[
+            {
+              title: "AI Integration Leadership",
+              description: "Master the art of leading AI transformation initiatives and building AI-ready teams",
+              features: ["AI Strategy Development", "Change Management", "Team Transformation", "Technology Adoption"],
+              color: "from-blue-400 to-blue-600"
+            },
+            {
+              title: "Agile Excellence",
+              description: "Become a certified Agile leader with deep expertise in modern methodologies",
+              features: ["Scrum Mastery", "Kanban Implementation", "Team Facilitation", "Continuous Improvement"],
+              color: "from-green-400 to-green-600"
+            },
+            {
+              title: "Positive Intelligence (PQ®)",
+              description: "Develop mental fitness and emotional intelligence for peak performance",
+              features: ["Mental Fitness Training", "Stress Management", "Peak Performance", "Leadership Presence"],
+              color: "from-purple-400 to-purple-600"
+            }
+          ].map((program, index) => (
+            <Card key={index} className="group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white/90 backdrop-blur-sm border-0 shadow-lg overflow-hidden rounded-xl flex flex-col h-full">
+              <div className={`h-2 bg-gradient-to-r ${program.color}`}></div>
               
-              {/* Distinctive Contact Button in Footer */}
-              <div className="mt-6">
-                <motion.div
-                  whileHover={{ scale: 1.02, y: -1 }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                >
+              <CardHeader className="flex-shrink-0">
+                <CardTitle className="text-xl font-bold group-hover:text-blue-600 transition-colors min-h-[3rem] flex items-center">
+                  {program.title}
+                </CardTitle>
+                <CardDescription className="text-gray-600 leading-relaxed min-h-[4.5rem]">
+                  {program.description}
+                </CardDescription>
+              </CardHeader>
+
+              <CardContent className="flex-1 flex flex-col">
+                <div className="flex-1">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3">Program Includes:</h4>
+                  <div className="space-y-2">
+                    {program.features.map((feature, idx) => (
+                      <div key={idx} className="flex items-center text-sm text-gray-600">
+                        <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
+                        <span>{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mt-6">
                   <Button 
-                    asChild 
-                    size="sm"
-                    className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group w-full"
+                    className={`w-full bg-gradient-to-r ${program.color} hover:shadow-lg text-white shadow-md transition-all duration-300 group-hover:scale-105`}
+                    asChild
                   >
                     <Link href="/contact">
-                      {/* Subtle shine effect */}
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                        initial={{ x: '-100%' }}
-                        whileHover={{ x: '100%' }}
-                        transition={{ duration: 0.6, ease: "easeInOut" }}
-                      />
-                      <span className="relative z-10 flex items-center justify-center">
-                        <MessageSquare className="w-4 h-4 mr-2" />
-                        Contact Us
+                      <span className="flex items-center justify-center">
+                        Get Started
+                        <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
                       </span>
                     </Link>
                   </Button>
-                </motion.div>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6, duration: 0.5 }}
-            >
-              <h3 className="text-lg font-semibold mb-4">Support</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Cookie Policy</a></li>
-              </ul>
-            </motion.div>
-          </div>
-
-          <Separator className="bg-gray-800 mb-8" />
-
-          <motion.div 
-            className="text-center text-gray-400"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.7, duration: 0.5 }}
-          >
-            <p>&copy; {new Date().getFullYear()} Synergies4 LLC. All rights reserved.</p>
-            <p className="mt-2 text-sm">
-              Synergies4™, PocketCoachAI™, Adaptive Content Pods™ are trademarks of Synergies4 LLC.
-            </p>
-          </motion.div>
-        </div>
-      </motion.footer>
-    </main>
-  );
-}
-
-// Why Choose Section Component
-function WhyChooseSection() {
-  const { ref, isInView } = useScrollAnimation();
-
-  const benefits = [
-    {
-      title: "Tailored for Your Goals",
-      description: "Whether you're advancing your own career or leading a team through change, our coaching is customized to your specific needs, challenges, and aspirations.",
-      icon: <Target className="h-8 w-8" />
-    },
-    {
-      title: "Expert-Led Guidance",
-      description: "Work 1:1 or in small cohorts with seasoned experts who are certified leaders in AI, Agile, and PQ methodologies — real-world practitioners who bring theory to life.",
-      icon: <Award className="h-8 w-8" />
-    },
-    {
-      title: "Action-Oriented Transformation",
-      description: "Our coaching isn't just about knowledge — it's about applying frameworks, building mindsets, and driving measurable results in your personal and professional journey.",
-      icon: <Rocket className="h-8 w-8" />
-    },
-    {
-      title: "Designed for B2C and B2B Impact",
-      description: "From individual career coaching to enterprise-wide team development, we offer flexible programs to scale growth and innovation at every level.",
-      icon: <Users className="h-8 w-8" />
-    }
-  ];
-
-  return (
-    <motion.section 
-      ref={ref}
-      className="py-20 bg-white"
-      initial="initial"
-      animate={isInView ? "animate" : "initial"}
-      variants={staggerContainer}
-    >
-      <div className="container mx-auto px-4">
-        <motion.div className="text-center mb-16" variants={fadeInUp}>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Why Choose Synergies4 Coaching?
-          </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Experience personalized coaching that transforms knowledge into real-world results.
-          </p>
-        </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {benefits.map((benefit, index) => (
-            <motion.div key={index} variants={scaleIn}>
-              <Card className="h-full text-center hover:shadow-lg transition-shadow duration-300">
-                <CardHeader>
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600">
-                    {benefit.icon}
-                  </div>
-                  <CardTitle className="text-xl">{benefit.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-base">
-                    {benefit.description}
-                  </CardDescription>
-                </CardContent>
-              </Card>
-            </motion.div>
+                </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>
-    </motion.section>
+    </section>
   );
 }
 
-// Focus Areas Section Component
-function FocusAreasSection() {
-  const { ref, isInView } = useScrollAnimation();
-
-  const focusAreas = [
-    {
-      title: "AI Integration Coaching",
-      description: "Learn how to leverage AI ethically, strategically, and innovatively — becoming a leader in the future of work.",
-      icon: <Brain className="h-8 w-8" />
-    },
-    {
-      title: "Agile Transformation Coaching",
-      description: "Master agile leadership principles, drive transformation initiatives, and create high-performing, adaptive teams.",
-      icon: <Zap className="h-8 w-8" />
-    },
-    {
-      title: "Positive Intelligence (PQ) Coaching",
-      description: "Strengthen your mental fitness, resilience, and emotional intelligence to thrive under pressure and navigate complex challenges with ease.",
-      icon: <Lightbulb className="h-8 w-8" />
-    }
-  ];
-
-  return (
-    <motion.section 
-      ref={ref}
-      className="py-20 bg-gray-50"
-      initial="initial"
-      animate={isInView ? "animate" : "initial"}
-      variants={staggerContainer}
-    >
-      <div className="container mx-auto px-4">
-        <motion.div className="text-center mb-16" variants={fadeInUp}>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Our Coaching Focus Areas
-          </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Specialized coaching programs designed to accelerate your growth in key areas.
-          </p>
-        </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {focusAreas.map((area, index) => (
-            <motion.div key={index} variants={scaleIn}>
-              <Card className="h-full hover:shadow-xl transition-all duration-300 group">
-                <CardHeader className="text-center">
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 group-hover:scale-110 transition-transform duration-300">
-                    {area.icon}
-                  </div>
-                  <CardTitle className="text-xl text-blue-600">{area.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 leading-relaxed">{area.description}</p>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </motion.section>
-  );
-}
-
-// Testimonials Section Component
+// Testimonials Section
 function TestimonialsSection() {
-  const { ref, isInView } = useScrollAnimation();
-
-  const testimonials = [
-    {
-      quote: "I thought I was taking a certification. What I received was far more: a deep personal transformation thanks to the coaching that accompanied the courses.",
-      author: "Certified AI Practitioner",
-      role: "Professional",
-      company: "USA",
-      avatar: "CP"
-    },
-    {
-      quote: "Synergies4's coaching transformed our leadership team's mindset. We didn't just learn Agile and AI — we lived it. Our team's productivity, innovation, and collaboration levels have skyrocketed.",
-      author: "Director of Transformation",
-      role: "Leadership",
-      company: "Fortune 500",
-      avatar: "DT"
-    }
-  ];
-
   return (
-    <motion.section 
-      ref={ref}
-      className="py-20 bg-white"
-      initial="initial"
-      animate={isInView ? "animate" : "initial"}
-      variants={staggerContainer}
-    >
+    <section className="py-20 bg-white">
       <div className="container mx-auto px-4">
-        <motion.div className="text-center mb-16" variants={fadeInUp}>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        <div className="text-center mb-16">
+          <Badge className="mb-4 bg-yellow-100 text-yellow-700 hover:bg-yellow-200 border-yellow-200">
+            <Star className="w-4 h-4 mr-2" />
+            Success Stories
+          </Badge>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
             What Our Clients Say
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Real transformations from professionals who experienced our coaching programs.
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            Real results from professionals who transformed their careers through our coaching programs
           </p>
-        </motion.div>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          {testimonials.map((testimonial, index) => (
-            <motion.div key={index} variants={scaleIn}>
-              <Card className="h-full">
-                <CardContent className="pt-6">
-                  <div className="flex mb-4">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    ))}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {[
+            {
+              name: "Sarah Chen",
+              role: "Senior Product Manager",
+              company: "Tech Innovators Inc.",
+              content: "The AI Integration Leadership coaching transformed how I approach product development. I'm now leading our company's AI strategy with confidence.",
+              rating: 5,
+              image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face"
+            },
+            {
+              name: "Marcus Rodriguez",
+              role: "Agile Coach",
+              company: "Global Solutions Ltd.",
+              content: "The Agile Excellence program gave me the tools and confidence to transform our entire organization's approach to project management.",
+              rating: 5,
+              image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
+            },
+            {
+              name: "Emily Watson",
+              role: "Executive Director",
+              company: "Future Enterprises",
+              content: "Positive Intelligence coaching helped me develop the mental fitness needed to lead through challenging times with clarity and resilience.",
+              rating: 5,
+              image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face"
+            }
+          ].map((testimonial, index) => (
+            <Card key={index} className="hover:shadow-xl transition-all duration-300 group border-0 shadow-lg bg-white/90 backdrop-blur-sm">
+              <CardContent className="pt-6">
+                <div className="flex mb-4">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                  ))}
+                </div>
+                <p className="text-gray-600 mb-6 italic leading-relaxed">"{testimonial.content}"</p>
+                <div className="flex items-center">
+                  <Avatar className="h-12 w-12 mr-4">
+                    <AvatarImage src={testimonial.image} alt={testimonial.name} />
+                    <AvatarFallback>{testimonial.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-semibold text-gray-900">{testimonial.name}</p>
+                    <p className="text-sm text-gray-600">{testimonial.role}</p>
+                    <p className="text-sm text-gray-500">{testimonial.company}</p>
                   </div>
-                  <blockquote className="text-gray-600 mb-6 italic leading-relaxed text-lg">
-                    "{testimonial.quote}"
-                  </blockquote>
-                  <div className="flex items-center space-x-3">
-                    <Avatar>
-                      <AvatarFallback className="bg-blue-100 text-blue-600">
-                        {testimonial.avatar}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-semibold text-gray-900">{testimonial.author}</p>
-                      <p className="text-sm text-gray-500">{testimonial.role} • {testimonial.company}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
+                </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>
-    </motion.section>
+    </section>
   );
 }
 
-// CTA Section Component
+// CTA Section
 function CTASection() {
-  const { ref, isInView } = useScrollAnimation();
-
   return (
-    <motion.section 
-      ref={ref}
-      className="py-20 bg-gradient-to-r from-blue-600 to-purple-600 text-white"
-      initial="initial"
-      animate={isInView ? "animate" : "initial"}
-      variants={staggerContainer}
-    >
-      <div className="container mx-auto px-4 text-center">
-        <motion.div variants={fadeInUp}>
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Synergies4 — Training for the Leaders of Tomorrow
-          </h2>
-          <p className="text-xl mb-4 opacity-90">
-            Because training builds skills.
-          </p>
-          <h3 className="text-2xl font-semibold mb-8 opacity-95">
-            But coaching builds leaders.
-          </h3>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" variant="secondary" className="text-lg px-8 py-6" asChild>
-              <Link href="/courses">
-                Explore Our Programs
-                <BookOpen className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-white text-white hover:bg-white hover:text-blue-600" asChild>
-              <Link href="/signup">
-                Start Your Journey
-                <Compass className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-          </div>
-        </motion.div>
+    <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600 text-white relative overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-20 right-10 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
+        <div className="absolute bottom-20 left-10 w-24 h-24 bg-white/10 rounded-lg blur-lg"></div>
       </div>
-    </motion.section>
+
+      <div className="container mx-auto px-4 text-center relative z-10">
+        <h2 className="text-3xl md:text-4xl font-bold mb-6">
+          Ready to Transform Your Leadership?
+        </h2>
+        <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
+          Take the first step towards becoming the leader you're meant to be. Our expert coaches are ready to guide your journey.
+        </p>
+        
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button 
+            size="lg" 
+            className="text-lg px-8 py-6 bg-white text-blue-600 hover:bg-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+            asChild
+          >
+            <Link href="/contact">
+              Start Your Coaching Journey
+              <ArrowRight className="h-5 w-5 ml-2" />
+            </Link>
+          </Button>
+          <Button 
+            size="lg" 
+            variant="outline" 
+            className="text-lg px-8 py-6 border-2 border-white text-white hover:bg-white hover:text-blue-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+            asChild
+          >
+            <Link href="/courses">
+              Explore Our Courses
+              <BookOpen className="h-5 w-5 ml-2" />
+            </Link>
+          </Button>
+        </div>
+      </div>
+    </section>
   );
 } 
