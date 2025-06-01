@@ -752,5 +752,4 @@ export default function NewBlogPostPage() {
       )}
     </div>
   );
-} 
-} 
+}
