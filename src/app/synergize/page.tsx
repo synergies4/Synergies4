@@ -498,8 +498,8 @@ export default function SynergizePage() {
 
       {/* Chat Interface - Mobile Optimized */}
       <section className="flex-1 bg-gray-50 flex flex-col min-h-0">
-        <div className="container mx-auto px-2 md:px-4 max-w-4xl flex-1 flex flex-col py-2 md:py-4">
-          <Card className="flex-1 flex flex-col shadow-lg min-h-0">
+        <div className="container mx-auto px-2 md:px-4 max-w-4xl flex-1 flex flex-col py-2 md:py-4 min-h-0">
+          <Card className="flex-1 flex flex-col shadow-lg min-h-0 max-h-full">
             <CardHeader className="border-b bg-gradient-to-r from-blue-50 to-purple-50 flex-shrink-0 py-3 md:py-4">
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center text-lg md:text-xl">
@@ -548,15 +548,15 @@ export default function SynergizePage() {
               </div>
             </CardHeader>
             
-            <CardContent className="flex-1 flex flex-col p-0 min-h-0">
+            <CardContent className="flex-1 flex flex-col p-0 min-h-0 overflow-hidden">
               {/* Messages */}
               <div 
                 ref={chatContainerRef}
-                className="flex-1 overflow-y-auto p-2 md:p-4 space-y-3 md:space-y-4 min-h-0"
+                className="flex-1 overflow-y-auto p-2 md:p-4 space-y-3 md:space-y-4"
                 style={{ 
-                  height: 'calc(100vh - 400px)',
-                  minHeight: '400px',
-                  maxHeight: 'calc(100vh - 300px)'
+                  height: 'calc(100vh - 500px)',
+                  minHeight: '300px',
+                  maxHeight: 'calc(100vh - 400px)'
                 }}
               >
                 <AnimatePresence>
