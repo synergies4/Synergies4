@@ -34,7 +34,11 @@ import {
   Link as LinkIcon,
   FileText,
   CheckCircle,
-  Eye
+  Eye,
+  Sparkles,
+  Brain,
+  Lightbulb,
+  Copy
 } from 'lucide-react';
 
 interface ModuleContent {
@@ -99,6 +103,13 @@ export default function CreateCourse() {
     content: '',
     description: ''
   });
+  
+  // AI Assistant State
+  const [showAIAssistant, setShowAIAssistant] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiContext, setAiContext] = useState('');
+  const [aiSuggestions, setAiSuggestions] = useState('');
+  const [aiMode, setAiMode] = useState<'description' | 'modules' | 'quiz' | 'content'>('description');
   
   const [formData, setFormData] = useState<CourseFormData>({
     title: '',
@@ -261,6 +272,68 @@ export default function CreateCourse() {
         questions: prev.quiz.questions.filter(q => q.id !== questionId)
       } : undefined
     }));
+  };
+
+  // AI Assistant Functions
+  const generateAISuggestions = async () => {
+    setAiLoading(true);
+    try {
+      let prompt = '';
+      
+      switch (aiMode) {
+        case 'description':
+          prompt = `Create a compelling course description for a course titled "${formData.title}" in the ${formData.category} category at ${formData.level} level. Context: ${aiContext}. Include learning objectives, target audience, and key benefits. Make it engaging and professional.`;
+          break;
+        case 'modules':
+          prompt = `Create a detailed course module structure for "${formData.title}" - a ${formData.level} level ${formData.category} course. Context: ${aiContext}. Provide 4-6 modules with titles, descriptions, and suggested content types (videos, documents, exercises). Format as a structured list.`;
+          break;
+        case 'quiz':
+          prompt = `Create 5-8 quiz questions for a course titled "${formData.title}" in ${formData.category}. Context: ${aiContext}. Include multiple choice questions with 4 options each, correct answers, and explanations. Make them practical and test real understanding.`;
+          break;
+        case 'content':
+          prompt = `Generate content ideas and learning materials for "${formData.title}" course. Context: ${aiContext}. Suggest specific videos, readings, exercises, and practical activities that would help students master the subject. Be specific and actionable.`;
+          break;
+      }
+
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [
+            { role: 'system', content: 'You are an expert course designer and educational content creator. Provide detailed, practical suggestions for online course development.' },
+            { role: 'user', content: prompt }
+          ],
+          provider: 'anthropic'
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setAiSuggestions(data.content || data.response);
+      } else {
+        setAiSuggestions('Sorry, I encountered an error generating suggestions. Please try again.');
+      }
+    } catch (error) {
+      console.error('AI suggestion error:', error);
+      setAiSuggestions('Sorry, I encountered an error generating suggestions. Please try again.');
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const applyAISuggestion = (field: string) => {
+    if (field === 'description') {
+      setFormData(prev => ({ ...prev, description: aiSuggestions }));
+    } else if (field === 'shortDesc') {
+      // Extract first paragraph or first 200 chars for short description
+      const shortDesc = aiSuggestions.split('\n')[0].substring(0, 200) + '...';
+      setFormData(prev => ({ ...prev, shortDesc }));
+    }
+    setShowAIAssistant(false);
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
   };
 
   const handleSubmit = async (status: string) => {
@@ -1097,7 +1170,194 @@ export default function CreateCourse() {
             <ChevronRight className="w-4 h-4 ml-2" />
           </Button>
         </div>
+
+        {/* AI Assistant Floating Button */}
+        <div className="fixed bottom-6 right-6 z-50">
+          <Button
+            onClick={() => setShowAIAssistant(true)}
+            className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-full w-14 h-14"
+            size="lg"
+          >
+            <Sparkles className="w-6 h-6" />
+          </Button>
+        </div>
       </main>
+
+      {/* AI Assistant Modal */}
+      {showAIAssistant && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-4xl max-h-[90vh] overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-purple-600 to-blue-600 text-white">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <Brain className="w-6 h-6" />
+                  <div>
+                    <CardTitle>AI Course Assistant</CardTitle>
+                    <CardDescription className="text-purple-100">
+                      Get AI-powered suggestions for your course content
+                    </CardDescription>
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowAIAssistant(false)}
+                  className="text-white hover:bg-white/20"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+              <div className="space-y-6">
+                {/* AI Mode Selection */}
+                <div>
+                  <Label className="text-sm font-medium">What would you like help with?</Label>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">
+                    <Button
+                      variant={aiMode === 'description' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setAiMode('description')}
+                      className="flex flex-col items-center p-4 h-auto"
+                    >
+                      <FileText className="w-5 h-5 mb-2" />
+                      <span className="text-xs">Description</span>
+                    </Button>
+                    <Button
+                      variant={aiMode === 'modules' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setAiMode('modules')}
+                      className="flex flex-col items-center p-4 h-auto"
+                    >
+                      <BookOpen className="w-5 h-5 mb-2" />
+                      <span className="text-xs">Modules</span>
+                    </Button>
+                    <Button
+                      variant={aiMode === 'quiz' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setAiMode('quiz')}
+                      className="flex flex-col items-center p-4 h-auto"
+                    >
+                      <HelpCircle className="w-5 h-5 mb-2" />
+                      <span className="text-xs">Quiz</span>
+                    </Button>
+                    <Button
+                      variant={aiMode === 'content' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setAiMode('content')}
+                      className="flex flex-col items-center p-4 h-auto"
+                    >
+                      <Lightbulb className="w-5 h-5 mb-2" />
+                      <span className="text-xs">Content Ideas</span>
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Context Input */}
+                <div>
+                  <Label htmlFor="aiContext" className="text-sm font-medium">
+                    Additional Context (Optional)
+                  </Label>
+                  <Textarea
+                    id="aiContext"
+                    value={aiContext}
+                    onChange={(e) => setAiContext(e.target.value)}
+                    placeholder="Provide any additional context about your course, target audience, specific requirements, etc."
+                    className="mt-2"
+                    rows={3}
+                  />
+                </div>
+
+                {/* Course Info Display */}
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h4 className="font-medium mb-2">Current Course Info:</h4>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-gray-600">Title:</span> {formData.title || 'Not set'}
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Category:</span> {formData.category || 'Not set'}
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Level:</span> {formData.level || 'Not set'}
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Modules:</span> {formData.modules.length}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Generate Button */}
+                <Button
+                  onClick={generateAISuggestions}
+                  disabled={aiLoading || !formData.title}
+                  className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                >
+                  {aiLoading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Generating Suggestions...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      Generate AI Suggestions
+                    </>
+                  )}
+                </Button>
+
+                {/* AI Suggestions */}
+                {aiSuggestions && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-medium">AI Suggestions:</h4>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => copyToClipboard(aiSuggestions)}
+                      >
+                        <Copy className="w-4 h-4 mr-2" />
+                        Copy
+                      </Button>
+                    </div>
+                    <div className="bg-white border rounded-lg p-4 max-h-60 overflow-y-auto">
+                      <pre className="whitespace-pre-wrap text-sm">{aiSuggestions}</pre>
+                    </div>
+                    
+                    {aiMode === 'description' && (
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={() => applyAISuggestion('description')}
+                          size="sm"
+                          className="flex-1"
+                        >
+                          Apply to Description
+                        </Button>
+                        <Button
+                          onClick={() => applyAISuggestion('shortDesc')}
+                          variant="outline"
+                          size="sm"
+                          className="flex-1"
+                        >
+                          Apply to Short Description
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {!formData.title && (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <p className="text-sm text-yellow-800">
+                      Please enter a course title first to get AI suggestions.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 } 

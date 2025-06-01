@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Save, Eye, X, FileText, Tag, Image as ImageIcon } from 'lucide-react';
+import { ArrowLeft, Save, Eye, X, FileText, Tag, Image as ImageIcon, Sparkles, Brain, Lightbulb, Copy, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 
@@ -38,6 +38,13 @@ export default function NewBlogPostPage() {
     meta_description: ''
   });
   const [tagInput, setTagInput] = useState('');
+
+  // AI Assistant State
+  const [showAIAssistant, setShowAIAssistant] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiContext, setAiContext] = useState('');
+  const [aiSuggestions, setAiSuggestions] = useState('');
+  const [aiMode, setAiMode] = useState<'content' | 'outline' | 'title' | 'seo'>('content');
 
   useEffect(() => {
     if (userProfile?.role === 'ADMIN') {
@@ -94,6 +101,72 @@ export default function NewBlogPostPage() {
       e.preventDefault();
       addTag();
     }
+  };
+
+  // AI Assistant Functions
+  const generateAISuggestions = async () => {
+    setAiLoading(true);
+    try {
+      let prompt = '';
+      
+      switch (aiMode) {
+        case 'content':
+          prompt = `Write a comprehensive blog post about "${formData.title}" in the ${formData.category} category. Context: ${aiContext}. Include an engaging introduction, main sections with subheadings, practical examples, and a compelling conclusion. Make it informative and engaging for professionals.`;
+          break;
+        case 'outline':
+          prompt = `Create a detailed blog post outline for "${formData.title}" in the ${formData.category} category. Context: ${aiContext}. Provide a structured outline with main sections, subsections, and key points to cover. Include introduction, main body sections, and conclusion.`;
+          break;
+        case 'title':
+          prompt = `Generate 10 compelling blog post titles related to "${formData.title || aiContext}" in the ${formData.category} category. Context: ${aiContext}. Make them engaging, SEO-friendly, and click-worthy for professional audiences.`;
+          break;
+        case 'seo':
+          prompt = `Create SEO-optimized meta title, meta description, and suggest relevant tags for a blog post titled "${formData.title}" in the ${formData.category} category. Context: ${aiContext}. Focus on search engine optimization and user engagement.`;
+          break;
+      }
+
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [
+            { role: 'system', content: 'You are an expert content writer and SEO specialist. Create high-quality, engaging blog content for professional audiences.' },
+            { role: 'user', content: prompt }
+          ],
+          provider: 'anthropic'
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setAiSuggestions(data.content || data.response);
+      } else {
+        setAiSuggestions('Sorry, I encountered an error generating suggestions. Please try again.');
+      }
+    } catch (error) {
+      console.error('AI suggestion error:', error);
+      setAiSuggestions('Sorry, I encountered an error generating suggestions. Please try again.');
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const applyAISuggestion = (field: string) => {
+    if (field === 'content') {
+      setFormData(prev => ({ ...prev, content: aiSuggestions }));
+    } else if (field === 'excerpt') {
+      // Extract first paragraph for excerpt
+      const excerpt = aiSuggestions.split('\n\n')[0].substring(0, 300) + '...';
+      setFormData(prev => ({ ...prev, excerpt }));
+    } else if (field === 'title') {
+      // Use first suggested title
+      const firstTitle = aiSuggestions.split('\n')[0].replace(/^\d+\.\s*/, '');
+      setFormData(prev => ({ ...prev, title: firstTitle, slug: generateSlug(firstTitle) }));
+    }
+    setShowAIAssistant(false);
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
   };
 
   const savePost = async () => {
@@ -479,6 +552,205 @@ export default function NewBlogPostPage() {
           </div>
         </div>
       </main>
+
+      {/* AI Assistant Floating Button */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <Button
+          onClick={() => setShowAIAssistant(true)}
+          className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-full w-14 h-14"
+          size="lg"
+        >
+          <Sparkles className="w-6 h-6" />
+        </Button>
+      </div>
+
+      {/* AI Assistant Modal */}
+      {showAIAssistant && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-4xl max-h-[90vh] overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-purple-600 to-blue-600 text-white">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <Brain className="w-6 h-6" />
+                  <div>
+                    <CardTitle>AI Blog Assistant</CardTitle>
+                    <CardDescription className="text-purple-100">
+                      Get AI-powered suggestions for your blog content
+                    </CardDescription>
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowAIAssistant(false)}
+                  className="text-white hover:bg-white/20"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+              <div className="space-y-6">
+                {/* AI Mode Selection */}
+                <div>
+                  <Label className="text-sm font-medium">What would you like help with?</Label>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">
+                    <Button
+                      variant={aiMode === 'content' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setAiMode('content')}
+                      className="flex flex-col items-center p-4 h-auto"
+                    >
+                      <FileText className="w-5 h-5 mb-2" />
+                      <span className="text-xs">Full Content</span>
+                    </Button>
+                    <Button
+                      variant={aiMode === 'outline' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setAiMode('outline')}
+                      className="flex flex-col items-center p-4 h-auto"
+                    >
+                      <Lightbulb className="w-5 h-5 mb-2" />
+                      <span className="text-xs">Outline</span>
+                    </Button>
+                    <Button
+                      variant={aiMode === 'title' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setAiMode('title')}
+                      className="flex flex-col items-center p-4 h-auto"
+                    >
+                      <Tag className="w-5 h-5 mb-2" />
+                      <span className="text-xs">Title Ideas</span>
+                    </Button>
+                    <Button
+                      variant={aiMode === 'seo' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setAiMode('seo')}
+                      className="flex flex-col items-center p-4 h-auto"
+                    >
+                      <Eye className="w-5 h-5 mb-2" />
+                      <span className="text-xs">SEO</span>
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Context Input */}
+                <div>
+                  <Label htmlFor="aiContext" className="text-sm font-medium">
+                    Topic or Additional Context
+                  </Label>
+                  <Textarea
+                    id="aiContext"
+                    value={aiContext}
+                    onChange={(e) => setAiContext(e.target.value)}
+                    placeholder="Describe your blog topic, target audience, key points to cover, etc."
+                    className="mt-2"
+                    rows={3}
+                  />
+                </div>
+
+                {/* Blog Info Display */}
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h4 className="font-medium mb-2">Current Blog Info:</h4>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-gray-600">Title:</span> {formData.title || 'Not set'}
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Category:</span> {formData.category || 'Not set'}
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Tags:</span> {formData.tags.length}
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Content:</span> {formData.content ? `${formData.content.length} chars` : 'Empty'}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Generate Button */}
+                <Button
+                  onClick={generateAISuggestions}
+                  disabled={aiLoading || (!formData.title && !aiContext)}
+                  className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                >
+                  {aiLoading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Generating Suggestions...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      Generate AI Suggestions
+                    </>
+                  )}
+                </Button>
+
+                {/* AI Suggestions */}
+                {aiSuggestions && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-medium">AI Suggestions:</h4>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => copyToClipboard(aiSuggestions)}
+                      >
+                        <Copy className="w-4 h-4 mr-2" />
+                        Copy
+                      </Button>
+                    </div>
+                    <div className="bg-white border rounded-lg p-4 max-h-60 overflow-y-auto">
+                      <pre className="whitespace-pre-wrap text-sm">{aiSuggestions}</pre>
+                    </div>
+                    
+                    <div className="flex gap-2">
+                      {aiMode === 'content' && (
+                        <>
+                          <Button
+                            onClick={() => applyAISuggestion('content')}
+                            size="sm"
+                            className="flex-1"
+                          >
+                            Apply to Content
+                          </Button>
+                          <Button
+                            onClick={() => applyAISuggestion('excerpt')}
+                            variant="outline"
+                            size="sm"
+                            className="flex-1"
+                          >
+                            Apply to Excerpt
+                          </Button>
+                        </>
+                      )}
+                      {aiMode === 'title' && (
+                        <Button
+                          onClick={() => applyAISuggestion('title')}
+                          size="sm"
+                          className="flex-1"
+                        >
+                          Apply First Title
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {!formData.title && !aiContext && (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <p className="text-sm text-yellow-800">
+                      Please enter a blog title or provide context to get AI suggestions.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
+} 
 } 
