@@ -29,7 +29,12 @@ import {
   Edit,
   HelpCircle,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Video,
+  Link as LinkIcon,
+  FileText,
+  CheckCircle,
+  Eye
 } from 'lucide-react';
 
 interface ModuleContent {
