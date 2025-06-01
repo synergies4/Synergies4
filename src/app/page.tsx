@@ -36,18 +36,18 @@ export default function HomePage() {
   return (
     <PageLayout>
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-slate-900 via-gray-900 to-black min-h-screen flex items-center overflow-hidden">
+      <section className="relative bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 min-h-screen flex items-center overflow-hidden">
         {/* Enhanced Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
           {/* Animated Orbs */}
           <div className="absolute top-1/4 right-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-gradient-to-br from-teal-600/20 to-emerald-600/20 rounded-full blur-3xl animate-pulse"></div>
           <div className="absolute bottom-1/3 left-1/3 w-48 sm:w-80 h-48 sm:h-80 bg-gradient-to-br from-cyan-500/15 to-teal-600/15 rounded-full blur-3xl animate-pulse animation-delay-1000"></div>
-          <div className="absolute top-2/3 left-1/4 w-32 sm:w-64 h-32 sm:h-64 bg-gradient-to-br from-purple-500/10 to-pink-600/10 rounded-full blur-2xl animate-pulse animation-delay-2000"></div>
+          <div className="absolute top-2/3 left-1/4 w-32 sm:w-64 h-32 sm:h-64 bg-gradient-to-br from-slate-500/10 to-gray-600/10 rounded-full blur-2xl animate-pulse animation-delay-2000"></div>
           
           {/* Geometric Shapes - Mobile Optimized */}
           <div className="absolute top-20 left-4 sm:left-20 w-16 sm:w-32 h-16 sm:h-32 border border-white/10 rounded-full animate-pulse"></div>
           <div className="absolute bottom-20 right-4 sm:right-20 w-12 sm:w-24 h-12 sm:h-24 border border-cyan-400/20 rounded-lg rotate-45 animate-pulse" style={{ animationDelay: '1.5s' }}></div>
-          <div className="absolute top-1/2 right-4 sm:right-10 w-8 sm:w-16 h-8 sm:h-16 border border-purple-400/20 rounded-full animate-pulse" style={{ animationDelay: '3s' }}></div>
+          <div className="absolute top-1/2 right-4 sm:right-10 w-8 sm:w-16 h-8 sm:h-16 border border-teal-400/20 rounded-full animate-pulse" style={{ animationDelay: '3s' }}></div>
         </div>
 
         {/* Sophisticated Grid Pattern */}
@@ -180,20 +180,20 @@ export default function HomePage() {
 // Value Propositions Section
 function ValuePropositionsSection() {
   return (
-    <section className="py-24 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+    <section className="py-24 bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-blue-400/20 to-purple-600/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-br from-cyan-400/20 to-blue-600/20 rounded-full blur-3xl animate-pulse animation-delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-br from-purple-400/10 to-pink-600/10 rounded-full blur-2xl animate-pulse animation-delay-2000"></div>
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-teal-400/20 to-emerald-600/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-br from-cyan-400/20 to-teal-600/20 rounded-full blur-3xl animate-pulse animation-delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-br from-slate-400/10 to-gray-600/10 rounded-full blur-2xl animate-pulse animation-delay-2000"></div>
       </div>
 
       {/* Sophisticated Grid Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle at 25% 25%, #60A5FA 1px, transparent 1px),
-                           radial-gradient(circle at 75% 75%, #A78BFA 1px, transparent 1px),
-                           radial-gradient(circle at 50% 50%, #34D399 0.5px, transparent 0.5px)`,
+          backgroundImage: `radial-gradient(circle at 25% 25%, #14B8A6 1px, transparent 1px),
+                           radial-gradient(circle at 75% 75%, #10B981 1px, transparent 1px),
+                           radial-gradient(circle at 50% 50%, #06B6D4 0.5px, transparent 0.5px)`,
           backgroundSize: '60px 60px, 80px 80px, 40px 40px'
         }} />
       </div>
@@ -202,21 +202,21 @@ function ValuePropositionsSection() {
         {/* Enhanced Header */}
         <div className="text-center mb-20">
           <div className="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 mb-8">
-            <span className="w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full mr-3 animate-pulse"></span>
+            <span className="w-2 h-2 bg-gradient-to-r from-teal-400 to-emerald-400 rounded-full mr-3 animate-pulse"></span>
             <span className="text-white/90 text-sm font-medium">Why Choose Synergies4?</span>
           </div>
           
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-8 leading-tight">
-            <span className="bg-gradient-to-r from-white via-blue-100 to-cyan-200 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-white via-gray-100 to-cyan-200 bg-clip-text text-transparent">
               Your AI-Powered
             </span>
             <br />
-            <span className="bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-teal-200 via-emerald-200 to-cyan-200 bg-clip-text text-transparent">
               Learning Partner
             </span>
           </h2>
           
-          <p className="text-lg md:text-xl lg:text-2xl text-blue-100/90 max-w-4xl mx-auto leading-relaxed font-light">
+          <p className="text-lg md:text-xl lg:text-2xl text-gray-100/90 max-w-4xl mx-auto leading-relaxed font-light">
             We're not just another training company. We're your intelligent partners in creating 
             <span className="text-cyan-300 font-medium"> personalized learning journeys </span>
             that adapt to your unique goals and accelerate your professional growth.
@@ -230,32 +230,32 @@ function ValuePropositionsSection() {
               icon: <Brain className="h-10 w-10" />,
               title: "AI-Powered Learning",
               description: "Personalized learning paths powered by cutting-edge AI that understands your unique style and accelerates your growth trajectory.",
-              gradient: "from-blue-500 to-cyan-400",
-              glowColor: "blue-400/30",
+              gradient: "from-teal-500 to-cyan-400",
+              glowColor: "teal-400/30",
               delay: "0"
             },
             {
               icon: <Target className="h-10 w-10" />,
               title: "Practical Skills",
               description: "Learn frameworks and methodologies that you can immediately apply in your work, with real-world projects and hands-on experience.",
-              gradient: "from-purple-500 to-pink-400",
-              glowColor: "purple-400/30",
+              gradient: "from-emerald-500 to-teal-400",
+              glowColor: "emerald-400/30",
               delay: "200"
             },
             {
               icon: <Users className="h-10 w-10" />,
               title: "Expert Instructors",
               description: "Learn from industry leaders with real-world experience, offering mentorship and insights you can't find anywhere else.",
-              gradient: "from-emerald-500 to-teal-400",
-              glowColor: "emerald-400/30",
+              gradient: "from-cyan-500 to-emerald-400",
+              glowColor: "cyan-400/30",
               delay: "400"
             },
             {
               icon: <Award className="h-10 w-10" />,
               title: "Recognized Certifications",
               description: "Earn globally recognized certificates that are valued by top employers and respected by industry professionals worldwide.",
-              gradient: "from-orange-500 to-red-400",
-              glowColor: "orange-400/30",
+              gradient: "from-slate-500 to-gray-400",
+              glowColor: "slate-400/30",
               delay: "600"
             }
           ].map((item, index) => (
@@ -282,7 +282,7 @@ function ValuePropositionsSection() {
                   <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-cyan-200 transition-colors duration-300">
                     {item.title}
                   </h3>
-                  <p className="text-blue-100/80 leading-relaxed text-base group-hover:text-white/90 transition-colors duration-300">
+                  <p className="text-gray-100/80 leading-relaxed text-base group-hover:text-white/90 transition-colors duration-300">
                     {item.description}
                   </p>
                 </div>
@@ -299,7 +299,7 @@ function ValuePropositionsSection() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 max-w-3xl mx-auto">
             <Button 
               size="lg" 
-              className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 hover:scale-105 border-0 group"
+              className="w-full sm:w-auto bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white px-8 py-4 rounded-xl shadow-2xl hover:shadow-teal-500/25 transition-all duration-300 hover:scale-105 border-0 group"
               asChild
             >
               <Link href="/courses">
@@ -312,7 +312,7 @@ function ValuePropositionsSection() {
             
             <Button 
               size="lg" 
-              className="w-full sm:w-auto bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 rounded-xl shadow-2xl hover:shadow-white/25 transition-all duration-300 hover:scale-105 border-0 font-semibold group"
+              className="w-full sm:w-auto bg-white text-teal-600 hover:bg-gray-100 px-8 py-4 rounded-xl shadow-2xl hover:shadow-white/25 transition-all duration-300 hover:scale-105 border-0 font-semibold group"
               asChild
             >
               <Link href="/synergize">
@@ -345,10 +345,10 @@ function FeaturedCoursesSection() {
 
   const getLevelColor = (level: string) => {
     switch (level?.toLowerCase()) {
-      case 'beginner': return 'from-emerald-500 to-green-600';
-      case 'intermediate': return 'from-blue-500 to-indigo-600';
-      case 'advanced': return 'from-purple-500 to-pink-600';
-      default: return 'from-gray-500 to-slate-600';
+      case 'beginner': return 'bg-green-100 text-green-800 border-green-200';
+      case 'intermediate': return 'bg-teal-100 text-teal-800 border-teal-200';
+      case 'advanced': return 'bg-slate-100 text-slate-800 border-slate-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
@@ -427,20 +427,20 @@ function FeaturedCoursesSection() {
   const displayCourses = courses.length > 0 ? courses : fallbackCourses;
 
   return (
-    <section className="py-24 bg-gradient-to-br from-indigo-950 via-slate-900 to-gray-900 relative overflow-hidden">
+    <section className="py-24 bg-gradient-to-br from-slate-950 via-gray-900 to-slate-900 relative overflow-hidden">
       {/* Dynamic Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-blue-500/10 to-purple-600/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/3 left-1/3 w-80 h-80 bg-gradient-to-br from-cyan-500/10 to-blue-600/10 rounded-full blur-3xl animate-pulse animation-delay-1000"></div>
-        <div className="absolute top-2/3 left-1/4 w-64 h-64 bg-gradient-to-br from-emerald-500/10 to-teal-600/10 rounded-full blur-2xl animate-pulse animation-delay-2000"></div>
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-teal-500/10 to-emerald-600/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/3 left-1/3 w-80 h-80 bg-gradient-to-br from-cyan-500/10 to-teal-600/10 rounded-full blur-3xl animate-pulse animation-delay-1000"></div>
+        <div className="absolute top-2/3 left-1/4 w-64 h-64 bg-gradient-to-br from-slate-500/10 to-gray-600/10 rounded-full blur-2xl animate-pulse animation-delay-2000"></div>
       </div>
 
       {/* Geometric Pattern */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute inset-0" style={{
-          backgroundImage: `conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(59, 130, 246, 0.3) 60deg, transparent 120deg),
-                           conic-gradient(from 180deg at 25% 75%, transparent 0deg, rgba(168, 85, 247, 0.3) 60deg, transparent 120deg),
-                           conic-gradient(from 90deg at 75% 25%, transparent 0deg, rgba(34, 197, 94, 0.3) 60deg, transparent 120deg)`,
+          backgroundImage: `conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(20, 184, 166, 0.3) 60deg, transparent 120deg),
+                           conic-gradient(from 180deg at 25% 75%, transparent 0deg, rgba(16, 185, 129, 0.3) 60deg, transparent 120deg),
+                           conic-gradient(from 90deg at 75% 25%, transparent 0deg, rgba(6, 182, 212, 0.3) 60deg, transparent 120deg)`,
           backgroundSize: '120px 120px, 80px 80px, 100px 100px'
         }} />
       </div>
@@ -448,22 +448,22 @@ function FeaturedCoursesSection() {
       <div className="container mx-auto px-4 relative z-10">
         {/* Enhanced Header */}
         <div className="text-center mb-20">
-          <div className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-sm rounded-full border border-blue-300/30 mb-8">
-            <BookOpen className="w-5 h-5 text-blue-300 mr-3" />
-            <span className="text-blue-100 font-medium">Featured Learning Experiences</span>
+          <div className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-teal-500/20 to-emerald-500/20 backdrop-blur-sm rounded-full border border-teal-300/30 mb-8">
+            <BookOpen className="w-5 h-5 text-teal-300 mr-3" />
+            <span className="text-teal-100 font-medium">Featured Learning Experiences</span>
           </div>
           
           <h2 className="text-4xl md:text-6xl font-bold mb-8 leading-tight">
-            <span className="bg-gradient-to-r from-white via-blue-200 to-cyan-300 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-white via-gray-200 to-cyan-300 bg-clip-text text-transparent">
               Start Your Learning
             </span>
             <br />
-            <span className="bg-gradient-to-r from-purple-300 via-pink-300 to-orange-300 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-teal-300 via-emerald-300 to-cyan-300 bg-clip-text text-transparent">
               Journey Today
             </span>
           </h2>
           
-          <p className="text-xl md:text-2xl text-blue-200/90 max-w-4xl mx-auto leading-relaxed font-light">
+          <p className="text-xl md:text-2xl text-gray-200/90 max-w-4xl mx-auto leading-relaxed font-light">
             Discover our most popular courses designed by 
             <span className="text-cyan-300 font-medium"> industry experts </span>
             to accelerate your career growth and unlock your full potential.
@@ -495,7 +495,7 @@ function FeaturedCoursesSection() {
                 className={`group relative animate-fade-in-up animation-delay-${index * 200}`}
               >
                 {/* Card Glow Effect */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 rounded-2xl blur opacity-0 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
+                <div className="absolute -inset-1 bg-gradient-to-r from-teal-500 via-emerald-500 to-cyan-500 rounded-2xl blur opacity-0 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
                 
                 {/* Main Card */}
                 <div className="relative bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden shadow-2xl hover:bg-white/15 transition-all duration-500 group-hover:scale-105 group-hover:-translate-y-3 flex flex-col h-full">
@@ -536,7 +536,7 @@ function FeaturedCoursesSection() {
                     </h3>
                     
                     {/* Description */}
-                    <p className="text-blue-200/80 text-sm leading-relaxed mb-4 flex-1 group-hover:text-white/90 transition-colors duration-300">
+                    <p className="text-gray-200/80 text-sm leading-relaxed mb-4 flex-1 group-hover:text-white/90 transition-colors duration-300">
                       {course.short_desc}
                     </p>
 
@@ -551,9 +551,9 @@ function FeaturedCoursesSection() {
                             />
                           ))}
                         </div>
-                        <span className="text-blue-200 font-medium ml-1">{course.rating || '4.8'}</span>
+                        <span className="text-gray-200 font-medium ml-1">{course.rating || '4.8'}</span>
                       </div>
-                      <div className="flex items-center text-blue-300/80">
+                      <div className="flex items-center text-gray-300/80">
                         <Users className="h-4 w-4 mr-1" />
                         <span>{course.students || '1,200'}+</span>
                       </div>
@@ -561,11 +561,11 @@ function FeaturedCoursesSection() {
 
                     {/* Price */}
                     <div className="flex items-center justify-between mb-6">
-                      <div className="text-2xl font-bold bg-gradient-to-r from-cyan-300 to-blue-400 bg-clip-text text-transparent">
+                      <div className="text-2xl font-bold bg-gradient-to-r from-cyan-300 to-teal-400 bg-clip-text text-transparent">
                         {formatPrice(course.price)}
                       </div>
                       {course.price && course.price > 0 && (
-                        <div className="text-sm text-blue-300/60 line-through">
+                        <div className="text-sm text-gray-300/60 line-through">
                           ${Math.round(course.price * 1.4)}
                         </div>
                       )}
@@ -574,7 +574,7 @@ function FeaturedCoursesSection() {
                     {/* CTA Button */}
                     <Button 
                       asChild 
-                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-105 rounded-xl border-0"
+                      className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-105 rounded-xl border-0"
                     >
                       <Link href={`/courses/${createCourseSlug(course.title)}`}>
                         <span className="flex items-center justify-center">
@@ -595,7 +595,7 @@ function FeaturedCoursesSection() {
           <div className="inline-flex items-center space-x-4">
             <Button 
               size="lg" 
-              className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-8 py-4 rounded-xl shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 hover:scale-105 border-0"
+              className="bg-gradient-to-r from-cyan-500 to-teal-600 hover:from-cyan-600 hover:to-teal-700 text-white px-8 py-4 rounded-xl shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 hover:scale-105 border-0"
               asChild
             >
               <Link href="/courses">
@@ -604,7 +604,7 @@ function FeaturedCoursesSection() {
               </Link>
             </Button>
             
-            <div className="text-blue-200/60 text-sm">
+            <div className="text-gray-200/60 text-sm">
               Join <span className="font-semibold text-cyan-300">10,000+</span> learners worldwide
             </div>
           </div>
@@ -619,18 +619,18 @@ function CertificationsSection() {
   const getLevelColor = (level: string) => {
     switch (level?.toLowerCase()) {
       case 'beginner': return 'bg-green-100 text-green-800 border-green-200';
-      case 'intermediate': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'advanced': return 'bg-purple-100 text-purple-800 border-purple-200';
+      case 'intermediate': return 'bg-teal-100 text-teal-800 border-teal-200';
+      case 'advanced': return 'bg-slate-100 text-slate-800 border-slate-200';
       default: return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
   const getProgressColor = (level: string) => {
     switch (level?.toLowerCase()) {
-      case 'beginner': return 'from-green-400 to-green-600';
-      case 'intermediate': return 'from-blue-400 to-blue-600';
-      case 'advanced': return 'from-purple-400 to-purple-600';
-      default: return 'from-gray-400 to-gray-600';
+      case 'beginner': return 'from-emerald-400 to-green-600';
+      case 'intermediate': return 'from-teal-400 to-cyan-600';
+      case 'advanced': return 'from-slate-400 to-gray-600';
+      default: return 'from-gray-400 to-slate-600';
     }
   };
 
@@ -983,12 +983,12 @@ function PartnersSection() {
 // CTA Section
 function CTASection() {
   return (
-    <section className="py-20 bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-600 text-white relative overflow-hidden">
+    <section className="py-20 bg-gradient-to-br from-teal-600 via-emerald-600 to-cyan-600 text-white relative overflow-hidden">
       {/* Enhanced Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-white/10 to-purple-300/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/3 left-1/3 w-80 h-80 bg-gradient-to-br from-blue-300/15 to-white/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-2/3 left-1/4 w-64 h-64 bg-gradient-to-br from-indigo-300/10 to-purple-300/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-white/10 to-teal-300/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/3 left-1/3 w-80 h-80 bg-gradient-to-br from-cyan-300/15 to-white/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-2/3 left-1/4 w-64 h-64 bg-gradient-to-br from-emerald-300/10 to-teal-300/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
       </div>
 
       {/* Geometric Pattern */}
@@ -1005,21 +1005,21 @@ function CTASection() {
 
       <div className="container mx-auto px-4 text-center relative z-10">
         <div className="inline-flex items-center px-6 py-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 mb-8">
-          <Rocket className="w-5 h-5 text-purple-300 mr-3" />
+          <Rocket className="w-5 h-5 text-teal-300 mr-3" />
           <span className="text-white/90 font-medium">Ready to Get Started?</span>
         </div>
         
         <h2 className="text-4xl md:text-6xl font-bold mb-8 leading-tight">
-          <span className="bg-gradient-to-r from-white via-purple-100 to-blue-200 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-white via-gray-100 to-cyan-200 bg-clip-text text-transparent">
             Ready to Transform
           </span>
           <br />
-          <span className="bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-cyan-200 via-teal-200 to-emerald-200 bg-clip-text text-transparent">
             Your Career?
           </span>
         </h2>
         
-        <p className="text-xl md:text-2xl text-purple-100/90 max-w-4xl mx-auto leading-relaxed font-light mb-12">
+        <p className="text-xl md:text-2xl text-teal-100/90 max-w-4xl mx-auto leading-relaxed font-light mb-12">
           Join thousands of professionals who have accelerated their growth with our 
           <span className="text-white font-medium"> AI-powered learning platform</span>
         </p>
@@ -1028,7 +1028,7 @@ function CTASection() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 max-w-3xl mx-auto">
             <Button 
               size="lg" 
-              className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 hover:scale-105 border-0 group"
+              className="w-full sm:w-auto bg-gradient-to-r from-slate-600 to-gray-600 hover:from-slate-700 hover:to-gray-700 text-white px-8 py-4 rounded-xl shadow-2xl hover:shadow-slate-500/25 transition-all duration-300 hover:scale-105 border-0 group"
               asChild
             >
               <Link href="/courses">
@@ -1041,7 +1041,7 @@ function CTASection() {
             
             <Button 
               size="lg" 
-              className="w-full sm:w-auto bg-gradient-to-r from-white/20 to-white/10 border-2 border-white text-white hover:bg-white hover:text-purple-600 shadow-2xl hover:shadow-white/25 transition-all duration-300 hover:scale-105 font-semibold rounded-xl backdrop-blur-sm group" 
+              className="w-full sm:w-auto bg-gradient-to-r from-white/20 to-white/10 border-2 border-white text-white hover:bg-white hover:text-teal-600 shadow-2xl hover:shadow-white/25 transition-all duration-300 hover:scale-105 font-semibold rounded-xl backdrop-blur-sm group" 
               asChild
             >
               <Link href="/contact">
@@ -1063,11 +1063,11 @@ function CTASection() {
             { number: "50+", label: "Expert Courses", icon: <BookOpen className="w-5 h-5" /> }
           ].map((stat, index) => (
             <div key={index} className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 hover:bg-white/10 transition-all duration-300 hover:scale-105 group">
-              <div className="flex items-center justify-center mb-3 text-purple-300 group-hover:text-white transition-colors">
+              <div className="flex items-center justify-center mb-3 text-teal-300 group-hover:text-white transition-colors">
                 {stat.icon}
               </div>
               <div className="text-2xl md:text-3xl font-bold text-white mb-1 group-hover:scale-110 transition-transform">{stat.number}</div>
-              <div className="text-sm text-purple-200/80 uppercase tracking-wide font-medium group-hover:text-white/90 transition-colors">{stat.label}</div>
+              <div className="text-sm text-teal-200/80 uppercase tracking-wide font-medium group-hover:text-white/90 transition-colors">{stat.label}</div>
             </div>
           ))}
         </div>

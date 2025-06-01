@@ -236,7 +236,7 @@ export default function GlobalSearch({
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder={placeholder}
-                    className="pl-10 sm:pl-12 pr-12 sm:pr-16 h-12 sm:h-14 text-base sm:text-lg border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 rounded-xl"
+                    className="pl-10 sm:pl-12 pr-12 sm:pr-16 h-12 sm:h-14 text-base sm:text-lg border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 rounded-xl bg-white text-gray-900 placeholder:text-gray-500"
                   />
                   {speechSupported && (
                     <Button
@@ -244,7 +244,7 @@ export default function GlobalSearch({
                       size="sm"
                       onClick={isListening ? stopVoiceSearch : startVoiceSearch}
                       className={`absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 p-2 ${
-                        isListening ? 'text-red-600 hover:text-red-700' : 'text-gray-400 hover:text-gray-600'
+                        isListening ? 'text-red-600 hover:text-red-700' : 'text-gray-500 hover:text-gray-700'
                       }`}
                     >
                       {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
@@ -255,7 +255,7 @@ export default function GlobalSearch({
                   variant="ghost"
                   size="sm"
                   onClick={onClose}
-                  className="h-12 sm:h-14 w-12 sm:w-14 rounded-xl flex-shrink-0"
+                  className="h-12 sm:h-14 w-12 sm:w-14 rounded-xl flex-shrink-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
                 >
                   <X className="h-5 w-5" />
                 </Button>
@@ -266,12 +266,11 @@ export default function GlobalSearch({
                 <div className="flex flex-col sm:flex-row flex-wrap gap-3 mt-4">
                   {types.length > 1 && (
                     <div className="flex items-center space-x-2">
-                      <Filter className="h-4 w-4 text-gray-500 flex-shrink-0" />
-                      {/* Mobile: Use native select, Desktop: Keep styled select */}
+                      <Filter className="h-4 w-4 text-gray-600 flex-shrink-0" />
                       <select
                         value={selectedType}
                         onChange={(e) => setSelectedType(e.target.value)}
-                        className="flex-1 sm:flex-initial text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white min-w-0"
+                        className="flex-1 sm:flex-initial text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-white text-gray-900 min-w-0"
                       >
                         <option value="all">All Types</option>
                         <option value="course">Courses</option>
@@ -285,7 +284,7 @@ export default function GlobalSearch({
                     <select
                       value={selectedCategory}
                       onChange={(e) => setSelectedCategory(e.target.value)}
-                      className="flex-1 sm:flex-initial text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white min-w-0"
+                      className="flex-1 sm:flex-initial text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-white text-gray-900 min-w-0"
                     >
                       <option value="all">All Categories</option>
                       {categories.filter(cat => cat !== 'all').map(category => (
@@ -298,7 +297,7 @@ export default function GlobalSearch({
 
               {/* Voice feedback - Mobile Optimized */}
               {isListening && (
-                <div className="mt-4 flex items-center space-x-2 text-red-600 bg-red-50 rounded-lg p-3">
+                <div className="mt-4 flex items-center space-x-2 text-red-600 bg-red-50 rounded-lg p-3 border border-red-200">
                   <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
                   <span className="text-sm font-medium">Listening for your voice...</span>
                   <div className="ml-auto text-xs text-red-500">Tap mic to stop</div>
@@ -396,7 +395,7 @@ export default function GlobalSearch({
                       <button
                         key={index}
                         onClick={() => handleSuggestionClick(suggestion)}
-                        className="text-sm px-3 py-2 bg-gray-100 hover:bg-teal-100 hover:text-teal-700 rounded-full transition-colors active:bg-teal-200"
+                        className="text-sm px-3 py-2 bg-gray-100 hover:bg-teal-100 hover:text-teal-700 rounded-full transition-colors active:bg-teal-200 text-gray-700"
                       >
                         {suggestion}
                       </button>
@@ -412,7 +411,7 @@ export default function GlobalSearch({
                 <h4 className="text-sm font-medium text-gray-700 mb-3">Search Tips</h4>
                 <div className="grid grid-cols-1 gap-4 text-sm text-gray-600">
                   <div>
-                    <p className="font-medium mb-2">Popular searches:</p>
+                    <p className="font-medium mb-2 text-gray-700">Popular searches:</p>
                     <div className="flex flex-wrap gap-2">
                       {['agile training', 'scrum master', 'leadership development'].map((term) => (
                         <button
@@ -426,8 +425,8 @@ export default function GlobalSearch({
                     </div>
                   </div>
                   <div>
-                    <p className="font-medium mb-1">Search across:</p>
-                    <ul className="space-y-1 text-xs">
+                    <p className="font-medium mb-1 text-gray-700">Search across:</p>
+                    <ul className="space-y-1 text-xs text-gray-600">
                       <li>• Training courses</li>
                       <li>• Blog articles</li>
                       <li>• Site pages</li>
@@ -435,8 +434,8 @@ export default function GlobalSearch({
                   </div>
                   {speechSupported && (
                     <div className="sm:hidden">
-                      <p className="font-medium mb-1">Voice search:</p>
-                      <p className="text-xs">Tap the microphone icon to search using your voice</p>
+                      <p className="font-medium mb-1 text-gray-700">Voice search:</p>
+                      <p className="text-xs text-gray-600">Tap the microphone icon to search using your voice</p>
                     </div>
                   )}
                 </div>
