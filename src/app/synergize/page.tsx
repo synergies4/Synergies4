@@ -172,13 +172,34 @@ export default function SynergizeAgile() {
         content: `Hello! I'm your ${role.name} AI assistant in ${mode.name} mode. ${mode.description}. How can I help you with your Agile journey today?`,
         timestamp: new Date(),
         mode: selectedMode,
-        role: selectedRole
+        role: selectedRole,
+        provider: selectedProvider
       };
       
       setMessages([welcomeMessage]);
       setHasInitialized(true);
     }
-  }, [hasInitialized, selectedRole, selectedMode]);
+  }, [hasInitialized, selectedRole, selectedMode, selectedProvider]);
+
+  // Reset chat when role or mode changes (after initialization)
+  useEffect(() => {
+    if (hasInitialized) {
+      const role = AGILE_ROLES[selectedRole as keyof typeof AGILE_ROLES];
+      const mode = INTERACTION_MODES[selectedMode as keyof typeof INTERACTION_MODES];
+      
+      const welcomeMessage: Message = {
+        id: 'welcome',
+        type: 'ai',
+        content: `Hello! I'm your ${role.name} AI assistant in ${mode.name} mode. ${mode.description}. How can I help you with your Agile journey today?`,
+        timestamp: new Date(),
+        mode: selectedMode,
+        role: selectedRole,
+        provider: selectedProvider
+      };
+      
+      setMessages([welcomeMessage]);
+    }
+  }, [selectedRole, selectedMode, selectedProvider, hasInitialized]);
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim() && files.length === 0) return;
@@ -227,18 +248,32 @@ export default function SynergizeAgile() {
             { role: 'system', content: systemPrompt },
             { role: 'user', content: inputMessage }
           ],
-          provider: selectedProvider
+          provider: selectedProvider,
+          attachments: files.map(file => ({
+            name: file.name,
+            type: file.type,
+            size: file.size
+          }))
         }),
       });
 
-      if (!response.ok) throw new Error('Failed to get response');
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API Response Error:', response.status, errorText);
+        throw new Error(`API request failed with status ${response.status}`);
+      }
 
       const data = await response.json();
+      
+      if (!data.content && !data.response) {
+        console.error('Invalid API response:', data);
+        throw new Error('Invalid response format from API');
+      }
       
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'ai',
-        content: data.content,
+        content: data.content || data.response,
         timestamp: new Date(),
         mode: selectedMode,
         role: selectedRole,
@@ -247,11 +282,24 @@ export default function SynergizeAgile() {
 
       setMessages(prev => [...prev, aiMessage]);
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Chat Error:', error);
+      
+      let errorContent = 'Sorry, I encountered an error. Please try again.';
+      
+      if (error instanceof Error) {
+        if (error.message.includes('Failed to fetch')) {
+          errorContent = 'Unable to connect to the AI service. Please check your internet connection and try again.';
+        } else if (error.message.includes('API request failed')) {
+          errorContent = `There was an issue with the ${selectedProvider} service. Please try switching to a different AI provider or try again later.`;
+        } else if (error.message.includes('Invalid response format')) {
+          errorContent = 'Received an unexpected response from the AI service. Please try again or contact support if the issue persists.';
+        }
+      }
+      
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'ai',
-        content: 'Sorry, I encountered an error. Please try again.',
+        content: errorContent,
         timestamp: new Date(),
         mode: selectedMode,
         role: selectedRole,

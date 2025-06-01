@@ -19,7 +19,44 @@ type AIProvider = 'anthropic' | 'openai' | 'google';
 
 export async function POST(request: NextRequest) {
   try {
-    const { message, history, provider = 'anthropic', attachments } = await request.json();
+    const body = await request.json();
+    
+    // Handle both old format (message, history) and new format (messages)
+    let message: string;
+    let history: Message[] = [];
+    let provider: AIProvider = 'anthropic';
+    let attachments: FileAttachment[] = [];
+
+    if (body.messages && Array.isArray(body.messages)) {
+      // New format from Synergize page
+      const messages = body.messages;
+      const systemMessage = messages.find((msg: any) => msg.role === 'system');
+      const userMessages = messages.filter((msg: any) => msg.role === 'user');
+      
+      if (userMessages.length > 0) {
+        message = userMessages[userMessages.length - 1].content;
+        history = userMessages.slice(0, -1).map((msg: any) => ({
+          id: Date.now().toString(),
+          role: msg.role,
+          content: msg.content,
+          timestamp: new Date()
+        }));
+      } else {
+        return NextResponse.json(
+          { error: 'No user message found' },
+          { status: 400 }
+        );
+      }
+      
+      provider = body.provider || 'anthropic';
+      attachments = body.attachments || [];
+    } else {
+      // Old format
+      message = body.message;
+      history = body.history || [];
+      provider = body.provider || 'anthropic';
+      attachments = body.attachments || [];
+    }
 
     if (!message || typeof message !== 'string') {
       return NextResponse.json(
@@ -70,7 +107,8 @@ export async function POST(request: NextRequest) {
       console.error(`${provider.toUpperCase()}_API_KEY is not configured`);
       return NextResponse.json(
         { 
-          response: `I'm currently unavailable with ${provider}. Please try a different provider or contact support for assistance.` 
+          content: `I'm currently unavailable with ${provider}. Please try a different provider or contact support for assistance.`,
+          response: `I'm currently unavailable with ${provider}. Please try a different provider or contact support for assistance.`
         },
         { status: 200 }
       );
@@ -170,7 +208,8 @@ You can also help with:
       
       return NextResponse.json(
         { 
-          response: `I'm experiencing some technical difficulties with ${provider}. Please try again in a moment, or feel free to contact our support team for immediate assistance.` 
+          content: `I'm experiencing some technical difficulties with ${provider}. Please try again in a moment, or feel free to contact our support team for immediate assistance.`,
+          response: `I'm experiencing some technical difficulties with ${provider}. Please try again in a moment, or feel free to contact our support team for immediate assistance.`
         },
         { status: 200 }
       );
@@ -204,7 +243,8 @@ You can also help with:
     }
 
     return NextResponse.json({
-      response: responseText,
+      content: responseText,  // For Synergize page
+      response: responseText, // For backward compatibility
       provider: provider
     });
 
@@ -213,7 +253,8 @@ You can also help with:
     
     return NextResponse.json(
       { 
-        response: "I'm currently experiencing technical difficulties. Please try again later or contact our support team for assistance." 
+        content: "I'm currently experiencing technical difficulties. Please try again later or contact our support team for assistance.",
+        response: "I'm currently experiencing technical difficulties. Please try again later or contact our support team for assistance."
       },
       { status: 200 }
     );
