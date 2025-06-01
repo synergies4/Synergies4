@@ -110,33 +110,42 @@ export default function SynergizeAgile() {
   const [selectedMode, setSelectedMode] = useState<string>('chat');
   const [isLoading, setIsLoading] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
+  const [hasInitialized, setHasInitialized] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
   };
 
+  // Only scroll to bottom when new messages are added (not on role/mode changes)
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    if (messages.length > 0 && hasInitialized) {
+      scrollToBottom();
+    }
+  }, [messages.length, hasInitialized]);
 
-  // Add welcome message on role/mode change
+  // Initialize with a single welcome message only once
   useEffect(() => {
-    const role = AGILE_ROLES[selectedRole as keyof typeof AGILE_ROLES];
-    const mode = INTERACTION_MODES[selectedMode as keyof typeof INTERACTION_MODES];
-    
-    const welcomeMessage: Message = {
-      id: Date.now().toString(),
-      type: 'ai',
-      content: `Hello! I'm your ${role.name} AI assistant in ${mode.name} mode. ${mode.description}. How can I help you with your Agile journey today?`,
-      timestamp: new Date(),
-      mode: selectedMode,
-      role: selectedRole
-    };
-    
-    setMessages([welcomeMessage]);
-  }, [selectedRole, selectedMode]);
+    if (!hasInitialized) {
+      const role = AGILE_ROLES[selectedRole as keyof typeof AGILE_ROLES];
+      const mode = INTERACTION_MODES[selectedMode as keyof typeof INTERACTION_MODES];
+      
+      const welcomeMessage: Message = {
+        id: 'welcome',
+        type: 'ai',
+        content: `Hello! I'm your ${role.name} AI assistant in ${mode.name} mode. ${mode.description}. How can I help you with your Agile journey today?`,
+        timestamp: new Date(),
+        mode: selectedMode,
+        role: selectedRole
+      };
+      
+      setMessages([welcomeMessage]);
+      setHasInitialized(true);
+    }
+  }, [hasInitialized, selectedRole, selectedMode]);
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim() && files.length === 0) return;
@@ -233,6 +242,7 @@ export default function SynergizeAgile() {
   const clearChat = () => {
     setMessages([]);
     setFiles([]);
+    setHasInitialized(false);
   };
 
   const currentRole = AGILE_ROLES[selectedRole as keyof typeof AGILE_ROLES];
@@ -418,7 +428,7 @@ export default function SynergizeAgile() {
 
             {/* Chat Interface */}
             <Card className="h-[600px] flex flex-col border-0 shadow-xl">
-              <CardHeader className={`bg-gradient-to-r ${currentRole.color} text-white rounded-t-lg`}>
+              <CardHeader className={`bg-gradient-to-r ${currentRole.color} text-white rounded-t-lg flex-shrink-0`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     {currentRole.icon}
@@ -438,9 +448,25 @@ export default function SynergizeAgile() {
                 </div>
               </CardHeader>
 
-              <CardContent className="flex-1 flex flex-col p-0">
+              <CardContent className="flex-1 flex flex-col p-0 min-h-0">
                 {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 min-h-0">
+                  {messages.length === 0 && (
+                    <div className="flex items-center justify-center h-full">
+                      <div className="text-center">
+                        <div className={`w-16 h-16 bg-gradient-to-r ${currentRole.color} rounded-full flex items-center justify-center mx-auto mb-4`}>
+                          <Bot className="h-8 w-8 text-white" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                          {currentRole.name} Assistant
+                        </h3>
+                        <p className="text-gray-600 max-w-sm">
+                          Ready to help with {currentMode.description.toLowerCase()}. Start by typing your question below.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  
                   {messages.map((message) => (
                     <div
                       key={message.id}
@@ -483,6 +509,7 @@ export default function SynergizeAgile() {
                       </div>
                     </div>
                   ))}
+                  
                   {isLoading && (
                     <div className="flex justify-start">
                       <div className="bg-white border shadow-sm rounded-lg p-4 max-w-[80%]">
@@ -504,7 +531,7 @@ export default function SynergizeAgile() {
 
                 {/* File Upload Area */}
                 {files.length > 0 && (
-                  <div className="border-t bg-gray-50 p-4">
+                  <div className="border-t bg-gray-50 p-4 flex-shrink-0">
                     <div className="flex flex-wrap gap-2">
                       {files.map((file, index) => (
                         <div key={index} className="flex items-center bg-white rounded-lg p-2 border">
@@ -527,7 +554,7 @@ export default function SynergizeAgile() {
                 )}
 
                 {/* Input Area */}
-                <div className="border-t bg-white p-4">
+                <div className="border-t bg-white p-4 flex-shrink-0">
                   <div className="flex space-x-2">
                     <Button
                       variant="outline"
@@ -541,7 +568,7 @@ export default function SynergizeAgile() {
                       value={inputMessage}
                       onChange={(e) => setInputMessage(e.target.value)}
                       placeholder={`Ask your ${currentRole.name} assistant anything about Agile...`}
-                      className="flex-1 min-h-[60px] resize-none"
+                      className="flex-1 min-h-[60px] max-h-[120px] resize-none"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && !e.shiftKey) {
                           e.preventDefault();
