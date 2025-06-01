@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 
 interface SearchResult {
   id: string;
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const supabase = createServerClient();
+    const supabase = await createClient();
     const searchTerm = query.trim().toLowerCase();
     const searchWords = searchTerm.split(' ').filter(word => word.length > 2);
 
@@ -315,7 +315,7 @@ function generateSearchSuggestions(searchTerm: string, results: SearchResult[]):
 }
 
 function getAvailableCategories(results: SearchResult[]): string[] {
-  return [...new Set(results.map(r => r.category).filter(Boolean))];
+  return [...new Set(results.map(r => r.category).filter((category): category is string => Boolean(category)))];
 }
 
 function getAvailableTypes(results: SearchResult[]): string[] {

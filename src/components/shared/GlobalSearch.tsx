@@ -73,7 +73,7 @@ export default function GlobalSearch({
   
   const router = useRouter();
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const searchTimeoutRef = useRef<NodeJS.Timeout>();
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const recognitionRef = useRef<any>(null);
 
   // Check for speech recognition support

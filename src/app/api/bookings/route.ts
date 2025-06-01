@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 
 interface BookingData {
   course_id?: string;
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = createServerClient();
+    const supabase = await createClient();
 
     // Check if time slot is available
     const { data: existingBookings, error: checkError } = await supabase
@@ -141,7 +141,7 @@ export async function GET(request: NextRequest) {
     const service_type = searchParams.get('service_type');
     const action = searchParams.get('action');
 
-    const supabase = createServerClient();
+    const supabase = await createClient();
 
     // Get available time slots for a specific date
     if (action === 'availability' && date) {
@@ -235,7 +235,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const supabase = createServerClient();
+    const supabase = await createClient();
 
     const { data: booking, error } = await supabase
       .from('bookings')
