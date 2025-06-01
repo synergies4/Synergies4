@@ -11,6 +11,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { UserAvatar } from '@/components/UserAvatar';
+import { useAuth } from '@/contexts/AuthContext';
 import { 
   ArrowRight, 
   BookOpen, 
@@ -76,6 +78,7 @@ export default function Courses() {
   const { scrollYProgress } = useScroll();
   const heroY = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
+  const { user } = useAuth();
 
   return (
     <main className="min-h-screen">
@@ -125,14 +128,17 @@ export default function Courses() {
               whileHover={{ scale: 1.05 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
-              <Link href="/">
-                <Image 
-                  src="/synergies4_logo.jpeg" 
-                  alt="Synergies4 Logo" 
-                  width={150} 
-                  height={72} 
-                  className="h-10 w-auto"
-                />
+              <Link href="/" className="flex items-center">
+                <motion.span 
+                  className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover:from-blue-700 hover:to-purple-700 transition-all duration-300"
+                  whileHover={{ 
+                    scale: 1.02,
+                    textShadow: "0 0 8px rgba(59, 130, 246, 0.5)"
+                  }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                >
+                  Synergies4
+                </motion.span>
               </Link>
             </motion.div>
             
@@ -169,12 +175,18 @@ export default function Courses() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.5, duration: 0.5 }}
             >
-              <Button variant="ghost" asChild>
-                <Link href="/login">Login</Link>
-              </Button>
-              <Button asChild>
-                <Link href="/signup">Sign Up</Link>
-              </Button>
+              {user ? (
+                <UserAvatar />
+              ) : (
+                <>
+                  <Button variant="ghost" asChild>
+                    <Link href="/login">Login</Link>
+                  </Button>
+                  <Button asChild>
+                    <Link href="/signup">Sign Up</Link>
+                  </Button>
+                </>
+              )}
             </motion.div>
           </div>
         </div>
@@ -284,18 +296,18 @@ export default function Courses() {
               key={`particle-${i}`}
               className="absolute w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-40"
               style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
+                left: `${(i * 5) % 100}%`,
+                top: `${(i * 7) % 100}%`,
               }}
               animate={{
                 y: [0, -100, 0],
-                x: [0, Math.random() * 50 - 25, 0],
+                x: [0, (i % 2 === 0 ? 25 : -25), 0],
                 opacity: [0.4, 0.8, 0.4],
               }}
               transition={{
-                duration: 4 + Math.random() * 4,
+                duration: 4 + (i % 4),
                 repeat: Infinity,
-                delay: Math.random() * 2,
+                delay: i * 0.1,
                 ease: "easeInOut"
               }}
             />

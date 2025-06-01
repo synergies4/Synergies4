@@ -162,14 +162,17 @@ export default function IndustryInsightPage() {
               whileHover={{ scale: 1.05 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
-              <Link href="/">
-                <Image 
-                  src="/synergies4_logo.jpeg" 
-                  alt="Synergies4 Logo" 
-                  width={150} 
-                  height={72} 
-                  className="h-10 w-auto"
-                />
+              <Link href="/" className="flex items-center">
+                <motion.span 
+                  className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover:from-blue-700 hover:to-purple-700 transition-all duration-300"
+                  whileHover={{ 
+                    scale: 1.02,
+                    textShadow: "0 0 8px rgba(59, 130, 246, 0.5)"
+                  }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                >
+                  Synergies4
+                </motion.span>
               </Link>
             </motion.div>
             
@@ -298,7 +301,130 @@ export default function IndustryInsightPage() {
 
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-12 md:py-20 overflow-hidden">
-        <div className="container mx-auto px-4 text-center">
+        {/* Animated Background */}
+        <div className="absolute inset-0 overflow-hidden">
+          {/* Floating Gradient Shapes */}
+          <motion.div
+            className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-lg blur-xl"
+            animate={{
+              x: [0, 30, 0],
+              y: [0, -20, 0],
+              rotate: [0, 180, 360],
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+          <motion.div
+            className="absolute top-32 right-20 w-24 h-24 bg-gradient-to-br from-purple-400/25 to-pink-400/25 rounded-full blur-lg"
+            animate={{
+              x: [0, -25, 0],
+              y: [0, 15, 0],
+              scale: [1, 1.2, 1],
+            }}
+            transition={{
+              duration: 6,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 1
+            }}
+          />
+          <motion.div
+            className="absolute bottom-20 left-1/4 w-40 h-40 bg-gradient-to-br from-indigo-400/15 to-blue-400/15 rounded-2xl blur-2xl"
+            animate={{
+              x: [0, 40, 0],
+              y: [0, -30, 0],
+              rotate: [0, -90, 0],
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 2
+            }}
+          />
+          <motion.div
+            className="absolute top-1/2 right-10 w-28 h-28 bg-gradient-to-br from-cyan-400/20 to-blue-400/20 rounded-lg blur-xl"
+            animate={{
+              x: [0, -20, 0],
+              y: [0, 25, 0],
+              rotate: [0, 270, 360],
+            }}
+            transition={{
+              duration: 7,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 0.5
+            }}
+          />
+          <motion.div
+            className="absolute bottom-32 right-1/3 w-36 h-36 bg-gradient-to-br from-violet-400/18 to-purple-400/18 rounded-full blur-2xl"
+            animate={{
+              x: [0, 35, 0],
+              y: [0, -40, 0],
+              scale: [1, 0.8, 1],
+            }}
+            transition={{
+              duration: 9,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 1.5
+            }}
+          />
+          
+          {/* Pixelated Grid Overlay */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="grid grid-cols-12 md:grid-cols-20 lg:grid-cols-32 h-full gap-1">
+              {Array.from({ length: 384 }).map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="bg-gradient-to-br from-blue-500/30 to-purple-500/30 rounded-sm"
+                  initial={{ opacity: 0 }}
+                  animate={{ 
+                    opacity: [0, 0.3, 0],
+                    scale: [0.8, 1, 0.8]
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    delay: i * 0.01,
+                    ease: "easeInOut"
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Floating Particles */}
+          {Array.from({ length: 20 }).map((_, i) => (
+            <motion.div
+              key={`particle-${i}`}
+              className="absolute w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-40"
+              style={{
+                left: `${(i * 5) % 100}%`,
+                top: `${(i * 7) % 100}%`,
+              }}
+              animate={{
+                y: [0, -100, 0],
+                x: [0, (i % 2 === 0 ? 25 : -25), 0],
+                opacity: [0.4, 0.8, 0.4],
+              }}
+              transition={{
+                duration: 4 + (i % 4),
+                repeat: Infinity,
+                delay: i * 0.1,
+                ease: "easeInOut"
+              }}
+            />
+          ))}
+
+          {/* Gradient Mesh */}
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-pink-500/5 animate-pulse" />
+        </div>
+
+        <div className="container mx-auto px-4 text-center relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 100 }}
             animate={{ opacity: 1, y: 0 }}

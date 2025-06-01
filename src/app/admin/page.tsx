@@ -169,14 +169,17 @@ export default function AdminDashboard() {
               whileHover={{ scale: 1.05 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
-              <Link href="/">
-                <Image 
-                  src="/synergies4_logo.jpeg" 
-                  alt="Synergies4 Logo" 
-                  width={150} 
-                  height={72} 
-                  className="h-10 w-auto"
-                />
+              <Link href="/" className="flex items-center">
+                <motion.span 
+                  className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover:from-blue-700 hover:to-purple-700 transition-all duration-300"
+                  whileHover={{ 
+                    scale: 1.02,
+                    textShadow: "0 0 8px rgba(59, 130, 246, 0.5)"
+                  }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                >
+                  Synergies4
+                </motion.span>
               </Link>
             </motion.div>
             
