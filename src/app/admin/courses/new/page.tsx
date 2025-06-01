@@ -219,6 +219,23 @@ export default function CreateCourse() {
     }
   }, [user, userProfile, authLoading, router]);
 
+  // Prevent body scroll when AI modal is open
+  useEffect(() => {
+    if (showAIAssistant) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.paddingRight = '0px'; // Prevent layout shift
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+    }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+    };
+  }, [showAIAssistant]);
+
   const handleInputChange = (field: keyof CourseFormData, value: string | boolean) => {
     setFormData(prev => ({
       ...prev,
@@ -1779,7 +1796,7 @@ export default function CreateCourse() {
 
       {/* AI Assistant Modal */}
       {showAIAssistant && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-hidden">
           {/* Mobile: Full screen modal */}
           <div className="block sm:hidden w-full h-full">
             <Card className="h-full w-full flex flex-col overflow-hidden rounded-lg">
@@ -1809,7 +1826,7 @@ export default function CreateCourse() {
               </CardHeader>
 
               {/* Mobile Content - Scrollable */}
-              <div className="flex-1 overflow-y-auto">
+              <div className="flex-1 overflow-y-auto overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
                 <CardContent className="p-4">
                   <div className="space-y-4">
                     {/* AI Mode Selection - Mobile */}
@@ -1954,7 +1971,7 @@ export default function CreateCourse() {
                         </div>
                         
                         <div className="bg-white border rounded-lg overflow-hidden shadow-sm">
-                          <div className="max-h-48 overflow-y-auto p-3">
+                          <div className="max-h-48 overflow-y-auto p-3" style={{ WebkitOverflowScrolling: 'touch' }}>
                             <pre className="whitespace-pre-wrap text-xs leading-relaxed">{aiSuggestions}</pre>
                           </div>
                         </div>
@@ -2045,7 +2062,7 @@ export default function CreateCourse() {
           </div>
 
           {/* Desktop: Centered modal with proper scrolling */}
-          <div className="hidden sm:block w-full max-w-4xl max-h-[95vh] flex flex-col">
+          <div className="hidden sm:block w-full max-w-4xl h-[90vh] flex flex-col">
             <Card className="flex flex-col h-full overflow-hidden">
               {/* Desktop Header - Fixed */}
               <CardHeader className="bg-gradient-to-r from-purple-600 to-blue-600 text-white flex-shrink-0">
@@ -2073,7 +2090,7 @@ export default function CreateCourse() {
               </CardHeader>
 
               {/* Desktop Content - Scrollable */}
-              <div className="flex-1 overflow-y-auto">
+              <div className="flex-1 overflow-y-auto overscroll-contain">
                 <CardContent className="p-6">
                   <div className="space-y-6">
                     {/* AI Mode Selection - Desktop */}
@@ -2218,7 +2235,7 @@ export default function CreateCourse() {
                         </div>
                         
                         <div className="bg-white border rounded-lg overflow-hidden shadow-sm">
-                          <div className="max-h-60 overflow-y-auto p-4">
+                          <div className="max-h-60 overflow-y-auto p-4 overscroll-contain">
                             <pre className="whitespace-pre-wrap text-sm leading-relaxed">{aiSuggestions}</pre>
                           </div>
                         </div>
