@@ -72,63 +72,101 @@ export default function AboutUs() {
 // Mission Section
 function MissionSection() {
   return (
-    <section className="py-20 bg-white relative overflow-hidden">
-      {/* Simple Background Pattern */}
-      <div className="absolute inset-0 opacity-5">
+    <section className="py-24 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+      {/* Enhanced Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-blue-500/20 to-purple-600/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/3 left-1/3 w-80 h-80 bg-gradient-to-br from-cyan-500/15 to-blue-600/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-2/3 left-1/4 w-64 h-64 bg-gradient-to-br from-emerald-500/10 to-teal-600/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+      </div>
+
+      {/* Sophisticated Grid Pattern */}
+      <div className="absolute inset-0 opacity-10">
         <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle at 25% 25%, #3B82F6 2px, transparent 2px),
-                           radial-gradient(circle at 75% 75%, #8B5CF6 2px, transparent 2px)`,
-          backgroundSize: '60px 60px'
+          backgroundImage: `
+            radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.3) 2px, transparent 2px),
+            radial-gradient(circle at 75% 75%, rgba(168, 85, 247, 0.3) 2px, transparent 2px),
+            radial-gradient(circle at 50% 50%, rgba(34, 197, 94, 0.2) 1px, transparent 1px)
+          `,
+          backgroundSize: '60px 60px, 80px 80px, 40px 40px'
         }} />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
-        <div className="text-center mb-16">
-          <Badge className="mb-4 bg-blue-100 text-blue-700 hover:bg-blue-200 border-blue-200">
-            <Target className="w-4 h-4 mr-2" />
-            Our Mission
-          </Badge>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-            Sharper Minds. Stronger Teams. Healthier Workplaces.
+        <div className="text-center mb-20">
+          <div className="inline-flex items-center px-6 py-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 mb-8">
+            <Target className="w-5 h-5 text-blue-300 mr-3" />
+            <span className="text-white/90 font-medium">Our Mission</span>
+          </div>
+          <h2 className="text-4xl md:text-6xl font-bold mb-8 leading-tight">
+            <span className="bg-gradient-to-r from-white via-blue-100 to-cyan-200 bg-clip-text text-transparent">
+              Sharper Minds.
+            </span>
+            <br />
+            <span className="bg-gradient-to-r from-purple-300 via-pink-300 to-orange-300 bg-clip-text text-transparent">
+              Stronger Teams.
+            </span>
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            We believe in the power of human potential amplified by intelligent technology
+          <p className="text-xl md:text-2xl text-blue-100/90 max-w-4xl mx-auto leading-relaxed font-light">
+            We believe in the power of 
+            <span className="text-cyan-300 font-medium"> human potential </span>
+            amplified by intelligent technology
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
             {
-              icon: <Eye className="h-8 w-8" />,
+              icon: <Eye className="h-10 w-10" />,
               title: "Our Vision",
-              description: "A world where every professional has the tools and mindset to thrive in an AI-enhanced workplace."
+              description: "A world where every professional has the tools and mindset to thrive in an AI-enhanced workplace.",
+              gradient: "from-blue-500 to-cyan-400",
+              glowColor: "blue-400/30"
             },
             {
-              icon: <Heart className="h-8 w-8" />,
-              title: "Our Values",
-              description: "Human-centered design, continuous learning, and sustainable transformation guide everything we do."
+              icon: <Heart className="h-10 w-10" />,
+              title: "Our Values", 
+              description: "Human-centered design, continuous learning, and sustainable transformation guide everything we do.",
+              gradient: "from-purple-500 to-pink-400",
+              glowColor: "purple-400/30"
             },
             {
-              icon: <Rocket className="h-8 w-8" />,
+              icon: <Rocket className="h-10 w-10" />,
               title: "Our Approach",
-              description: "We combine cutting-edge AI with proven methodologies to create lasting organizational change."
+              description: "We combine cutting-edge AI with proven methodologies to create lasting organizational change.",
+              gradient: "from-emerald-500 to-teal-400",
+              glowColor: "emerald-400/30"
             }
           ].map((item, index) => (
-            <Card key={index} className="h-full text-center hover:shadow-xl transition-all duration-300 group border-0 shadow-lg bg-white/80 backdrop-blur-sm hover:scale-105">
-              <CardHeader>
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 group-hover:scale-110 transition-transform duration-300">
-                  {item.icon}
+            <div key={index} className="group relative">
+              {/* Glow Effect */}
+              <div className={`absolute -inset-1 bg-gradient-to-r ${item.gradient} rounded-2xl blur opacity-0 group-hover:opacity-75 transition duration-1000 group-hover:duration-200`}></div>
+              
+              {/* Main Card */}
+              <div className="relative bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 p-8 h-full hover:bg-white/15 transition-all duration-500 group-hover:scale-105 group-hover:-translate-y-2">
+                {/* Icon Container */}
+                <div className="relative mb-6">
+                  <div className={`w-20 h-20 bg-gradient-to-br ${item.gradient} rounded-2xl flex items-center justify-center mx-auto mb-6 text-white shadow-2xl group-hover:scale-110 group-hover:rotate-3 transition-all duration-500`}>
+                    {item.icon}
+                  </div>
+                  {/* Floating particles effect */}
+                  <div className={`absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-24 bg-${item.glowColor} rounded-full blur-xl opacity-0 group-hover:opacity-100 group-hover:scale-150 transition-all duration-700`}></div>
                 </div>
-                <CardTitle className="text-xl group-hover:text-blue-600 transition-colors">
-                  {item.title}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-base leading-relaxed">
-                  {item.description}
-                </CardDescription>
-              </CardContent>
-            </Card>
+
+                {/* Content */}
+                <div className="text-center">
+                  <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-cyan-200 transition-colors duration-300">
+                    {item.title}
+                  </h3>
+                  <p className="text-blue-100/80 leading-relaxed text-base group-hover:text-white/90 transition-colors duration-300">
+                    {item.description}
+                  </p>
+                </div>
+
+                {/* Hover indicator */}
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-white to-transparent group-hover:w-16 transition-all duration-500 rounded-full"></div>
+              </div>
+            </div>
           ))}
         </div>
       </div>
@@ -139,23 +177,53 @@ function MissionSection() {
 // Statistics Section
 function StatisticsSection() {
   return (
-    <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Our Impact in Numbers
+    <section className="py-24 bg-gradient-to-br from-indigo-950 via-slate-900 to-gray-900 relative overflow-hidden">
+      {/* Dynamic Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-blue-500/10 to-purple-600/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/3 left-1/3 w-80 h-80 bg-gradient-to-br from-cyan-500/10 to-blue-600/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-2/3 left-1/4 w-64 h-64 bg-gradient-to-br from-emerald-500/10 to-teal-600/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+      </div>
+
+      {/* Geometric Pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(59, 130, 246, 0.3) 60deg, transparent 120deg),
+                           conic-gradient(from 180deg at 25% 75%, transparent 0deg, rgba(168, 85, 247, 0.3) 60deg, transparent 120deg)`,
+          backgroundSize: '120px 120px, 80px 80px'
+        }} />
+      </div>
+
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="text-center mb-20">
+          <div className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-sm rounded-full border border-blue-300/30 mb-8">
+            <TrendingUp className="w-5 h-5 text-blue-300 mr-3" />
+            <span className="text-blue-100 font-medium">Our Impact in Numbers</span>
+          </div>
+          
+          <h2 className="text-4xl md:text-6xl font-bold mb-8 leading-tight">
+            <span className="bg-gradient-to-r from-white via-blue-200 to-cyan-300 bg-clip-text text-transparent">
+              Real Results from
+            </span>
+            <br />
+            <span className="bg-gradient-to-r from-purple-300 via-pink-300 to-orange-300 bg-clip-text text-transparent">
+              Real Organizations
+            </span>
           </h2>
-          <p className="text-xl opacity-90 max-w-2xl mx-auto">
-            Real results from organizations and professionals who chose to transform with us
+          
+          <p className="text-xl md:text-2xl text-blue-200/90 max-w-4xl mx-auto leading-relaxed font-light">
+            Professionals and organizations who chose to 
+            <span className="text-cyan-300 font-medium"> transform with us </span>
+            and unlock their full potential.
           </p>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {[
-            { number: 10000, suffix: "+", label: "Professionals Trained" },
-            { number: 95, suffix: "%", label: "Success Rate" },
-            { number: 500, suffix: "+", label: "Organizations Served" },
-            { number: 50, suffix: "+", label: "Countries Reached" }
+            { number: 10000, suffix: "+", label: "Professionals Trained", gradient: "from-blue-400 to-cyan-500" },
+            { number: 95, suffix: "%", label: "Success Rate", gradient: "from-emerald-400 to-green-500" },
+            { number: 500, suffix: "+", label: "Organizations Served", gradient: "from-purple-400 to-pink-500" },
+            { number: 50, suffix: "+", label: "Countries Reached", gradient: "from-orange-400 to-red-500" }
           ].map((stat, index) => (
             <StatCard key={index} stat={stat} index={index} />
           ))}
@@ -165,7 +233,7 @@ function StatisticsSection() {
   );
 }
 
-// Stat Card Component
+// Enhanced Stat Card Component
 function StatCard({ stat, index }: { stat: any, index: number }) {
   const { count, setIsVisible } = useCounter(stat.number);
   
@@ -175,11 +243,20 @@ function StatCard({ stat, index }: { stat: any, index: number }) {
   }, [setIsVisible, index]);
 
   return (
-    <div className="text-center hover:scale-105 transition-transform duration-300">
-      <div className="text-4xl md:text-5xl font-bold mb-2 text-blue-100">
-        {count.toLocaleString()}{stat.suffix}
+    <div className="group text-center relative">
+      {/* Background glow */}
+      <div className={`absolute inset-0 bg-gradient-to-r ${stat.gradient} rounded-2xl blur opacity-0 group-hover:opacity-20 transition-all duration-700`}></div>
+      
+      {/* Main content */}
+      <div className="relative bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 hover:bg-white/10 transition-all duration-500 group-hover:scale-110 group-hover:-translate-y-2">
+        <div className={`text-4xl md:text-5xl font-bold mb-2 bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent group-hover:scale-110 transition-transform duration-300`}>
+          {count.toLocaleString()}{stat.suffix}
+        </div>
+        <div className="text-blue-200/80 text-sm md:text-base group-hover:text-white transition-colors duration-300">{stat.label}</div>
+        
+        {/* Floating indicator */}
+        <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-transparent via-white to-transparent group-hover:w-12 transition-all duration-500"></div>
       </div>
-      <div className="text-blue-200 text-sm md:text-base">{stat.label}</div>
     </div>
   );
 }
@@ -187,79 +264,129 @@ function StatCard({ stat, index }: { stat: any, index: number }) {
 // Special Section
 function SpecialSection() {
   return (
-    <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50 relative overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-5">
+    <section className="py-24 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
+      {/* Enhanced Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-blue-400/20 to-purple-600/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-br from-cyan-400/20 to-blue-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-br from-purple-400/10 to-pink-600/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+      </div>
+
+      {/* Sophisticated Grid Pattern */}
+      <div className="absolute inset-0 opacity-[0.03]">
         <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle at 20% 80%, #3B82F6 2px, transparent 2px),
-                           radial-gradient(circle at 80% 20%, #8B5CF6 2px, transparent 2px),
-                           radial-gradient(circle at 40% 40%, #06B6D4 2px, transparent 2px)`,
-          backgroundSize: '100px 100px'
+          backgroundImage: `
+            radial-gradient(circle at 25% 25%, #60A5FA 1px, transparent 1px),
+            radial-gradient(circle at 75% 75%, #A78BFA 1px, transparent 1px),
+            radial-gradient(circle at 50% 50%, #34D399 0.5px, transparent 0.5px)
+          `,
+          backgroundSize: '60px 60px, 80px 80px, 40px 40px'
         }} />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
-        <div className="text-center mb-16">
-          <Badge className="mb-4 bg-purple-100 text-purple-700 hover:bg-purple-200 border-purple-200">
-            <Lightbulb className="w-4 h-4 mr-2" />
-            What Makes Us Special
-          </Badge>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-            Beyond Traditional Training
+        <div className="text-center mb-20">
+          <div className="inline-flex items-center px-6 py-3 bg-white/60 backdrop-blur-sm rounded-full border border-purple-200/50 mb-8">
+            <Lightbulb className="w-5 h-5 text-purple-600 mr-3" />
+            <span className="text-purple-700 font-medium">What Makes Us Special</span>
+          </div>
+          
+          <h2 className="text-4xl md:text-6xl font-bold mb-8 leading-tight">
+            <span className="bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+              Beyond Traditional
+            </span>
+            <br />
+            <span className="bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent">
+              Training
+            </span>
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            We don't just teach concepts - we transform how people think, work, and lead
+          
+          <p className="text-xl md:text-2xl text-gray-700 max-w-4xl mx-auto leading-relaxed font-light">
+            We don't just teach concepts - we 
+            <span className="text-purple-600 font-medium"> transform how people think, </span>
+            work, and lead
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {[
             {
-              icon: <Brain className="h-8 w-8" />,
+              icon: <Brain className="h-10 w-10" />,
               title: "AI-Powered Personalization",
-              description: "Every learning experience is tailored to your unique needs, goals, and learning style."
+              description: "Every learning experience is tailored to your unique needs, goals, and learning style.",
+              gradient: "from-blue-500 to-cyan-400",
+              bgGradient: "from-blue-50 to-cyan-50"
             },
             {
-              icon: <Users className="h-8 w-8" />,
+              icon: <Users className="h-10 w-10" />,
               title: "Human-Centered Design",
-              description: "Technology serves people, not the other way around. We prioritize human connection and growth."
+              description: "Technology serves people, not the other way around. We prioritize human connection and growth.",
+              gradient: "from-purple-500 to-pink-400",
+              bgGradient: "from-purple-50 to-pink-50"
             },
             {
-              icon: <Target className="h-8 w-8" />,
+              icon: <Target className="h-10 w-10" />,
               title: "Results-Driven Approach",
-              description: "We measure success by real-world impact, not just completion rates or satisfaction scores."
+              description: "We measure success by real-world impact, not just completion rates or satisfaction scores.",
+              gradient: "from-emerald-500 to-teal-400",
+              bgGradient: "from-emerald-50 to-teal-50"
             },
             {
-              icon: <Rocket className="h-8 w-8" />,
+              icon: <Rocket className="h-10 w-10" />,
               title: "Continuous Innovation",
-              description: "We stay ahead of industry trends to ensure our methods remain cutting-edge and effective."
+              description: "We stay ahead of industry trends to ensure our methods remain cutting-edge and effective.",
+              gradient: "from-orange-500 to-red-400",
+              bgGradient: "from-orange-50 to-red-50"
             },
             {
-              icon: <CheckCircle className="h-8 w-8" />,
+              icon: <CheckCircle className="h-10 w-10" />,
               title: "Proven Methodologies",
-              description: "Our approaches are backed by research, tested in practice, and refined through experience."
+              description: "Our approaches are backed by research, tested in practice, and refined through experience.",
+              gradient: "from-indigo-500 to-purple-400",
+              bgGradient: "from-indigo-50 to-purple-50"
             },
             {
-              icon: <Award className="h-8 w-8" />,
+              icon: <Award className="h-10 w-10" />,
               title: "Expert Community",
-              description: "Learn from and connect with a global network of industry leaders and practitioners."
+              description: "Learn from and connect with a global network of industry leaders and practitioners.",
+              gradient: "from-yellow-500 to-orange-400",
+              bgGradient: "from-yellow-50 to-orange-50"
             }
           ].map((item, index) => (
-            <Card key={index} className="h-full text-center hover:shadow-xl transition-all duration-300 group border-0 shadow-lg bg-white/80 backdrop-blur-sm hover:scale-105">
-              <CardHeader>
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 group-hover:scale-110 transition-transform duration-300">
-                  {item.icon}
+            <div key={index} className={`group relative animate-fade-in-up animation-delay-${index * 100}`}>
+              {/* Glow Effect */}
+              <div className={`absolute -inset-1 bg-gradient-to-r ${item.gradient} rounded-2xl blur opacity-0 group-hover:opacity-25 transition duration-1000 group-hover:duration-200`}></div>
+              
+              {/* Main Card */}
+              <div className={`relative bg-gradient-to-br ${item.bgGradient} rounded-2xl border border-white/50 p-8 h-full hover:bg-white/80 transition-all duration-500 group-hover:scale-105 group-hover:-translate-y-3 shadow-lg hover:shadow-2xl backdrop-blur-sm`}>
+                {/* Icon Container */}
+                <div className="relative mb-6">
+                  <div className={`w-20 h-20 bg-gradient-to-br ${item.gradient} rounded-2xl flex items-center justify-center mx-auto mb-6 text-white shadow-xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}>
+                    {item.icon}
+                  </div>
+                  
+                  {/* Floating ring effect */}
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-24 border-2 border-current rounded-full opacity-0 group-hover:opacity-20 group-hover:scale-150 transition-all duration-700" style={{ color: item.gradient.includes('blue') ? '#3B82F6' : item.gradient.includes('purple') ? '#8B5CF6' : '#10B981' }}></div>
                 </div>
-                <CardTitle className="text-xl group-hover:text-blue-600 transition-colors">
-                  {item.title}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-base leading-relaxed">
-                  {item.description}
-                </CardDescription>
-              </CardContent>
-            </Card>
+
+                {/* Content */}
+                <div className="text-center">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-blue-700 transition-colors duration-300">
+                    {item.title}
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed text-base group-hover:text-gray-800 transition-colors duration-300">
+                    {item.description}
+                  </p>
+                </div>
+
+                {/* Decorative elements */}
+                <div className="absolute top-4 right-4 w-8 h-8 bg-white/30 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
+                <div className="absolute bottom-4 left-4 w-6 h-6 bg-white/20 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-700" style={{ animationDelay: '200ms' }}></div>
+                
+                {/* Bottom highlight */}
+                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-current to-transparent group-hover:w-20 transition-all duration-500 rounded-full" style={{ color: item.gradient.includes('blue') ? '#3B82F6' : item.gradient.includes('purple') ? '#8B5CF6' : '#10B981' }}></div>
+              </div>
+            </div>
           ))}
         </div>
       </div>
@@ -302,18 +429,47 @@ function AboutDetailsSection() {
 // Testimonials Section
 function TestimonialsSection() {
   return (
-    <section className="py-20 bg-gray-50">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <Badge className="mb-4 bg-yellow-100 text-yellow-700 hover:bg-yellow-200 border-yellow-200">
-            <Star className="w-4 h-4 mr-2" />
-            What People Say
-          </Badge>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-            Transformations That Speak for Themselves
+    <section className="py-24 bg-gradient-to-br from-gray-900 via-slate-800 to-gray-900 relative overflow-hidden">
+      {/* Enhanced Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-yellow-500/20 to-orange-600/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/3 left-1/3 w-80 h-80 bg-gradient-to-br from-blue-500/15 to-cyan-600/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-2/3 left-1/4 w-64 h-64 bg-gradient-to-br from-purple-500/10 to-pink-600/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+      </div>
+
+      {/* Geometric Pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `
+            radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 2px, transparent 2px),
+            radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 2px, transparent 2px),
+            radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.05) 1px, transparent 1px)
+          `,
+          backgroundSize: '100px 100px, 80px 80px, 60px 60px'
+        }} />
+      </div>
+
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="text-center mb-20">
+          <div className="inline-flex items-center px-6 py-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 mb-8">
+            <Star className="w-5 h-5 text-yellow-300 mr-3" />
+            <span className="text-white/90 font-medium">What People Say</span>
+          </div>
+          
+          <h2 className="text-4xl md:text-6xl font-bold mb-8 leading-tight">
+            <span className="bg-gradient-to-r from-white via-yellow-100 to-orange-200 bg-clip-text text-transparent">
+              Transformations That
+            </span>
+            <br />
+            <span className="bg-gradient-to-r from-yellow-300 via-orange-300 to-red-300 bg-clip-text text-transparent">
+              Speak for Themselves
+            </span>
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Real stories from professionals who've experienced the Synergies4 difference
+          
+          <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed font-light">
+            Real stories from professionals who've experienced the 
+            <span className="text-yellow-300 font-medium"> Synergies4 difference </span>
+            and transformed their careers
           </p>
         </div>
 
@@ -325,7 +481,9 @@ function TestimonialsSection() {
               company: "Fortune 500 Company",
               content: "Synergies4 didn't just teach us about AI—they transformed how we think about innovation. Our team's productivity has increased by 40% since completing their program.",
               rating: 5,
-              image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face"
+              image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
+              gradient: "from-blue-500 to-cyan-400",
+              bgGradient: "from-blue-900/20 to-cyan-900/20"
             },
             {
               name: "Michael Chen",
@@ -333,7 +491,9 @@ function TestimonialsSection() {
               company: "Tech Startup",
               content: "The combination of Agile methodologies with AI insights has revolutionized how we approach product development. We're delivering value faster than ever before.",
               rating: 5,
-              image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
+              image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+              gradient: "from-purple-500 to-pink-400",
+              bgGradient: "from-purple-900/20 to-pink-900/20"
             },
             {
               name: "Emily Rodriguez",
@@ -341,30 +501,62 @@ function TestimonialsSection() {
               company: "Global Consulting Firm",
               content: "The positive intelligence training has been life-changing. I'm not just a better leader—I'm a better person. My team has noticed the difference immediately.",
               rating: 5,
-              image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face"
+              image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+              gradient: "from-emerald-500 to-teal-400",
+              bgGradient: "from-emerald-900/20 to-teal-900/20"
             }
           ].map((testimonial, index) => (
-            <Card key={index} className="hover:shadow-xl transition-all duration-300 group border-0 shadow-lg bg-white/90 backdrop-blur-sm">
-              <CardContent className="pt-6">
-                <div className="flex mb-4">
+            <div key={index} className={`group relative animate-fade-in-up animation-delay-${index * 200}`}>
+              {/* Glow Effect */}
+              <div className={`absolute -inset-1 bg-gradient-to-r ${testimonial.gradient} rounded-2xl blur opacity-0 group-hover:opacity-30 transition duration-1000 group-hover:duration-200`}></div>
+              
+              {/* Main Card */}
+              <div className={`relative bg-gradient-to-br ${testimonial.bgGradient} backdrop-blur-xl rounded-2xl border border-white/20 p-8 h-full hover:bg-white/5 transition-all duration-500 group-hover:scale-105 group-hover:-translate-y-3 shadow-xl hover:shadow-2xl`}>
+                {/* Quote Icon */}
+                <div className="absolute top-6 right-6 text-white/20 group-hover:text-white/40 transition-colors duration-300">
+                  <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
+                  </svg>
+                </div>
+
+                {/* Stars */}
+                <div className="flex mb-6">
                   {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-current mr-1 group-hover:scale-110 transition-transform duration-300" style={{ animationDelay: `${i * 100}ms` }} />
                   ))}
                 </div>
-                <p className="text-gray-600 mb-6 italic leading-relaxed">"{testimonial.content}"</p>
+
+                {/* Content */}
+                <p className="text-gray-200 mb-8 italic leading-relaxed text-lg group-hover:text-white transition-colors duration-300 font-light">"{testimonial.content}"</p>
+                
+                {/* Author */}
                 <div className="flex items-center">
-                  <Avatar className="h-12 w-12 mr-4">
-                    <AvatarImage src={testimonial.image} alt={testimonial.name} />
-                    <AvatarFallback>{testimonial.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                  </Avatar>
+                  <div className="relative">
+                    <Avatar className="h-16 w-16 mr-4 ring-2 ring-white/20 group-hover:ring-white/40 transition-all duration-300">
+                      <AvatarImage src={testimonial.image} alt={testimonial.name} />
+                      <AvatarFallback className="bg-gradient-to-br from-gray-600 to-gray-800 text-white">
+                        {testimonial.name.split(' ').map(n => n[0]).join('')}
+                      </AvatarFallback>
+                    </Avatar>
+                    {/* Glow effect for avatar */}
+                    <div className={`absolute inset-0 bg-gradient-to-r ${testimonial.gradient} rounded-full blur opacity-0 group-hover:opacity-30 transition-all duration-500`}></div>
+                  </div>
+                  
                   <div>
-                    <p className="font-semibold text-gray-900">{testimonial.name}</p>
-                    <p className="text-sm text-gray-600">{testimonial.role}</p>
-                    <p className="text-sm text-gray-500">{testimonial.company}</p>
+                    <p className="font-bold text-white text-lg group-hover:text-yellow-200 transition-colors duration-300">{testimonial.name}</p>
+                    <p className="text-gray-300 text-base group-hover:text-gray-200 transition-colors duration-300">{testimonial.role}</p>
+                    <p className="text-gray-400 text-sm group-hover:text-gray-300 transition-colors duration-300">{testimonial.company}</p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+
+                {/* Decorative elements */}
+                <div className="absolute bottom-4 right-4 w-6 h-6 bg-white/10 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
+                <div className="absolute top-1/2 left-0 w-1 h-12 bg-gradient-to-b from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
+                
+                {/* Bottom accent */}
+                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-yellow-400 to-transparent group-hover:w-24 transition-all duration-500 rounded-full"></div>
+              </div>
+            </div>
           ))}
         </div>
       </div>

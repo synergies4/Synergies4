@@ -102,38 +102,72 @@ export default function Contact() {
       />
 
       {/* Contact Form Section */}
-      <section id="contact-form" className="py-20 bg-white">
-        <div className="container mx-auto px-4">
+      <section id="contact-form" className="py-24 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
+        {/* Enhanced Background Elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-blue-400/20 to-purple-600/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-br from-cyan-400/20 to-blue-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-br from-purple-400/10 to-pink-600/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+        </div>
+
+        {/* Sophisticated Grid Pattern */}
+        <div className="absolute inset-0 opacity-[0.03]">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `
+              radial-gradient(circle at 25% 25%, #60A5FA 1px, transparent 1px),
+              radial-gradient(circle at 75% 75%, #A78BFA 1px, transparent 1px),
+              radial-gradient(circle at 50% 50%, #34D399 0.5px, transparent 0.5px)
+            `,
+            backgroundSize: '60px 60px, 80px 80px, 40px 40px'
+          }} />
+        </div>
+
+        <div className="container mx-auto px-4 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Contact Form */}
-            <div className="space-y-8">
+            <div className="space-y-8 animate-fade-in-up">
               <div className="text-center lg:text-left">
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">Send us a Message</h2>
-                <p className="text-gray-600">
-                  Fill out the form below and we'll get back to you within 24 hours.
+                <div className="inline-flex items-center px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full border border-blue-200/50 mb-6">
+                  <MessageSquare className="w-4 h-4 text-blue-600 mr-2" />
+                  <span className="text-blue-700 font-medium text-sm">Contact Form</span>
+                </div>
+                <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+                  Send us a Message
+                </h2>
+                <p className="text-lg text-gray-700 leading-relaxed">
+                  Fill out the form below and we'll get back to you within 
+                  <span className="text-blue-600 font-medium"> 24 hours.</span>
                 </p>
               </div>
 
               {isSubmitted ? (
-                <Card className="border-green-200 bg-green-50">
-                  <CardContent className="p-8 text-center">
-                    <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <CheckCircle className="h-8 w-8 text-white" />
+                <div className="group relative">
+                  {/* Glow Effect */}
+                  <div className="absolute -inset-1 bg-gradient-to-r from-green-400 to-emerald-500 rounded-2xl blur opacity-25 animate-pulse"></div>
+                  
+                  {/* Success Card */}
+                  <div className="relative bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl border border-green-200/50 p-8 text-center backdrop-blur-sm">
+                    <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl animate-bounce">
+                      <CheckCircle className="h-10 w-10 text-white" />
                     </div>
-                    <h3 className="text-2xl font-bold text-green-800 mb-2">Message Sent!</h3>
-                    <p className="text-green-700">
-                      Thank you for reaching out. We'll get back to you within 24 hours.
+                    <h3 className="text-2xl font-bold text-green-800 mb-4">Message Sent Successfully!</h3>
+                    <p className="text-green-700 leading-relaxed">
+                      Thank you for reaching out. We'll get back to you within 24 hours with a personalized response.
                     </p>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               ) : (
-                <Card className="shadow-lg border-0">
-                  <CardContent className="p-8">
+                <div className="group relative">
+                  {/* Glow Effect */}
+                  <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-purple-500 rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-700"></div>
+                  
+                  {/* Form Card */}
+                  <div className="relative bg-white/80 backdrop-blur-xl rounded-2xl border border-white/50 p-8 shadow-xl hover:shadow-2xl transition-all duration-500">
                     <form onSubmit={handleSubmit} className="space-y-6">
                       {/* Name Fields */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="firstName" className="text-sm font-medium text-gray-700">
+                        <div className="group">
+                          <Label htmlFor="firstName" className="text-sm font-semibold text-gray-700 mb-2 block">
                             First Name *
                           </Label>
                           <Input
@@ -142,12 +176,12 @@ export default function Contact() {
                             value={formData.firstName}
                             onChange={handleInputChange}
                             required
-                            className="mt-2 transition-all duration-200 focus:ring-2 focus:ring-blue-500"
+                            className="transition-all duration-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-300 bg-white/90"
                             placeholder="John"
                           />
                         </div>
-                        <div>
-                          <Label htmlFor="lastName" className="text-sm font-medium text-gray-700">
+                        <div className="group">
+                          <Label htmlFor="lastName" className="text-sm font-semibold text-gray-700 mb-2 block">
                             Last Name *
                           </Label>
                           <Input
@@ -156,7 +190,7 @@ export default function Contact() {
                             value={formData.lastName}
                             onChange={handleInputChange}
                             required
-                            className="mt-2 transition-all duration-200 focus:ring-2 focus:ring-blue-500"
+                            className="transition-all duration-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-300 bg-white/90"
                             placeholder="Doe"
                           />
                         </div>
@@ -164,8 +198,8 @@ export default function Contact() {
 
                       {/* Contact Fields */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                        <div className="group">
+                          <Label htmlFor="email" className="text-sm font-semibold text-gray-700 mb-2 block">
                             Email Address *
                           </Label>
                           <Input
@@ -175,12 +209,12 @@ export default function Contact() {
                             value={formData.email}
                             onChange={handleInputChange}
                             required
-                            className="mt-2 transition-all duration-200 focus:ring-2 focus:ring-blue-500"
+                            className="transition-all duration-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-300 bg-white/90"
                             placeholder="john@company.com"
                           />
                         </div>
-                        <div>
-                          <Label htmlFor="phone" className="text-sm font-medium text-gray-700">
+                        <div className="group">
+                          <Label htmlFor="phone" className="text-sm font-semibold text-gray-700 mb-2 block">
                             Phone Number
                           </Label>
                           <Input
@@ -189,7 +223,7 @@ export default function Contact() {
                             type="tel"
                             value={formData.phone}
                             onChange={handleInputChange}
-                            className="mt-2 transition-all duration-200 focus:ring-2 focus:ring-blue-500"
+                            className="transition-all duration-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-300 bg-white/90"
                             placeholder="+1 (555) 123-4567"
                           />
                         </div>
@@ -197,8 +231,8 @@ export default function Contact() {
 
                       {/* Company and Inquiry Type */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="company" className="text-sm font-medium text-gray-700">
+                        <div className="group">
+                          <Label htmlFor="company" className="text-sm font-semibold text-gray-700 mb-2 block">
                             Company
                           </Label>
                           <Input
@@ -206,19 +240,19 @@ export default function Contact() {
                             name="company"
                             value={formData.company}
                             onChange={handleInputChange}
-                            className="mt-2 transition-all duration-200 focus:ring-2 focus:ring-blue-500"
+                            className="transition-all duration-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-300 bg-white/90"
                             placeholder="Your Company"
                           />
                         </div>
-                        <div>
-                          <Label htmlFor="inquiryType" className="text-sm font-medium text-gray-700">
+                        <div className="group">
+                          <Label htmlFor="inquiryType" className="text-sm font-semibold text-gray-700 mb-2 block">
                             Inquiry Type *
                           </Label>
                           <Select value={formData.inquiryType} onValueChange={handleSelectChange}>
-                            <SelectTrigger className="mt-2 transition-all duration-200 focus:ring-2 focus:ring-blue-500">
+                            <SelectTrigger className="transition-all duration-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-300 bg-white/90">
                               <SelectValue placeholder="Select inquiry type" />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="bg-white/95 backdrop-blur-xl border border-gray-200">
                               <SelectItem value="general">General Inquiry</SelectItem>
                               <SelectItem value="courses">Course Information</SelectItem>
                               <SelectItem value="coaching">Coaching Services</SelectItem>
@@ -231,8 +265,8 @@ export default function Contact() {
                       </div>
 
                       {/* Subject */}
-                      <div>
-                        <Label htmlFor="subject" className="text-sm font-medium text-gray-700">
+                      <div className="group">
+                        <Label htmlFor="subject" className="text-sm font-semibold text-gray-700 mb-2 block">
                           Subject *
                         </Label>
                         <Input
@@ -241,14 +275,14 @@ export default function Contact() {
                           value={formData.subject}
                           onChange={handleInputChange}
                           required
-                          className="mt-2 transition-all duration-200 focus:ring-2 focus:ring-blue-500"
+                          className="transition-all duration-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-300 bg-white/90"
                           placeholder="How can we help you?"
                         />
                       </div>
 
                       {/* Message */}
-                      <div>
-                        <Label htmlFor="message" className="text-sm font-medium text-gray-700">
+                      <div className="group">
+                        <Label htmlFor="message" className="text-sm font-semibold text-gray-700 mb-2 block">
                           Message *
                         </Label>
                         <Textarea
@@ -258,134 +292,156 @@ export default function Contact() {
                           onChange={handleInputChange}
                           required
                           rows={6}
-                          className="mt-2 transition-all duration-200 focus:ring-2 focus:ring-blue-500"
+                          className="transition-all duration-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-300 bg-white/90 resize-none"
                           placeholder="Tell us more about your needs..."
                         />
                       </div>
 
                       {/* Submit Button */}
-                      <Button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white py-3 text-lg font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg"
-                      >
-                        {isSubmitting ? (
-                          <>
-                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                            Sending Message...
-                          </>
-                        ) : (
-                          <>
-                            <Send className="mr-2 h-5 w-5" />
-                            Send Message
-                          </>
-                        )}
-                      </Button>
+                      <div className="relative">
+                        <Button
+                          type="submit"
+                          disabled={isSubmitting}
+                          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-4 text-lg font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl border-0 rounded-xl group"
+                        >
+                          {isSubmitting ? (
+                            <>
+                              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                              Sending Message...
+                            </>
+                          ) : (
+                            <>
+                              <Send className="mr-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                              Send Message
+                            </>
+                          )}
+                        </Button>
+                      </div>
                     </form>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               )}
             </div>
 
             {/* Contact Information */}
-            <div className="space-y-8">
+            <div className="space-y-8 animate-fade-in-up animation-delay-200">
               <div className="text-center lg:text-left">
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">Get in Touch</h2>
-                <p className="text-gray-600">
-                  Prefer to reach out directly? Here are all the ways you can contact us.
+                <div className="inline-flex items-center px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full border border-purple-200/50 mb-6">
+                  <Phone className="w-4 h-4 text-purple-600 mr-2" />
+                  <span className="text-purple-700 font-medium text-sm">Contact Info</span>
+                </div>
+                <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-gray-900 via-purple-800 to-blue-800 bg-clip-text text-transparent">
+                  Get in Touch
+                </h2>
+                <p className="text-lg text-gray-700 leading-relaxed">
+                  Prefer to reach out directly? Here are all the ways you can 
+                  <span className="text-purple-600 font-medium"> contact us.</span>
                 </p>
               </div>
 
               <div className="space-y-6">
                 {/* Contact Methods */}
-                <Card className="hover:shadow-lg transition-shadow duration-300">
-                  <CardContent className="p-6">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Mail className="h-6 w-6 text-blue-600" />
+                {[
+                  {
+                    icon: <Mail className="h-6 w-6" />,
+                    title: "Email Us",
+                    description: "Send us an email anytime",
+                    contact: "hello@synergies4.com",
+                    href: "mailto:hello@synergies4.com",
+                    gradient: "from-blue-500 to-cyan-400",
+                    bgGradient: "from-blue-50 to-cyan-50"
+                  },
+                  {
+                    icon: <Phone className="h-6 w-6" />,
+                    title: "Call Us",
+                    description: "Mon-Fri from 8am to 5pm PST",
+                    contact: "+1 (555) 123-4567",
+                    href: "tel:+1-555-123-4567",
+                    gradient: "from-green-500 to-emerald-400",
+                    bgGradient: "from-green-50 to-emerald-50"
+                  },
+                  {
+                    icon: <MessageSquare className="h-6 w-6" />,
+                    title: "Live Chat",
+                    description: "Chat with our support team",
+                    contact: "Start Chat",
+                    href: "#",
+                    gradient: "from-purple-500 to-pink-400",
+                    bgGradient: "from-purple-50 to-pink-50"
+                  }
+                ].map((item, index) => (
+                  <div key={index} className="group relative">
+                    {/* Glow Effect */}
+                    <div className={`absolute -inset-1 bg-gradient-to-r ${item.gradient} rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-700`}></div>
+                    
+                    {/* Contact Card */}
+                    <div className={`relative bg-gradient-to-br ${item.bgGradient} rounded-2xl border border-white/50 p-6 hover:bg-white/80 transition-all duration-500 group-hover:scale-105 group-hover:-translate-y-1 shadow-lg hover:shadow-2xl backdrop-blur-sm`}>
+                      <div className="flex items-start space-x-4">
+                        <div className={`w-12 h-12 bg-gradient-to-br ${item.gradient} rounded-xl flex items-center justify-center flex-shrink-0 text-white shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
+                          {item.icon}
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-bold text-gray-900 mb-1 text-lg group-hover:text-blue-700 transition-colors">{item.title}</h3>
+                          <p className="text-gray-600 mb-3 group-hover:text-gray-800 transition-colors">{item.description}</p>
+                          {item.href === "#" ? (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className={`text-purple-600 border-purple-600 hover:bg-purple-50 transition-all duration-300 hover:scale-105`}
+                            >
+                              {item.contact}
+                            </Button>
+                          ) : (
+                            <a 
+                              href={item.href} 
+                              className={`font-semibold transition-colors duration-300 hover:underline ${item.gradient.includes('blue') ? 'text-blue-600 hover:text-blue-700' : item.gradient.includes('green') ? 'text-green-600 hover:text-green-700' : 'text-purple-600 hover:text-purple-700'}`}
+                            >
+                              {item.contact}
+                            </a>
+                          )}
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900 mb-1">Email Us</h3>
-                        <p className="text-gray-600 mb-2">Send us an email anytime</p>
-                        <a 
-                          href="mailto:hello@synergies4.com" 
-                          className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
-                        >
-                          hello@synergies4.com
-                        </a>
-                      </div>
+                      
+                      {/* Decorative element */}
+                      <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-current to-transparent group-hover:w-16 transition-all duration-500 rounded-full" style={{ color: item.gradient.includes('blue') ? '#3B82F6' : item.gradient.includes('green') ? '#10B981' : '#8B5CF6' }}></div>
                     </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="hover:shadow-lg transition-shadow duration-300">
-                  <CardContent className="p-6">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Phone className="h-6 w-6 text-green-600" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900 mb-1">Call Us</h3>
-                        <p className="text-gray-600 mb-2">Mon-Fri from 8am to 5pm PST</p>
-                        <a 
-                          href="tel:+1-555-123-4567" 
-                          className="text-green-600 hover:text-green-700 font-medium transition-colors"
-                        >
-                          +1 (555) 123-4567
-                        </a>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="hover:shadow-lg transition-shadow duration-300">
-                  <CardContent className="p-6">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <MessageSquare className="h-6 w-6 text-purple-600" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900 mb-1">Live Chat</h3>
-                        <p className="text-gray-600 mb-2">Chat with our support team</p>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          className="text-purple-600 border-purple-600 hover:bg-purple-50"
-                        >
-                          Start Chat
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                ))}
 
                 {/* Business Hours */}
-                <Card className="bg-gray-50">
-                  <CardContent className="p-6">
+                <div className="group relative">
+                  {/* Glow Effect */}
+                  <div className="absolute -inset-1 bg-gradient-to-r from-orange-400 to-yellow-500 rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-700"></div>
+                  
+                  {/* Hours Card */}
+                  <div className="relative bg-gradient-to-br from-orange-50 to-yellow-50 rounded-2xl border border-white/50 p-6 hover:bg-white/80 transition-all duration-500 group-hover:scale-105 group-hover:-translate-y-1 shadow-lg hover:shadow-2xl backdrop-blur-sm">
                     <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Clock className="h-6 w-6 text-orange-600" />
+                      <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-yellow-500 rounded-xl flex items-center justify-center flex-shrink-0 text-white shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+                        <Clock className="h-6 w-6" />
                       </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900 mb-3">Business Hours</h3>
-                        <div className="space-y-1 text-sm text-gray-600">
-                          <div className="flex justify-between">
-                            <span>Monday - Friday</span>
-                            <span>8:00 AM - 5:00 PM PST</span>
+                      <div className="flex-1">
+                        <h3 className="font-bold text-gray-900 mb-3 text-lg group-hover:text-orange-700 transition-colors">Business Hours</h3>
+                        <div className="space-y-2 text-sm text-gray-700">
+                          <div className="flex justify-between items-center py-1 px-3 bg-white/50 rounded-lg">
+                            <span className="font-medium">Monday - Friday</span>
+                            <span className="text-orange-600 font-semibold">8:00 AM - 5:00 PM PST</span>
                           </div>
-                          <div className="flex justify-between">
-                            <span>Saturday</span>
-                            <span>9:00 AM - 2:00 PM PST</span>
+                          <div className="flex justify-between items-center py-1 px-3 bg-white/50 rounded-lg">
+                            <span className="font-medium">Saturday</span>
+                            <span className="text-orange-600 font-semibold">9:00 AM - 2:00 PM PST</span>
                           </div>
-                          <div className="flex justify-between">
-                            <span>Sunday</span>
-                            <span>Closed</span>
+                          <div className="flex justify-between items-center py-1 px-3 bg-white/50 rounded-lg">
+                            <span className="font-medium">Sunday</span>
+                            <span className="text-gray-500 font-semibold">Closed</span>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
+                    
+                    {/* Decorative element */}
+                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-orange-500 to-transparent group-hover:w-16 transition-all duration-500 rounded-full"></div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -393,74 +449,123 @@ export default function Contact() {
       </section>
 
       {/* Global Offices Section */}
-      <section id="locations" className="py-20 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Our Global Presence
+      <section id="locations" className="py-24 bg-gradient-to-br from-gray-900 via-slate-800 to-gray-900 relative overflow-hidden">
+        {/* Enhanced Background Elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-blue-500/20 to-cyan-600/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-1/3 left-1/3 w-80 h-80 bg-gradient-to-br from-purple-500/15 to-pink-600/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute top-2/3 left-1/4 w-64 h-64 bg-gradient-to-br from-emerald-500/10 to-teal-600/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+        </div>
+
+        {/* Geometric Pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `
+              radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 2px, transparent 2px),
+              radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 2px, transparent 2px),
+              radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.05) 1px, transparent 1px)
+            `,
+            backgroundSize: '100px 100px, 80px 80px, 60px 60px'
+          }} />
+        </div>
+
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center mb-20">
+            <div className="inline-flex items-center px-6 py-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 mb-8">
+              <Globe className="w-5 h-5 text-blue-300 mr-3" />
+              <span className="text-white/90 font-medium">Global Presence</span>
+            </div>
+            
+            <h2 className="text-4xl md:text-6xl font-bold mb-8 leading-tight">
+              <span className="bg-gradient-to-r from-white via-blue-200 to-cyan-300 bg-clip-text text-transparent">
+                We're Here to
+              </span>
+              <br />
+              <span className="bg-gradient-to-r from-purple-300 via-pink-300 to-orange-300 bg-clip-text text-transparent">
+                Serve You
+              </span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              We're here to serve you with offices around the world.
+            
+            <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed font-light">
+              With offices around the world, we're 
+              <span className="text-cyan-300 font-medium"> always close by </span>
+              to provide personalized support and service.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* San Francisco */}
-            <Card className="hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Building className="h-8 w-8 text-blue-600" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">San Francisco</h3>
-                <p className="text-gray-600 mb-4">Headquarters</p>
-                <div className="space-y-2 text-sm text-gray-600">
-                  <div className="flex items-center justify-center">
-                    <MapPin className="h-4 w-4 mr-2" />
-                    <span>123 Innovation Drive</span>
+            {[
+              {
+                city: "San Francisco",
+                role: "Headquarters",
+                address: "123 Innovation Drive",
+                location: "San Francisco, CA 94105",
+                country: "United States",
+                icon: <Building className="h-8 w-8" />,
+                gradient: "from-blue-500 to-cyan-400",
+                bgGradient: "from-blue-900/20 to-cyan-900/20"
+              },
+              {
+                city: "New York",
+                role: "East Coast Hub",
+                address: "456 Business Ave",
+                location: "New York, NY 10001",
+                country: "United States",
+                icon: <Users className="h-8 w-8" />,
+                gradient: "from-emerald-500 to-teal-400",
+                bgGradient: "from-emerald-900/20 to-teal-900/20"
+              },
+              {
+                city: "London",
+                role: "European Office",
+                address: "789 Tech Street",
+                location: "London EC2A 4DP",
+                country: "United Kingdom",
+                icon: <Globe className="h-8 w-8" />,
+                gradient: "from-purple-500 to-pink-400",
+                bgGradient: "from-purple-900/20 to-pink-900/20"
+              }
+            ].map((office, index) => (
+              <div key={index} className={`group relative animate-fade-in-up animation-delay-${index * 200}`}>
+                {/* Glow Effect */}
+                <div className={`absolute -inset-1 bg-gradient-to-r ${office.gradient} rounded-2xl blur opacity-0 group-hover:opacity-30 transition duration-1000 group-hover:duration-200`}></div>
+                
+                {/* Office Card */}
+                <div className={`relative bg-gradient-to-br ${office.bgGradient} backdrop-blur-xl rounded-2xl border border-white/20 p-8 h-full hover:bg-white/5 transition-all duration-500 group-hover:scale-105 group-hover:-translate-y-3 shadow-xl hover:shadow-2xl text-center`}>
+                  {/* Icon */}
+                  <div className="relative mb-6">
+                    <div className={`w-20 h-20 bg-gradient-to-br ${office.gradient} rounded-2xl flex items-center justify-center mx-auto text-white shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}>
+                      {office.icon}
+                    </div>
+                    
+                    {/* Floating ring effect */}
+                    <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-24 border-2 border-current rounded-full opacity-0 group-hover:opacity-20 group-hover:scale-150 transition-all duration-700" style={{ color: office.gradient.includes('blue') ? '#3B82F6' : office.gradient.includes('emerald') ? '#10B981' : '#8B5CF6' }}></div>
                   </div>
-                  <p>San Francisco, CA 94105</p>
-                  <p>United States</p>
-                </div>
-              </CardContent>
-            </Card>
 
-            {/* New York */}
-            <Card className="hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Users className="h-8 w-8 text-green-600" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">New York</h3>
-                <p className="text-gray-600 mb-4">East Coast Hub</p>
-                <div className="space-y-2 text-sm text-gray-600">
-                  <div className="flex items-center justify-center">
-                    <MapPin className="h-4 w-4 mr-2" />
-                    <span>456 Business Ave</span>
+                  {/* Content */}
+                  <div>
+                    <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-cyan-200 transition-colors duration-300">{office.city}</h3>
+                    <p className="text-gray-300 mb-6 text-lg group-hover:text-gray-200 transition-colors duration-300">{office.role}</p>
+                    
+                    <div className="space-y-2 text-gray-400 group-hover:text-gray-300 transition-colors duration-300">
+                      <div className="flex items-center justify-center text-sm">
+                        <MapPin className="h-4 w-4 mr-2 text-cyan-400" />
+                        <span>{office.address}</span>
+                      </div>
+                      <p className="text-sm">{office.location}</p>
+                      <p className="text-sm font-medium">{office.country}</p>
+                    </div>
                   </div>
-                  <p>New York, NY 10001</p>
-                  <p>United States</p>
-                </div>
-              </CardContent>
-            </Card>
 
-            {/* London */}
-            <Card className="hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Globe className="h-8 w-8 text-purple-600" />
+                  {/* Decorative elements */}
+                  <div className="absolute top-4 right-4 w-6 h-6 bg-white/10 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
+                  <div className="absolute bottom-4 left-4 w-4 h-4 bg-white/10 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-700" style={{ animationDelay: '200ms' }}></div>
+                  
+                  {/* Bottom accent */}
+                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent group-hover:w-20 transition-all duration-500 rounded-full"></div>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">London</h3>
-                <p className="text-gray-600 mb-4">European Office</p>
-                <div className="space-y-2 text-sm text-gray-600">
-                  <div className="flex items-center justify-center">
-                    <MapPin className="h-4 w-4 mr-2" />
-                    <span>789 Tech Street</span>
-                  </div>
-                  <p>London EC2A 4DP</p>
-                  <p>United Kingdom</p>
-                </div>
-              </CardContent>
-            </Card>
+              </div>
+            ))}
           </div>
         </div>
       </section>
