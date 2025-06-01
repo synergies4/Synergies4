@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Save, Eye, X, FileText, Tag, Image as ImageIcon, Sparkles, Brain, Lightbulb, Copy, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import PageLayout from '@/components/shared/PageLayout';
 
 interface BlogCategory {
   name: string;
@@ -236,520 +237,522 @@ export default function NewBlogPostPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Mobile-Optimized Header */}
-      <header className="bg-white shadow-sm border-b sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 gap-4">
-            <div className="flex items-center space-x-3">
-              <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 flex-shrink-0" />
-              <div className="min-w-0">
-                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 truncate">Create New Post</h1>
-                <p className="text-sm sm:text-base text-gray-600 hidden sm:block">Write and publish a new blog post</p>
+    <PageLayout>
+      <div className="min-h-screen bg-gray-50">
+        {/* Mobile-Optimized Header */}
+        <header className="bg-white shadow-sm border-b sticky top-0 z-40">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 gap-4">
+              <div className="flex items-center space-x-3">
+                <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 flex-shrink-0" />
+                <div className="min-w-0">
+                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 truncate">Create New Post</h1>
+                  <p className="text-sm sm:text-base text-gray-600 hidden sm:block">Write and publish a new blog post</p>
+                </div>
+              </div>
+              <div className="flex space-x-2 sm:space-x-3">
+                <Button variant="outline" size="sm" asChild className="flex-1 sm:flex-none">
+                  <Link href="/admin/blog">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    <span className="hidden sm:inline">Back to Blog</span>
+                    <span className="sm:hidden">Back</span>
+                  </Link>
+                </Button>
+                <Button 
+                  size="sm"
+                  onClick={savePost}
+                  disabled={loading}
+                  className="flex-1 sm:flex-none"
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Save Post</span>
+                  <span className="sm:hidden">Save</span>
+                </Button>
               </div>
             </div>
-            <div className="flex space-x-2 sm:space-x-3">
-              <Button variant="outline" size="sm" asChild className="flex-1 sm:flex-none">
-                <Link href="/admin/blog">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  <span className="hidden sm:inline">Back to Blog</span>
-                  <span className="sm:hidden">Back</span>
-                </Link>
-              </Button>
-              <Button 
-                size="sm"
-                onClick={savePost}
-                disabled={loading}
-                className="flex-1 sm:flex-none"
-              >
-                <Save className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Save Post</span>
-                <span className="sm:hidden">Save</span>
-              </Button>
-            </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto py-4 sm:py-6 px-4 sm:px-6 lg:px-8">
-        <div className="space-y-6 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-8">
-          {/* Main Content - Mobile First, Desktop 2/3 width */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Basic Info */}
-            <Card>
-              <CardHeader className="pb-4">
-                <CardTitle className="text-lg">Basic Information</CardTitle>
-                <CardDescription className="text-sm">
-                  Enter the main details for your blog post
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="title" className="text-sm font-medium">Title *</Label>
-                  <Input
-                    id="title"
-                    value={formData.title}
-                    onChange={(e) => handleTitleChange(e.target.value)}
-                    placeholder="Enter post title..."
-                    className="mt-2"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="slug" className="text-sm font-medium">URL Slug</Label>
-                  <Input
-                    id="slug"
-                    value={formData.slug}
-                    onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
-                    placeholder="url-friendly-slug"
-                    className="mt-2"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    URL: /industry-insight/{formData.slug || 'your-post-slug'}
-                  </p>
-                </div>
-
-                <div>
-                  <Label htmlFor="excerpt" className="text-sm font-medium">Excerpt</Label>
-                  <Textarea
-                    id="excerpt"
-                    value={formData.excerpt}
-                    onChange={(e) => setFormData(prev => ({ ...prev, excerpt: e.target.value }))}
-                    placeholder="Brief description of the post..."
-                    className="mt-2"
-                    rows={3}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Content */}
-            <Card>
-              <CardHeader className="pb-4">
-                <CardTitle className="text-lg flex items-center">
-                  <FileText className="w-5 h-5 mr-2" />
-                  Content *
-                </CardTitle>
-                <CardDescription className="text-sm">
-                  Write your blog post content. You can use HTML tags for formatting.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Textarea
-                  value={formData.content}
-                  onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-                  placeholder="Write your blog post content here... You can use HTML tags like <h2>, <p>, <strong>, <ul>, <li>, etc."
-                  className="min-h-[300px] sm:min-h-[400px]"
-                />
-                <p className="text-xs text-gray-500 mt-2">
-                  Estimated reading time: {Math.ceil(formData.content.split(' ').length / 200)} minutes
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* SEO - Mobile: Show after content, Desktop: Show after content */}
-            <Card>
-              <CardHeader className="pb-4">
-                <CardTitle className="text-lg">SEO Settings</CardTitle>
-                <CardDescription className="text-sm">
-                  Optimize your post for search engines
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="meta_title" className="text-sm font-medium">Meta Title</Label>
-                  <Input
-                    id="meta_title"
-                    value={formData.meta_title}
-                    onChange={(e) => setFormData(prev => ({ ...prev, meta_title: e.target.value }))}
-                    placeholder="SEO title (defaults to post title)"
-                    className="mt-2"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="meta_description" className="text-sm font-medium">Meta Description</Label>
-                  <Textarea
-                    id="meta_description"
-                    value={formData.meta_description}
-                    onChange={(e) => setFormData(prev => ({ ...prev, meta_description: e.target.value }))}
-                    placeholder="SEO description (defaults to excerpt)"
-                    className="mt-2"
-                    rows={2}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Sidebar - Mobile: Stack below content, Desktop: 1/3 width */}
-          <div className="space-y-6">
-            {/* Category */}
-            <Card>
-              <CardHeader className="pb-4">
-                <CardTitle className="text-lg flex items-center">
-                  <Tag className="w-5 h-5 mr-2" />
-                  Category *
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Select 
-                  value={formData.category} 
-                  onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((category) => (
-                      <SelectItem key={category.slug} value={category.name}>
-                        {category.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </CardContent>
-            </Card>
-
-            {/* Featured Image */}
-            <Card>
-              <CardHeader className="pb-4">
-                <CardTitle className="text-lg flex items-center">
-                  <ImageIcon className="w-5 h-5 mr-2" />
-                  Featured Image
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="image" className="text-sm font-medium">Image URL</Label>
-                  <Input
-                    id="image"
-                    value={formData.image}
-                    onChange={(e) => setFormData(prev => ({ ...prev, image: e.target.value }))}
-                    placeholder="https://example.com/image.jpg"
-                    className="mt-2"
-                  />
-                </div>
-                {formData.image && (
-                  <div className="mt-4">
-                    <img
-                      src={formData.image}
-                      alt="Featured image preview"
-                      className="w-full h-32 object-cover rounded-md border"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                      }}
-                    />
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Tags */}
-            <Card>
-              <CardHeader className="pb-4">
-                <CardTitle className="text-lg flex items-center">
-                  <Tag className="w-5 h-5 mr-2" />
-                  Tags
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex gap-2">
+        {/* Main Content */}
+        <main className="max-w-7xl mx-auto py-4 sm:py-6 px-4 sm:px-6 lg:px-8">
+          <div className="space-y-6 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-8">
+            {/* Main Content - Mobile First, Desktop 2/3 width */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Basic Info */}
+              <Card>
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-lg">Basic Information</CardTitle>
+                  <CardDescription className="text-sm">
+                    Enter the main details for your blog post
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <Label htmlFor="title" className="text-sm font-medium">Title *</Label>
                     <Input
-                      value={tagInput}
-                      onChange={(e) => setTagInput(e.target.value)}
-                      onKeyPress={handleKeyPress}
-                      placeholder="Add a tag..."
-                      className="flex-1"
+                      id="title"
+                      value={formData.title}
+                      onChange={(e) => handleTitleChange(e.target.value)}
+                      placeholder="Enter post title..."
+                      className="mt-2"
                     />
-                    <Button onClick={addTag} size="sm" variant="outline">
-                      Add
-                    </Button>
                   </div>
-                  
-                  {formData.tags.length > 0 && (
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium">Current Tags:</Label>
-                      <div className="flex flex-wrap gap-2">
-                        {formData.tags.map((tag, index) => (
-                          <Badge key={index} variant="secondary" className="flex items-center gap-1 text-xs">
-                            {tag}
-                            <X 
-                              className="h-3 w-3 cursor-pointer hover:text-red-600" 
-                              onClick={() => removeTag(tag)}
-                            />
-                          </Badge>
-                        ))}
-                      </div>
+
+                  <div>
+                    <Label htmlFor="slug" className="text-sm font-medium">URL Slug</Label>
+                    <Input
+                      id="slug"
+                      value={formData.slug}
+                      onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
+                      placeholder="url-friendly-slug"
+                      className="mt-2"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      URL: /industry-insight/{formData.slug || 'your-post-slug'}
+                    </p>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="excerpt" className="text-sm font-medium">Excerpt</Label>
+                    <Textarea
+                      id="excerpt"
+                      value={formData.excerpt}
+                      onChange={(e) => setFormData(prev => ({ ...prev, excerpt: e.target.value }))}
+                      placeholder="Brief description of the post..."
+                      className="mt-2"
+                      rows={3}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Content */}
+              <Card>
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-lg flex items-center">
+                    <FileText className="w-5 h-5 mr-2" />
+                    Content *
+                  </CardTitle>
+                  <CardDescription className="text-sm">
+                    Write your blog post content. You can use HTML tags for formatting.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Textarea
+                    value={formData.content}
+                    onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
+                    placeholder="Write your blog post content here... You can use HTML tags like <h2>, <p>, <strong>, <ul>, <li>, etc."
+                    className="min-h-[300px] sm:min-h-[400px]"
+                  />
+                  <p className="text-xs text-gray-500 mt-2">
+                    Estimated reading time: {Math.ceil(formData.content.split(' ').length / 200)} minutes
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* SEO - Mobile: Show after content, Desktop: Show after content */}
+              <Card>
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-lg">SEO Settings</CardTitle>
+                  <CardDescription className="text-sm">
+                    Optimize your post for search engines
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <Label htmlFor="meta_title" className="text-sm font-medium">Meta Title</Label>
+                    <Input
+                      id="meta_title"
+                      value={formData.meta_title}
+                      onChange={(e) => setFormData(prev => ({ ...prev, meta_title: e.target.value }))}
+                      placeholder="SEO title (defaults to post title)"
+                      className="mt-2"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="meta_description" className="text-sm font-medium">Meta Description</Label>
+                    <Textarea
+                      id="meta_description"
+                      value={formData.meta_description}
+                      onChange={(e) => setFormData(prev => ({ ...prev, meta_description: e.target.value }))}
+                      placeholder="SEO description (defaults to excerpt)"
+                      className="mt-2"
+                      rows={2}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Sidebar - Mobile: Stack below content, Desktop: 1/3 width */}
+            <div className="space-y-6">
+              {/* Category */}
+              <Card>
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-lg flex items-center">
+                    <Tag className="w-5 h-5 mr-2" />
+                    Category *
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Select 
+                    value={formData.category} 
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map((category) => (
+                        <SelectItem key={category.slug} value={category.name}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </CardContent>
+              </Card>
+
+              {/* Featured Image */}
+              <Card>
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-lg flex items-center">
+                    <ImageIcon className="w-5 h-5 mr-2" />
+                    Featured Image
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <Label htmlFor="image" className="text-sm font-medium">Image URL</Label>
+                    <Input
+                      id="image"
+                      value={formData.image}
+                      onChange={(e) => setFormData(prev => ({ ...prev, image: e.target.value }))}
+                      placeholder="https://example.com/image.jpg"
+                      className="mt-2"
+                    />
+                  </div>
+                  {formData.image && (
+                    <div className="mt-4">
+                      <img
+                        src={formData.image}
+                        alt="Featured image preview"
+                        className="w-full h-32 object-cover rounded-md border"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
                     </div>
                   )}
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
 
-            {/* Publish Actions - Mobile: Show at bottom, Desktop: Show in sidebar */}
-            <Card>
-              <CardHeader className="pb-4">
-                <CardTitle className="text-lg">Publish</CardTitle>
-                <CardDescription className="text-sm">
-                  Ready to publish your post?
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div>
-                    <Label className="text-sm font-medium">Status</Label>
-                    <Select 
-                      value={formData.status} 
-                      onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}
-                    >
-                      <SelectTrigger className="mt-2">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="draft">Draft</SelectItem>
-                        <SelectItem value="published">Published</SelectItem>
-                      </SelectContent>
-                    </Select>
+              {/* Tags */}
+              <Card>
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-lg flex items-center">
+                    <Tag className="w-5 h-5 mr-2" />
+                    Tags
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex gap-2">
+                      <Input
+                        value={tagInput}
+                        onChange={(e) => setTagInput(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        placeholder="Add a tag..."
+                        className="flex-1"
+                      />
+                      <Button onClick={addTag} size="sm" variant="outline">
+                        Add
+                      </Button>
+                    </div>
+                    
+                    {formData.tags.length > 0 && (
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">Current Tags:</Label>
+                        <div className="flex flex-wrap gap-2">
+                          {formData.tags.map((tag, index) => (
+                            <Badge key={index} variant="secondary" className="flex items-center gap-1 text-xs">
+                              {tag}
+                              <X 
+                                className="h-3 w-3 cursor-pointer hover:text-red-600" 
+                                onClick={() => removeTag(tag)}
+                              />
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  
-                  <Button 
-                    onClick={savePost}
-                    disabled={loading}
-                    className="w-full"
-                    size="lg"
+                </CardContent>
+              </Card>
+
+              {/* Publish Actions - Mobile: Show at bottom, Desktop: Show in sidebar */}
+              <Card>
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-lg">Publish</CardTitle>
+                  <CardDescription className="text-sm">
+                    Ready to publish your post?
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div>
+                      <Label className="text-sm font-medium">Status</Label>
+                      <Select 
+                        value={formData.status} 
+                        onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}
+                      >
+                        <SelectTrigger className="mt-2">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="draft">Draft</SelectItem>
+                          <SelectItem value="published">Published</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <Button 
+                      onClick={savePost}
+                      disabled={loading}
+                      className="w-full"
+                      size="lg"
+                    >
+                      {loading ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <Save className="w-4 h-4 mr-2" />
+                          {formData.status === 'published' ? 'Publish Post' : 'Save Draft'}
+                        </>
+                      )}
+                    </Button>
+                    
+                    {formData.title && formData.slug && (
+                      <Button 
+                        variant="outline" 
+                        className="w-full"
+                        asChild
+                      >
+                        <Link href={`/industry-insight/${formData.slug}`} target="_blank">
+                          <Eye className="w-4 h-4 mr-2" />
+                          Preview Post
+                        </Link>
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </main>
+
+        {/* AI Assistant Floating Button */}
+        <div className="fixed bottom-6 right-6 z-50">
+          <Button
+            onClick={() => setShowAIAssistant(true)}
+            className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-full w-14 h-14"
+            size="lg"
+          >
+            <Sparkles className="w-6 h-6" />
+          </Button>
+        </div>
+
+        {/* AI Assistant Modal */}
+        {showAIAssistant && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <Card className="w-full max-w-4xl max-h-[90vh] overflow-hidden">
+              <CardHeader className="bg-gradient-to-r from-purple-600 to-blue-600 text-white">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <Brain className="w-6 h-6" />
+                    <div>
+                      <CardTitle>AI Blog Assistant</CardTitle>
+                      <CardDescription className="text-purple-100">
+                        Get AI-powered suggestions for your blog content
+                      </CardDescription>
+                    </div>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowAIAssistant(false)}
+                    className="text-white hover:bg-white/20"
                   >
-                    {loading ? (
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+                <div className="space-y-6">
+                  {/* AI Mode Selection */}
+                  <div>
+                    <Label className="text-sm font-medium">What would you like help with?</Label>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">
+                      <Button
+                        variant={aiMode === 'content' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setAiMode('content')}
+                        className="flex flex-col items-center p-4 h-auto"
+                      >
+                        <FileText className="w-5 h-5 mb-2" />
+                        <span className="text-xs">Full Content</span>
+                      </Button>
+                      <Button
+                        variant={aiMode === 'outline' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setAiMode('outline')}
+                        className="flex flex-col items-center p-4 h-auto"
+                      >
+                        <Lightbulb className="w-5 h-5 mb-2" />
+                        <span className="text-xs">Outline</span>
+                      </Button>
+                      <Button
+                        variant={aiMode === 'title' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setAiMode('title')}
+                        className="flex flex-col items-center p-4 h-auto"
+                      >
+                        <Tag className="w-5 h-5 mb-2" />
+                        <span className="text-xs">Title Ideas</span>
+                      </Button>
+                      <Button
+                        variant={aiMode === 'seo' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setAiMode('seo')}
+                        className="flex flex-col items-center p-4 h-auto"
+                      >
+                        <Eye className="w-5 h-5 mb-2" />
+                        <span className="text-xs">SEO</span>
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Context Input */}
+                  <div>
+                    <Label htmlFor="aiContext" className="text-sm font-medium">
+                      Topic or Additional Context
+                    </Label>
+                    <Textarea
+                      id="aiContext"
+                      value={aiContext}
+                      onChange={(e) => setAiContext(e.target.value)}
+                      placeholder="Describe your blog topic, target audience, key points to cover, etc."
+                      className="mt-2"
+                      rows={3}
+                    />
+                  </div>
+
+                  {/* Blog Info Display */}
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h4 className="font-medium mb-2">Current Blog Info:</h4>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="text-gray-600">Title:</span> {formData.title || 'Not set'}
+                      </div>
+                      <div>
+                        <span className="text-gray-600">Category:</span> {formData.category || 'Not set'}
+                      </div>
+                      <div>
+                        <span className="text-gray-600">Tags:</span> {formData.tags.length}
+                      </div>
+                      <div>
+                        <span className="text-gray-600">Content:</span> {formData.content ? `${formData.content.length} chars` : 'Empty'}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Generate Button */}
+                  <Button
+                    onClick={generateAISuggestions}
+                    disabled={aiLoading || (!formData.title && !aiContext)}
+                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                  >
+                    {aiLoading ? (
                       <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                        Saving...
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Generating Suggestions...
                       </>
                     ) : (
                       <>
-                        <Save className="w-4 h-4 mr-2" />
-                        {formData.status === 'published' ? 'Publish Post' : 'Save Draft'}
+                        <Sparkles className="w-4 h-4 mr-2" />
+                        Generate AI Suggestions
                       </>
                     )}
                   </Button>
-                  
-                  {formData.title && formData.slug && (
-                    <Button 
-                      variant="outline" 
-                      className="w-full"
-                      asChild
-                    >
-                      <Link href={`/industry-insight/${formData.slug}`} target="_blank">
-                        <Eye className="w-4 h-4 mr-2" />
-                        Preview Post
-                      </Link>
-                    </Button>
+
+                  {/* AI Suggestions */}
+                  {aiSuggestions && (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-medium">AI Suggestions:</h4>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => copyToClipboard(aiSuggestions)}
+                        >
+                          <Copy className="w-4 h-4 mr-2" />
+                          Copy
+                        </Button>
+                      </div>
+                      <div className="bg-white border rounded-lg p-4 max-h-60 overflow-y-auto">
+                        <pre className="whitespace-pre-wrap text-sm">{aiSuggestions}</pre>
+                      </div>
+                      
+                      <div className="flex gap-2">
+                        {aiMode === 'content' && (
+                          <>
+                            <Button
+                              onClick={() => applyAISuggestion('content')}
+                              size="sm"
+                              className="flex-1"
+                            >
+                              Apply to Content
+                            </Button>
+                            <Button
+                              onClick={() => applyAISuggestion('excerpt')}
+                              variant="outline"
+                              size="sm"
+                              className="flex-1"
+                            >
+                              Apply to Excerpt
+                            </Button>
+                          </>
+                        )}
+                        {aiMode === 'title' && (
+                          <Button
+                            onClick={() => applyAISuggestion('title')}
+                            size="sm"
+                            className="flex-1"
+                          >
+                            Apply First Title
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {!formData.title && !aiContext && (
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                      <p className="text-sm text-yellow-800">
+                        Please enter a blog title or provide context to get AI suggestions.
+                      </p>
+                    </div>
                   )}
                 </div>
               </CardContent>
             </Card>
           </div>
-        </div>
-      </main>
-
-      {/* AI Assistant Floating Button */}
-      <div className="fixed bottom-6 right-6 z-50">
-        <Button
-          onClick={() => setShowAIAssistant(true)}
-          className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-full w-14 h-14"
-          size="lg"
-        >
-          <Sparkles className="w-6 h-6" />
-        </Button>
+        )}
       </div>
-
-      {/* AI Assistant Modal */}
-      {showAIAssistant && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <Card className="w-full max-w-4xl max-h-[90vh] overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-purple-600 to-blue-600 text-white">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <Brain className="w-6 h-6" />
-                  <div>
-                    <CardTitle>AI Blog Assistant</CardTitle>
-                    <CardDescription className="text-purple-100">
-                      Get AI-powered suggestions for your blog content
-                    </CardDescription>
-                  </div>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowAIAssistant(false)}
-                  className="text-white hover:bg-white/20"
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
-              <div className="space-y-6">
-                {/* AI Mode Selection */}
-                <div>
-                  <Label className="text-sm font-medium">What would you like help with?</Label>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">
-                    <Button
-                      variant={aiMode === 'content' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setAiMode('content')}
-                      className="flex flex-col items-center p-4 h-auto"
-                    >
-                      <FileText className="w-5 h-5 mb-2" />
-                      <span className="text-xs">Full Content</span>
-                    </Button>
-                    <Button
-                      variant={aiMode === 'outline' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setAiMode('outline')}
-                      className="flex flex-col items-center p-4 h-auto"
-                    >
-                      <Lightbulb className="w-5 h-5 mb-2" />
-                      <span className="text-xs">Outline</span>
-                    </Button>
-                    <Button
-                      variant={aiMode === 'title' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setAiMode('title')}
-                      className="flex flex-col items-center p-4 h-auto"
-                    >
-                      <Tag className="w-5 h-5 mb-2" />
-                      <span className="text-xs">Title Ideas</span>
-                    </Button>
-                    <Button
-                      variant={aiMode === 'seo' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setAiMode('seo')}
-                      className="flex flex-col items-center p-4 h-auto"
-                    >
-                      <Eye className="w-5 h-5 mb-2" />
-                      <span className="text-xs">SEO</span>
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Context Input */}
-                <div>
-                  <Label htmlFor="aiContext" className="text-sm font-medium">
-                    Topic or Additional Context
-                  </Label>
-                  <Textarea
-                    id="aiContext"
-                    value={aiContext}
-                    onChange={(e) => setAiContext(e.target.value)}
-                    placeholder="Describe your blog topic, target audience, key points to cover, etc."
-                    className="mt-2"
-                    rows={3}
-                  />
-                </div>
-
-                {/* Blog Info Display */}
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="font-medium mb-2">Current Blog Info:</h4>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="text-gray-600">Title:</span> {formData.title || 'Not set'}
-                    </div>
-                    <div>
-                      <span className="text-gray-600">Category:</span> {formData.category || 'Not set'}
-                    </div>
-                    <div>
-                      <span className="text-gray-600">Tags:</span> {formData.tags.length}
-                    </div>
-                    <div>
-                      <span className="text-gray-600">Content:</span> {formData.content ? `${formData.content.length} chars` : 'Empty'}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Generate Button */}
-                <Button
-                  onClick={generateAISuggestions}
-                  disabled={aiLoading || (!formData.title && !aiContext)}
-                  className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
-                >
-                  {aiLoading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Generating Suggestions...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-4 h-4 mr-2" />
-                      Generate AI Suggestions
-                    </>
-                  )}
-                </Button>
-
-                {/* AI Suggestions */}
-                {aiSuggestions && (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-medium">AI Suggestions:</h4>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => copyToClipboard(aiSuggestions)}
-                      >
-                        <Copy className="w-4 h-4 mr-2" />
-                        Copy
-                      </Button>
-                    </div>
-                    <div className="bg-white border rounded-lg p-4 max-h-60 overflow-y-auto">
-                      <pre className="whitespace-pre-wrap text-sm">{aiSuggestions}</pre>
-                    </div>
-                    
-                    <div className="flex gap-2">
-                      {aiMode === 'content' && (
-                        <>
-                          <Button
-                            onClick={() => applyAISuggestion('content')}
-                            size="sm"
-                            className="flex-1"
-                          >
-                            Apply to Content
-                          </Button>
-                          <Button
-                            onClick={() => applyAISuggestion('excerpt')}
-                            variant="outline"
-                            size="sm"
-                            className="flex-1"
-                          >
-                            Apply to Excerpt
-                          </Button>
-                        </>
-                      )}
-                      {aiMode === 'title' && (
-                        <Button
-                          onClick={() => applyAISuggestion('title')}
-                          size="sm"
-                          className="flex-1"
-                        >
-                          Apply First Title
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {!formData.title && !aiContext && (
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                    <p className="text-sm text-yellow-800">
-                      Please enter a blog title or provide context to get AI suggestions.
-                    </p>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-    </div>
+    </PageLayout>
   );
 }

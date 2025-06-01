@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/contexts/AuthContext';
+import PageLayout from '@/components/shared/PageLayout';
 import { 
   ArrowLeft,
   Save, 
@@ -830,31 +831,7 @@ export default function CreateCourse() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Mobile-Optimized Header */}
-      <header className="bg-white shadow-sm border-b sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 gap-4">
-            <div className="flex items-center space-x-3">
-              <BookOpen className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 flex-shrink-0" />
-              <div className="min-w-0">
-                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 truncate">Create Course</h1>
-                <p className="text-sm sm:text-base text-gray-600 hidden sm:block">Add a new course to your platform</p>
-              </div>
-            </div>
-            <div className="flex space-x-2 sm:space-x-3">
-              <Button variant="outline" size="sm" asChild className="flex-1 sm:flex-none">
-                <Link href="/admin">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  <span className="hidden sm:inline">Back to Admin</span>
-                  <span className="sm:hidden">Back</span>
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
-
+    <PageLayout>
       {/* Main Content */}
       <main className="max-w-4xl mx-auto py-4 sm:py-6 px-4 sm:px-6 lg:px-8">
         {/* Mobile-Optimized Progress Steps */}
@@ -2063,6 +2040,6 @@ export default function CreateCourse() {
           </Card>
         </div>
       )}
-    </div>
+    </PageLayout>
   );
 } 
