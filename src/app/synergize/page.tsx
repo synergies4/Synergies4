@@ -36,7 +36,8 @@ import {
   Lightbulb,
   TrendingUp,
   Award,
-  Globe
+  Globe,
+  Download
 } from 'lucide-react';
 
 // Agile roles and their specific capabilities
@@ -136,7 +137,266 @@ interface Message {
   provider?: keyof typeof AI_PROVIDERS;
 }
 
-// Specialized interface components for different modes
+// Slide Presentation Component - replaces chat interface for presentation mode
+const SlidePresentation = ({ 
+  slides, 
+  onClose, 
+  presentationTitle,
+  onExportPDF 
+}: {
+  slides: any[];
+  onClose: () => void;
+  presentationTitle: string;
+  onExportPDF: () => void;
+}) => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showNotes, setShowNotes] = useState(false);
+
+  const nextSlide = () => {
+    if (currentSlide < slides.length - 1) {
+      setCurrentSlide(currentSlide + 1);
+    }
+  };
+
+  const prevSlide = () => {
+    if (currentSlide > 0) {
+      setCurrentSlide(currentSlide - 1);
+    }
+  };
+
+  const goToSlide = (index: number) => {
+    setCurrentSlide(index);
+  };
+
+  const toggleFullscreen = () => {
+    if (!isFullscreen) {
+      document.documentElement.requestFullscreen?.();
+    } else {
+      document.exitFullscreen?.();
+    }
+    setIsFullscreen(!isFullscreen);
+  };
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        prevSlide();
+      } else if (e.key === 'Escape') {
+        setIsFullscreen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [currentSlide, slides.length]);
+
+  if (slides.length === 0) return null;
+
+  const slide = slides[currentSlide];
+
+  return (
+    <div className={`${isFullscreen ? 'fixed inset-0 z-50 bg-black' : 'relative'}`}>
+      {/* Presentation Header */}
+      {!isFullscreen && (
+        <div className="flex items-center justify-between p-4 bg-gray-900 text-white">
+          <div className="flex items-center space-x-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+              className="text-white hover:bg-gray-700"
+            >
+              <ArrowRight className="h-4 w-4 rotate-180 mr-2" />
+              Back to Generator
+            </Button>
+            <h2 className="text-lg font-semibold">{presentationTitle}</h2>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowNotes(!showNotes)}
+              className="text-white hover:bg-gray-700"
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              {showNotes ? 'Hide' : 'Show'} Notes
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleFullscreen}
+              className="text-white hover:bg-gray-700"
+            >
+              <Presentation className="h-4 w-4 mr-2" />
+              Present
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onExportPDF}
+              className="text-white hover:bg-gray-700"
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Export PDF
+            </Button>
+          </div>
+        </div>
+      )}
+
+      <div className={`flex ${isFullscreen ? 'h-screen' : 'h-[600px]'}`}>
+        {/* Slide Thumbnails */}
+        {!isFullscreen && (
+          <div className="w-64 bg-gray-100 border-r overflow-y-auto">
+            <div className="p-4">
+              <h3 className="text-sm font-semibold text-gray-700 mb-3">Slides ({slides.length})</h3>
+              <div className="space-y-2">
+                {slides.map((slideItem, index) => (
+                  <div
+                    key={index}
+                    onClick={() => goToSlide(index)}
+                    className={`p-3 rounded cursor-pointer transition-all ${
+                      currentSlide === index 
+                        ? 'bg-blue-100 border-2 border-blue-500' 
+                        : 'bg-white border border-gray-200 hover:bg-gray-50'
+                    }`}
+                  >
+                    <div className="text-xs font-medium text-gray-600 mb-1">
+                      Slide {slideItem.slideNumber}
+                    </div>
+                    <div className="text-sm font-semibold text-gray-900 truncate">
+                      {slideItem.title}
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      {slideItem.layout}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Main Slide Display */}
+        <div className="flex-1 flex flex-col">
+          {/* Slide Content */}
+          <div className={`flex-1 bg-white flex items-center justify-center p-8 ${isFullscreen ? 'text-white bg-gray-900' : ''}`}>
+            <div className="w-full max-w-4xl">
+              {slide.layout === 'title-slide' ? (
+                <div className="text-center">
+                  <h1 className={`text-4xl md:text-6xl font-bold mb-8 ${isFullscreen ? 'text-white' : 'text-gray-900'}`}>
+                    {slide.title}
+                  </h1>
+                  <div className="space-y-4">
+                    {slide.content.map((item: string, idx: number) => (
+                      <p key={idx} className={`text-xl md:text-2xl ${isFullscreen ? 'text-gray-300' : 'text-gray-600'}`}>
+                        {item}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className={`${slide.layout === 'two-column' ? 'grid grid-cols-2 gap-8' : ''}`}>
+                  <div className={slide.layout === 'two-column' ? '' : 'mb-8'}>
+                    <h2 className={`text-3xl md:text-4xl font-bold mb-6 ${isFullscreen ? 'text-white' : 'text-gray-900'} border-b-2 ${isFullscreen ? 'border-gray-600' : 'border-gray-200'} pb-4`}>
+                      {slide.title}
+                    </h2>
+                    <ul className="space-y-4">
+                      {slide.content.map((item: string, idx: number) => (
+                        <li key={idx} className="flex items-start">
+                          <span className={`w-3 h-3 rounded-full mt-2 mr-4 flex-shrink-0 ${isFullscreen ? 'bg-blue-400' : 'bg-blue-500'}`}></span>
+                          <span className={`text-lg md:text-xl ${isFullscreen ? 'text-gray-200' : 'text-gray-700'}`}>
+                            {item}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  {slide.imageUrl && (
+                    <div className="flex items-center justify-center">
+                      <img 
+                        src={slide.imageUrl} 
+                        alt={`Slide ${slide.slideNumber}`}
+                        className="max-w-full max-h-96 object-contain rounded-lg shadow-lg"
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Navigation Controls */}
+          <div className={`flex items-center justify-between p-4 ${isFullscreen ? 'bg-gray-800 text-white' : 'bg-gray-50 border-t'}`}>
+            <Button
+              variant={isFullscreen ? "ghost" : "outline"}
+              size="sm"
+              onClick={prevSlide}
+              disabled={currentSlide === 0}
+              className={isFullscreen ? "text-white hover:bg-gray-700" : ""}
+            >
+              <ArrowRight className="h-4 w-4 rotate-180 mr-2" />
+              Previous
+            </Button>
+
+            <div className="flex items-center space-x-4">
+              <span className={`text-sm ${isFullscreen ? 'text-gray-300' : 'text-gray-600'}`}>
+                {currentSlide + 1} of {slides.length}
+              </span>
+              <div className="flex space-x-1">
+                {slides.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => goToSlide(index)}
+                    className={`w-2 h-2 rounded-full transition-all ${
+                      currentSlide === index 
+                        ? (isFullscreen ? 'bg-blue-400' : 'bg-blue-500')
+                        : (isFullscreen ? 'bg-gray-600' : 'bg-gray-300')
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <Button
+              variant={isFullscreen ? "ghost" : "outline"}
+              size="sm"
+              onClick={nextSlide}
+              disabled={currentSlide === slides.length - 1}
+              className={isFullscreen ? "text-white hover:bg-gray-700" : ""}
+            >
+              Next
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Speaker Notes Panel */}
+        {showNotes && !isFullscreen && slide.speakerNotes && (
+          <div className="w-80 bg-yellow-50 border-l p-4 overflow-y-auto">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">Speaker Notes</h3>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              {slide.speakerNotes}
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Fullscreen Exit Hint */}
+      {isFullscreen && (
+        <div className="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded text-sm">
+          Press ESC to exit fullscreen
+        </div>
+      )}
+    </div>
+  );
+};
+
 const PresentationGenerator = ({ 
   currentRole, 
   inputMessage, 
@@ -155,6 +415,8 @@ const PresentationGenerator = ({
   const [generatedSlides, setGeneratedSlides] = useState<any[]>([]);
   const [isGeneratingImages, setIsGeneratingImages] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showPresentation, setShowPresentation] = useState(false);
+  const [presentationTitle, setPresentationTitle] = useState('');
 
   const generatePresentation = async () => {
     const prompt = `Create a comprehensive ${slideCount}-slide presentation about "${presentationTopic}" for ${audience} in a ${presentationStyle} style.
@@ -284,7 +546,7 @@ const PresentationGenerator = ({
       <!DOCTYPE html>
       <html>
         <head>
-          <title>${presentationTopic} - Presentation</title>
+          <title>${presentationTitle || presentationTopic} - Presentation</title>
           <style>
             @media print {
               body { margin: 0; }
@@ -320,6 +582,7 @@ const PresentationGenerator = ({
             const presentationData = JSON.parse(jsonMatch[0]);
             if (presentationData.slides) {
               setGeneratedSlides(presentationData.slides);
+              setPresentationTitle(presentationData.title || presentationTopic);
               
               // Generate images if requested
               if (includeImages) {
@@ -333,6 +596,18 @@ const PresentationGenerator = ({
       }
     }
   }, [messages, includeImages]);
+
+  // Show presentation view if slides are generated and user wants to present
+  if (showPresentation && generatedSlides.length > 0) {
+    return (
+      <SlidePresentation
+        slides={generatedSlides}
+        onClose={() => setShowPresentation(false)}
+        presentationTitle={presentationTitle}
+        onExportPDF={exportToPDF}
+      />
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -400,14 +675,23 @@ const PresentationGenerator = ({
         </div>
         
         {generatedSlides.length > 0 && (
-          <Button 
-            onClick={exportToPDF}
-            variant="outline"
-            className="bg-green-50 hover:bg-green-100 border-green-200"
-          >
-            <FileText className="h-4 w-4 mr-2" />
-            Export to PDF
-          </Button>
+          <div className="flex space-x-2">
+            <Button 
+              onClick={() => setShowPresentation(true)}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              <Presentation className="h-4 w-4 mr-2" />
+              Present Slides
+            </Button>
+            <Button 
+              onClick={exportToPDF}
+              variant="outline"
+              className="bg-green-50 hover:bg-green-100 border-green-200"
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Export PDF
+            </Button>
+          </div>
         )}
       </div>
       
@@ -432,9 +716,14 @@ const PresentationGenerator = ({
       {/* Slide Preview */}
       {generatedSlides.length > 0 && (
         <div className="mt-6 space-y-4">
-          <h3 className="text-lg font-semibold">Presentation Preview</h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold">Presentation Preview</h3>
+            <Badge variant="outline" className="bg-blue-50 text-blue-700">
+              {generatedSlides.length} slides ready
+            </Badge>
+          </div>
           <div className="grid gap-4">
-            {generatedSlides.map((slide, index) => (
+            {generatedSlides.slice(0, 3).map((slide, index) => (
               <Card key={index} className="p-4 border-l-4 border-blue-500">
                 <div className="flex items-start justify-between mb-2">
                   <h4 className="font-semibold text-lg">Slide {slide.slideNumber}: {slide.title}</h4>
@@ -443,18 +732,16 @@ const PresentationGenerator = ({
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <ul className="space-y-1 text-sm">
-                      {slide.content.map((item: string, idx: number) => (
+                      {slide.content.slice(0, 3).map((item: string, idx: number) => (
                         <li key={idx} className="flex items-start">
                           <span className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-2 flex-shrink-0"></span>
                           {item}
                         </li>
                       ))}
+                      {slide.content.length > 3 && (
+                        <li className="text-gray-500 text-xs">...and {slide.content.length - 3} more points</li>
+                      )}
                     </ul>
-                    {slide.speakerNotes && (
-                      <div className="mt-3 p-2 bg-gray-50 rounded text-xs">
-                        <strong>Speaker Notes:</strong> {slide.speakerNotes}
-                      </div>
-                    )}
                   </div>
                   {slide.imageUrl && (
                     <div className="text-center">
@@ -468,6 +755,18 @@ const PresentationGenerator = ({
                 </div>
               </Card>
             ))}
+            {generatedSlides.length > 3 && (
+              <div className="text-center p-4 bg-gray-50 rounded-lg">
+                <p className="text-gray-600">...and {generatedSlides.length - 3} more slides</p>
+                <Button 
+                  onClick={() => setShowPresentation(true)}
+                  variant="outline"
+                  className="mt-2"
+                >
+                  View All Slides
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       )}
