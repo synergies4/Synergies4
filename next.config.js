@@ -9,9 +9,6 @@ const nextConfig = {
   },
   // Ensure API routes are treated as serverless functions
   serverExternalPackages: ['@prisma/client', 'bcryptjs'],
-  experimental: {
-    serverComponentsExternalPackages: ['bcryptjs']
-  },
 };
 
 module.exports = nextConfig;
