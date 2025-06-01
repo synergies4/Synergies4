@@ -423,7 +423,8 @@ const PresentationGenerator = ({
     
     As a ${currentRole.name}, structure this presentation to be highly effective for your role's perspective.
     
-    Return the response in this EXACT JSON format:
+    IMPORTANT: Return ONLY valid JSON in this EXACT format (no additional text before or after):
+
     {
       "title": "Presentation Title",
       "slides": [
@@ -433,10 +434,20 @@ const PresentationGenerator = ({
           "content": ["Bullet point 1", "Bullet point 2", "Bullet point 3"],
           "speakerNotes": "Detailed speaker notes for this slide",
           "imagePrompt": "Detailed description for DALL-E image generation",
-          "layout": "title-slide" | "content" | "two-column" | "image-focus"
+          "layout": "title-slide"
+        },
+        {
+          "slideNumber": 2,
+          "title": "Another Slide Title",
+          "content": ["Point 1", "Point 2", "Point 3"],
+          "speakerNotes": "Speaker notes",
+          "imagePrompt": "Image description",
+          "layout": "content"
         }
       ]
     }
+    
+    Layout options: "title-slide", "content", "two-column", "image-focus"
     
     Include these slide types:
     1. Title slide with agenda
@@ -446,7 +457,9 @@ const PresentationGenerator = ({
     
     Make imagePrompt descriptions specific, professional, and suitable for business presentations. Each should be different and relevant to the slide content.
     
-    Ensure the presentation is engaging, actionable, and tailored to the ${currentRole.name} perspective.`;
+    Ensure the presentation is engaging, actionable, and tailored to the ${currentRole.name} perspective.
+    
+    Return ONLY the JSON object, no explanatory text.`;
     
     setInputMessage(prompt);
     await handleSendMessage();
@@ -574,28 +587,67 @@ const PresentationGenerator = ({
   useEffect(() => {
     if (messages.length > 0) {
       const lastMessage = messages[messages.length - 1];
-      if (lastMessage.type === 'ai' && lastMessage.content.includes('"slides"')) {
+      if (lastMessage.type === 'ai' && (lastMessage.content.includes('"slides"') || lastMessage.content.includes('"title"'))) {
         try {
-          // Extract JSON from the response
-          const jsonMatch = lastMessage.content.match(/\{[\s\S]*\}/);
+          // Try multiple approaches to extract JSON
+          let presentationData = null;
+          
+          // Method 1: Look for complete JSON object with proper braces
+          const jsonMatch = lastMessage.content.match(/\{(?:[^{}]|{[^{}]*})*\}/);
           if (jsonMatch) {
-            const presentationData = JSON.parse(jsonMatch[0]);
-            if (presentationData.slides) {
-              setGeneratedSlides(presentationData.slides);
-              setPresentationTitle(presentationData.title || presentationTopic);
-              
-              // Generate images if requested
-              if (includeImages) {
-                generateSlideImages(presentationData.slides).then(setGeneratedSlides);
+            try {
+              presentationData = JSON.parse(jsonMatch[0]);
+            } catch (e) {
+              console.log('Method 1 failed, trying method 2');
+            }
+          }
+          
+          // Method 2: Look for JSON between code blocks
+          if (!presentationData) {
+            const codeBlockMatch = lastMessage.content.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+            if (codeBlockMatch) {
+              try {
+                presentationData = JSON.parse(codeBlockMatch[1]);
+              } catch (e) {
+                console.log('Method 2 failed, trying method 3');
               }
             }
           }
+          
+          // Method 3: Extract everything between first { and last }
+          if (!presentationData) {
+            const firstBrace = lastMessage.content.indexOf('{');
+            const lastBrace = lastMessage.content.lastIndexOf('}');
+            if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+              try {
+                const jsonStr = lastMessage.content.substring(firstBrace, lastBrace + 1);
+                presentationData = JSON.parse(jsonStr);
+              } catch (e) {
+                console.log('Method 3 failed');
+              }
+            }
+          }
+          
+          // If we successfully parsed the data and it has slides
+          if (presentationData && presentationData.slides && Array.isArray(presentationData.slides)) {
+            console.log('Successfully parsed presentation data:', presentationData);
+            setGeneratedSlides(presentationData.slides);
+            setPresentationTitle(presentationData.title || presentationTopic);
+            
+            // Generate images if requested
+            if (includeImages) {
+              generateSlideImages(presentationData.slides).then(setGeneratedSlides);
+            }
+          } else {
+            console.log('No valid presentation data found in response');
+          }
         } catch (error) {
           console.error('Failed to parse presentation data:', error);
+          console.log('Raw message content:', lastMessage.content);
         }
       }
     }
-  }, [messages, includeImages]);
+  }, [messages, includeImages, presentationTopic]);
 
   // Show presentation view if slides are generated and user wants to present
   if (showPresentation && generatedSlides.length > 0) {
