@@ -2,6 +2,7 @@
   "name": "synergies4",
   "version": "0.1.0",
   "private": true,
+  "description": "AI-powered learning platform with course and blog AI assistants",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
