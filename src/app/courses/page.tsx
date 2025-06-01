@@ -232,7 +232,7 @@ function CourseDirectorySection() {
                     <img 
                       src={course.image || getDefaultImage(course.category)}
                       alt={course.title}
-                      className="w-full h-48 lg:h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.src = getDefaultImage(course.category);

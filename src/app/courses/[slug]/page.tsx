@@ -32,23 +32,12 @@ import {
   Zap,
   TrendingUp,
   BarChart3,
-  Brain
+  Brain,
+  Video,
+  Link as LinkIcon,
+  File,
+  FileText
 } from 'lucide-react';
-
-// Animation variants
-const fadeInUp = {
-  initial: { opacity: 0, y: 60 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.6, ease: [0.6, -0.05, 0.01, 0.99] }
-};
-
-const staggerContainer = {
-  animate: {
-    transition: {
-      staggerChildren: 0.1
-    }
-  }
-};
 
 // Interfaces
 interface Course {
@@ -86,13 +75,6 @@ interface Module {
   lessons: Lesson[];
 }
 
-// Scroll-triggered animation hook
-function useScrollAnimation() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-  return { ref, isInView };
-}
-
 export default function CoursePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
   const { user, loading: authLoading } = useAuth();
@@ -105,9 +87,6 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
     enrollment: any;
   } | null>(null);
   const [enrolling, setEnrolling] = useState(false);
-
-  const { scrollYProgress } = useScroll();
-  const heroY = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);
 
   useEffect(() => {
     fetchCourseData();
@@ -352,25 +331,20 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
   return (
     <PageLayout>
       <main className="min-h-screen">
-        {/* Hero Section */}
-        <section 
-          className="relative bg-gradient-to-br from-blue-900 via-blue-800 to-purple-900 text-white overflow-hidden"
-          style={{ y: heroY }}
-        >
+        {/* Hero Section - Fixed height and no parallax */}
+        <section className="relative bg-gradient-to-br from-blue-900 via-blue-800 to-purple-900 text-white overflow-hidden min-h-[600px] flex items-center">
           {/* Background Elements */}
           <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute top-20 right-10 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
-            <div className="absolute bottom-20 left-10 w-24 h-24 bg-white/10 rounded-lg blur-lg"></div>
+            <div className="absolute top-20 right-10 w-32 h-32 bg-white/10 rounded-full blur-xl animate-float"></div>
+            <div className="absolute bottom-20 left-10 w-24 h-24 bg-white/10 rounded-lg blur-lg animate-float-delayed"></div>
           </div>
 
-          <div className="container mx-auto px-4 py-20 relative z-10">
-            <div
-              className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
-            >
+          <div className="container mx-auto px-4 py-12 relative z-10 w-full">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               {/* Course Info */}
-              <div className="space-y-6">
+              <div className="space-y-6 animate-fade-in-up">
                 <div className="flex items-center space-x-4 mb-4">
-                  <Button variant="outline" size="sm" asChild className="text-white border-white/30 hover:bg-white/10">
+                  <Button variant="outline" size="sm" asChild className="text-white border-white/30 hover:bg-white/10 transition-all duration-300">
                     <Link href="/courses">
                       <ArrowLeft className="w-4 h-4 mr-2" />
                       Back to Courses
@@ -390,23 +364,23 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                 </p>
 
                 <div className="flex flex-wrap gap-4 text-sm">
-                  <div className="flex items-center">
+                  <div className="flex items-center bg-white/10 px-3 py-2 rounded-lg">
                     <Target className="w-4 h-4 mr-2" />
                     <span>{course.level}</span>
                   </div>
                   {course.duration && (
-                    <div className="flex items-center">
+                    <div className="flex items-center bg-white/10 px-3 py-2 rounded-lg">
                       <Clock className="w-4 h-4 mr-2" />
                       <span>{course.duration}</span>
                     </div>
                   )}
-                  <div className="flex items-center">
+                  <div className="flex items-center bg-white/10 px-3 py-2 rounded-lg">
                     <Award className="w-4 h-4 mr-2" />
                     <span>Certificate Included</span>
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-4">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6">
                   <div className="text-3xl font-bold">
                     {formatPrice(course.price)}
                   </div>
@@ -415,8 +389,8 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
               </div>
 
               {/* Course Image */}
-              <div className="relative">
-                <div className="relative overflow-hidden rounded-2xl shadow-2xl">
+              <div className="relative animate-fade-in-up animation-delay-200">
+                <div className="relative overflow-hidden rounded-2xl shadow-2xl transform hover:scale-105 transition-transform duration-300">
                   <img 
                     src={course.image || getDefaultImage(course.category)}
                     alt={course.title}
@@ -427,33 +401,34 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                     }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                  <div className="absolute inset-0 bg-blue-500/10"></div>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Course Content */}
-        <section className="py-20 bg-white">
+        {/* Course Content - Removed sticky behavior */}
+        <section className="py-20 bg-white relative">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
               {/* Main Content */}
               <div className="lg:col-span-2 space-y-12">
                 {/* Description */}
-                <div>
+                <div className="animate-fade-in-up">
                   <h2 className="text-3xl font-bold text-gray-900 mb-6">Course Overview</h2>
                   <div className="prose prose-lg max-w-none text-gray-700">
-                    <p>{course.description}</p>
+                    <p className="text-lg leading-relaxed">{course.description}</p>
                   </div>
                 </div>
 
                 {/* Course Modules */}
                 {modules.length > 0 && (
-                  <div>
+                  <div className="animate-fade-in-up animation-delay-200">
                     <h2 className="text-3xl font-bold text-gray-900 mb-6">Course Curriculum</h2>
                     <div className="space-y-4">
                       {modules.map((module, index) => (
-                        <Card key={module.id} className="border-l-4 border-l-blue-500">
+                        <Card key={module.id} className="border-l-4 border-l-blue-500 hover:shadow-lg transition-shadow duration-300">
                           <CardHeader>
                             <CardTitle className="flex items-center justify-between">
                               <span>Module {module.order_num}: {module.title}</span>
@@ -470,9 +445,11 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                             <CardContent>
                               <div className="space-y-2">
                                 {module.lessons.map((lesson) => (
-                                  <div key={lesson.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                  <div key={lesson.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200">
                                     <div className="flex items-center space-x-3">
-                                      {getContentTypeIcon(lesson.content)}
+                                      <div className={`p-1 rounded ${getContentTypeColor(lesson.content)}`}>
+                                        {getContentTypeIcon(lesson.content)}
+                                      </div>
                                       <span className="font-medium">{lesson.title}</span>
                                     </div>
                                     {lesson.duration && (
@@ -488,71 +465,85 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                     </div>
                   </div>
                 )}
-              </div>
-
-              {/* Sidebar */}
-              <div className="space-y-8">
-                {/* Course Stats */}
-                <div>
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Course Details</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-gray-600">Level</span>
-                        <Badge variant="outline">{course.level}</Badge>
-                      </div>
-                      {course.duration && (
-                        <div className="flex items-center justify-between">
-                          <span className="text-gray-600">Duration</span>
-                          <span className="font-medium">{course.duration}</span>
-                        </div>
-                      )}
-                      <div className="flex items-center justify-between">
-                        <span className="text-gray-600">Category</span>
-                        <span className="font-medium">{course.category}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-gray-600">Certificate</span>
-                        <CheckCircle className="w-5 h-5 text-green-500" />
-                      </div>
-                      <Separator />
-                      <div className="flex items-center justify-between text-lg font-bold">
-                        <span>Price</span>
-                        <span className="text-blue-600">{formatPrice(course.price)}</span>
-                      </div>
-                      <div className="pt-4">
-                        {getEnrollmentButton()}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
 
                 {/* What You'll Learn */}
-                <div>
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>What You'll Learn</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3">
-                        {[
-                          'Master the fundamentals and advanced concepts',
-                          'Apply knowledge through practical exercises',
-                          'Gain industry-recognized certification',
-                          'Access to exclusive resources and community',
-                          'Lifetime access to course materials'
-                        ].map((item, index) => (
-                          <div key={index} className="flex items-start space-x-3">
-                            <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                            <span className="text-gray-700">{item}</span>
-                          </div>
-                        ))}
+                <div className="animate-fade-in-up animation-delay-300">
+                  <h2 className="text-3xl font-bold text-gray-900 mb-6">What You'll Learn</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {[
+                      'Master core concepts and methodologies',
+                      'Apply practical skills in real-world scenarios',
+                      'Develop strategic thinking capabilities',
+                      'Build confidence in your expertise',
+                      'Network with industry professionals',
+                      'Earn a recognized certification'
+                    ].map((item, index) => (
+                      <div key={index} className="flex items-start space-x-3 p-4 bg-blue-50 rounded-lg">
+                        <CheckCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                        <span className="text-gray-700">{item}</span>
                       </div>
-                    </CardContent>
-                  </Card>
+                    ))}
+                  </div>
                 </div>
+              </div>
+
+              {/* Sidebar - Fixed positioning removed */}
+              <div className="space-y-8">
+                {/* Course Stats */}
+                <Card className="animate-fade-in-up animation-delay-400">
+                  <CardHeader>
+                    <CardTitle>Course Details</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Level</span>
+                      <Badge variant="outline">{course.level}</Badge>
+                    </div>
+                    {course.duration && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600">Duration</span>
+                        <span className="font-medium">{course.duration}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Category</span>
+                      <span className="font-medium">{course.category}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Certificate</span>
+                      <CheckCircle className="w-5 h-5 text-green-600" />
+                    </div>
+                    <Separator />
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-blue-600 mb-2">
+                        {formatPrice(course.price)}
+                      </div>
+                      {getEnrollmentButton()}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Course Features */}
+                <Card className="animate-fade-in-up animation-delay-500">
+                  <CardHeader>
+                    <CardTitle>Course Features</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {[
+                      { icon: <BookOpen className="w-4 h-4" />, text: 'Comprehensive curriculum' },
+                      { icon: <Users className="w-4 h-4" />, text: 'Expert instructors' },
+                      { icon: <Award className="w-4 h-4" />, text: 'Industry certification' },
+                      { icon: <Clock className="w-4 h-4" />, text: 'Flexible scheduling' },
+                      { icon: <Globe className="w-4 h-4" />, text: 'Online access' },
+                      { icon: <MessageSquare className="w-4 h-4" />, text: 'Community support' }
+                    ].map((feature, index) => (
+                      <div key={index} className="flex items-center space-x-3">
+                        <div className="text-blue-600">{feature.icon}</div>
+                        <span className="text-gray-700">{feature.text}</span>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
               </div>
             </div>
           </div>
