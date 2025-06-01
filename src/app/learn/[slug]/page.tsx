@@ -96,6 +96,9 @@ export default function LearnCoursePage({ params }: { params: Promise<{ slug: st
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'lesson' | 'quiz'>('lesson');
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [lessonNotes, setLessonNotes] = useState<Record<string, string>>({});
+  const [showNotes, setShowNotes] = useState(false);
 
   const createCourseSlug = (title: string) => {
     return title
@@ -298,6 +301,23 @@ export default function LearnCoursePage({ params }: { params: Promise<{ slug: st
     return totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
   };
 
+  const checkCourseCompletion = () => {
+    const progress = calculateOverallProgress();
+    if (progress === 100 && !showCompletionModal) {
+      setShowCompletionModal(true);
+    }
+  };
+
+  // Check for completion whenever lesson progress updates
+  useEffect(() => {
+    checkCourseCompletion();
+  }, [lessonProgress]);
+
+  const generateCertificate = () => {
+    // This would integrate with a certificate generation service
+    alert('Certificate generation coming soon! You will receive your certificate via email.');
+  };
+
   const renderLessonContent = () => {
     if (!currentLesson) return null;
 
@@ -370,19 +390,65 @@ export default function LearnCoursePage({ params }: { params: Promise<{ slug: st
             </Link>
           </Button>
 
-          {getNextLesson() && (
-            <Button onClick={() => {
-              const next = getNextLesson();
-              if (next) {
-                setCurrentLesson(next.lesson);
-                setCurrentModule(next.module);
-              }
-            }}>
-              Next Lesson
-              <SkipForward className="ml-2 h-4 w-4" />
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowNotes(!showNotes)}
+              className={showNotes ? 'bg-blue-50 border-blue-300' : ''}
+            >
+              <FileText className="mr-2 h-4 w-4" />
+              {showNotes ? 'Hide Notes' : 'Take Notes'}
             </Button>
-          )}
+
+            {getNextLesson() && (
+              <Button onClick={() => {
+                const next = getNextLesson();
+                if (next) {
+                  setCurrentLesson(next.lesson);
+                  setCurrentModule(next.module);
+                }
+              }}>
+                Next Lesson
+                <SkipForward className="ml-2 h-4 w-4" />
+              </Button>
+            )}
+          </div>
         </div>
+
+        {/* Notes Section */}
+        <AnimatePresence>
+          {showNotes && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Card className="mt-6">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    My Notes for this Lesson
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <textarea
+                    value={lessonNotes[currentLesson.id] || ''}
+                    onChange={(e) => setLessonNotes(prev => ({
+                      ...prev,
+                      [currentLesson.id]: e.target.value
+                    }))}
+                    placeholder="Take notes about this lesson..."
+                    className="w-full h-32 p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  <p className="text-xs text-gray-500 mt-2">
+                    Your notes are saved automatically and will be available when you return to this lesson.
+                  </p>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     );
   };
@@ -420,6 +486,64 @@ export default function LearnCoursePage({ params }: { params: Promise<{ slug: st
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* Navigation Header */}
+      <motion.nav 
+        className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b shadow-sm"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            >
+              <Link href="/" className="flex items-center">
+                <motion.span 
+                  className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover:from-blue-700 hover:to-purple-700 transition-all duration-300"
+                  whileHover={{ 
+                    scale: 1.02,
+                    textShadow: "0 0 8px rgba(59, 130, 246, 0.5)"
+                  }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                >
+                  Synergies4
+                </motion.span>
+              </Link>
+            </motion.div>
+            
+            <div className="hidden md:flex items-center space-x-6">
+              <Button variant="ghost" asChild>
+                <Link href={`/courses/${resolvedParams.slug}`}>
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Course Details
+                </Link>
+              </Button>
+              <Button variant="ghost" asChild>
+                <Link href="/courses">All Courses</Link>
+              </Button>
+            </div>
+            
+            <div className="flex items-center space-x-3">
+              {user && (
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-gray-600">Welcome, {user.email}</span>
+                  <Button variant="outline" size="sm" onClick={async () => {
+                    const { createClient } = await import('@/lib/supabase/client');
+                    const supabase = createClient();
+                    await supabase.auth.signOut();
+                    window.location.href = '/';
+                  }}>
+                    Logout
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </motion.nav>
+
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <motion.div
@@ -570,6 +694,88 @@ export default function LearnCoursePage({ params }: { params: Promise<{ slug: st
           </motion.div>
         </div>
       </div>
+
+      {/* Course Completion Modal */}
+      <AnimatePresence>
+        {showCompletionModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowCompletionModal(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, y: 50 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.8, y: 50 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              className="bg-white rounded-2xl p-8 max-w-md w-full text-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2, type: "spring", stiffness: 300, damping: 20 }}
+              >
+                <Award className="h-16 w-16 text-yellow-500 mx-auto mb-4" />
+              </motion.div>
+              
+              <motion.h2
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="text-2xl font-bold text-gray-900 mb-2"
+              >
+                🎉 Congratulations!
+              </motion.h2>
+              
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="text-gray-600 mb-6"
+              >
+                You've successfully completed <strong>{course?.title}</strong>! 
+                You're now ready to apply your new skills.
+              </motion.p>
+              
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="space-y-3"
+              >
+                <Button 
+                  onClick={generateCertificate}
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                >
+                  <Award className="mr-2 h-4 w-4" />
+                  Get Certificate
+                </Button>
+                
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowCompletionModal(false)}
+                  className="w-full"
+                >
+                  Continue Learning
+                </Button>
+                
+                <Button 
+                  variant="ghost" 
+                  asChild
+                  className="w-full"
+                >
+                  <Link href="/courses">
+                    Explore More Courses
+                  </Link>
+                </Button>
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

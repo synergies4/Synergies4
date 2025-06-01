@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar, Clock, User, Search, ArrowRight, Menu, X, FileText, Lightbulb } from 'lucide-react';
+import { Calendar, Clock, User, Search, ArrowRight, Menu, X, FileText, Lightbulb, MessageSquare } from 'lucide-react';
 import { UserAvatar } from '@/components/UserAvatar';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -213,6 +213,38 @@ export default function IndustryInsightPage() {
                   </Link>
                 </motion.div>
               ))}
+              
+              {/* Distinctive Contact Button */}
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7, duration: 0.5 }}
+              >
+                <motion.div
+                  whileHover={{ scale: 1.02, y: -1 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                >
+                  <Button 
+                    asChild 
+                    className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
+                  >
+                    <Link href="/contact">
+                      {/* Subtle shine effect */}
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                        initial={{ x: '-100%' }}
+                        whileHover={{ x: '100%' }}
+                        transition={{ duration: 0.6, ease: "easeInOut" }}
+                      />
+                      <span className="relative z-10 flex items-center">
+                        <MessageSquare className="w-4 h-4 mr-2" />
+                        Contact
+                      </span>
+                    </Link>
+                  </Button>
+                </motion.div>
+              </motion.div>
             </div>
             
             {/* Desktop Auth */}
@@ -275,12 +307,42 @@ export default function IndustryInsightPage() {
                         item === 'Industry Insight' ? '/industry-insight' :
                         `/${item.toLowerCase().replace(' ', '-')}`
                       }
-                      className="block text-gray-600 hover:text-blue-600 transition-colors font-medium py-2 text-lg"
+                      className={`block text-gray-600 hover:text-blue-600 transition-colors font-medium py-2 text-lg ${
+                        item === 'Industry Insight' ? 'text-blue-600 font-semibold' : ''
+                      }`}
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       {item}
                     </Link>
                   ))}
+                  
+                  {/* Distinctive Contact Button for Mobile */}
+                  <div className="pt-2">
+                    <motion.div
+                      whileHover={{ scale: 1.02, y: -1 }}
+                      whileTap={{ scale: 0.98 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                    >
+                      <Button 
+                        asChild 
+                        className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group text-lg py-3"
+                      >
+                        <Link href="/contact" onClick={() => setMobileMenuOpen(false)}>
+                          {/* Subtle shine effect */}
+                          <motion.div
+                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                            initial={{ x: '-100%' }}
+                            whileHover={{ x: '100%' }}
+                            transition={{ duration: 0.6, ease: "easeInOut" }}
+                          />
+                          <span className="relative z-10 flex items-center justify-center">
+                            <MessageSquare className="w-4 h-4 mr-2" />
+                            Contact Us
+                          </span>
+                        </Link>
+                      </Button>
+                    </motion.div>
+                  </div>
                   
                   {/* Mobile Auth */}
                   <div className="pt-4 border-t space-y-3">

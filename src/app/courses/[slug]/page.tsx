@@ -2,12 +2,14 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { motion, useScroll, useTransform, useInView } from 'framer-motion';
+import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'framer-motion';
 import { useRef, useState, useEffect, use } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { UserAvatar } from '@/components/UserAvatar';
+import { useAuth } from '@/contexts/AuthContext';
 import { 
   ArrowLeft,
   ArrowRight, 
@@ -24,7 +26,10 @@ import {
   FileText,
   Link as LinkIcon,
   File,
-  Play
+  Play,
+  MessageSquare,
+  Menu,
+  X
 } from 'lucide-react';
 
 // Animation variants
@@ -87,6 +92,7 @@ function useScrollAnimation() {
 
 export default function CoursePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
+  const { user, loading: authLoading } = useAuth();
   const [course, setCourse] = useState<Course | null>(null);
   const [modules, setModules] = useState<Module[]>([]);
   const [loading, setLoading] = useState(true);
@@ -96,6 +102,7 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
     enrollment: any;
   } | null>(null);
   const [enrolling, setEnrolling] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const { scrollYProgress } = useScroll();
   const heroY = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);
@@ -351,14 +358,17 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
               whileHover={{ scale: 1.05 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
-              <Link href="/">
-                <Image 
-                  src="/synergies4_logo.jpeg" 
-                  alt="Synergies4 Logo" 
-                  width={150} 
-                  height={72} 
-                  className="h-10 w-auto"
-                />
+              <Link href="/" className="flex items-center">
+                <motion.span 
+                  className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover:from-blue-700 hover:to-purple-700 transition-all duration-300"
+                  whileHover={{ 
+                    scale: 1.02,
+                    textShadow: "0 0 8px rgba(59, 130, 246, 0.5)"
+                  }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                >
+                  Synergies4
+                </motion.span>
               </Link>
             </motion.div>
             
@@ -387,22 +397,161 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                   </Link>
                 </motion.div>
               ))}
+              
+              {/* Distinctive Contact Button */}
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7, duration: 0.5 }}
+              >
+                <motion.div
+                  whileHover={{ scale: 1.02, y: -1 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                >
+                  <Button 
+                    asChild 
+                    className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
+                  >
+                    <Link href="/contact">
+                      {/* Subtle shine effect */}
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                        initial={{ x: '-100%' }}
+                        whileHover={{ x: '100%' }}
+                        transition={{ duration: 0.6, ease: "easeInOut" }}
+                      />
+                      <span className="relative z-10 flex items-center">
+                        <MessageSquare className="w-4 h-4 mr-2" />
+                        Contact
+                      </span>
+                    </Link>
+                  </Button>
+                </motion.div>
+              </motion.div>
             </div>
             
             <motion.div 
-              className="flex items-center space-x-3"
+              className="hidden md:flex items-center space-x-3"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.5, duration: 0.5 }}
             >
-              <Button variant="ghost" asChild>
-                <Link href="/login">Login</Link>
-              </Button>
-              <Button asChild>
-                <Link href="/signup">Sign Up</Link>
-              </Button>
+              {user ? (
+                <UserAvatar />
+              ) : (
+                <>
+                  <Button variant="ghost" asChild className="hover:bg-blue-50 hover:text-blue-600 transition-colors">
+                    <Link href="/login">Login</Link>
+                  </Button>
+                  <Button asChild className="bg-blue-600 hover:bg-blue-700 transition-colors">
+                    <Link href="/signup">Sign Up</Link>
+                  </Button>
+                </>
+              )}
             </motion.div>
+
+            {/* Mobile Menu Button */}
+            <div className="md:hidden">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="p-2"
+              >
+                {mobileMenuOpen ? (
+                  <X className="h-6 w-6" />
+                ) : (
+                  <Menu className="h-6 w-6" />
+                )}
+              </Button>
+            </div>
           </div>
+
+          {/* Mobile Menu */}
+          <AnimatePresence>
+            {mobileMenuOpen && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="md:hidden border-t bg-white/95 backdrop-blur-md overflow-hidden"
+              >
+                <div className="px-4 py-4 space-y-4">
+                  {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item) => (
+                    <Link
+                      key={item}
+                      href={
+                        item === 'About Us' ? '/about-us' :
+                        item === 'Courses' ? '/courses' :
+                        item === 'Coaching' ? '/coaching' : 
+                        item === 'Consulting' ? '/consulting' : 
+                        item === 'Industry Insight' ? '/industry-insight' :
+                        `/${item.toLowerCase().replace(' ', '-')}`
+                      }
+                      className={`block text-gray-600 hover:text-blue-600 transition-colors font-medium py-2 text-lg ${
+                        item === 'Courses' ? 'text-blue-600 font-semibold' : ''
+                      }`}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {item}
+                    </Link>
+                  ))}
+                  
+                  {/* Distinctive Contact Button for Mobile */}
+                  <div className="pt-2">
+                    <motion.div
+                      whileHover={{ scale: 1.02, y: -1 }}
+                      whileTap={{ scale: 0.98 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                    >
+                      <Button 
+                        asChild 
+                        className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group text-lg py-3"
+                      >
+                        <Link href="/contact" onClick={() => setMobileMenuOpen(false)}>
+                          {/* Subtle shine effect */}
+                          <motion.div
+                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                            initial={{ x: '-100%' }}
+                            whileHover={{ x: '100%' }}
+                            transition={{ duration: 0.6, ease: "easeInOut" }}
+                          />
+                          <span className="relative z-10 flex items-center justify-center">
+                            <MessageSquare className="w-4 h-4 mr-2" />
+                            Contact Us
+                          </span>
+                        </Link>
+                      </Button>
+                    </motion.div>
+                  </div>
+                  
+                  {/* Mobile Auth */}
+                  <div className="pt-4 border-t space-y-3">
+                    {user ? (
+                      <div className="flex items-center space-x-2">
+                        <UserAvatar />
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        <Button variant="ghost" className="w-full justify-start text-lg py-3" asChild>
+                          <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                            Login
+                          </Link>
+                        </Button>
+                        <Button className="w-full text-lg py-3" asChild>
+                          <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
+                            Sign Up
+                          </Link>
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </motion.nav>
 

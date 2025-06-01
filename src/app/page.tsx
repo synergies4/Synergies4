@@ -350,7 +350,7 @@ export default function Home() {
                 className="md:hidden border-t bg-white/95 backdrop-blur-md overflow-hidden"
               >
                 <div className="px-4 py-4 space-y-4">
-                  {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight', 'Contact'].map((item) => (
+                  {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item) => (
                     <Link
                       key={item}
                       href={
@@ -359,7 +359,6 @@ export default function Home() {
                         item === 'Coaching' ? '/coaching' : 
                         item === 'Consulting' ? '/consulting' : 
                         item === 'Industry Insight' ? '/industry-insight' :
-                        item === 'Contact' ? '/contact' :
                         `/${item.toLowerCase().replace(' ', '-')}`
                       }
                       className="block text-gray-600 hover:text-blue-600 transition-colors font-medium py-2 text-lg"
@@ -368,6 +367,34 @@ export default function Home() {
                       {item}
                     </Link>
                   ))}
+                  
+                  {/* Distinctive Contact Button for Mobile */}
+                  <div className="pt-2">
+                    <motion.div
+                      whileHover={{ scale: 1.02, y: -1 }}
+                      whileTap={{ scale: 0.98 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                    >
+                      <Button 
+                        asChild 
+                        className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group text-lg py-3"
+                      >
+                        <Link href="/contact" onClick={() => setMobileMenuOpen(false)}>
+                          {/* Subtle shine effect */}
+                          <motion.div
+                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                            initial={{ x: '-100%' }}
+                            whileHover={{ x: '100%' }}
+                            transition={{ duration: 0.6, ease: "easeInOut" }}
+                          />
+                          <span className="relative z-10 flex items-center justify-center">
+                            <MessageSquare className="w-4 h-4 mr-2" />
+                            Contact Us
+                          </span>
+                        </Link>
+                      </Button>
+                    </motion.div>
+                  </div>
                   
                   {/* Mobile Auth */}
                   <div className="pt-4 border-t space-y-3">
@@ -1154,13 +1181,13 @@ function CertificationsSection() {
                   <div className="mb-4">
                     <div className="flex justify-between text-xs text-gray-500 mb-1">
                       <span>Course Completion</span>
-                      <span>{Math.floor(Math.random() * 40) + 60}%</span>
+                      <span>{60 + (index * 7) % 40}%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <motion.div 
                         className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full"
                         initial={{ width: 0 }}
-                        animate={isInView ? { width: `${Math.floor(Math.random() * 40) + 60}%` } : { width: 0 }}
+                        animate={isInView ? { width: `${60 + (index * 7) % 40}%` } : { width: 0 }}
                         transition={{ delay: 0.5 + index * 0.1, duration: 1 }}
                       />
                     </div>

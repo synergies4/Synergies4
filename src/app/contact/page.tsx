@@ -252,7 +252,7 @@ export default function Contact() {
                 className="md:hidden border-t bg-white/95 backdrop-blur-md overflow-hidden"
               >
                 <div className="px-4 py-4 space-y-4">
-                  {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight', 'Contact'].map((item) => (
+                  {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item) => (
                     <Link
                       key={item}
                       href={
@@ -261,7 +261,6 @@ export default function Contact() {
                         item === 'Coaching' ? '/coaching' : 
                         item === 'Consulting' ? '/consulting' : 
                         item === 'Industry Insight' ? '/industry-insight' :
-                        item === 'Contact' ? '/contact' :
                         `/${item.toLowerCase().replace(' ', '-')}`
                       }
                       className="block text-gray-600 hover:text-blue-600 transition-colors font-medium py-2 text-lg"
@@ -270,6 +269,25 @@ export default function Contact() {
                       {item}
                     </Link>
                   ))}
+                  
+                  {/* Distinctive Contact Button for Mobile - Active State */}
+                  <div className="pt-2">
+                    <motion.div
+                      whileHover={{ scale: 1.02, y: -1 }}
+                      whileTap={{ scale: 0.98 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                    >
+                      <Button 
+                        asChild 
+                        className="w-full bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-lg text-lg py-3 cursor-default"
+                      >
+                        <div className="flex items-center justify-center">
+                          <MessageSquare className="w-4 h-4 mr-2" />
+                          Contact Us (Current)
+                        </div>
+                      </Button>
+                    </motion.div>
+                  </div>
                   
                   {/* Mobile Auth */}
                   <div className="pt-4 border-t space-y-3">
