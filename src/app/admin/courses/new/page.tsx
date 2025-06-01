@@ -418,20 +418,36 @@ export default function CreateCourse() {
           Context: ${aiContext}`;
           break;
         case 'quiz':
-          prompt = `Generate 10 quiz questions for the course "${formData.title}" (${formData.category}, ${formData.level} level). Include multiple choice, true/false, and short answer questions. Format as JSON:
+          prompt = `Generate 10 quiz questions for the course "${formData.title}" (${formData.category}, ${formData.level} level). Include multiple choice, true/false, and short answer questions. 
+          
+          IMPORTANT: Return ONLY valid JSON in this EXACT format (no additional text before or after):
+
           {
             "questions": [
               {
-                "question": "Question text",
+                "question": "What is the core principle of Agile methodology?",
                 "type": "MULTIPLE_CHOICE",
-                "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
-                "correctAnswer": "Option 1",
-                "explanation": "Why this is correct",
+                "options": ["Embrace change", "Follow rigid plans", "Avoid feedback", "Focus only on documentation"],
+                "correctAnswer": "Embrace change",
+                "explanation": "Agile methodology emphasizes embracing change over following a rigid plan",
                 "points": 5
+              },
+              {
+                "question": "Scrum sprints are typically 2-4 weeks long",
+                "type": "TRUE_FALSE", 
+                "options": ["True", "False"],
+                "correctAnswer": "True",
+                "explanation": "Standard Scrum sprints are indeed 2-4 weeks in duration",
+                "points": 3
               }
             ]
           }
-          Context: ${aiContext}`;
+
+          Generate questions that test understanding of key concepts. Use these exact field names: "question", "type", "options", "correctAnswer", "explanation", "points".
+          Question types: "MULTIPLE_CHOICE", "TRUE_FALSE", "SHORT_ANSWER"
+          Context: ${aiContext}
+
+          Return ONLY the JSON object, no explanatory text.`;
           break;
         case 'content':
           prompt = `Suggest specific content ideas for the course "${formData.title}" including:
@@ -663,45 +679,126 @@ export default function CreateCourse() {
         break;
       case 'modules':
         try {
-          const moduleData = JSON.parse(aiSuggestions);
-          if (moduleData.modules) {
+          // Try multiple approaches to extract JSON
+          let moduleData = null;
+          
+          // Method 1: Try direct parsing first
+          try {
+            moduleData = JSON.parse(aiSuggestions);
+          } catch (e) {
+            // Method 2: Look for JSON between code blocks
+            const codeBlockMatch = aiSuggestions.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+            if (codeBlockMatch) {
+              try {
+                moduleData = JSON.parse(codeBlockMatch[1]);
+              } catch (e2) {
+                // Method 3: Extract everything between first { and last }
+                const firstBrace = aiSuggestions.indexOf('{');
+                const lastBrace = aiSuggestions.lastIndexOf('}');
+                if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+                  const jsonStr = aiSuggestions.substring(firstBrace, lastBrace + 1);
+                  moduleData = JSON.parse(jsonStr);
+                }
+              }
+            }
+          }
+          
+          if (moduleData && moduleData.modules && Array.isArray(moduleData.modules)) {
             const newModules = moduleData.modules.map((mod: any, index: number) => ({
               id: Date.now().toString() + index,
-              title: mod.title,
-              description: mod.description,
+              title: mod.title || mod.name || mod.moduleName || `Module ${index + 1}`,
+              description: mod.description || mod.desc || mod.summary || '',
               order: index + 1,
               contents: []
             }));
-            setFormData(prev => ({ ...prev, modules: newModules }));
+            
+            // Validate that we have valid modules
+            if (newModules.length > 0 && newModules[0].title) {
+              setFormData(prev => ({ ...prev, modules: newModules }));
+              setShowAIAssistant(false);
+              return;
+            } else {
+              throw new Error('No valid modules found in the parsed data');
+            }
+          } else {
+            throw new Error('Invalid JSON structure - expected "modules" array');
           }
         } catch (error) {
           console.error('Failed to parse module data:', error);
-          alert('Failed to apply module suggestions. Please copy and paste manually.');
+          console.log('Raw AI suggestions:', aiSuggestions);
+          
+          // Provide more helpful error message
+          const errorMessage = error instanceof Error 
+            ? `Failed to parse module data: ${error.message}. Please copy and paste manually.`
+            : 'Failed to apply module suggestions. Please copy and paste manually.';
+          
+          alert(errorMessage);
         }
         break;
       case 'quiz':
         try {
-          const quizData = JSON.parse(aiSuggestions);
-          if (quizData.questions) {
+          // Try multiple approaches to extract JSON
+          let quizData = null;
+          
+          // Method 1: Try direct parsing first
+          try {
+            quizData = JSON.parse(aiSuggestions);
+          } catch (e) {
+            // Method 2: Look for JSON between code blocks
+            const codeBlockMatch = aiSuggestions.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+            if (codeBlockMatch) {
+              try {
+                quizData = JSON.parse(codeBlockMatch[1]);
+              } catch (e2) {
+                // Method 3: Extract everything between first { and last }
+                const firstBrace = aiSuggestions.indexOf('{');
+                const lastBrace = aiSuggestions.lastIndexOf('}');
+                if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+                  const jsonStr = aiSuggestions.substring(firstBrace, lastBrace + 1);
+                  quizData = JSON.parse(jsonStr);
+                }
+              }
+            }
+          }
+          
+          if (quizData && quizData.questions && Array.isArray(quizData.questions)) {
             const newQuiz = {
               id: Date.now().toString(),
               title: `${formData.title} Quiz`,
               description: 'Test your knowledge',
               questions: quizData.questions.map((q: any, index: number) => ({
                 id: Date.now().toString() + index,
-                question_text: q.question,
-                question_type: q.type,
-                options: q.options || [],
-                correct_answer: q.correctAnswer,
-                explanation: q.explanation,
-                points: q.points || 5
+                // Handle multiple possible field name variations
+                question_text: q.question || q.question_text || q.questionText || '',
+                question_type: q.type || q.question_type || q.questionType || 'MULTIPLE_CHOICE',
+                options: q.options || q.choices || q.answers || [],
+                correct_answer: q.correctAnswer || q.correct_answer || q.answer || q.solution || '',
+                explanation: q.explanation || q.rationale || q.reasoning || '',
+                points: q.points || q.score || 5
               }))
             };
-            setFormData(prev => ({ ...prev, quiz: newQuiz }));
+            
+            // Validate that we have valid questions
+            if (newQuiz.questions.length > 0 && newQuiz.questions[0].question_text) {
+              setFormData(prev => ({ ...prev, quiz: newQuiz }));
+              setShowAIAssistant(false);
+              return;
+            } else {
+              throw new Error('No valid questions found in the parsed data');
+            }
+          } else {
+            throw new Error('Invalid JSON structure - expected "questions" array');
           }
         } catch (error) {
           console.error('Failed to parse quiz data:', error);
-          alert('Failed to apply quiz suggestions. Please copy and paste manually.');
+          console.log('Raw AI suggestions:', aiSuggestions);
+          
+          // Provide more helpful error message
+          const errorMessage = error instanceof Error 
+            ? `Failed to parse quiz data: ${error.message}. Please copy and paste manually.`
+            : 'Failed to apply quiz suggestions. Please copy and paste manually.';
+          
+          alert(errorMessage);
         }
         break;
     }
