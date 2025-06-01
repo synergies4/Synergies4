@@ -166,11 +166,43 @@ export default function Coaching() {
                 </motion.div>
               ))}
               
-              {/* Distinctive Contact Button */}
+              {/* Synergize Button */}
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7, duration: 0.5 }}
+              >
+                <motion.div
+                  whileHover={{ scale: 1.02, y: -1 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                >
+                  <Button 
+                    asChild 
+                    className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
+                  >
+                    <Link href="/synergize">
+                      {/* Subtle shine effect */}
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                        initial={{ x: '-100%' }}
+                        whileHover={{ x: '100%' }}
+                        transition={{ duration: 0.6, ease: "easeInOut" }}
+                      />
+                      <span className="relative z-10 flex items-center">
+                        <Brain className="w-4 h-4 mr-2" />
+                        Synergize
+                      </span>
+                    </Link>
+                  </Button>
+                </motion.div>
+              </motion.div>
+              
+              {/* Distinctive Contact Button */}
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8, duration: 0.5 }}
               >
                 <motion.div
                   whileHover={{ scale: 1.02, y: -1 }}
@@ -267,8 +299,28 @@ export default function Coaching() {
                     </Link>
                   ))}
                   
-                  {/* Distinctive Contact Button for Mobile */}
-                  <div className="pt-2">
+                  {/* Mobile Buttons */}
+                  <div className="pt-2 space-y-3">
+                    {/* Synergize Button for Mobile */}
+                    <motion.div
+                      whileHover={{ scale: 1.02, y: -1 }}
+                      whileTap={{ scale: 0.98 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                    >
+                      <Button 
+                        asChild 
+                        className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group text-lg py-3"
+                      >
+                        <Link href="/synergize" onClick={() => setMobileMenuOpen(false)}>
+                          <span className="relative z-10 flex items-center justify-center">
+                            <Brain className="w-4 h-4 mr-2" />
+                            Synergize
+                          </span>
+                        </Link>
+                      </Button>
+                    </motion.div>
+                    
+                    {/* Contact Button for Mobile */}
                     <motion.div
                       whileHover={{ scale: 1.02, y: -1 }}
                       whileTap={{ scale: 0.98 }}

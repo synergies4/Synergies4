@@ -661,6 +661,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6, ease: [0.6, -0.05, 0.01, 0.99] }}
+            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
             <motion.div
               whileHover={{ 
@@ -687,6 +688,37 @@ export default function Home() {
                   <span className="relative z-10 flex items-center">
                     Boost Your Career – Explore Courses
                     <ArrowRight className="h-4 w-4 md:h-5 md:w-5 ml-2 transition-transform group-hover:translate-x-1" />
+                  </span>
+                </Link>
+              </Button>
+            </motion.div>
+
+            <motion.div
+              whileHover={{ 
+                scale: 1.02,
+                y: -2
+              }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ type: "spring", stiffness: 400, damping: 25 }}
+            >
+              <Button 
+                size="lg" 
+                variant="outline"
+                className="text-base md:text-lg px-6 md:px-8 py-4 md:py-6 w-full sm:w-auto border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group" 
+                asChild
+              >
+                <Link href="/synergize">
+                  {/* Subtle shine effect */}
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-600/20 to-transparent"
+                    initial={{ x: '-100%' }}
+                    whileHover={{ x: '100%' }}
+                    transition={{ duration: 0.6, ease: "easeInOut" }}
+                  />
+                  
+                  <span className="relative z-10 flex items-center">
+                    <Brain className="h-4 w-4 md:h-5 md:w-5 mr-2" />
+                    Try Synergize AI
                   </span>
                 </Link>
               </Button>
