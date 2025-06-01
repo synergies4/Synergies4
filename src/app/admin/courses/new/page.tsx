@@ -111,7 +111,7 @@ export default function CreateCourse() {
   
   // AI Assistant State
   const [showAIAssistant, setShowAIAssistant] = useState(false);
-  const [aiMode, setAiMode] = useState<'title' | 'description' | 'category' | 'modules' | 'quiz' | 'content' | 'pricing' | 'marketing' | 'imageIdeas'>('description');
+  const [aiMode, setAiMode] = useState<'title' | 'description' | 'shortDesc' | 'category' | 'modules' | 'quiz' | 'content' | 'pricing' | 'marketing' | 'imageIdeas'>('description');
   const [aiContext, setAiContext] = useState('');
   const [aiSuggestions, setAiSuggestions] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
@@ -120,12 +120,13 @@ export default function CreateCourse() {
   const [showModuleAI, setShowModuleAI] = useState<{[key: string]: boolean}>({});
 
   // Define AI mode type
-  type AiModeType = 'title' | 'description' | 'category' | 'modules' | 'quiz' | 'content' | 'pricing' | 'marketing' | 'imageIdeas';
+  type AiModeType = 'title' | 'description' | 'shortDesc' | 'category' | 'modules' | 'quiz' | 'content' | 'pricing' | 'marketing' | 'imageIdeas';
 
   // Memoized AI mode options for performance
   const aiModeOptions = useMemo(() => [
     { mode: 'title' as AiModeType, icon: Sparkles, label: 'Title Ideas', shortLabel: 'Title' },
     { mode: 'description' as AiModeType, icon: FileText, label: 'Description', shortLabel: 'Description' },
+    { mode: 'shortDesc' as AiModeType, icon: FileText, label: 'Short Description', shortLabel: 'Short Desc' },
     { mode: 'category' as AiModeType, icon: Tag, label: 'Category', shortLabel: 'Category' },
     { mode: 'modules' as AiModeType, icon: BookOpen, label: 'Modules', shortLabel: 'Modules' },
     { mode: 'quiz' as AiModeType, icon: HelpCircle, label: 'Quiz', shortLabel: 'Quiz' },
@@ -144,6 +145,10 @@ export default function CreateCourse() {
     description: {
       title: 'Generate Course Description',
       description: 'Create a comprehensive course description with learning objectives and benefits.'
+    },
+    shortDesc: {
+      title: 'Generate Short Description',
+      description: 'Create a concise, engaging short description perfect for course cards and previews.'
     },
     category: {
       title: 'Suggest Course Category',
@@ -374,6 +379,9 @@ export default function CreateCourse() {
           break;
         case 'description':
           prompt = `Create a comprehensive course description for "${formData.title}" - a ${formData.category} course for ${formData.level} level students. Include learning objectives, what students will gain, and why they should take this course. Context: ${aiContext}`;
+          break;
+        case 'shortDesc':
+          prompt = `Create a concise, engaging short description (150-200 characters) for the course "${formData.title}" - a ${formData.category} course. This will be used for course cards and previews. Make it compelling and highlight the key benefit. Context: ${aiContext}`;
           break;
         case 'category':
           prompt = `Based on the course title "${formData.title}" and this context: ${aiContext}, suggest the most appropriate category from these options: Agile & Scrum, Leadership, Product Management, Mental Fitness, Technology, Business. Provide the top 3 category recommendations with brief explanations for why each would be suitable.`;
