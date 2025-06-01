@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -167,26 +166,17 @@ export default function StudentDashboard() {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
         <div className="container mx-auto px-4 py-6 md:py-8">
           {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-6 md:mb-8"
-          >
+          <div className="mb-6 md:mb-8">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
               Welcome back, {userProfile?.name || user?.email}!
             </h1>
             <p className="text-gray-600 text-sm md:text-base">
               Continue your learning journey and track your progress.
             </p>
-          </motion.div>
+          </div>
 
           {/* Stats Cards */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8"
-          >
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
             <Card>
               <CardContent className="p-4 md:p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
@@ -234,14 +224,10 @@ export default function StudentDashboard() {
                 </div>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
 
           {/* Main Content */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
+          <div>
             <Tabs defaultValue="courses" className="space-y-4 md:space-y-6">
               <TabsList className="grid w-full grid-cols-3 h-auto">
                 <TabsTrigger value="courses" className="text-xs md:text-sm py-2 md:py-3">My Courses</TabsTrigger>
@@ -275,11 +261,8 @@ export default function StudentDashboard() {
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
                     {enrollments.map((enrollment) => (
-                      <motion.div
+                      <div
                         key={enrollment.id}
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.1 }}
                       >
                         <Card className="h-full hover:shadow-lg transition-shadow">
                           <div className="aspect-video relative overflow-hidden rounded-t-lg">
@@ -348,7 +331,7 @@ export default function StudentDashboard() {
                             </div>
                           </CardContent>
                         </Card>
-                      </motion.div>
+                      </div>
                     ))}
                   </div>
                 )}
@@ -462,7 +445,7 @@ export default function StudentDashboard() {
                 </div>
               </TabsContent>
             </Tabs>
-          </motion.div>
+          </div>
         </div>
       </div>
     </PageLayout>

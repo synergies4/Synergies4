@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'framer-motion';
 import { useRef, useState, useEffect, use } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,14 +22,17 @@ import {
   Target,
   GraduationCap,
   Loader2,
-  Video,
-  FileText,
-  Link as LinkIcon,
-  File,
   Play,
+  Download,
+  Share2,
+  Heart,
   MessageSquare,
-  Menu,
-  X
+  Calendar,
+  Globe,
+  Zap,
+  TrendingUp,
+  BarChart3,
+  Brain
 } from 'lucide-react';
 
 // Animation variants
@@ -351,7 +353,7 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
     <PageLayout>
       <main className="min-h-screen">
         {/* Hero Section */}
-        <motion.section 
+        <section 
           className="relative bg-gradient-to-br from-blue-900 via-blue-800 to-purple-900 text-white overflow-hidden"
           style={{ y: heroY }}
         >
@@ -362,14 +364,11 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
           </div>
 
           <div className="container mx-auto px-4 py-20 relative z-10">
-            <motion.div
-              initial="initial"
-              animate="animate"
-              variants={staggerContainer}
+            <div
               className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
             >
               {/* Course Info */}
-              <motion.div variants={fadeInUp} className="space-y-6">
+              <div className="space-y-6">
                 <div className="flex items-center space-x-4 mb-4">
                   <Button variant="outline" size="sm" asChild className="text-white border-white/30 hover:bg-white/10">
                     <Link href="/courses">
@@ -413,10 +412,10 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                   </div>
                   {getEnrollmentButton()}
                 </div>
-              </motion.div>
+              </div>
 
               {/* Course Image */}
-              <motion.div variants={fadeInUp} className="relative">
+              <div className="relative">
                 <div className="relative overflow-hidden rounded-2xl shadow-2xl">
                   <img 
                     src={course.image || getDefaultImage(course.category)}
@@ -429,10 +428,10 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                 </div>
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
           </div>
-        </motion.section>
+        </section>
 
         {/* Course Content */}
         <section className="py-20 bg-white">
@@ -441,24 +440,16 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
               {/* Main Content */}
               <div className="lg:col-span-2 space-y-12">
                 {/* Description */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                >
+                <div>
                   <h2 className="text-3xl font-bold text-gray-900 mb-6">Course Overview</h2>
                   <div className="prose prose-lg max-w-none text-gray-700">
                     <p>{course.description}</p>
                   </div>
-                </motion.div>
+                </div>
 
                 {/* Course Modules */}
                 {modules.length > 0 && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                  >
+                  <div>
                     <h2 className="text-3xl font-bold text-gray-900 mb-6">Course Curriculum</h2>
                     <div className="space-y-4">
                       {modules.map((module, index) => (
@@ -495,18 +486,14 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                         </Card>
                       ))}
                     </div>
-                  </motion.div>
+                  </div>
                 )}
               </div>
 
               {/* Sidebar */}
               <div className="space-y-8">
                 {/* Course Stats */}
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.4 }}
-                >
+                <div>
                   <Card>
                     <CardHeader>
                       <CardTitle>Course Details</CardTitle>
@@ -540,14 +527,10 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                       </div>
                     </CardContent>
                   </Card>
-                </motion.div>
+                </div>
 
                 {/* What You'll Learn */}
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.5 }}
-                >
+                <div>
                   <Card>
                     <CardHeader>
                       <CardTitle>What You'll Learn</CardTitle>
@@ -569,7 +552,7 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                       </div>
                     </CardContent>
                   </Card>
-                </motion.div>
+                </div>
               </div>
             </div>
           </div>

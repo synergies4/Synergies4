@@ -1,15 +1,25 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, Mail, Lock, User, Eye, EyeOff, CheckCircle } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
+import { useAuth } from '@/contexts/AuthContext';
+import { 
+  Eye, 
+  EyeOff, 
+  Loader2, 
+  Mail, 
+  Lock,
+  User,
+  ArrowLeft,
+  Github,
+  Chrome
+} from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
 export default function Signup() {
@@ -80,11 +90,7 @@ export default function Signup() {
   if (success) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-md"
-        >
+        <div className="w-full max-w-md">
           <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-sm text-center">
             <CardContent className="pt-8 pb-6">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -96,19 +102,14 @@ export default function Signup() {
               </p>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-md"
-      >
+      <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-block">
             <Image
@@ -228,13 +229,9 @@ export default function Signup() {
               </div>
 
               {error && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-sm text-destructive bg-destructive/10 p-3 rounded-md"
-                >
+                <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
                   {error}
-                </motion.div>
+                </div>
               )}
 
               <Button
@@ -271,7 +268,7 @@ export default function Signup() {
             </div>
           </CardFooter>
         </Card>
-      </motion.div>
+      </div>
     </div>
   );
 } 

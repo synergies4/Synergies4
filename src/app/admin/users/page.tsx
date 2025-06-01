@@ -1,22 +1,28 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { useAuth } from '@/contexts/AuthContext';
-import { UserAvatar } from '@/components/UserAvatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useAuth } from '@/contexts/AuthContext';
+import { 
+  Users, 
+  Search, 
+  Filter, 
+  MoreHorizontal, 
+  UserPlus,
+  ArrowLeft,
+  Shield,
+  Mail,
+  Calendar,
+  Loader2
+} from 'lucide-react';
+import { UserAvatar } from '@/components/UserAvatar';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,20 +34,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { 
-  Loader2, 
-  Users, 
-  Shield, 
-  User,
-  Home,
-  Search,
-  MoreHorizontal,
-  Trash2,
-  Edit,
-  Mail,
-  Calendar
-} from 'lucide-react';
-import { Input } from '@/components/ui/input';
 import { createClient } from '@/lib/supabase/client';
 
 interface UserData {
@@ -321,10 +313,7 @@ export default function UserManagement() {
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
+          <div className="flex-1">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Users</CardTitle>
@@ -337,13 +326,9 @@ export default function UserManagement() {
                 </p>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
+          <div className="flex-1">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Admins</CardTitle>
@@ -358,13 +343,9 @@ export default function UserManagement() {
                 </p>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
+          <div className="flex-1">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Instructors</CardTitle>
@@ -379,13 +360,9 @@ export default function UserManagement() {
                 </p>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
+          <div className="flex-1">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Students</CardTitle>
@@ -400,16 +377,11 @@ export default function UserManagement() {
                 </p>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
         </div>
 
         {/* Filters and Search */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="mb-6"
-        >
+        <div className="mb-6">
           <Card>
             <CardHeader>
               <CardTitle>Filters</CardTitle>
@@ -443,100 +415,94 @@ export default function UserManagement() {
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
 
         {/* Users Table */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle>Users ({filteredUsers.length})</CardTitle>
-              <CardDescription>
-                Manage user accounts and permissions
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {filteredUsers.map((userData) => (
-                  <div key={userData.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-                    <div className="flex items-center space-x-4">
-                      <Avatar>
-                        <AvatarFallback className="bg-blue-100 text-blue-600">
-                          {getInitials(userData.name, userData.email)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <div className="flex items-center space-x-2">
-                          <h4 className="font-medium text-gray-900">
-                            {userData.name || 'No name'}
-                          </h4>
-                          <Badge variant={getRoleBadgeVariant(userData.role)}>
-                            {userData.role}
-                          </Badge>
+        <Card>
+          <CardHeader>
+            <CardTitle>Users ({filteredUsers.length})</CardTitle>
+            <CardDescription>
+              Manage user accounts and permissions
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {filteredUsers.map((userData) => (
+                <div key={userData.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                  <div className="flex items-center space-x-4">
+                    <Avatar>
+                      <AvatarFallback className="bg-blue-100 text-blue-600">
+                        {getInitials(userData.name, userData.email)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <div className="flex items-center space-x-2">
+                        <h4 className="font-medium text-gray-900">
+                          {userData.name || 'No name'}
+                        </h4>
+                        <Badge variant={getRoleBadgeVariant(userData.role)}>
+                          {userData.role}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center space-x-4 text-sm text-gray-500">
+                        <div className="flex items-center space-x-1">
+                          <Mail className="h-3 w-3" />
+                          <span>{userData.email}</span>
                         </div>
-                        <div className="flex items-center space-x-4 text-sm text-gray-500">
-                          <div className="flex items-center space-x-1">
-                            <Mail className="h-3 w-3" />
-                            <span>{userData.email}</span>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <Calendar className="h-3 w-3" />
-                            <span>Joined {new Date(userData.created_at).toLocaleDateString()}</span>
-                          </div>
-                          <span>{userData.enrollments_count} enrollments</span>
+                        <div className="flex items-center space-x-1">
+                          <Calendar className="h-3 w-3" />
+                          <span>Joined {new Date(userData.created_at).toLocaleDateString()}</span>
                         </div>
+                        <span>{userData.enrollments_count} enrollments</span>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Select
-                        value={userData.role}
-                        onValueChange={(value) => handleRoleChange(userData.id, value)}
-                      >
-                        <SelectTrigger className="w-32">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="USER">Student</SelectItem>
-                          <SelectItem value="INSTRUCTOR">Instructor</SelectItem>
-                          <SelectItem value="ADMIN">Admin</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Delete User</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Are you sure you want to delete {userData.name || userData.email}? 
-                              This action cannot be undone and will remove all their data.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleDeleteUser(userData.id)}
-                              className="bg-red-600 hover:bg-red-700"
-                            >
-                              Delete User
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+                  <div className="flex items-center space-x-2">
+                    <Select
+                      value={userData.role}
+                      onValueChange={(value) => handleRoleChange(userData.id, value)}
+                    >
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="USER">Student</SelectItem>
+                        <SelectItem value="INSTRUCTOR">Instructor</SelectItem>
+                        <SelectItem value="ADMIN">Admin</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete User</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to delete {userData.name || userData.email}? 
+                            This action cannot be undone and will remove all their data.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleDeleteUser(userData.id)}
+                            className="bg-red-600 hover:bg-red-700"
+                          >
+                            Delete User
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </main>
     </div>
   );

@@ -1,42 +1,36 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { useAuth } from '@/contexts/AuthContext';
 import { 
-  Loader2, 
-  BookOpen, 
-  Shield, 
-  Home,
   ArrowLeft,
-  Plus,
-  X,
-  Upload,
-  Save,
+  Save, 
+  Plus, 
+  Trash2, 
+  Upload, 
+  BookOpen,
+  Clock,
+  Users,
+  DollarSign,
+  Target,
+  Award,
+  Loader2,
   Eye,
+  Edit,
+  FileText,
   Video,
   Link as LinkIcon,
-  FileText,
-  HelpCircle,
-  Trash2,
-  ChevronLeft,
-  ChevronRight,
-  Check
+  CheckCircle
 } from 'lucide-react';
 
 interface ModuleContent {
@@ -473,7 +467,7 @@ export default function CreateCourse() {
                       ? 'bg-blue-600 border-blue-600 text-white' 
                       : 'border-gray-300 text-gray-500'
                   }`}>
-                    {currentStep > step.number ? <Check className="w-4 h-4" /> : step.number}
+                    {currentStep > step.number ? <CheckCircle className="w-4 h-4" /> : step.number}
                   </div>
                   <div className="ml-2 min-w-0">
                     <p className={`text-xs font-medium truncate ${
@@ -502,7 +496,7 @@ export default function CreateCourse() {
                       ? 'bg-blue-600 border-blue-600 text-white' 
                       : 'border-gray-300 text-gray-500'
                   }`}>
-                    {currentStep > step.number ? <Check className="w-5 h-5" /> : step.number}
+                    {currentStep > step.number ? <CheckCircle className="w-5 h-5" /> : step.number}
                   </div>
                   <div className="ml-3">
                     <p className={`text-sm font-medium ${
@@ -528,11 +522,7 @@ export default function CreateCourse() {
           <CardContent className="p-4 sm:p-6">
             {/* Step 1: Basic Info */}
             {currentStep === 1 && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="space-y-4 sm:space-y-6"
-              >
+              <div className="space-y-4 sm:space-y-6">
                 <div>
                   <Label htmlFor="title" className="text-sm font-medium">Course Title *</Label>
                   <Input
@@ -583,16 +573,12 @@ export default function CreateCourse() {
                     </SelectContent>
                   </Select>
                 </div>
-              </motion.div>
+              </div>
             )}
 
             {/* Step 2: Details */}
             {currentStep === 2 && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="space-y-4 sm:space-y-6"
-              >
+              <div className="space-y-4 sm:space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="level" className="text-sm font-medium">Level *</Label>
@@ -670,16 +656,12 @@ export default function CreateCourse() {
                   />
                   <Label htmlFor="featured" className="text-sm font-medium">Featured Course</Label>
                 </div>
-              </motion.div>
+              </div>
             )}
 
             {/* Step 3: Content */}
             {currentStep === 3 && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="space-y-4 sm:space-y-6"
-              >
+              <div className="space-y-4 sm:space-y-6">
                 <div>
                   <h3 className="text-lg font-semibold mb-4">Course Modules</h3>
                   
@@ -857,16 +839,12 @@ export default function CreateCourse() {
                     </Card>
                   ))}
                 </div>
-              </motion.div>
+              </div>
             )}
 
             {/* Step 4: Quiz */}
             {currentStep === 4 && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="space-y-4 sm:space-y-6"
-              >
+              <div className="space-y-4 sm:space-y-6">
                 <div>
                   <h3 className="text-lg font-semibold mb-4">Course Quiz (Optional)</h3>
                   
@@ -1001,16 +979,12 @@ export default function CreateCourse() {
                     </div>
                   )}
                 </div>
-              </motion.div>
+              </div>
             )}
 
             {/* Step 5: Review */}
             {currentStep === 5 && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="space-y-4 sm:space-y-6"
-              >
+              <div className="space-y-4 sm:space-y-6">
                 <div>
                   <h3 className="text-lg font-semibold mb-4">Review & Publish</h3>
                   
@@ -1087,7 +1061,7 @@ export default function CreateCourse() {
                     </Button>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             )}
           </CardContent>
         </Card>
