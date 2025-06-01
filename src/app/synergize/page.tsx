@@ -929,11 +929,10 @@ const ScenarioSimulator = ({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent 
-                    className="z-[9999999] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
+                    className="z-[50] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
                     position="popper"
                     sideOffset={4}
                     align="start"
-                    sticky="always"
                     onCloseAutoFocus={(e) => e.preventDefault()}
                     onEscapeKeyDown={(e) => e.preventDefault()}
                   >
@@ -993,11 +992,10 @@ const ScenarioSimulator = ({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent 
-                    className="z-[9999999] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
+                    className="z-[50] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
                     position="popper"
                     sideOffset={4}
                     align="start"
-                    sticky="always"
                     onCloseAutoFocus={(e) => e.preventDefault()}
                     onEscapeKeyDown={(e) => e.preventDefault()}
                   >
@@ -1145,11 +1143,10 @@ const RoleBasedAdvisor = ({
                 <SelectValue placeholder="Select a challenge..." />
               </SelectTrigger>
               <SelectContent 
-                className="z-[9999999] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
+                className="z-[50] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
                 position="popper"
                 sideOffset={4}
                 align="start"
-                sticky="always"
                 onCloseAutoFocus={(e) => e.preventDefault()}
                 onEscapeKeyDown={(e) => e.preventDefault()}
               >
@@ -1190,11 +1187,10 @@ const RoleBasedAdvisor = ({
                 <SelectValue placeholder="Select experience..." />
               </SelectTrigger>
               <SelectContent 
-                className="z-[9999999] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
+                className="z-[50] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
                 position="popper"
                 sideOffset={4}
                 align="start"
-                sticky="always"
                 onCloseAutoFocus={(e) => e.preventDefault()}
                 onEscapeKeyDown={(e) => e.preventDefault()}
               >
@@ -1622,7 +1618,7 @@ export default function SynergizeAgile() {
             </div>
 
             {/* Configuration Panel */}
-            <Card className="mb-8 bg-gradient-to-r from-blue-50 to-purple-50 border-0 shadow-lg sticky top-4 z-[9999]">
+            <Card className="mb-8 bg-gradient-to-r from-blue-50 to-purple-50 border-0 shadow-lg relative">
               <CardHeader>
                 <CardTitle className="text-center text-xl">Configure Your Training Session</CardTitle>
               </CardHeader>
@@ -1660,11 +1656,10 @@ export default function SynergizeAgile() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent 
-                            className="z-[9999999] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
+                            className="z-[50] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
                             position="popper"
                             sideOffset={4}
                             align="start"
-                            sticky="always"
                             onCloseAutoFocus={(e) => e.preventDefault()}
                             onEscapeKeyDown={(e) => e.preventDefault()}
                           >
@@ -1721,11 +1716,10 @@ export default function SynergizeAgile() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent 
-                            className="z-[9999999] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
+                            className="z-[50] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
                             position="popper"
                             sideOffset={4}
                             align="start"
-                            sticky="always"
                             onCloseAutoFocus={(e) => e.preventDefault()}
                             onEscapeKeyDown={(e) => e.preventDefault()}
                           >
@@ -1782,11 +1776,10 @@ export default function SynergizeAgile() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent 
-                            className="z-[9999999] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
+                            className="z-[50] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
                             position="popper"
                             sideOffset={4}
                             align="start"
-                            sticky="always"
                             onCloseAutoFocus={(e) => e.preventDefault()}
                             onEscapeKeyDown={(e) => e.preventDefault()}
                           >
@@ -1816,7 +1809,7 @@ export default function SynergizeAgile() {
             </Card>
 
             {/* Chat Interface */}
-            <Card className="h-[600px] flex flex-col border-0 shadow-xl overflow-hidden relative z-[1]">
+            <Card className="h-[600px] flex flex-col border-0 shadow-xl overflow-hidden relative">
               <CardHeader className={`bg-gradient-to-r ${currentRole.color} text-white rounded-t-lg flex-shrink-0`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
@@ -1926,7 +1919,7 @@ export default function SynergizeAgile() {
                 </div>
 
                 {/* Specialized Mode Interface */}
-                <div className="border-t bg-white p-4 flex-shrink-0 max-h-[300px] overflow-y-auto relative z-[200]">
+                <div className="border-t bg-white p-4 flex-shrink-0 max-h-[300px] overflow-y-auto relative">
                   {selectedMode === 'presentation' && (
                     <PresentationGenerator
                       currentRole={currentRole}
