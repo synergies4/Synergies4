@@ -152,77 +152,187 @@ const PresentationGenerator = ({
   const [audience, setAudience] = useState('');
   const [includeImages, setIncludeImages] = useState(true);
   const [presentationStyle, setPresentationStyle] = useState('professional');
+  const [generatedSlides, setGeneratedSlides] = useState<any[]>([]);
+  const [isGeneratingImages, setIsGeneratingImages] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const generatePresentation = async () => {
-    const imagePrompt = includeImages ? 
-      `\n\nFor each slide, also generate a detailed image description that I can use to create visuals. Make the image descriptions specific, professional, and relevant to the content.` : '';
-    
     const prompt = `Create a comprehensive ${slideCount}-slide presentation about "${presentationTopic}" for ${audience} in a ${presentationStyle} style.
     
     As a ${currentRole.name}, structure this presentation to be highly effective for your role's perspective.
     
-    For each slide, provide:
-    1. **Slide Number & Title**
-    2. **Main Content** (3-5 key bullet points)
-    3. **Speaker Notes** (detailed talking points)
-    4. **Visual Elements** (charts, diagrams, or layout suggestions)
-    ${imagePrompt}
-    5. **Transition Notes** (how to move to next slide)
+    Return the response in this EXACT JSON format:
+    {
+      "title": "Presentation Title",
+      "slides": [
+        {
+          "slideNumber": 1,
+          "title": "Slide Title",
+          "content": ["Bullet point 1", "Bullet point 2", "Bullet point 3"],
+          "speakerNotes": "Detailed speaker notes for this slide",
+          "imagePrompt": "Detailed description for DALL-E image generation",
+          "layout": "title-slide" | "content" | "two-column" | "image-focus"
+        }
+      ]
+    }
     
-    Format the presentation with clear slide breaks using "--- SLIDE X ---" headers.
+    Include these slide types:
+    1. Title slide with agenda
+    2. Content slides with 3-5 bullet points each
+    3. Visual/diagram slides
+    4. Conclusion with call-to-action
     
-    Include:
-    - Opening hook and agenda
-    - Clear learning objectives
-    - Interactive elements or discussion points
-    - Strong conclusion with call-to-action
-    - Q&A preparation notes
+    Make imagePrompt descriptions specific, professional, and suitable for business presentations. Each should be different and relevant to the slide content.
     
-    Make this presentation engaging, actionable, and tailored to the ${currentRole.name} perspective.`;
+    Ensure the presentation is engaging, actionable, and tailored to the ${currentRole.name} perspective.`;
     
     setInputMessage(prompt);
     await handleSendMessage();
+  };
+
+  const generateSlideImages = async (slides: any[]) => {
+    if (!includeImages) return slides;
     
-    // If images are requested, generate them after the presentation
-    if (includeImages) {
-      setTimeout(async () => {
+    setIsGeneratingImages(true);
+    const updatedSlides = [...slides];
+    
+    for (let i = 0; i < slides.length; i++) {
+      setCurrentImageIndex(i + 1);
+      const slide = slides[i];
+      
+      try {
+        const imagePrompt = `Professional business presentation slide: ${slide.imagePrompt}. Modern, clean design with ${presentationStyle} style. High quality, suitable for corporate presentation. 16:9 aspect ratio.`;
+        
+        const imageResponse = await fetch('/api/generate-image', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            prompt: imagePrompt,
+            provider: 'openai'
+          })
+        });
+        
+        if (imageResponse.ok) {
+          const imageData = await imageResponse.json();
+          updatedSlides[i] = {
+            ...slide,
+            imageUrl: imageData.imageUrl
+          };
+        }
+      } catch (error) {
+        console.error(`Failed to generate image for slide ${i + 1}:`, error);
+      }
+      
+      // Small delay to avoid rate limiting
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    
+    setIsGeneratingImages(false);
+    setCurrentImageIndex(0);
+    return updatedSlides;
+  };
+
+  const exportToPDF = async () => {
+    if (generatedSlides.length === 0) return;
+    
+    // Create a new window with the presentation
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+    
+    const slideHTML = generatedSlides.map((slide, index) => `
+      <div class="slide" style="
+        width: 210mm;
+        height: 148mm;
+        padding: 20mm;
+        margin-bottom: 10mm;
+        background: white;
+        border: 1px solid #ddd;
+        page-break-after: always;
+        font-family: 'Arial', sans-serif;
+        position: relative;
+        box-sizing: border-box;
+      ">
+        <div style="display: flex; height: 100%; ${slide.layout === 'two-column' ? 'flex-direction: row;' : 'flex-direction: column;'}">
+          ${slide.layout === 'title-slide' ? `
+            <div style="text-align: center; display: flex; flex-direction: column; justify-content: center; height: 100%;">
+              <h1 style="font-size: 36px; color: #1e40af; margin-bottom: 20px;">${slide.title}</h1>
+              <div style="font-size: 18px; color: #666;">
+                ${slide.content.map((item: string) => `<p style="margin: 10px 0;">${item}</p>`).join('')}
+              </div>
+            </div>
+          ` : `
+            <div style="${slide.layout === 'two-column' ? 'flex: 1; padding-right: 20px;' : 'flex: 1;'}">
+              <h2 style="font-size: 28px; color: #1e40af; margin-bottom: 20px; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">${slide.title}</h2>
+              <ul style="font-size: 16px; line-height: 1.6; color: #374151;">
+                ${slide.content.map((item: string) => `<li style="margin-bottom: 10px;">${item}</li>`).join('')}
+              </ul>
+            </div>
+            ${slide.imageUrl ? `
+              <div style="${slide.layout === 'two-column' ? 'flex: 1;' : 'margin-top: 20px;'} text-align: center;">
+                <img src="${slide.imageUrl}" style="max-width: 100%; max-height: ${slide.layout === 'two-column' ? '300px' : '200px'}; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" />
+              </div>
+            ` : ''}
+          `}
+        </div>
+        <div style="position: absolute; bottom: 10mm; right: 20mm; font-size: 12px; color: #9ca3af;">
+          Slide ${slide.slideNumber} of ${generatedSlides.length}
+        </div>
+      </div>
+    `).join('');
+    
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>${presentationTopic} - Presentation</title>
+          <style>
+            @media print {
+              body { margin: 0; }
+              .slide { page-break-after: always; }
+            }
+            body { margin: 0; padding: 20px; background: #f5f5f5; }
+          </style>
+        </head>
+        <body>
+          ${slideHTML}
+        </body>
+      </html>
+    `);
+    
+    printWindow.document.close();
+    printWindow.focus();
+    
+    // Trigger print dialog
+    setTimeout(() => {
+      printWindow.print();
+    }, 1000);
+  };
+
+  // Parse generated presentation from AI response
+  useEffect(() => {
+    if (messages.length > 0) {
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessage.type === 'ai' && lastMessage.content.includes('"slides"')) {
         try {
-          const imagePrompt = `Professional presentation slide image for "${presentationTopic}" - modern, clean design with ${presentationStyle} style, suitable for ${audience}`;
-          
-          const imageResponse = await fetch('/api/generate-image', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              prompt: imagePrompt,
-              provider: 'openai'
-            })
-          });
-          
-          if (imageResponse.ok) {
-            const imageData = await imageResponse.json();
-            const imageMessage = `🎨 **Generated Presentation Visual**\n\n![Presentation Image](${imageData.imageUrl})\n\n*You can use this as inspiration for your slide visuals or as a template image.*`;
-            
-            // Add image message to chat
-            const aiMessage = {
-              id: (Date.now() + Math.random()).toString(),
-              type: 'ai' as const,
-              content: imageMessage,
-              timestamp: new Date(),
-              mode: 'presentation',
-              role: currentRole.name,
-              provider: selectedProvider
-            };
-            
-            // This would need to be passed down as a prop to update messages
-            // For now, we'll just log it
-            console.log('Generated image:', imageData.imageUrl);
+          // Extract JSON from the response
+          const jsonMatch = lastMessage.content.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+            const presentationData = JSON.parse(jsonMatch[0]);
+            if (presentationData.slides) {
+              setGeneratedSlides(presentationData.slides);
+              
+              // Generate images if requested
+              if (includeImages) {
+                generateSlideImages(presentationData.slides).then(setGeneratedSlides);
+              }
+            }
           }
         } catch (error) {
-          console.error('Failed to generate presentation image:', error);
+          console.error('Failed to parse presentation data:', error);
         }
-      }, 2000);
+      }
     }
-  };
+  }, [messages, includeImages]);
 
   return (
     <div className="space-y-4">
@@ -275,18 +385,40 @@ const PresentationGenerator = ({
         </div>
       </div>
       
-      <div className="flex items-center space-x-2 px-4">
-        <input
-          type="checkbox"
-          id="includeImages"
-          checked={includeImages}
-          onChange={(e) => setIncludeImages(e.target.checked)}
-          className="rounded"
-        />
-        <Label htmlFor="includeImages" className="text-sm">
-          Generate visual elements and sample images
-        </Label>
+      <div className="flex items-center justify-between px-4">
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="includeImages"
+            checked={includeImages}
+            onChange={(e) => setIncludeImages(e.target.checked)}
+            className="rounded"
+          />
+          <Label htmlFor="includeImages" className="text-sm">
+            Generate DALL-E images for each slide
+          </Label>
+        </div>
+        
+        {generatedSlides.length > 0 && (
+          <Button 
+            onClick={exportToPDF}
+            variant="outline"
+            className="bg-green-50 hover:bg-green-100 border-green-200"
+          >
+            <FileText className="h-4 w-4 mr-2" />
+            Export to PDF
+          </Button>
+        )}
       </div>
+      
+      {isGeneratingImages && (
+        <div className="p-4 bg-blue-50 rounded-lg">
+          <div className="flex items-center space-x-2">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <span className="text-sm">Generating images for slide {currentImageIndex} of {slideCount}...</span>
+          </div>
+        </div>
+      )}
       
       <Button 
         onClick={generatePresentation}
@@ -296,6 +428,49 @@ const PresentationGenerator = ({
         {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Presentation className="h-4 w-4 mr-2" />}
         Generate {slideCount}-Slide Presentation
       </Button>
+      
+      {/* Slide Preview */}
+      {generatedSlides.length > 0 && (
+        <div className="mt-6 space-y-4">
+          <h3 className="text-lg font-semibold">Presentation Preview</h3>
+          <div className="grid gap-4">
+            {generatedSlides.map((slide, index) => (
+              <Card key={index} className="p-4 border-l-4 border-blue-500">
+                <div className="flex items-start justify-between mb-2">
+                  <h4 className="font-semibold text-lg">Slide {slide.slideNumber}: {slide.title}</h4>
+                  <Badge variant="outline">{slide.layout}</Badge>
+                </div>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <ul className="space-y-1 text-sm">
+                      {slide.content.map((item: string, idx: number) => (
+                        <li key={idx} className="flex items-start">
+                          <span className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-2 flex-shrink-0"></span>
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                    {slide.speakerNotes && (
+                      <div className="mt-3 p-2 bg-gray-50 rounded text-xs">
+                        <strong>Speaker Notes:</strong> {slide.speakerNotes}
+                      </div>
+                    )}
+                  </div>
+                  {slide.imageUrl && (
+                    <div className="text-center">
+                      <img 
+                        src={slide.imageUrl} 
+                        alt={`Slide ${slide.slideNumber}`}
+                        className="max-w-full h-32 object-cover rounded border"
+                      />
+                    </div>
+                  )}
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -563,11 +738,12 @@ export default function SynergizeAgile() {
     }
   };
 
-  // Only scroll to bottom when new AI messages are added (not user messages)
+  // Only scroll to bottom when new AI messages are added (not user messages or config changes)
   useEffect(() => {
     if (messages.length > 0 && hasInitialized) {
       const lastMessage = messages[messages.length - 1];
-      if (lastMessage.type === 'ai') {
+      // Only scroll for new AI messages, not for config changes
+      if (lastMessage.type === 'ai' && lastMessage.id !== 'welcome') {
         scrollToBottom();
       }
     }
@@ -594,7 +770,7 @@ export default function SynergizeAgile() {
     }
   }, [hasInitialized, selectedRole, selectedMode, selectedProvider]);
 
-  // Reset chat when role or mode changes (after initialization)
+  // Reset chat when role or mode changes (after initialization) - but don't scroll
   useEffect(() => {
     if (hasInitialized) {
       const role = AGILE_ROLES[selectedRole as keyof typeof AGILE_ROLES];
@@ -611,6 +787,7 @@ export default function SynergizeAgile() {
       };
       
       setMessages([welcomeMessage]);
+      // Don't scroll when changing configurations
     }
   }, [selectedRole, selectedMode, selectedProvider, hasInitialized]);
 
