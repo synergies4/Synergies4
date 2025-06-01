@@ -137,16 +137,14 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Enhanced Scroll Indicator - Fixed Positioning */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center relative group hover:border-white/50 transition-colors">
+        {/* Enhanced Scroll Indicator with Centered Text - Fixed Positioning */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2">
+          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center relative group hover:border-white/50 transition-colors animate-bounce">
             <div className="w-1 h-3 bg-gradient-to-b from-white/60 to-transparent rounded-full mt-2 animate-pulse group-hover:from-cyan-400/80 transition-colors"></div>
           </div>
-        </div>
-
-        {/* Floating Action Hint - Fixed Positioning */}
-        <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 text-white/60 text-sm font-medium animate-pulse">
-          Scroll to explore
+          <div className="text-white/60 text-sm font-medium animate-pulse">
+            Scroll to explore
+          </div>
         </div>
       </section>
 
@@ -909,19 +907,37 @@ function NewsletterSection() {
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError('');
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-    setEmail('');
-    
-    setTimeout(() => setIsSubmitted(false), 3000);
+    try {
+      const response = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to subscribe');
+      }
+
+      setIsSubmitted(true);
+      setEmail('');
+      
+      setTimeout(() => setIsSubmitted(false), 5000);
+    } catch (error) {
+      console.error('Newsletter subscription error:', error);
+      setError(error instanceof Error ? error.message : 'Failed to subscribe. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -934,26 +950,33 @@ function NewsletterSection() {
           Get the latest insights on AI, leadership, and professional development
         </p>
         
-        <form onSubmit={handleSubmit} className="max-w-md mx-auto flex gap-4">
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your email"
-            className="flex-1 px-4 py-3 rounded-lg"
-            required
-          />
-          <Button 
-            type="submit" 
-            disabled={isSubmitting}
-            className="bg-white text-teal-600 hover:bg-gray-100"
-          >
-            {isSubmitting ? 'Subscribing...' : 'Subscribe'}
-          </Button>
+        <form onSubmit={handleSubmit} className="max-w-md mx-auto">
+          <div className="flex gap-4">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+              className="flex-1 px-4 py-3 rounded-lg bg-white text-gray-900 placeholder:text-gray-500"
+              required
+              disabled={isSubmitting}
+            />
+            <Button 
+              type="submit" 
+              disabled={isSubmitting}
+              className="bg-white text-teal-600 hover:bg-gray-100 px-6 py-3 font-medium"
+            >
+              {isSubmitting ? 'Subscribing...' : 'Subscribe'}
+            </Button>
+          </div>
+          
+          {error && (
+            <p className="text-red-200 mt-3 text-sm">{error}</p>
+          )}
         </form>
         
         {isSubmitted && (
-          <p className="text-green-200 mt-4">Thanks for subscribing!</p>
+          <p className="text-green-200 mt-4 font-medium">Thanks for subscribing! Check your email for confirmation.</p>
         )}
       </div>
     </section>
@@ -1018,6 +1041,7 @@ function CTASection() {
             Your Career?
           </span>
         </h2>
+        
         
         <p className="text-xl md:text-2xl text-teal-100/90 max-w-4xl mx-auto leading-relaxed font-light mb-12">
           Join thousands of professionals who have accelerated their growth with our 
