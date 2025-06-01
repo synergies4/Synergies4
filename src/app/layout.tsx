@@ -93,7 +93,7 @@ export default function RootLayout({
         <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.webmanifest" />
-        <meta name="theme-color" content="#4b1aff" />
+        <meta name="theme-color" content="#0d9488" />
       </head>
       <body className={inter.className} suppressHydrationWarning>
         <PerformanceOptimizer />

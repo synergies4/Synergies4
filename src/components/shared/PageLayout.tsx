@@ -215,7 +215,7 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
 
           {/* Mobile Menu */}
           {mobileMenuOpen && (
-            <div className="lg:hidden border-t bg-white/95 backdrop-blur-md">
+            <div className="lg:hidden border-t bg-white/95 backdrop-blur-md max-h-[80vh] overflow-y-auto">
               <div className="px-4 py-4 space-y-4">
                 {/* Navigation Links */}
                 {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item) => (
@@ -262,7 +262,7 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                   
                   <Button 
                     asChild 
-                    className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 text-lg py-3 h-auto"
+                    className="w-full bg-gradient-to-r from-slate-600 to-gray-600 hover:from-slate-700 hover:to-gray-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 text-lg py-3 h-auto"
                   >
                     <Link href="/contact" onClick={() => setMobileMenuOpen(false)}>
                       <MessageSquare className="w-5 h-5 mr-2" />
@@ -279,7 +279,7 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                         <UserAvatar />
                         <span className="text-gray-700 font-medium">Welcome back!</span>
                       </div>
-                      <Button variant="outline" className="w-full text-lg py-3 h-auto" asChild>
+                      <Button variant="outline" className="w-full text-lg py-3 h-auto border-gray-300 text-gray-700 hover:text-gray-900" asChild>
                         <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
                           <BarChart3 className="w-5 h-5 mr-2" />
                           Dashboard
@@ -287,7 +287,7 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                       </Button>
                       <Button
                         variant="outline"
-                        className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 text-lg py-3 h-auto"
+                        className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 border-red-300 hover:border-red-400 text-lg py-3 h-auto"
                         onClick={() => {
                           signOut();
                           setMobileMenuOpen(false);
@@ -299,7 +299,7 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      <Button variant="outline" className="w-full text-lg py-3 h-auto" asChild>
+                      <Button variant="outline" className="w-full text-lg py-3 h-auto border-gray-300 text-gray-700 hover:text-gray-900" asChild>
                         <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
                           <User className="w-5 h-5 mr-2" />
                           Login
@@ -313,6 +313,9 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                     </div>
                   )}
                 </div>
+                
+                {/* Add some bottom padding to ensure last item is visible */}
+                <div className="pb-4"></div>
               </div>
             </div>
           )}
