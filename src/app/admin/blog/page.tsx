@@ -162,12 +162,7 @@ export default function AdminBlogPage() {
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
               {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item, index) => (
-                <div
-                  key={item}
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 + index * 0.1, duration: 0.5 }}
-                >
+                <div key={item}>
                   <Link 
                     href={
                       item === 'About Us' ? '/about-us' :
