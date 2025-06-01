@@ -903,15 +903,25 @@ const ScenarioSimulator = ({
             <div>
               <Label className="text-sm font-medium">Role</Label>
               <Select value={person1Role} onValueChange={setPerson1Role}>
-                <SelectTrigger>
+                <SelectTrigger className="touch-manipulation min-h-[44px] text-base">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Scrum Master">Scrum Master</SelectItem>
-                  <SelectItem value="Product Owner">Product Owner</SelectItem>
-                  <SelectItem value="Developer">Developer</SelectItem>
-                  <SelectItem value="Stakeholder">Stakeholder</SelectItem>
-                  <SelectItem value="Team Lead">Team Lead</SelectItem>
+                <SelectContent 
+                  className="z-[99999] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
+                  position="popper"
+                  sideOffset={4}
+                  align="start"
+                  sticky="always"
+                  onCloseAutoFocus={(e) => e.preventDefault()}
+                  onEscapeKeyDown={(e) => e.preventDefault()}
+                >
+                  <div className="max-h-[250px] overflow-y-auto">
+                    <SelectItem value="Scrum Master" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-green-50 data-[state=checked]:bg-green-100">Scrum Master</SelectItem>
+                    <SelectItem value="Product Owner" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-green-50 data-[state=checked]:bg-green-100">Product Owner</SelectItem>
+                    <SelectItem value="Developer" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-green-50 data-[state=checked]:bg-green-100">Developer</SelectItem>
+                    <SelectItem value="Stakeholder" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-green-50 data-[state=checked]:bg-green-100">Stakeholder</SelectItem>
+                    <SelectItem value="Team Lead" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-green-50 data-[state=checked]:bg-green-100">Team Lead</SelectItem>
+                  </div>
                 </SelectContent>
               </Select>
             </div>
@@ -934,15 +944,25 @@ const ScenarioSimulator = ({
             <div>
               <Label className="text-sm font-medium">Role</Label>
               <Select value={person2Role} onValueChange={setPerson2Role}>
-                <SelectTrigger>
+                <SelectTrigger className="touch-manipulation min-h-[44px] text-base">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Scrum Master">Scrum Master</SelectItem>
-                  <SelectItem value="Product Owner">Product Owner</SelectItem>
-                  <SelectItem value="Developer">Developer</SelectItem>
-                  <SelectItem value="Stakeholder">Stakeholder</SelectItem>
-                  <SelectItem value="Team Lead">Team Lead</SelectItem>
+                <SelectContent 
+                  className="z-[99999] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
+                  position="popper"
+                  sideOffset={4}
+                  align="start"
+                  sticky="always"
+                  onCloseAutoFocus={(e) => e.preventDefault()}
+                  onEscapeKeyDown={(e) => e.preventDefault()}
+                >
+                  <div className="max-h-[250px] overflow-y-auto">
+                    <SelectItem value="Scrum Master" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-blue-50 data-[state=checked]:bg-blue-100">Scrum Master</SelectItem>
+                    <SelectItem value="Product Owner" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-blue-50 data-[state=checked]:bg-blue-100">Product Owner</SelectItem>
+                    <SelectItem value="Developer" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-blue-50 data-[state=checked]:bg-blue-100">Developer</SelectItem>
+                    <SelectItem value="Stakeholder" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-blue-50 data-[state=checked]:bg-blue-100">Stakeholder</SelectItem>
+                    <SelectItem value="Team Lead" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-blue-50 data-[state=checked]:bg-blue-100">Team Lead</SelectItem>
+                  </div>
                 </SelectContent>
               </Select>
             </div>
@@ -1054,26 +1074,46 @@ const RoleBasedAdvisor = ({
         <div>
           <Label className="text-sm font-medium">Common Challenge</Label>
           <Select value={selectedChallenge} onValueChange={setSelectedChallenge}>
-            <SelectTrigger>
+            <SelectTrigger className="touch-manipulation min-h-[44px] text-base">
               <SelectValue placeholder="Select a challenge..." />
             </SelectTrigger>
-            <SelectContent>
-              {challenges[currentRole.name.toLowerCase().replace(' ', '-') as keyof typeof challenges]?.map((challenge, idx) => (
-                <SelectItem key={idx} value={challenge}>{challenge}</SelectItem>
-              ))}
+            <SelectContent 
+              className="z-[99999] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
+              position="popper"
+              sideOffset={4}
+              align="start"
+              sticky="always"
+              onCloseAutoFocus={(e) => e.preventDefault()}
+              onEscapeKeyDown={(e) => e.preventDefault()}
+            >
+              <div className="max-h-[250px] overflow-y-auto">
+                {challenges[currentRole.name.toLowerCase().replace(' ', '-') as keyof typeof challenges]?.map((challenge, idx) => (
+                  <SelectItem key={idx} value={challenge} className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-orange-50 data-[state=checked]:bg-orange-100">{challenge}</SelectItem>
+                ))}
+              </div>
             </SelectContent>
           </Select>
         </div>
         <div>
           <Label className="text-sm font-medium">Experience Level</Label>
           <Select value={experienceLevel} onValueChange={setExperienceLevel}>
-            <SelectTrigger>
+            <SelectTrigger className="touch-manipulation min-h-[44px] text-base">
               <SelectValue placeholder="Select experience..." />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="beginner">Beginner (0-1 years)</SelectItem>
-              <SelectItem value="intermediate">Intermediate (1-3 years)</SelectItem>
-              <SelectItem value="advanced">Advanced (3+ years)</SelectItem>
+            <SelectContent 
+              className="z-[99999] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
+              position="popper"
+              sideOffset={4}
+              align="start"
+              sticky="always"
+              onCloseAutoFocus={(e) => e.preventDefault()}
+              onEscapeKeyDown={(e) => e.preventDefault()}
+            >
+              <div className="max-h-[250px] overflow-y-auto">
+                <SelectItem value="beginner" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-orange-50 data-[state=checked]:bg-orange-100">Beginner (0-1 years)</SelectItem>
+                <SelectItem value="intermediate" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-orange-50 data-[state=checked]:bg-orange-100">Intermediate (1-3 years)</SelectItem>
+                <SelectItem value="advanced" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-orange-50 data-[state=checked]:bg-orange-100">Advanced (3+ years)</SelectItem>
+              </div>
             </SelectContent>
           </Select>
         </div>
@@ -1504,22 +1544,32 @@ export default function SynergizeAgile() {
                     </label>
                     <div className="relative">
                       <Select value={selectedRole} onValueChange={handleRoleChange}>
-                        <SelectTrigger className="w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent touch-manipulation">
+                        <SelectTrigger className="w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent touch-manipulation min-h-[44px] text-base">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent 
-                          className="z-[9999] max-h-60 overflow-y-auto"
+                          className="z-[99999] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
                           position="popper"
                           sideOffset={4}
+                          align="start"
+                          sticky="always"
+                          onCloseAutoFocus={(e) => e.preventDefault()}
+                          onEscapeKeyDown={(e) => e.preventDefault()}
                         >
-                          {Object.entries(AGILE_ROLES).map(([key, role]) => (
-                            <SelectItem key={key} value={key} className="focus:bg-blue-50 cursor-pointer">
-                              <div className="flex items-center">
-                                {role.icon}
-                                <span className="ml-2">{role.name}</span>
-                              </div>
-                            </SelectItem>
-                          ))}
+                          <div className="max-h-[250px] overflow-y-auto">
+                            {Object.entries(AGILE_ROLES).map(([key, role]) => (
+                              <SelectItem 
+                                key={key} 
+                                value={key} 
+                                className="focus:bg-blue-50 cursor-pointer min-h-[44px] px-4 py-3 data-[highlighted]:bg-blue-50 data-[state=checked]:bg-blue-100"
+                              >
+                                <div className="flex items-center w-full">
+                                  <span className="flex-shrink-0">{role.icon}</span>
+                                  <span className="ml-2 flex-1 text-left">{role.name}</span>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </div>
                         </SelectContent>
                       </Select>
                     </div>
@@ -1532,22 +1582,32 @@ export default function SynergizeAgile() {
                     </label>
                     <div className="relative">
                       <Select value={selectedMode} onValueChange={handleModeChange}>
-                        <SelectTrigger className="w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent touch-manipulation">
+                        <SelectTrigger className="w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent touch-manipulation min-h-[44px] text-base">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent 
-                          className="z-[9999] max-h-60 overflow-y-auto"
+                          className="z-[99999] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
                           position="popper"
                           sideOffset={4}
+                          align="start"
+                          sticky="always"
+                          onCloseAutoFocus={(e) => e.preventDefault()}
+                          onEscapeKeyDown={(e) => e.preventDefault()}
                         >
-                          {Object.entries(INTERACTION_MODES).map(([key, mode]) => (
-                            <SelectItem key={key} value={key} className="focus:bg-blue-50 cursor-pointer">
-                              <div className="flex items-center">
-                                {mode.icon}
-                                <span className="ml-2">{mode.name}</span>
-                              </div>
-                            </SelectItem>
-                          ))}
+                          <div className="max-h-[250px] overflow-y-auto">
+                            {Object.entries(INTERACTION_MODES).map(([key, mode]) => (
+                              <SelectItem 
+                                key={key} 
+                                value={key} 
+                                className="focus:bg-blue-50 cursor-pointer min-h-[44px] px-4 py-3 data-[highlighted]:bg-blue-50 data-[state=checked]:bg-blue-100"
+                              >
+                                <div className="flex items-center w-full">
+                                  <span className="flex-shrink-0">{mode.icon}</span>
+                                  <span className="ml-2 flex-1 text-left">{mode.name}</span>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </div>
                         </SelectContent>
                       </Select>
                     </div>
@@ -1560,23 +1620,33 @@ export default function SynergizeAgile() {
                     </label>
                     <div className="relative">
                       <Select value={selectedProvider} onValueChange={handleProviderChange}>
-                        <SelectTrigger className="w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent touch-manipulation">
+                        <SelectTrigger className="w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent touch-manipulation min-h-[44px] text-base">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent 
-                          className="z-[9999] max-h-60 overflow-y-auto"
+                          className="z-[99999] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
                           position="popper"
                           sideOffset={4}
+                          align="start"
+                          sticky="always"
+                          onCloseAutoFocus={(e) => e.preventDefault()}
+                          onEscapeKeyDown={(e) => e.preventDefault()}
                         >
-                          {Object.entries(AI_PROVIDERS).map(([key, provider]) => (
-                            <SelectItem key={key} value={key} className="focus:bg-blue-50 cursor-pointer">
-                              <div className="flex items-center">
-                                {provider.icon}
-                                <span className="ml-2">{provider.name}</span>
-                                <span className="ml-1 text-xs text-gray-500">({provider.badge})</span>
-                              </div>
-                            </SelectItem>
-                          ))}
+                          <div className="max-h-[250px] overflow-y-auto">
+                            {Object.entries(AI_PROVIDERS).map(([key, provider]) => (
+                              <SelectItem 
+                                key={key} 
+                                value={key} 
+                                className="focus:bg-blue-50 cursor-pointer min-h-[44px] px-4 py-3 data-[highlighted]:bg-blue-50 data-[state=checked]:bg-blue-100"
+                              >
+                                <div className="flex items-center w-full">
+                                  <span className="flex-shrink-0">{provider.icon}</span>
+                                  <span className="ml-2 flex-1 text-left">{provider.name}</span>
+                                  <span className="ml-1 text-xs text-gray-500 flex-shrink-0">({provider.badge})</span>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </div>
                         </SelectContent>
                       </Select>
                     </div>

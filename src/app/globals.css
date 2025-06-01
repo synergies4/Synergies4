@@ -1587,3 +1587,65 @@ img[loading="lazy"].loaded {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* Enhanced mobile dropdown support */
+@media (max-width: 768px) {
+  /* Ensure dropdowns are properly touchable on mobile */
+  [data-radix-select-trigger] {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+    touch-action: manipulation;
+    min-height: 44px;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  [data-radix-select-content] {
+    -webkit-overflow-scrolling: touch;
+    transform: translateZ(0); /* Force hardware acceleration */
+    will-change: transform;
+    max-height: min(300px, 70vh);
+  }
+
+  [data-radix-select-item] {
+    min-height: 44px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+  }
+
+  /* Prevent viewport zoom on select focus */
+  select, input[type="text"], input[type="email"], textarea {
+    font-size: 16px !important;
+  }
+
+  /* Enhanced touch targets for mobile */
+  .touch-manipulation {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+    user-select: none;
+    -webkit-user-select: none;
+  }
+}
+
+/* Synergize AI specific dropdown improvements */
+.synergize-dropdown {
+  @apply touch-manipulation;
+}
+
+.synergize-dropdown [data-radix-select-content] {
+  @apply z-[99999] bg-white border border-gray-200 shadow-xl rounded-lg;
+  transform: translateZ(0);
+  -webkit-overflow-scrolling: touch;
+}
+
+.synergize-dropdown [data-radix-select-item] {
+  @apply min-h-[44px] px-4 py-3 cursor-pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+}
+
+.synergize-dropdown [data-radix-select-item][data-highlighted] {
+  @apply bg-blue-50;
+}
+
+.synergize-dropdown [data-radix-select-item][data-state="checked"] {
+  @apply bg-blue-100;
+}
