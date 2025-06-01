@@ -1,6 +1,76 @@
 # Synergies4 - AI-Powered Learning Platform
 
-A comprehensive learning management system built with Next.js, featuring AI-powered courses, user authentication, payment processing, and admin management.
+<!-- Test deployment after webhook removal -->
+
+An AI-powered learning management system built with Next.js, featuring AI assistants for course creation and blog writing.
+
+## Features
+
+- 🤖 AI-powered course creation assistant
+- 📝 AI blog writing assistant  
+- 👥 User management with role-based access
+- 📚 Comprehensive course management
+- 🎓 Student enrollment and progress tracking
+- 📊 Admin dashboard with analytics
+- 🎨 Modern, responsive UI with Tailwind CSS
+- 🔐 Secure authentication with Supabase
+- 📱 Mobile-first design
+
+## Tech Stack
+
+- **Frontend**: Next.js 15, React 19, TypeScript
+- **Styling**: Tailwind CSS, shadcn/ui components
+- **Backend**: Supabase (Database + Auth)
+- **AI**: Anthropic Claude, OpenAI GPT
+- **Deployment**: Vercel
+- **UI Components**: Radix UI primitives
+
+## Getting Started
+
+1. Clone the repository
+2. Install dependencies: `npm install`
+3. Set up environment variables (see `.env.example`)
+4. Run development server: `npm run dev`
+5. Open [http://localhost:3000](http://localhost:3000)
+
+## Environment Variables
+
+```bash
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
+# AI APIs
+ANTHROPIC_API_KEY=your_anthropic_key
+OPENAI_API_KEY=your_openai_key
+
+# Other
+NEXTAUTH_SECRET=your_nextauth_secret
+```
+
+## Project Structure
+
+```
+src/
+├── app/                 # Next.js 13+ app directory
+├── components/          # Reusable UI components
+├── contexts/           # React contexts
+├── lib/               # Utility functions and configs
+└── types/             # TypeScript type definitions
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## License
+
+MIT License - see LICENSE file for details.
 
 ## 🚀 Features
 
