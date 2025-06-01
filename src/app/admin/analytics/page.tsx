@@ -3,7 +3,6 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,7 +20,13 @@ import {
   Eye,
   Clock,
   Star,
-  Download
+  Download,
+  Award,
+  Calendar,
+  Target,
+  ArrowUp,
+  ArrowDown,
+  Filter
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
@@ -252,244 +257,211 @@ export default function Analytics() {
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         {/* Overview Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{analytics.overview.totalUsers.toLocaleString()}</div>
-                <div className="flex items-center text-xs">
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Students</p>
+                <p className="text-2xl font-bold text-gray-900">{analytics.overview.totalUsers.toLocaleString()}</p>
+                <p className="text-xs text-green-600 flex items-center mt-1">
                   {analytics.overview.userGrowth >= 0 ? (
-                    <TrendingUp className="h-3 w-3 text-green-500 mr-1" />
+                    <ArrowUp className="h-3 w-3 mr-1" />
                   ) : (
-                    <TrendingDown className="h-3 w-3 text-red-500 mr-1" />
+                    <ArrowDown className="h-3 w-3 mr-1" />
                   )}
-                  <span className={analytics.overview.userGrowth >= 0 ? 'text-green-500' : 'text-red-500'}>
+                  <span className={analytics.overview.userGrowth >= 0 ? 'text-green-600' : 'text-red-600'}>
                     {formatPercentage(analytics.overview.userGrowth)}
                   </span>
-                  <span className="text-muted-foreground ml-1">from last month</span>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
+                </p>
+              </div>
+              <div className="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Users className="h-6 w-6 text-blue-600" />
+              </div>
+            </div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{formatCurrency(analytics.overview.totalRevenue)}</div>
-                <div className="flex items-center text-xs">
-                  {analytics.overview.revenueGrowth >= 0 ? (
-                    <TrendingUp className="h-3 w-3 text-green-500 mr-1" />
-                  ) : (
-                    <TrendingDown className="h-3 w-3 text-red-500 mr-1" />
-                  )}
-                  <span className={analytics.overview.revenueGrowth >= 0 ? 'text-green-500' : 'text-red-500'}>
-                    {formatPercentage(analytics.overview.revenueGrowth)}
-                  </span>
-                  <span className="text-muted-foreground ml-1">from last month</span>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Enrollments</CardTitle>
-                <BookOpen className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{analytics.overview.totalEnrollments.toLocaleString()}</div>
-                <div className="flex items-center text-xs">
-                  {analytics.overview.enrollmentGrowth >= 0 ? (
-                    <TrendingUp className="h-3 w-3 text-green-500 mr-1" />
-                  ) : (
-                    <TrendingDown className="h-3 w-3 text-red-500 mr-1" />
-                  )}
-                  <span className={analytics.overview.enrollmentGrowth >= 0 ? 'text-green-500' : 'text-red-500'}>
-                    {formatPercentage(analytics.overview.enrollmentGrowth)}
-                  </span>
-                  <span className="text-muted-foreground ml-1">from last month</span>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Active Courses</CardTitle>
-                <Eye className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{analytics.overview.totalCourses}</div>
-                <div className="flex items-center text-xs">
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Active Courses</p>
+                <p className="text-2xl font-bold text-gray-900">{analytics.overview.totalCourses}</p>
+                <p className="text-xs text-green-600 flex items-center mt-1">
                   {analytics.overview.courseGrowth >= 0 ? (
-                    <TrendingUp className="h-3 w-3 text-green-500 mr-1" />
+                    <ArrowUp className="h-3 w-3 mr-1" />
                   ) : (
-                    <TrendingDown className="h-3 w-3 text-red-500 mr-1" />
+                    <ArrowDown className="h-3 w-3 mr-1" />
                   )}
-                  <span className={analytics.overview.courseGrowth >= 0 ? 'text-green-500' : 'text-red-500'}>
+                  <span className={analytics.overview.courseGrowth >= 0 ? 'text-green-600' : 'text-red-600'}>
                     {formatPercentage(analytics.overview.courseGrowth)}
                   </span>
-                  <span className="text-muted-foreground ml-1">from last month</span>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
+                </p>
+              </div>
+              <div className="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center">
+                <BookOpen className="h-6 w-6 text-green-600" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Revenue</p>
+                <p className="text-2xl font-bold text-gray-900">{formatCurrency(analytics.overview.totalRevenue)}</p>
+                <p className="text-xs text-green-600 flex items-center mt-1">
+                  {analytics.overview.revenueGrowth >= 0 ? (
+                    <ArrowUp className="h-3 w-3 mr-1" />
+                  ) : (
+                    <ArrowDown className="h-3 w-3 mr-1" />
+                  )}
+                  <span className={analytics.overview.revenueGrowth >= 0 ? 'text-green-600' : 'text-red-600'}>
+                    {formatPercentage(analytics.overview.revenueGrowth)}
+                  </span>
+                </p>
+              </div>
+              <div className="h-12 w-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                <DollarSign className="h-6 w-6 text-purple-600" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Enrollments</p>
+                <p className="text-2xl font-bold text-gray-900">{analytics.overview.totalEnrollments.toLocaleString()}</p>
+                <p className="text-xs text-green-600 flex items-center mt-1">
+                  {analytics.overview.enrollmentGrowth >= 0 ? (
+                    <ArrowUp className="h-3 w-3 mr-1" />
+                  ) : (
+                    <ArrowDown className="h-3 w-3 mr-1" />
+                  )}
+                  <span className={analytics.overview.enrollmentGrowth >= 0 ? 'text-green-600' : 'text-red-600'}>
+                    {formatPercentage(analytics.overview.enrollmentGrowth)}
+                  </span>
+                </p>
+              </div>
+              <div className="h-12 w-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                <BookOpen className="h-6 w-6 text-yellow-600" />
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Charts Row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Revenue Chart */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            <Card>
-              <CardHeader>
-                <CardTitle>Revenue Trend</CardTitle>
-                <CardDescription>Monthly revenue and enrollment growth</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-64 flex items-end justify-between space-x-2">
-                  {analytics.revenueData.map((data, index) => (
-                    <div key={data.month} className="flex flex-col items-center flex-1">
-                      <div className="w-full bg-gray-200 rounded-t relative" style={{ height: '200px' }}>
-                        <div 
-                          className="bg-blue-500 rounded-t absolute bottom-0 w-full transition-all duration-500"
-                          style={{ 
-                            height: `${(data.revenue / Math.max(...analytics.revenueData.map(d => d.revenue))) * 100}%` 
-                          }}
-                        />
-                        <div 
-                          className="bg-blue-300 rounded-t absolute bottom-0 w-full transition-all duration-500"
-                          style={{ 
-                            height: `${(data.enrollments / Math.max(...analytics.revenueData.map(d => d.enrollments))) * 50}%` 
-                          }}
-                        />
-                      </div>
-                      <span className="text-xs text-gray-500 mt-2">{data.month}</span>
-                    </div>
-                  ))}
-                </div>
-                <div className="flex items-center justify-center space-x-4 mt-4 text-sm">
-                  <div className="flex items-center">
-                    <div className="w-3 h-3 bg-blue-500 rounded mr-2" />
-                    <span>Revenue</span>
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Revenue Trend</h3>
+              <Button variant="outline" size="sm">
+                <Download className="h-4 w-4 mr-2" />
+                Export
+              </Button>
+            </div>
+            <div className="h-64 flex items-end justify-between space-x-2">
+              {analytics.revenueData.map((data, index) => (
+                <div key={data.month} className="flex flex-col items-center flex-1">
+                  <div className="w-full bg-gray-200 rounded-t relative" style={{ height: '200px' }}>
+                    <div 
+                      className="bg-blue-500 rounded-t absolute bottom-0 w-full transition-all duration-500"
+                      style={{ 
+                        height: `${(data.revenue / Math.max(...analytics.revenueData.map(d => d.revenue))) * 100}%` 
+                      }}
+                    />
+                    <div 
+                      className="bg-blue-300 rounded-t absolute bottom-0 w-full transition-all duration-500"
+                      style={{ 
+                        height: `${(data.enrollments / Math.max(...analytics.revenueData.map(d => d.enrollments))) * 50}%` 
+                      }}
+                    />
                   </div>
-                  <div className="flex items-center">
-                    <div className="w-3 h-3 bg-blue-300 rounded mr-2" />
-                    <span>Enrollments</span>
-                  </div>
+                  <span className="text-xs text-gray-500 mt-2">{data.month}</span>
                 </div>
-              </CardContent>
-            </Card>
-          </motion.div>
+              ))}
+            </div>
+            <div className="flex items-center justify-center space-x-4 mt-4 text-sm">
+              <div className="flex items-center">
+                <div className="w-3 h-3 bg-blue-500 rounded mr-2" />
+                <span>Revenue</span>
+              </div>
+              <div className="flex items-center">
+                <div className="w-3 h-3 bg-blue-300 rounded mr-2" />
+                <span>Enrollments</span>
+              </div>
+            </div>
+          </div>
 
           {/* User Activity Chart */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-          >
-            <Card>
-              <CardHeader>
-                <CardTitle>User Activity</CardTitle>
-                <CardDescription>Daily new users and activity</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-64 flex items-end justify-between space-x-1">
-                  {analytics.userActivity.map((data, index) => (
-                    <div key={data.date} className="flex flex-col items-center flex-1">
-                      <div className="w-full bg-gray-200 rounded-t relative" style={{ height: '200px' }}>
-                        <div 
-                          className="bg-green-500 rounded-t absolute bottom-0 w-full transition-all duration-500"
-                          style={{ 
-                            height: `${(data.newUsers / Math.max(...analytics.userActivity.map(d => d.newUsers))) * 100}%` 
-                          }}
-                        />
-                      </div>
-                      <span className="text-xs text-gray-500 mt-2">
-                        {new Date(data.date).getDate()}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-                <div className="flex items-center justify-center space-x-4 mt-4 text-sm">
-                  <div className="flex items-center">
-                    <div className="w-3 h-3 bg-green-500 rounded mr-2" />
-                    <span>New Users</span>
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">User Activity</h3>
+              <select className="text-sm border rounded px-2 py-1">
+                <option>Last 30 days</option>
+                <option>Last 90 days</option>
+                <option>Last year</option>
+              </select>
+            </div>
+            <div className="h-64 flex items-end justify-between space-x-1">
+              {analytics.userActivity.map((data, index) => (
+                <div key={data.date} className="flex flex-col items-center flex-1">
+                  <div className="w-full bg-gray-200 rounded-t relative" style={{ height: '200px' }}>
+                    <div 
+                      className="bg-green-500 rounded-t absolute bottom-0 w-full transition-all duration-500"
+                      style={{ 
+                        height: `${(data.newUsers / Math.max(...analytics.userActivity.map(d => d.newUsers))) * 100}%` 
+                      }}
+                    />
                   </div>
+                  <span className="text-xs text-gray-500 mt-2">
+                    {new Date(data.date).getDate()}
+                  </span>
                 </div>
-              </CardContent>
-            </Card>
-          </motion.div>
+              ))}
+            </div>
+            <div className="flex items-center justify-center space-x-4 mt-4 text-sm">
+              <div className="flex items-center">
+                <div className="w-3 h-3 bg-green-500 rounded mr-2" />
+                <span>New Users</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Top Courses */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle>Top Performing Courses</CardTitle>
-              <CardDescription>Courses ranked by enrollment and revenue</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {analytics.topCourses.map((course, index) => (
-                  <div key={course.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <span className="text-sm font-bold text-blue-600">#{index + 1}</span>
+        <div className="bg-white rounded-lg shadow-sm border p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">Top Performing Courses</h3>
+            <Button variant="outline" size="sm">
+              <Download className="h-4 w-4 mr-2" />
+              Export
+            </Button>
+          </div>
+          <div className="space-y-4">
+            {analytics.topCourses.map((course, index) => (
+              <div key={course.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                <div className="flex items-center space-x-4">
+                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <span className="text-sm font-bold text-blue-600">#{index + 1}</span>
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-gray-900">{course.title}</h4>
+                    <div className="flex items-center space-x-4 text-sm text-gray-500">
+                      <Badge variant="secondary">{course.category}</Badge>
+                      <div className="flex items-center space-x-1">
+                        <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                        <span>{course.rating}</span>
                       </div>
-                      <div>
-                        <h4 className="font-medium text-gray-900">{course.title}</h4>
-                        <div className="flex items-center space-x-4 text-sm text-gray-500">
-                          <Badge variant="secondary">{course.category}</Badge>
-                          <div className="flex items-center space-x-1">
-                            <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                            <span>{course.rating}</span>
-                          </div>
-                          <span>{course.enrollments} enrollments</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-medium text-gray-900">{formatCurrency(course.revenue)}</p>
-                      <p className="text-sm text-gray-500">Revenue</p>
+                      <span>{course.enrollments} enrollments</span>
                     </div>
                   </div>
-                ))}
+                </div>
+                <div className="text-right">
+                  <p className="font-medium text-gray-900">{formatCurrency(course.revenue)}</p>
+                  <p className="text-sm text-gray-500">Revenue</p>
+                </div>
               </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+            ))}
+          </div>
+        </div>
       </main>
     </div>
   );

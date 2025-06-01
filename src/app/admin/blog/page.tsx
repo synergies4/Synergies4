@@ -1,29 +1,26 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { useAuth } from '@/contexts/AuthContext';
-import { UserAvatar } from '@/components/UserAvatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   Plus, 
   Search, 
+  Filter, 
   Edit, 
   Trash2, 
-  Eye, 
-  Calendar, 
-  Clock, 
+  Eye,
+  Calendar,
+  Clock,
   User,
-  Filter,
   MoreHorizontal,
-  Menu,
-  X
+  ArrowUpDown
 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { UserAvatar } from '@/components/UserAvatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -148,36 +145,23 @@ export default function AdminBlogPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
-      <motion.nav 
-        className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b shadow-sm"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-      >
+      <div className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b shadow-sm">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
-            >
+            <div>
               <Link href="/" className="flex items-center">
-                <motion.span 
+                <span 
                   className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover:from-blue-700 hover:to-purple-700 transition-all duration-300"
-                  whileHover={{ 
-                    scale: 1.02,
-                    textShadow: "0 0 8px rgba(59, 130, 246, 0.5)"
-                  }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 >
                   Synergies4
-                </motion.span>
+                </span>
               </Link>
-            </motion.div>
+            </div>
             
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
               {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item, index) => (
-                <motion.div
+                <div
                   key={item}
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -196,19 +180,16 @@ export default function AdminBlogPage() {
                   >
                     {item}
                   </Link>
-                </motion.div>
+                </div>
               ))}
             </div>
             
             {/* Desktop Auth */}
-            <motion.div 
+            <div 
               className="hidden md:flex items-center space-x-3"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.5, duration: 0.5 }}
             >
               <UserAvatar />
-            </motion.div>
+            </div>
 
             {/* Mobile Menu Button */}
             <div className="md:hidden">
@@ -219,55 +200,47 @@ export default function AdminBlogPage() {
                 className="p-2"
               >
                 {mobileMenuOpen ? (
-                  <X className="h-6 w-6" />
+                  <ArrowUpDown className="h-6 w-6" />
                 ) : (
-                  <Menu className="h-6 w-6" />
+                  <ArrowUpDown className="h-6 w-6" />
                 )}
               </Button>
             </div>
           </div>
 
           {/* Mobile Menu */}
-          <AnimatePresence>
-            {mobileMenuOpen && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
-                className="md:hidden border-t bg-white/95 backdrop-blur-md overflow-hidden"
-              >
-                <div className="px-4 py-4 space-y-4">
-                  {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item) => (
-                    <Link
-                      key={item}
-                      href={
-                        item === 'About Us' ? '/about-us' :
-                        item === 'Courses' ? '/courses' :
-                        item === 'Coaching' ? '/coaching' : 
-                        item === 'Consulting' ? '/consulting' : 
-                        item === 'Industry Insight' ? '/industry-insight' :
-                        `/${item.toLowerCase().replace(' ', '-')}`
-                      }
-                      className="block text-gray-600 hover:text-blue-600 transition-colors font-medium py-2 text-lg"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      {item}
-                    </Link>
-                  ))}
-                  
-                  {/* Mobile Auth */}
-                  <div className="pt-4 border-t space-y-3">
-                    <div className="flex items-center space-x-2">
-                      <UserAvatar />
-                    </div>
+          {mobileMenuOpen && (
+            <div className="md:hidden border-t bg-white/95 backdrop-blur-md overflow-hidden">
+              <div className="px-4 py-4 space-y-4">
+                {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item) => (
+                  <Link
+                    key={item}
+                    href={
+                      item === 'About Us' ? '/about-us' :
+                      item === 'Courses' ? '/courses' :
+                      item === 'Coaching' ? '/coaching' : 
+                      item === 'Consulting' ? '/consulting' : 
+                      item === 'Industry Insight' ? '/industry-insight' :
+                      `/${item.toLowerCase().replace(' ', '-')}`
+                    }
+                    className="block text-gray-600 hover:text-blue-600 transition-colors font-medium py-2 text-lg"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {item}
+                  </Link>
+                ))}
+                
+                {/* Mobile Auth */}
+                <div className="pt-4 border-t space-y-3">
+                  <div className="flex items-center space-x-2">
+                    <UserAvatar />
                   </div>
                 </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+              </div>
+            </div>
+          )}
         </div>
-      </motion.nav>
+      </div>
 
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
@@ -351,11 +324,8 @@ export default function AdminBlogPage() {
         ) : (
           <div className="grid gap-4">
             {posts.map((post) => (
-              <motion.div
+              <div
                 key={post.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
               >
                 <Card className="hover:shadow-md transition-shadow">
                   <CardContent className="pt-6">
@@ -431,7 +401,7 @@ export default function AdminBlogPage() {
                     </div>
                   </CardContent>
                 </Card>
-              </motion.div>
+              </div>
             ))}
           </div>
         )}

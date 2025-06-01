@@ -1,31 +1,26 @@
 'use client';
 
 import { useState, useEffect, use } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '@/contexts/AuthContext';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { UserAvatar } from '@/components/UserAvatar';
+import { useAuth } from '@/contexts/AuthContext';
 import { 
+  ArrowLeft, 
+  ArrowRight, 
   BookOpen, 
-  Clock, 
   CheckCircle, 
-  Play,
-  Pause,
-  SkipForward,
-  ArrowLeft,
-  Award,
-  FileText,
-  Video,
-  Link as LinkIcon,
-  Lock,
-  Unlock,
-  Target
+  Clock, 
+  Play, 
+  Download,
+  MessageSquare,
+  Menu,
+  X
 } from 'lucide-react';
-import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 
 interface Course {
@@ -416,39 +411,32 @@ export default function LearnCoursePage({ params }: { params: Promise<{ slug: st
         </div>
 
         {/* Notes Section */}
-        <AnimatePresence>
-          {showNotes && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Card className="mt-6">
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <FileText className="h-5 w-5" />
-                    My Notes for this Lesson
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <textarea
-                    value={lessonNotes[currentLesson.id] || ''}
-                    onChange={(e) => setLessonNotes(prev => ({
-                      ...prev,
-                      [currentLesson.id]: e.target.value
-                    }))}
-                    placeholder="Take notes about this lesson..."
-                    className="w-full h-32 p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                  <p className="text-xs text-gray-500 mt-2">
-                    Your notes are saved automatically and will be available when you return to this lesson.
-                  </p>
-                </CardContent>
-              </Card>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <div
+          className={`${showNotes ? 'block' : 'hidden'}`}
+        >
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                My Notes for this Lesson
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <textarea
+                value={lessonNotes[currentLesson.id] || ''}
+                onChange={(e) => setLessonNotes(prev => ({
+                  ...prev,
+                  [currentLesson.id]: e.target.value
+                }))}
+                placeholder="Take notes about this lesson..."
+                className="w-full h-32 p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              <p className="text-xs text-gray-500 mt-2">
+                Your notes are saved automatically and will be available when you return to this lesson.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   };
@@ -487,31 +475,18 @@ export default function LearnCoursePage({ params }: { params: Promise<{ slug: st
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Navigation Header */}
-      <motion.nav 
-        className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b shadow-sm"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-      >
+      <div className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b shadow-sm">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
-            >
+            <div>
               <Link href="/" className="flex items-center">
-                <motion.span 
+                <span 
                   className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover:from-blue-700 hover:to-purple-700 transition-all duration-300"
-                  whileHover={{ 
-                    scale: 1.02,
-                    textShadow: "0 0 8px rgba(59, 130, 246, 0.5)"
-                  }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 >
                   Synergies4
-                </motion.span>
+                </span>
               </Link>
-            </motion.div>
+            </div>
             
             <div className="hidden md:flex items-center space-x-6">
               <Button variant="ghost" asChild>
@@ -542,15 +517,11 @@ export default function LearnCoursePage({ params }: { params: Promise<{ slug: st
             </div>
           </div>
         </div>
-      </motion.nav>
+      </div>
 
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
+        <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">{course?.title}</h1>
@@ -569,15 +540,11 @@ export default function LearnCoursePage({ params }: { params: Promise<{ slug: st
             </div>
             <Progress value={calculateOverallProgress()} className="h-3" />
           </div>
-        </motion.div>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar - Course Navigation */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="lg:col-span-1"
-          >
+          <div className="lg:col-span-1">
             <Card className="sticky top-8">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -655,127 +622,74 @@ export default function LearnCoursePage({ params }: { params: Promise<{ slug: st
                 )}
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
 
           {/* Main Content */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="lg:col-span-3"
-          >
-            <AnimatePresence mode="wait">
-              {activeTab === 'lesson' && (
-                <motion.div
-                  key="lesson"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                >
-                  {renderLessonContent()}
-                </motion.div>
-              )}
+          <div className="lg:col-span-3">
+            {activeTab === 'lesson' && (
+              <div>
+                {renderLessonContent()}
+              </div>
+            )}
 
-              {activeTab === 'quiz' && (
-                <motion.div
-                  key="quiz"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                >
-                  <QuizComponent 
-                    questions={quizQuestions} 
-                    courseId={course?.id || ''} 
-                    enrollmentId={enrollment?.id || ''}
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
+            {activeTab === 'quiz' && (
+              <QuizComponent 
+                questions={quizQuestions} 
+                courseId={course?.id || ''} 
+                enrollmentId={enrollment?.id || ''}
+              />
+            )}
+          </div>
         </div>
       </div>
 
       {/* Course Completion Modal */}
-      <AnimatePresence>
-        {showCompletionModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-            onClick={() => setShowCompletionModal(false)}
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8, y: 50 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.8, y: 50 }}
-              transition={{ type: "spring", stiffness: 300, damping: 25 }}
-              className="bg-white rounded-2xl p-8 max-w-md w-full text-center"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.2, type: "spring", stiffness: 300, damping: 20 }}
+      {showCompletionModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full text-center">
+            <div>
+              <Award className="h-16 w-16 text-yellow-500 mx-auto mb-4" />
+            </div>
+            
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              🎉 Congratulations!
+            </h2>
+            
+            <p className="text-gray-600 mb-6">
+              You've successfully completed <strong>{course?.title}</strong>! 
+              You're now ready to apply your new skills.
+            </p>
+            
+            <div className="space-y-3">
+              <Button 
+                onClick={generateCertificate}
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
               >
-                <Award className="h-16 w-16 text-yellow-500 mx-auto mb-4" />
-              </motion.div>
+                <Award className="mr-2 h-4 w-4" />
+                Get Certificate
+              </Button>
               
-              <motion.h2
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="text-2xl font-bold text-gray-900 mb-2"
+              <Button 
+                variant="outline" 
+                onClick={() => setShowCompletionModal(false)}
+                className="w-full"
               >
-                🎉 Congratulations!
-              </motion.h2>
+                Continue Learning
+              </Button>
               
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="text-gray-600 mb-6"
+              <Button 
+                variant="ghost" 
+                asChild
+                className="w-full"
               >
-                You've successfully completed <strong>{course?.title}</strong>! 
-                You're now ready to apply your new skills.
-              </motion.p>
-              
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className="space-y-3"
-              >
-                <Button 
-                  onClick={generateCertificate}
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                >
-                  <Award className="mr-2 h-4 w-4" />
-                  Get Certificate
-                </Button>
-                
-                <Button 
-                  variant="outline" 
-                  onClick={() => setShowCompletionModal(false)}
-                  className="w-full"
-                >
-                  Continue Learning
-                </Button>
-                
-                <Button 
-                  variant="ghost" 
-                  asChild
-                  className="w-full"
-                >
-                  <Link href="/courses">
-                    Explore More Courses
-                  </Link>
-                </Button>
-              </motion.div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                <Link href="/courses">
+                  Explore More Courses
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
