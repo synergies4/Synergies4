@@ -33,7 +33,10 @@ import {
   Link as LinkIcon,
   FileText,
   HelpCircle,
-  Trash2
+  Trash2,
+  ChevronLeft,
+  ChevronRight,
+  Check
 } from 'lucide-react';
 
 interface ModuleContent {
@@ -387,6 +390,18 @@ export default function CreateCourse() {
     }
   };
 
+  const nextStep = () => {
+    if (currentStep < steps.length) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const prevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -400,7 +415,7 @@ export default function CreateCourse() {
 
   if (!user || userProfile?.role !== 'ADMIN') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle className="text-center">Access Denied</CardTitle>
@@ -420,22 +435,23 @@ export default function CreateCourse() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      {/* Mobile-Optimized Header */}
+      <header className="bg-white shadow-sm border-b sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 gap-4">
             <div className="flex items-center space-x-3">
-              <BookOpen className="h-8 w-8 text-blue-600" />
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">Create Course</h1>
-                <p className="text-gray-600">Add a new course to your platform</p>
+              <BookOpen className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 flex-shrink-0" />
+              <div className="min-w-0">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 truncate">Create Course</h1>
+                <p className="text-sm sm:text-base text-gray-600 hidden sm:block">Add a new course to your platform</p>
               </div>
             </div>
-            <div className="flex space-x-3">
-              <Button variant="outline" asChild>
+            <div className="flex space-x-2 sm:space-x-3">
+              <Button variant="outline" size="sm" asChild className="flex-1 sm:flex-none">
                 <Link href="/admin">
                   <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Admin
+                  <span className="hidden sm:inline">Back to Admin</span>
+                  <span className="sm:hidden">Back</span>
                 </Link>
               </Button>
             </div>
@@ -444,95 +460,126 @@ export default function CreateCourse() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
-        {/* Progress Steps */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            {steps.map((step, index) => (
-              <div key={step.number} className="flex items-center">
-                <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
-                  currentStep >= step.number 
-                    ? 'bg-blue-600 border-blue-600 text-white' 
-                    : 'border-gray-300 text-gray-500'
-                }`}>
-                  {step.number}
-                </div>
-                <div className="ml-3">
-                  <p className={`text-sm font-medium ${
-                    currentStep >= step.number ? 'text-blue-600' : 'text-gray-500'
+      <main className="max-w-4xl mx-auto py-4 sm:py-6 px-4 sm:px-6 lg:px-8">
+        {/* Mobile-Optimized Progress Steps */}
+        <div className="mb-6 sm:mb-8">
+          {/* Mobile: Horizontal Scrollable Steps */}
+          <div className="block sm:hidden">
+            <div className="flex items-center space-x-4 overflow-x-auto pb-4">
+              {steps.map((step, index) => (
+                <div key={step.number} className="flex items-center flex-shrink-0">
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full border-2 text-sm ${
+                    currentStep >= step.number 
+                      ? 'bg-blue-600 border-blue-600 text-white' 
+                      : 'border-gray-300 text-gray-500'
                   }`}>
-                    {step.title}
-                  </p>
-                  <p className="text-xs text-gray-500">{step.description}</p>
+                    {currentStep > step.number ? <Check className="w-4 h-4" /> : step.number}
+                  </div>
+                  <div className="ml-2 min-w-0">
+                    <p className={`text-xs font-medium truncate ${
+                      currentStep >= step.number ? 'text-blue-600' : 'text-gray-500'
+                    }`}>
+                      {step.title}
+                    </p>
+                  </div>
+                  {index < steps.length - 1 && (
+                    <div className={`w-8 h-0.5 mx-3 ${
+                      currentStep > step.number ? 'bg-blue-600' : 'bg-gray-300'
+                    }`} />
+                  )}
                 </div>
-                {index < steps.length - 1 && (
-                  <div className={`flex-1 h-0.5 mx-4 ${
-                    currentStep > step.number ? 'bg-blue-600' : 'bg-gray-300'
-                  }`} />
-                )}
-              </div>
-            ))}
+              ))}
+            </div>
+          </div>
+
+          {/* Desktop: Full Steps Display */}
+          <div className="hidden sm:block">
+            <div className="flex items-center justify-between">
+              {steps.map((step, index) => (
+                <div key={step.number} className="flex items-center">
+                  <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
+                    currentStep >= step.number 
+                      ? 'bg-blue-600 border-blue-600 text-white' 
+                      : 'border-gray-300 text-gray-500'
+                  }`}>
+                    {currentStep > step.number ? <Check className="w-5 h-5" /> : step.number}
+                  </div>
+                  <div className="ml-3">
+                    <p className={`text-sm font-medium ${
+                      currentStep >= step.number ? 'text-blue-600' : 'text-gray-500'
+                    }`}>
+                      {step.title}
+                    </p>
+                    <p className="text-xs text-gray-500">{step.description}</p>
+                  </div>
+                  {index < steps.length - 1 && (
+                    <div className={`flex-1 h-0.5 mx-4 ${
+                      currentStep > step.number ? 'bg-blue-600' : 'bg-gray-300'
+                    }`} />
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
         {/* Form Steps */}
-        <Card>
-          <CardContent className="p-6">
+        <Card className="mb-6">
+          <CardContent className="p-4 sm:p-6">
             {/* Step 1: Basic Info */}
             {currentStep === 1 && (
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="space-y-6"
+                className="space-y-4 sm:space-y-6"
               >
                 <div>
-                  <Label htmlFor="title">Course Title *</Label>
+                  <Label htmlFor="title" className="text-sm font-medium">Course Title *</Label>
                   <Input
                     id="title"
                     value={formData.title}
                     onChange={(e) => handleInputChange('title', e.target.value)}
                     placeholder="Enter course title"
-                    className="mt-1"
+                    className="mt-2"
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="description">Description *</Label>
+                  <Label htmlFor="description" className="text-sm font-medium">Description *</Label>
                   <Textarea
                     id="description"
                     value={formData.description}
                     onChange={(e) => handleInputChange('description', e.target.value)}
-                    placeholder="Describe what students will learn in this course"
-                    rows={4}
-                    className="mt-1"
+                    placeholder="Enter detailed course description"
+                    className="mt-2 min-h-[120px]"
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="shortDesc">Short Description</Label>
+                  <Label htmlFor="shortDesc" className="text-sm font-medium">Short Description</Label>
                   <Textarea
                     id="shortDesc"
                     value={formData.shortDesc}
                     onChange={(e) => handleInputChange('shortDesc', e.target.value)}
-                    placeholder="Brief summary for course cards"
-                    rows={2}
-                    className="mt-1"
+                    placeholder="Brief course summary for listings"
+                    className="mt-2"
+                    rows={3}
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="category">Category *</Label>
+                  <Label htmlFor="category" className="text-sm font-medium">Category *</Label>
                   <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Select a category" />
+                    <SelectTrigger className="mt-2">
+                      <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="agile">Agile & Scrum</SelectItem>
-                      <SelectItem value="ai">Artificial Intelligence</SelectItem>
-                      <SelectItem value="product">Product Management</SelectItem>
                       <SelectItem value="leadership">Leadership</SelectItem>
-                      <SelectItem value="pq">PQ Skills</SelectItem>
-                      <SelectItem value="certification">Certification</SelectItem>
+                      <SelectItem value="product">Product Management</SelectItem>
+                      <SelectItem value="mental-fitness">Mental Fitness</SelectItem>
+                      <SelectItem value="technology">Technology</SelectItem>
+                      <SelectItem value="business">Business</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -544,14 +591,14 @@ export default function CreateCourse() {
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="space-y-6"
+                className="space-y-4 sm:space-y-6"
               >
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="level">Difficulty Level *</Label>
+                    <Label htmlFor="level" className="text-sm font-medium">Level *</Label>
                     <Select value={formData.level} onValueChange={(value) => handleInputChange('level', value)}>
-                      <SelectTrigger className="mt-1">
-                        <SelectValue placeholder="Select difficulty" />
+                      <SelectTrigger className="mt-2">
+                        <SelectValue placeholder="Select level" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="BEGINNER">Beginner</SelectItem>
@@ -562,41 +609,55 @@ export default function CreateCourse() {
                   </div>
 
                   <div>
-                    <Label htmlFor="duration">Duration</Label>
+                    <Label htmlFor="duration" className="text-sm font-medium">Duration</Label>
                     <Input
                       id="duration"
                       value={formData.duration}
                       onChange={(e) => handleInputChange('duration', e.target.value)}
-                      placeholder="e.g., 10 hours"
-                      className="mt-1"
+                      placeholder="e.g., 4 weeks, 20 hours"
+                      className="mt-2"
                     />
                   </div>
                 </div>
 
-                <div>
-                  <Label htmlFor="price">Price (USD)</Label>
-                  <Input
-                    id="price"
-                    type="number"
-                    step="0.01"
-                    value={formData.price}
-                    onChange={(e) => handleInputChange('price', e.target.value)}
-                    placeholder="Leave empty for free course"
-                    className="mt-1"
-                  />
-                  <p className="text-sm text-gray-500 mt-1">Leave empty to make this course free</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="price" className="text-sm font-medium">Price ($)</Label>
+                    <Input
+                      id="price"
+                      type="number"
+                      value={formData.price}
+                      onChange={(e) => handleInputChange('price', e.target.value)}
+                      placeholder="0.00"
+                      className="mt-2"
+                      min="0"
+                      step="0.01"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="status" className="text-sm font-medium">Status</Label>
+                    <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value)}>
+                      <SelectTrigger className="mt-2">
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="DRAFT">Draft</SelectItem>
+                        <SelectItem value="PUBLISHED">Published</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
 
                 <div>
-                  <Label htmlFor="image">Course Image URL</Label>
+                  <Label htmlFor="image" className="text-sm font-medium">Course Image URL</Label>
                   <Input
                     id="image"
                     value={formData.image}
                     onChange={(e) => handleInputChange('image', e.target.value)}
                     placeholder="https://example.com/image.jpg"
-                    className="mt-1"
+                    className="mt-2"
                   />
-                  <p className="text-sm text-gray-500 mt-1">URL to course thumbnail image</p>
                 </div>
 
                 <div className="flex items-center space-x-2">
@@ -605,9 +666,9 @@ export default function CreateCourse() {
                     id="featured"
                     checked={formData.featured}
                     onChange={(e) => handleInputChange('featured', e.target.checked)}
-                    className="rounded"
+                    className="rounded border-gray-300"
                   />
-                  <Label htmlFor="featured">Featured Course</Label>
+                  <Label htmlFor="featured" className="text-sm font-medium">Featured Course</Label>
                 </div>
               </motion.div>
             )}
@@ -617,178 +678,184 @@ export default function CreateCourse() {
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="space-y-6"
+                className="space-y-4 sm:space-y-6"
               >
                 <div>
-                  <Label>Course Modules</Label>
-                  <p className="text-sm text-gray-500 mb-4">Add modules and content to structure your course</p>
+                  <h3 className="text-lg font-semibold mb-4">Course Modules</h3>
                   
-                  <div className="space-y-6 mb-6">
-                    {formData.modules.map((module, index) => (
-                      <Card key={module.id} className="border-l-4 border-l-blue-500">
-                        <CardHeader>
-                          <div className="flex justify-between items-start">
-                            <div className="flex-1">
-                              <CardTitle className="text-lg">Module {index + 1}: {module.title}</CardTitle>
-                              <CardDescription>{module.description}</CardDescription>
-                            </div>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => removeModule(module.id)}
-                              className="text-red-600 hover:text-red-700"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </CardHeader>
-                        <CardContent>
-                          {/* Module Contents */}
-                          <div className="space-y-3 mb-4">
-                            {module.contents.map((content) => (
-                              <div key={content.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                <div className="flex items-center space-x-3">
-                                  {getContentIcon(content.type)}
-                                  <div>
-                                    <p className="font-medium">{content.title}</p>
-                                    <p className="text-sm text-gray-500 capitalize">{content.type}</p>
-                                  </div>
-                                </div>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => removeContentFromModule(module.id, content.id)}
-                                  className="text-red-600 hover:text-red-700"
-                                >
-                                  <X className="w-4 h-4" />
-                                </Button>
-                              </div>
-                            ))}
-                          </div>
-
-                          {/* Add Content Form */}
-                          {editingModule === module.id ? (
-                            <div className="space-y-4 p-4 border rounded-lg bg-blue-50">
-                              <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                  <Label>Content Type</Label>
-                                  <Select 
-                                    value={newContent.type} 
-                                    onValueChange={(value: 'video' | 'link' | 'document' | 'text') => 
-                                      setNewContent(prev => ({ ...prev, type: value }))
-                                    }
-                                  >
-                                    <SelectTrigger>
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="video">Video</SelectItem>
-                                      <SelectItem value="link">Link</SelectItem>
-                                      <SelectItem value="document">Document</SelectItem>
-                                      <SelectItem value="text">Text Content</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                                <div>
-                                  <Label>Title</Label>
-                                  <Input
-                                    value={newContent.title}
-                                    onChange={(e) => setNewContent(prev => ({ ...prev, title: e.target.value }))}
-                                    placeholder="Content title"
-                                  />
-                                </div>
-                              </div>
-                              <div>
-                                <Label>
-                                  {newContent.type === 'video' && 'Video URL'}
-                                  {newContent.type === 'link' && 'Link URL'}
-                                  {newContent.type === 'document' && 'Document URL'}
-                                  {newContent.type === 'text' && 'Text Content'}
-                                </Label>
-                                {newContent.type === 'text' ? (
-                                  <Textarea
-                                    value={newContent.content}
-                                    onChange={(e) => setNewContent(prev => ({ ...prev, content: e.target.value }))}
-                                    placeholder="Enter text content"
-                                    rows={4}
-                                  />
-                                ) : (
-                                  <Input
-                                    value={newContent.content}
-                                    onChange={(e) => setNewContent(prev => ({ ...prev, content: e.target.value }))}
-                                    placeholder={`Enter ${newContent.type} URL`}
-                                  />
-                                )}
-                              </div>
-                              <div>
-                                <Label>Description (Optional)</Label>
-                                <Input
-                                  value={newContent.description}
-                                  onChange={(e) => setNewContent(prev => ({ ...prev, description: e.target.value }))}
-                                  placeholder="Brief description"
-                                />
-                              </div>
-                              <div className="flex space-x-2">
-                                <Button onClick={() => addContentToModule(module.id)} size="sm">
-                                  Add Content
-                                </Button>
-                                <Button 
-                                  variant="outline" 
-                                  onClick={() => setEditingModule(null)} 
-                                  size="sm"
-                                >
-                                  Cancel
-                                </Button>
-                              </div>
-                            </div>
-                          ) : (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setEditingModule(module.id)}
-                              className="w-full"
-                            >
-                              <Plus className="w-4 h-4 mr-2" />
-                              Add Content to Module
-                            </Button>
-                          )}
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg">Add New Module</CardTitle>
+                  {/* Add New Module */}
+                  <Card className="mb-4">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base">Add New Module</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div>
-                        <Label htmlFor="moduleTitle">Module Title</Label>
+                        <Label htmlFor="moduleTitle" className="text-sm font-medium">Module Title</Label>
                         <Input
                           id="moduleTitle"
                           value={newModule.title}
                           onChange={(e) => setNewModule(prev => ({ ...prev, title: e.target.value }))}
                           placeholder="Enter module title"
-                          className="mt-1"
+                          className="mt-2"
                         />
                       </div>
                       <div>
-                        <Label htmlFor="moduleDescription">Module Description</Label>
+                        <Label htmlFor="moduleDescription" className="text-sm font-medium">Module Description</Label>
                         <Textarea
                           id="moduleDescription"
                           value={newModule.description}
                           onChange={(e) => setNewModule(prev => ({ ...prev, description: e.target.value }))}
-                          placeholder="Describe what this module covers"
+                          placeholder="Enter module description"
+                          className="mt-2"
                           rows={3}
-                          className="mt-1"
                         />
                       </div>
-                      <Button onClick={addModule} disabled={!newModule.title.trim()}>
+                      <Button onClick={addModule} className="w-full sm:w-auto">
                         <Plus className="w-4 h-4 mr-2" />
                         Add Module
                       </Button>
                     </CardContent>
                   </Card>
+
+                  {/* Existing Modules */}
+                  {formData.modules.map((module, index) => (
+                    <Card key={module.id} className="mb-4">
+                      <CardHeader className="pb-3">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                          <CardTitle className="text-base">
+                            Module {index + 1}: {module.title}
+                          </CardTitle>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => removeModule(module.id)}
+                            className="self-start sm:self-auto"
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Remove
+                          </Button>
+                        </div>
+                        <CardDescription>{module.description}</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        {/* Module Contents */}
+                        {module.contents.length > 0 && (
+                          <div className="mb-4">
+                            <h4 className="font-medium mb-2">Contents:</h4>
+                            <div className="space-y-2">
+                              {module.contents.map((content) => (
+                                <div key={content.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-gray-50 rounded-lg gap-2">
+                                  <div className="flex items-center space-x-2 min-w-0">
+                                    {getContentIcon(content.type)}
+                                    <div className="min-w-0">
+                                      <p className="font-medium text-sm truncate">{content.title}</p>
+                                      <p className="text-xs text-gray-500 truncate">{content.type}</p>
+                                    </div>
+                                  </div>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => removeContentFromModule(module.id, content.id)}
+                                    className="self-start sm:self-auto text-red-600 hover:text-red-700"
+                                  >
+                                    <X className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Add Content */}
+                        {editingModule === module.id ? (
+                          <div className="space-y-4 p-4 bg-blue-50 rounded-lg">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                              <div>
+                                <Label className="text-sm font-medium">Content Type</Label>
+                                <Select 
+                                  value={newContent.type} 
+                                  onValueChange={(value: 'video' | 'link' | 'document' | 'text') => 
+                                    setNewContent(prev => ({ ...prev, type: value }))
+                                  }
+                                >
+                                  <SelectTrigger className="mt-2">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="video">Video</SelectItem>
+                                    <SelectItem value="link">Link</SelectItem>
+                                    <SelectItem value="document">Document</SelectItem>
+                                    <SelectItem value="text">Text</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div>
+                                <Label className="text-sm font-medium">Content Title</Label>
+                                <Input
+                                  value={newContent.title}
+                                  onChange={(e) => setNewContent(prev => ({ ...prev, title: e.target.value }))}
+                                  placeholder="Enter content title"
+                                  className="mt-2"
+                                />
+                              </div>
+                            </div>
+                            <div>
+                              <Label className="text-sm font-medium">
+                                {newContent.type === 'text' ? 'Content' : 'URL'}
+                              </Label>
+                              {newContent.type === 'text' ? (
+                                <Textarea
+                                  value={newContent.content}
+                                  onChange={(e) => setNewContent(prev => ({ ...prev, content: e.target.value }))}
+                                  placeholder="Enter text content"
+                                  className="mt-2"
+                                  rows={4}
+                                />
+                              ) : (
+                                <Input
+                                  value={newContent.content}
+                                  onChange={(e) => setNewContent(prev => ({ ...prev, content: e.target.value }))}
+                                  placeholder="Enter URL"
+                                  className="mt-2"
+                                />
+                              )}
+                            </div>
+                            <div>
+                              <Label className="text-sm font-medium">Description (Optional)</Label>
+                              <Textarea
+                                value={newContent.description}
+                                onChange={(e) => setNewContent(prev => ({ ...prev, description: e.target.value }))}
+                                placeholder="Enter content description"
+                                className="mt-2"
+                                rows={2}
+                              />
+                            </div>
+                            <div className="flex flex-col sm:flex-row gap-2">
+                              <Button onClick={() => addContentToModule(module.id)} className="flex-1 sm:flex-none">
+                                Add Content
+                              </Button>
+                              <Button 
+                                variant="outline" 
+                                onClick={() => setEditingModule(null)}
+                                className="flex-1 sm:flex-none"
+                              >
+                                Cancel
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <Button
+                            variant="outline"
+                            onClick={() => setEditingModule(module.id)}
+                            className="w-full sm:w-auto"
+                          >
+                            <Plus className="w-4 h-4 mr-2" />
+                            Add Content
+                          </Button>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
               </motion.div>
             )}
@@ -798,122 +865,140 @@ export default function CreateCourse() {
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="space-y-6"
+                className="space-y-4 sm:space-y-6"
               >
                 <div>
-                  <Label>Course Quiz (Optional)</Label>
-                  <p className="text-sm text-gray-500 mb-4">Add a quiz to test student knowledge at the end of the course</p>
+                  <h3 className="text-lg font-semibold mb-4">Course Quiz (Optional)</h3>
                   
                   {!formData.quiz ? (
-                    <Button onClick={addQuiz} variant="outline">
-                      <HelpCircle className="w-4 h-4 mr-2" />
-                      Add Course Quiz
-                    </Button>
-                  ) : (
                     <Card>
-                      <CardHeader>
-                        <div className="flex justify-between items-center">
-                          <CardTitle>Course Quiz</CardTitle>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setFormData(prev => ({ ...prev, quiz: undefined }))}
-                            className="text-red-600"
-                          >
-                            <Trash2 className="w-4 h-4" />
+                      <CardContent className="p-6 text-center">
+                        <HelpCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                        <h4 className="text-lg font-medium mb-2">No Quiz Added</h4>
+                        <p className="text-gray-600 mb-4">Add a quiz to test your students' knowledge</p>
+                        <Button onClick={addQuiz}>
+                          <Plus className="w-4 h-4 mr-2" />
+                          Add Quiz
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    <div className="space-y-4">
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="text-base">Quiz Questions</CardTitle>
+                          <CardDescription>
+                            Add questions to test student understanding
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <Button onClick={addQuizQuestion} className="w-full sm:w-auto mb-4">
+                            <Plus className="w-4 h-4 mr-2" />
+                            Add Question
                           </Button>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div>
-                          <Label>Quiz Title</Label>
-                          <Input
-                            value={formData.quiz.title}
-                            onChange={(e) => setFormData(prev => ({
-                              ...prev,
-                              quiz: prev.quiz ? { ...prev.quiz, title: e.target.value } : undefined
-                            }))}
-                            placeholder="Quiz title"
-                          />
-                        </div>
-                        <div>
-                          <Label>Quiz Description</Label>
-                          <Textarea
-                            value={formData.quiz.description}
-                            onChange={(e) => setFormData(prev => ({
-                              ...prev,
-                              quiz: prev.quiz ? { ...prev.quiz, description: e.target.value } : undefined
-                            }))}
-                            placeholder="Quiz description"
-                            rows={2}
-                          />
-                        </div>
 
-                        {/* Quiz Questions */}
-                        <div className="space-y-4">
-                          <div className="flex justify-between items-center">
-                            <Label>Questions ({formData.quiz.questions.length})</Label>
-                            <Button onClick={addQuizQuestion} size="sm">
-                              <Plus className="w-4 h-4 mr-2" />
-                              Add Question
-                            </Button>
-                          </div>
-
-                          {formData.quiz.questions.map((question, qIndex) => (
-                            <Card key={question.id} className="border-l-4 border-l-green-500">
-                              <CardContent className="p-4">
-                                <div className="space-y-3">
-                                  <div className="flex justify-between items-start">
-                                    <Label>Question {qIndex + 1}</Label>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => removeQuizQuestion(question.id)}
-                                      className="text-red-600"
-                                    >
-                                      <X className="w-4 h-4" />
-                                    </Button>
-                                  </div>
+                          {formData.quiz.questions.map((question, index) => (
+                            <Card key={question.id} className="mb-4">
+                              <CardHeader className="pb-3">
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                                  <CardTitle className="text-sm">Question {index + 1}</CardTitle>
+                                  <Button
+                                    variant="destructive"
+                                    size="sm"
+                                    onClick={() => removeQuizQuestion(question.id)}
+                                    className="self-start sm:self-auto"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                              </CardHeader>
+                              <CardContent className="space-y-4">
+                                <div>
+                                  <Label className="text-sm font-medium">Question Text</Label>
                                   <Textarea
                                     value={question.question_text}
                                     onChange={(e) => updateQuizQuestion(question.id, 'question_text', e.target.value)}
                                     placeholder="Enter your question"
-                                    rows={2}
+                                    className="mt-2"
+                                    rows={3}
                                   />
-                                  
-                                  <div className="space-y-2">
-                                    <Label>Answer Options</Label>
-                                    {question.options.map((option, oIndex) => (
-                                      <div key={oIndex} className="flex items-center space-x-2">
-                                        <input
-                                          type="radio"
-                                          name={`correct-${question.id}`}
-                                          checked={question.correct_answer === option}
-                                          onChange={() => updateQuizQuestion(question.id, 'correct_answer', option)}
-                                        />
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                  <div>
+                                    <Label className="text-sm font-medium">Question Type</Label>
+                                    <Select 
+                                      value={question.question_type} 
+                                      onValueChange={(value) => updateQuizQuestion(question.id, 'question_type', value)}
+                                    >
+                                      <SelectTrigger className="mt-2">
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="MULTIPLE_CHOICE">Multiple Choice</SelectItem>
+                                        <SelectItem value="TRUE_FALSE">True/False</SelectItem>
+                                        <SelectItem value="SHORT_ANSWER">Short Answer</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                  <div>
+                                    <Label className="text-sm font-medium">Points</Label>
+                                    <Input
+                                      type="number"
+                                      value={question.points}
+                                      onChange={(e) => updateQuizQuestion(question.id, 'points', parseInt(e.target.value) || 1)}
+                                      className="mt-2"
+                                      min="1"
+                                    />
+                                  </div>
+                                </div>
+
+                                {question.question_type === 'MULTIPLE_CHOICE' && (
+                                  <div>
+                                    <Label className="text-sm font-medium">Answer Options</Label>
+                                    <div className="space-y-2 mt-2">
+                                      {question.options.map((option, optionIndex) => (
                                         <Input
+                                          key={optionIndex}
                                           value={option}
                                           onChange={(e) => {
                                             const newOptions = [...question.options];
-                                            newOptions[oIndex] = e.target.value;
+                                            newOptions[optionIndex] = e.target.value;
                                             updateQuizQuestion(question.id, 'options', newOptions);
-                                            // If this was the selected answer, update the correct_answer too
-                                            if (question.correct_answer === option) {
-                                              updateQuizQuestion(question.id, 'correct_answer', e.target.value);
-                                            }
                                           }}
-                                          placeholder={`Option ${oIndex + 1}`}
+                                          placeholder={`Option ${optionIndex + 1}`}
                                         />
-                                      </div>
-                                    ))}
+                                      ))}
+                                    </div>
                                   </div>
+                                )}
+
+                                <div>
+                                  <Label className="text-sm font-medium">Correct Answer</Label>
+                                  <Input
+                                    value={question.correct_answer}
+                                    onChange={(e) => updateQuizQuestion(question.id, 'correct_answer', e.target.value)}
+                                    placeholder="Enter the correct answer"
+                                    className="mt-2"
+                                  />
+                                </div>
+
+                                <div>
+                                  <Label className="text-sm font-medium">Explanation (Optional)</Label>
+                                  <Textarea
+                                    value={question.explanation || ''}
+                                    onChange={(e) => updateQuizQuestion(question.id, 'explanation', e.target.value)}
+                                    placeholder="Explain why this is the correct answer"
+                                    className="mt-2"
+                                    rows={2}
+                                  />
                                 </div>
                               </CardContent>
                             </Card>
                           ))}
-                        </div>
-                      </CardContent>
-                    </Card>
+                        </CardContent>
+                      </Card>
+                    </div>
                   )}
                 </div>
               </motion.div>
@@ -924,108 +1009,116 @@ export default function CreateCourse() {
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="space-y-6"
+                className="space-y-4 sm:space-y-6"
               >
                 <div>
-                  <h3 className="text-lg font-medium mb-4">Review Course Details</h3>
+                  <h3 className="text-lg font-semibold mb-4">Review & Publish</h3>
                   
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label className="text-sm font-medium text-gray-500">Title</Label>
-                        <p className="mt-1">{formData.title}</p>
-                      </div>
-                      <div>
-                        <Label className="text-sm font-medium text-gray-500">Category</Label>
-                        <p className="mt-1">{formData.category}</p>
-                      </div>
-                      <div>
-                        <Label className="text-sm font-medium text-gray-500">Level</Label>
-                        <p className="mt-1">{formData.level}</p>
-                      </div>
-                      <div>
-                        <Label className="text-sm font-medium text-gray-500">Price</Label>
-                        <p className="mt-1">{formData.price ? `$${formData.price}` : 'Free'}</p>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <Label className="text-sm font-medium text-gray-500">Description</Label>
-                      <p className="mt-1">{formData.description}</p>
-                    </div>
-                    
-                    <div>
-                      <Label className="text-sm font-medium text-gray-500">Modules ({formData.modules.length})</Label>
-                      <div className="mt-1 space-y-2">
-                        {formData.modules.map((module, index) => (
-                          <div key={module.id} className="p-3 bg-gray-50 rounded">
-                            <p className="font-medium">Module {index + 1}: {module.title}</p>
-                            <p className="text-sm text-gray-600">{module.description}</p>
-                            <p className="text-xs text-gray-500 mt-1">{module.contents.length} content items</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {formData.quiz && (
-                      <div>
-                        <Label className="text-sm font-medium text-gray-500">Quiz</Label>
-                        <div className="mt-1 p-3 bg-green-50 rounded">
-                          <p className="font-medium">{formData.quiz.title}</p>
-                          <p className="text-sm text-gray-600">{formData.quiz.description}</p>
-                          <p className="text-xs text-gray-500 mt-1">{formData.quiz.questions.length} questions</p>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-base">Course Summary</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <Label className="text-sm font-medium text-gray-600">Title</Label>
+                          <p className="font-medium">{formData.title || 'Not set'}</p>
+                        </div>
+                        <div>
+                          <Label className="text-sm font-medium text-gray-600">Category</Label>
+                          <p className="font-medium">{formData.category || 'Not set'}</p>
+                        </div>
+                        <div>
+                          <Label className="text-sm font-medium text-gray-600">Level</Label>
+                          <p className="font-medium">{formData.level || 'Not set'}</p>
+                        </div>
+                        <div>
+                          <Label className="text-sm font-medium text-gray-600">Price</Label>
+                          <p className="font-medium">{formData.price ? `$${formData.price}` : 'Free'}</p>
+                        </div>
+                        <div>
+                          <Label className="text-sm font-medium text-gray-600">Duration</Label>
+                          <p className="font-medium">{formData.duration || 'Not set'}</p>
+                        </div>
+                        <div>
+                          <Label className="text-sm font-medium text-gray-600">Status</Label>
+                          <Badge variant={formData.status === 'PUBLISHED' ? 'default' : 'secondary'}>
+                            {formData.status}
+                          </Badge>
                         </div>
                       </div>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            )}
+                      
+                      <div>
+                        <Label className="text-sm font-medium text-gray-600">Description</Label>
+                        <p className="text-sm mt-1">{formData.description || 'No description provided'}</p>
+                      </div>
 
-            {/* Navigation */}
-            <div className="flex justify-between mt-8 pt-6 border-t">
-              <Button
-                variant="outline"
-                onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
-                disabled={currentStep === 1}
-              >
-                Previous
-              </Button>
-              
-              <div className="flex space-x-3">
-                {currentStep === 5 ? (
-                  <>
+                      <div>
+                        <Label className="text-sm font-medium text-gray-600">Modules</Label>
+                        <p className="text-sm mt-1">{formData.modules.length} modules created</p>
+                      </div>
+
+                      <div>
+                        <Label className="text-sm font-medium text-gray-600">Quiz</Label>
+                        <p className="text-sm mt-1">
+                          {formData.quiz ? `${formData.quiz.questions.length} questions` : 'No quiz added'}
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <div className="flex flex-col sm:flex-row gap-3 mt-6">
                     <Button
-                      variant="outline"
                       onClick={() => handleSubmit('DRAFT')}
                       disabled={loading}
+                      variant="outline"
+                      className="flex-1"
                     >
-                      {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
+                      {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
                       Save as Draft
                     </Button>
                     <Button
                       onClick={() => handleSubmit('PUBLISHED')}
                       disabled={loading}
+                      className="flex-1"
                     >
-                      {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Eye className="w-4 h-4 mr-2" />}
+                      {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Eye className="w-4 h-4 mr-2" />}
                       Publish Course
                     </Button>
-                  </>
-                ) : (
-                  <Button
-                    onClick={() => setCurrentStep(Math.min(5, currentStep + 1))}
-                    disabled={
-                      (currentStep === 1 && (!formData.title || !formData.description || !formData.category)) ||
-                      (currentStep === 2 && !formData.level)
-                    }
-                  >
-                    Next
-                  </Button>
-                )}
-              </div>
-            </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
           </CardContent>
         </Card>
+
+        {/* Mobile-Optimized Navigation */}
+        <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3">
+          <Button
+            variant="outline"
+            onClick={prevStep}
+            disabled={currentStep === 1}
+            className="flex-1 sm:flex-none"
+          >
+            <ChevronLeft className="w-4 h-4 mr-2" />
+            Previous
+          </Button>
+          
+          <div className="hidden sm:flex items-center space-x-2">
+            <span className="text-sm text-gray-600">
+              Step {currentStep} of {steps.length}
+            </span>
+          </div>
+          
+          <Button
+            onClick={nextStep}
+            disabled={currentStep === steps.length}
+            className="flex-1 sm:flex-none"
+          >
+            Next
+            <ChevronRight className="w-4 h-4 ml-2" />
+          </Button>
+        </div>
       </main>
     </div>
   );
