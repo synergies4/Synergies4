@@ -27,7 +27,8 @@ import {
   X,
   Clock,
   ChevronUp,
-  MessageSquare
+  MessageSquare,
+  GraduationCap
 } from 'lucide-react';
 
 // Animation variants
@@ -268,11 +269,43 @@ export default function Home() {
                 </motion.div>
               ))}
               
-              {/* Distinctive Contact Button */}
+              {/* Synergize Button */}
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7, duration: 0.5 }}
+              >
+                <motion.div
+                  whileHover={{ scale: 1.02, y: -1 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                >
+                  <Button 
+                    asChild 
+                    className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
+                  >
+                    <Link href="/synergize">
+                      {/* Subtle shine effect */}
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                        initial={{ x: '-100%' }}
+                        whileHover={{ x: '100%' }}
+                        transition={{ duration: 0.6, ease: "easeInOut" }}
+                      />
+                      <span className="relative z-10 flex items-center">
+                        <Brain className="w-4 h-4 mr-2" />
+                        Synergize
+                      </span>
+                    </Link>
+                  </Button>
+                </motion.div>
+              </motion.div>
+              
+              {/* Distinctive Contact Button */}
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8, duration: 0.5 }}
               >
                 <motion.div
                   whileHover={{ scale: 1.02, y: -1 }}
@@ -368,8 +401,27 @@ export default function Home() {
                     </Link>
                   ))}
                   
-                  {/* Distinctive Contact Button for Mobile */}
-                  <div className="pt-2">
+                  {/* Mobile Buttons */}
+                  <div className="pt-2 space-y-3">
+                    <motion.div
+                      whileHover={{ scale: 1.02, y: -1 }}
+                      whileTap={{ scale: 0.98 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                    >
+                      <Button 
+                        asChild 
+                        className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group text-lg py-3"
+                      >
+                        <Link href="/synergize" onClick={() => setMobileMenuOpen(false)}>
+                          <span className="relative z-10 flex items-center justify-center">
+                            <Brain className="w-4 h-4 mr-2" />
+                            Synergize
+                          </span>
+                        </Link>
+                      </Button>
+                    </motion.div>
+                    
+                    {/* Distinctive Contact Button for Mobile */}
                     <motion.div
                       whileHover={{ scale: 1.02, y: -1 }}
                       whileTap={{ scale: 0.98 }}
@@ -522,31 +574,57 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Floating Particles */}
-          {Array.from({ length: 20 }).map((_, i) => (
-            <motion.div
-              key={`particle-${i}`}
-              className="absolute w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-40"
-              style={{
-                left: `${(i * 5) % 100}%`,
-                top: `${(i * 7) % 100}%`,
-              }}
-              animate={{
-                y: [0, -100, 0],
-                x: [0, (i % 2 === 0 ? 25 : -25), 0],
-                opacity: [0.4, 0.8, 0.4],
-              }}
-              transition={{
-                duration: 4 + (i % 4),
-                repeat: Infinity,
-                delay: i * 0.1,
-                ease: "easeInOut"
-              }}
-            />
-          ))}
+          {/* Floating Particles - Reduced for mobile performance */}
+          <div className="hidden md:block">
+            {Array.from({ length: 20 }).map((_, i) => (
+              <motion.div
+                key={`particle-${i}`}
+                className="absolute w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-40"
+                style={{
+                  left: `${(i * 12) % 100}%`,
+                  top: `${(i * 15) % 100}%`,
+                }}
+                animate={{
+                  y: [0, -50, 0],
+                  x: [0, (i % 2 === 0 ? 15 : -15), 0],
+                  opacity: [0.3, 0.6, 0.3],
+                }}
+                transition={{
+                  duration: 6 + (i % 3),
+                  repeat: Infinity,
+                  delay: i * 0.2,
+                  ease: "easeInOut"
+                }}
+              />
+            ))}
+          </div>
+          
+          {/* Mobile-optimized particles */}
+          <div className="block md:hidden">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <motion.div
+                key={`mobile-particle-${i}`}
+                className="absolute w-1 h-1 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-30"
+                style={{
+                  left: `${(i * 20) % 100}%`,
+                  top: `${(i * 25) % 100}%`,
+                }}
+                animate={{
+                  y: [0, -30, 0],
+                  opacity: [0.2, 0.4, 0.2],
+                }}
+                transition={{
+                  duration: 8,
+                  repeat: Infinity,
+                  delay: i * 0.5,
+                  ease: "easeInOut"
+                }}
+              />
+            ))}
+          </div>
 
-          {/* Gradient Mesh */}
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-pink-500/5 animate-pulse" />
+          {/* Gradient Mesh - Simplified for mobile */}
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/3 via-purple-500/3 to-pink-500/3" />
         </div>
 
         <motion.div 
@@ -651,60 +729,109 @@ export default function Home() {
 function ValuePropositionsSection() {
   const { ref, isInView } = useScrollAnimation();
 
-  const valueProps = [
-    {
-      icon: <Brain className="h-8 w-8" />,
-      title: "AI-Powered Learning",
-      description: "Personalized learning paths powered by artificial intelligence to accelerate your growth."
-    },
-    {
-      icon: <Target className="h-8 w-8" />,
-      title: "Practical Skills",
-      description: "Learn frameworks and methodologies that you can immediately apply in your work."
-    },
-    {
-      icon: <Users className="h-8 w-8" />,
-      title: "Expert Instructors",
-      description: "Learn from industry leaders with real-world experience in their fields."
-    },
-    {
-      icon: <Award className="h-8 w-8" />,
-      title: "Recognized Certifications",
-      description: "Earn certificates that are valued by employers and industry professionals."
-    }
-  ];
-
   return (
     <motion.section 
       ref={ref}
-      className="py-20 bg-white"
+      className="py-20 bg-white relative overflow-hidden"
       initial="initial"
       animate={isInView ? "animate" : "initial"}
       variants={staggerContainer}
     >
-      <div className="container mx-auto px-4">
+      {/* Subtle Background Pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `radial-gradient(circle at 25% 25%, #3B82F6 2px, transparent 2px),
+                           radial-gradient(circle at 75% 75%, #8B5CF6 2px, transparent 2px)`,
+          backgroundSize: '60px 60px'
+        }} />
+      </div>
+      
+      {/* Floating Geometric Shapes */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <motion.div
+          className="absolute top-20 right-10 w-20 h-20 border border-blue-200 rounded-full opacity-20"
+          animate={{
+            rotate: [0, 360],
+            scale: [1, 1.1, 1],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+        />
+        <motion.div
+          className="absolute bottom-20 left-10 w-16 h-16 bg-gradient-to-br from-purple-200 to-blue-200 rounded-lg opacity-20"
+          animate={{
+            rotate: [0, -360],
+            y: [0, -20, 0],
+          }}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        <motion.div
+          className="absolute top-1/2 left-1/4 w-12 h-12 border-2 border-indigo-200 rotate-45 opacity-20"
+          animate={{
+            rotate: [45, 405],
+            x: [0, 30, 0],
+          }}
+          transition={{
+            duration: 18,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+      </div>
+
+      <div className="container mx-auto px-4 relative z-10">
         <motion.div className="text-center mb-16" variants={fadeInUp}>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
             Why Choose Synergies4?
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
             We're not just another training company. We're your AI-powered partners in creating personalized learning journeys.
           </p>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {valueProps.map((prop, index) => (
+          {[
+            {
+              icon: <Brain className="h-8 w-8" />,
+              title: "AI-Powered Learning",
+              description: "Personalized learning paths powered by artificial intelligence to accelerate your growth."
+            },
+            {
+              icon: <Target className="h-8 w-8" />,
+              title: "Practical Skills",
+              description: "Learn frameworks and methodologies that you can immediately apply in your work."
+            },
+            {
+              icon: <Users className="h-8 w-8" />,
+              title: "Expert Instructors",
+              description: "Learn from industry leaders with real-world experience in their fields."
+            },
+            {
+              icon: <Award className="h-8 w-8" />,
+              title: "Recognized Certifications",
+              description: "Earn certificates that are valued by employers and industry professionals."
+            }
+          ].map((item, index) => (
             <motion.div key={index} variants={scaleIn}>
-              <Card className="h-full text-center hover:shadow-lg transition-shadow duration-300">
+              <Card className="h-full text-center hover:shadow-xl transition-all duration-300 group border-0 shadow-lg bg-white/80 backdrop-blur-sm">
                 <CardHeader>
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600">
-                    {prop.icon}
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 group-hover:scale-110 transition-transform duration-300">
+                    {item.icon}
                   </div>
-                  <CardTitle className="text-xl">{prop.title}</CardTitle>
+                  <CardTitle className="text-xl group-hover:text-blue-600 transition-colors">
+                    {item.title}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <CardDescription className="text-base">
-                    {prop.description}
+                  <CardDescription className="text-base leading-relaxed">
+                    {item.description}
                   </CardDescription>
                 </CardContent>
               </Card>
@@ -1029,165 +1156,169 @@ function FeaturedCoursesSection() {
 function CertificationsSection() {
   const { ref, isInView } = useScrollAnimation();
 
-  const categories = [
-    { 
-      title: "Agile & Scrum", 
-      image: "https://placehold.co/300x200/1e3a8a/FFFFFF/png?text=Agile", 
-      courses: 12,
-      description: "Master agile methodologies and scrum frameworks",
-      level: "All Levels",
-      duration: "4-8 weeks",
-      popular: true
+  const certifications = [
+    {
+      title: "AI-Powered Scrum Master",
+      level: "Professional",
+      duration: "8 weeks",
+      students: "2,500+",
+      rating: 4.9,
+      progress: 85,
+      color: "from-blue-500 to-cyan-500"
     },
-    { 
-      title: "Business Analysis", 
-      image: "https://placehold.co/300x200/15803d/FFFFFF/png?text=Business+Analysis", 
-      courses: 8,
-      description: "Learn to analyze business requirements and processes",
-      level: "Intermediate",
-      duration: "6-10 weeks",
-      popular: false
-    },
-    { 
-      title: "Product Management", 
-      image: "https://placehold.co/300x200/0ea5e9/FFFFFF/png?text=Product+Management", 
-      courses: 15,
-      description: "Drive product strategy and development",
-      level: "All Levels",
-      duration: "8-12 weeks",
-      popular: true
-    },
-    { 
-      title: "Business Strategy", 
-      image: "https://placehold.co/300x200/8b5cf6/FFFFFF/png?text=Business+Strategy", 
-      courses: 10,
-      description: "Develop strategic thinking and planning skills",
+    {
+      title: "Agile Product Owner",
       level: "Advanced",
-      duration: "6-8 weeks",
-      popular: false
+      duration: "6 weeks", 
+      students: "1,800+",
+      rating: 4.8,
+      progress: 92,
+      color: "from-green-500 to-emerald-500"
     },
-    { 
-      title: "PQ Skills", 
-      image: "https://placehold.co/300x200/ec4899/FFFFFF/png?text=PQ+Skills", 
-      courses: 6,
-      description: "Build mental fitness and emotional intelligence",
-      level: "Beginner",
-      duration: "4-6 weeks",
-      popular: false
-    },
-    { 
-      title: "Leadership", 
-      image: "https://placehold.co/300x200/f59e0b/FFFFFF/png?text=Leadership", 
-      courses: 9,
-      description: "Develop leadership and team management skills",
-      level: "Intermediate",
-      duration: "8-10 weeks",
-      popular: true
+    {
+      title: "Digital Transformation Leader",
+      level: "Executive",
+      duration: "12 weeks",
+      students: "950+", 
+      rating: 4.9,
+      progress: 78,
+      color: "from-purple-500 to-violet-500"
     }
   ];
 
   const getLevelColor = (level: string) => {
     switch (level) {
-      case 'Beginner': return 'bg-green-100 text-green-700';
-      case 'Intermediate': return 'bg-yellow-100 text-yellow-700';
-      case 'Advanced': return 'bg-red-100 text-red-700';
-      case 'All Levels': return 'bg-blue-100 text-blue-700';
-      default: return 'bg-gray-100 text-gray-700';
+      case 'Beginner': return 'bg-green-100 text-green-800';
+      case 'Intermediate': return 'bg-yellow-100 text-yellow-800';
+      case 'Advanced': return 'bg-orange-100 text-orange-800';
+      case 'Professional': return 'bg-blue-100 text-blue-800';
+      case 'Executive': return 'bg-purple-100 text-purple-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
   return (
     <motion.section 
       ref={ref}
-      className="py-20 bg-white"
+      className="py-20 bg-gradient-to-br from-gray-50 to-blue-50 relative overflow-hidden"
       initial="initial"
       animate={isInView ? "animate" : "initial"}
       variants={staggerContainer}
     >
-      <div className="container mx-auto px-4">
+      {/* Enhanced Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Subtle Grid Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+                             linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px)`,
+            backgroundSize: '40px 40px'
+          }} />
+        </div>
+        
+        {/* Floating Certificate Icons */}
+        <motion.div
+          className="absolute top-16 right-16 w-16 h-16 opacity-10"
+          animate={{
+            rotate: [0, 360],
+            scale: [1, 1.2, 1],
+          }}
+          transition={{
+            duration: 25,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+        >
+          <Award className="w-full h-full text-blue-600" />
+        </motion.div>
+        
+        <motion.div
+          className="absolute bottom-16 left-16 w-12 h-12 opacity-10"
+          animate={{
+            rotate: [0, -360],
+            y: [0, -15, 0],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        >
+          <GraduationCap className="w-full h-full text-purple-600" />
+        </motion.div>
+        
+        <motion.div
+          className="absolute top-1/3 left-1/3 w-8 h-8 opacity-10"
+          animate={{
+            rotate: [0, 180, 360],
+            x: [0, 20, 0],
+          }}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        >
+          <Star className="w-full h-full text-yellow-600" />
+        </motion.div>
+      </div>
+
+      <div className="container mx-auto px-4 relative z-10">
         <motion.div className="text-center mb-16" variants={fadeInUp}>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
             Professional Certifications
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Advance your career with industry-recognized certifications across multiple domains.
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            Earn industry-recognized certifications that validate your expertise and accelerate your career growth.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {categories.map((category, index) => (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {certifications.map((cert, index) => (
             <motion.div key={index} variants={scaleIn}>
-              <Card className="h-full hover:shadow-2xl transition-all duration-500 group cursor-pointer border-0 shadow-lg overflow-hidden">
-                <div className="relative overflow-hidden">
-                  <img 
-                    src={category.image}
-                    alt={category.title}
-                    className="w-full h-40 object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <Card className="h-full hover:shadow-2xl transition-all duration-300 group border-0 shadow-lg bg-white/90 backdrop-blur-sm overflow-hidden">
+                {/* Gradient Header */}
+                <div className={`h-2 bg-gradient-to-r ${cert.color}`} />
+                
+                <CardHeader className="relative">
+                  <div className="flex items-center justify-between mb-4">
+                    <Badge className={getLevelColor(cert.level)}>
+                      {cert.level}
+                    </Badge>
+                    <div className="flex items-center space-x-1">
+                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                      <span className="text-sm font-medium">{cert.rating}</span>
+                    </div>
+                  </div>
                   
-                  {/* Popular Badge */}
-                  {category.popular && (
-                    <Badge className="absolute top-4 left-4 bg-yellow-500 text-white shadow-lg">
-                      <Star className="w-3 h-3 mr-1" />
-                      Popular
-                    </Badge>
-                  )}
-
-                  {/* Level Badge */}
-                  <Badge className={`absolute top-4 right-4 ${getLevelColor(category.level)} shadow-lg`}>
-                    {category.level}
-                  </Badge>
-
-                  {/* Hover Overlay */}
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <Button 
-                      size="sm" 
-                      className="bg-white text-gray-900 hover:bg-gray-100 shadow-lg"
-                    >
-                      Explore Courses
-                    </Button>
+                  <CardTitle className="text-xl group-hover:text-blue-600 transition-colors">
+                    {cert.title}
+                  </CardTitle>
+                  
+                  <div className="flex items-center justify-between text-sm text-gray-600 mt-4">
+                    <div className="flex items-center space-x-1">
+                      <Clock className="h-4 w-4" />
+                      <span>{cert.duration}</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <Users className="h-4 w-4" />
+                      <span>{cert.students}</span>
+                    </div>
                   </div>
-                </div>
-
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between mb-2">
-                    <CardTitle className="text-xl group-hover:text-blue-600 transition-colors duration-300">
-                      {category.title}
-                    </CardTitle>
-                    <Badge variant="outline" className="text-xs">
-                      {category.courses} courses
-                    </Badge>
-                  </div>
-                  <CardDescription className="text-sm leading-relaxed">
-                    {category.description}
-                  </CardDescription>
                 </CardHeader>
-
-                <CardContent className="pt-0">
-                  {/* Course Meta */}
-                  <div className="flex items-center justify-between mb-4 text-sm text-gray-500">
-                    <div className="flex items-center">
-                      <Clock className="h-3 w-3 mr-1" />
-                      {category.duration}
-                    </div>
-                    <div className="flex items-center">
-                      <BookOpen className="h-3 w-3 mr-1" />
-                      {category.courses} courses
-                    </div>
-                  </div>
-
+                
+                <CardContent>
                   {/* Progress Bar */}
                   <div className="mb-4">
                     <div className="flex justify-between text-xs text-gray-500 mb-1">
                       <span>Course Completion</span>
-                      <span>{60 + (index * 7) % 40}%</span>
+                      <span>{cert.progress}%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <motion.div 
-                        className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full"
+                        className={`bg-gradient-to-r ${cert.color} h-2 rounded-full`}
                         initial={{ width: 0 }}
-                        animate={isInView ? { width: `${60 + (index * 7) % 40}%` } : { width: 0 }}
+                        animate={isInView ? { width: `${cert.progress}%` } : { width: 0 }}
                         transition={{ delay: 0.5 + index * 0.1, duration: 1 }}
                       />
                     </div>

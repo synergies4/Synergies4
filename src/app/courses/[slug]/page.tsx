@@ -765,6 +765,125 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
           </div>
         </div>
       </section>
+
+      {/* Footer */}
+      <motion.footer 
+        className="bg-gray-900 text-white py-16"
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+      >
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+            >
+              <motion.span 
+                className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-4 block"
+              >
+                Synergies4
+              </motion.span>
+              <p className="text-gray-400 mb-4">
+                AI-powered learning tailored uniquely to you and your organization.
+              </p>
+              <div className="flex space-x-4">
+                {['Facebook', 'Twitter', 'LinkedIn', 'Instagram'].map((social) => (
+                  <a key={social} href="#" className="text-gray-400 hover:text-white transition-colors">
+                    <span className="sr-only">{social}</span>
+                    <div className="w-6 h-6 bg-gray-400 rounded"></div>
+                  </a>
+                ))}
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.5 }}
+            >
+              <h3 className="text-lg font-semibold mb-4">Courses</h3>
+              <ul className="space-y-2 text-gray-400">
+                <li><a href="#" className="hover:text-white transition-colors">Agile & Scrum</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Product Management</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Leadership</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Business Analysis</a></li>
+              </ul>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.5 }}
+            >
+              <h3 className="text-lg font-semibold mb-4">Company</h3>
+              <ul className="space-y-2 text-gray-400">
+                <li><Link href="/about-us" className="hover:text-white transition-colors">About Us</Link></li>
+                <li><Link href="/coaching" className="hover:text-white transition-colors">Coaching</Link></li>
+                <li><Link href="/consulting" className="hover:text-white transition-colors">Consulting</Link></li>
+              </ul>
+              
+              {/* Distinctive Contact Button in Footer */}
+              <div className="mt-6">
+                <motion.div
+                  whileHover={{ scale: 1.02, y: -1 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                >
+                  <Button 
+                    asChild 
+                    size="sm"
+                    className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group w-full"
+                  >
+                    <Link href="/contact">
+                      {/* Subtle shine effect */}
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                        initial={{ x: '-100%' }}
+                        whileHover={{ x: '100%' }}
+                        transition={{ duration: 0.6, ease: "easeInOut" }}
+                      />
+                      <span className="relative z-10 flex items-center justify-center">
+                        <MessageSquare className="w-4 h-4 mr-2" />
+                        Contact Us
+                      </span>
+                    </Link>
+                  </Button>
+                </motion.div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.5 }}
+            >
+              <h3 className="text-lg font-semibold mb-4">Support</h3>
+              <ul className="space-y-2 text-gray-400">
+                <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Cookie Policy</a></li>
+              </ul>
+            </motion.div>
+          </div>
+
+          <Separator className="bg-gray-800 mb-8" />
+
+          <motion.div 
+            className="text-center text-gray-400"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.7, duration: 0.5 }}
+          >
+            <p>&copy; {new Date().getFullYear()} Synergies4 LLC. All rights reserved.</p>
+            <p className="mt-2 text-sm">
+              Synergies4™, PocketCoachAI™, Adaptive Content Pods™ are trademarks of Synergies4 LLC.
+            </p>
+          </motion.div>
+        </div>
+      </motion.footer>
     </main>
   );
 } 
