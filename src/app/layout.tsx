@@ -17,15 +17,17 @@ export const metadata: Metadata = {
   // Favicon and icons - Updated for better browser support
   icons: {
     icon: [
+      { url: "/faviconio.svg", type: "image/svg+xml" },
       { url: "/favicon.svg", type: "image/svg+xml" },
       { url: "/synergies4_logo.svg", type: "image/svg+xml" },
       { url: "/favicon.ico", sizes: "any" }
     ],
     apple: [
+      { url: "/faviconio.svg", type: "image/svg+xml" },
       { url: "/favicon.svg", type: "image/svg+xml" },
       { url: "/synergies4_logo.svg", type: "image/svg+xml" }
     ],
-    shortcut: "/favicon.svg"
+    shortcut: "/faviconio.svg"
   },
   
   // Open Graph / Facebook - Removed specific image to use defaults
@@ -87,9 +89,10 @@ export default function RootLayout({
     <html lang="en">
       <head>
         {/* Additional favicon links for better browser support */}
+        <link rel="icon" href="/faviconio.svg" type="image/svg+xml" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="apple-touch-icon" href="/favicon.svg" />
+        <link rel="apple-touch-icon" href="/faviconio.svg" />
       </head>
       <body className={inter.className} suppressHydrationWarning>
         <PerformanceOptimizer />

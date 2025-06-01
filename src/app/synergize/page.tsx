@@ -118,7 +118,7 @@ export default function SynergizePage() {
     const welcomeMessage: Message = {
       id: 'welcome',
       role: 'assistant',
-      content: `Hello! I'm your AI learning companion. I'm here to help you with questions about business, technology, leadership, and professional development. I can also help you generate images, create presentations, and analyze documents. How can I assist you today?`,
+      content: `Hi! I'm your AI learning assistant. How can I help you today?`,
       timestamp: new Date(),
       provider: selectedProvider
     };
@@ -240,7 +240,7 @@ export default function SynergizePage() {
     const welcomeMessage: Message = {
       id: 'welcome-new',
       role: 'assistant',
-      content: `Hello! I'm your AI learning companion. I'm here to help you with questions about business, technology, leadership, and professional development. I can also help you generate images, create presentations, and analyze documents. How can I assist you today?`,
+      content: `Hi! I'm your AI learning assistant. How can I help you today?`,
       timestamp: new Date(),
       provider: selectedProvider
     };
@@ -490,8 +490,8 @@ export default function SynergizePage() {
               Synergize
             </span>
           </h1>
-          <p className="text-sm md:text-lg text-gray-600 mb-4 md:mb-6 max-w-3xl mx-auto leading-relaxed">
-            Your intelligent learning companion powered by advanced AI. Get instant answers, personalized guidance, and expert insights.
+          <p className="text-sm md:text-lg text-gray-600 mb-4 md:mb-6 max-w-2xl mx-auto leading-relaxed">
+            Your AI learning companion. Get instant answers and personalized guidance.
           </p>
         </div>
       </section>
@@ -553,7 +553,11 @@ export default function SynergizePage() {
               <div 
                 ref={chatContainerRef}
                 className="flex-1 overflow-y-auto p-2 md:p-4 space-y-3 md:space-y-4 min-h-0"
-                style={{ maxHeight: 'calc(100vh - 300px)' }}
+                style={{ 
+                  height: 'calc(100vh - 400px)',
+                  minHeight: '400px',
+                  maxHeight: 'calc(100vh - 300px)'
+                }}
               >
                 <AnimatePresence>
                   {messages.map((message) => (
@@ -736,7 +740,7 @@ export default function SynergizePage() {
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    placeholder="Ask me anything about business, technology, or professional development..."
+                    placeholder="Ask me anything..."
                     className="flex-1 min-h-[40px] max-h-32 resize-none text-sm"
                     disabled={isLoading}
                   />
