@@ -223,27 +223,27 @@ export default function GlobalSearch({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm">
-      <div className="flex items-start justify-center min-h-screen pt-[10vh] px-4">
+      <div className="flex items-start justify-center min-h-screen pt-[5vh] sm:pt-[10vh] px-2 sm:px-4">
         <Card className="w-full max-w-3xl bg-white shadow-2xl border-0 rounded-2xl overflow-hidden">
           <CardContent className="p-0">
             {/* Search Header */}
-            <div className="p-6 border-b border-gray-100">
-              <div className="flex items-center space-x-4">
+            <div className="p-4 sm:p-6 border-b border-gray-100">
+              <div className="flex items-center space-x-2 sm:space-x-4">
                 <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 sm:h-5 w-4 sm:w-5" />
                   <Input
                     ref={searchInputRef}
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder={placeholder}
-                    className="pl-12 pr-12 h-14 text-lg border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 rounded-xl"
+                    className="pl-10 sm:pl-12 pr-12 sm:pr-16 h-12 sm:h-14 text-base sm:text-lg border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 rounded-xl"
                   />
                   {speechSupported && (
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={isListening ? stopVoiceSearch : startVoiceSearch}
-                      className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-2 ${
+                      className={`absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 p-2 ${
                         isListening ? 'text-red-600 hover:text-red-700' : 'text-gray-400 hover:text-gray-600'
                       }`}
                     >
@@ -255,22 +255,23 @@ export default function GlobalSearch({
                   variant="ghost"
                   size="sm"
                   onClick={onClose}
-                  className="h-14 w-14 rounded-xl"
+                  className="h-12 sm:h-14 w-12 sm:w-14 rounded-xl flex-shrink-0"
                 >
                   <X className="h-5 w-5" />
                 </Button>
               </div>
 
-              {/* Filters */}
+              {/* Filters - Mobile Optimized */}
               {showFilters && (categories.length > 1 || types.length > 1) && (
-                <div className="flex flex-wrap gap-3 mt-4">
+                <div className="flex flex-col sm:flex-row flex-wrap gap-3 mt-4">
                   {types.length > 1 && (
                     <div className="flex items-center space-x-2">
-                      <Filter className="h-4 w-4 text-gray-500" />
+                      <Filter className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                      {/* Mobile: Use native select, Desktop: Keep styled select */}
                       <select
                         value={selectedType}
                         onChange={(e) => setSelectedType(e.target.value)}
-                        className="text-sm border border-gray-300 rounded-lg px-3 py-1 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                        className="flex-1 sm:flex-initial text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white min-w-0"
                       >
                         <option value="all">All Types</option>
                         <option value="course">Courses</option>
@@ -284,7 +285,7 @@ export default function GlobalSearch({
                     <select
                       value={selectedCategory}
                       onChange={(e) => setSelectedCategory(e.target.value)}
-                      className="text-sm border border-gray-300 rounded-lg px-3 py-1 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                      className="flex-1 sm:flex-initial text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white min-w-0"
                     >
                       <option value="all">All Categories</option>
                       {categories.filter(cat => cat !== 'all').map(category => (
@@ -295,39 +296,50 @@ export default function GlobalSearch({
                 </div>
               )}
 
-              {/* Voice feedback */}
+              {/* Voice feedback - Mobile Optimized */}
               {isListening && (
-                <div className="mt-4 flex items-center space-x-2 text-red-600">
+                <div className="mt-4 flex items-center space-x-2 text-red-600 bg-red-50 rounded-lg p-3">
                   <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
-                  <span className="text-sm">Listening...</span>
+                  <span className="text-sm font-medium">Listening for your voice...</span>
+                  <div className="ml-auto text-xs text-red-500">Tap mic to stop</div>
+                </div>
+              )}
+
+              {/* Mobile tip for voice search */}
+              {speechSupported && !isListening && query.length === 0 && (
+                <div className="mt-4 sm:hidden bg-teal-50 border border-teal-200 rounded-lg p-3">
+                  <div className="flex items-center space-x-2 text-teal-700">
+                    <Mic className="h-4 w-4 flex-shrink-0" />
+                    <span className="text-sm">Tip: Tap the microphone to search using your voice</span>
+                  </div>
                 </div>
               )}
             </div>
 
-            {/* Search Results */}
-            <div className="max-h-[60vh] overflow-y-auto">
+            {/* Search Results - Mobile Optimized */}
+            <div className="max-h-[50vh] sm:max-h-[60vh] overflow-y-auto">
               {loading && (
-                <div className="flex items-center justify-center py-12">
+                <div className="flex items-center justify-center py-8 sm:py-12">
                   <Loader2 className="h-6 w-6 animate-spin text-teal-600 mr-2" />
                   <span className="text-gray-600">Searching...</span>
                 </div>
               )}
 
               {!loading && query.length > 1 && results.length === 0 && (
-                <div className="text-center py-12">
+                <div className="text-center py-8 sm:py-12 px-4">
                   <Search className="h-12 w-12 text-gray-300 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 mb-2">No results found</h3>
-                  <p className="text-gray-500">Try adjusting your search terms or filters</p>
+                  <p className="text-gray-500 text-sm sm:text-base">Try adjusting your search terms or filters</p>
                 </div>
               )}
 
               {results.length > 0 && (
-                <div className="p-4 space-y-2">
+                <div className="p-3 sm:p-4 space-y-2">
                   {results.map((result) => (
                     <div
                       key={result.id}
                       onClick={() => handleResultClick(result)}
-                      className="group p-4 rounded-xl hover:bg-gray-50 cursor-pointer transition-all duration-200 border border-transparent hover:border-gray-200"
+                      className="group p-3 sm:p-4 rounded-xl hover:bg-gray-50 cursor-pointer transition-all duration-200 border border-transparent hover:border-gray-200 active:bg-gray-100"
                     >
                       <div className="flex items-start space-x-3">
                         <div className="flex-shrink-0 p-2 bg-gray-100 rounded-lg group-hover:bg-white transition-colors">
@@ -335,11 +347,11 @@ export default function GlobalSearch({
                         </div>
                         
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center space-x-2 mb-2">
-                            <h4 className="font-medium text-gray-900 truncate group-hover:text-teal-600 transition-colors">
+                          <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2 mb-2">
+                            <h4 className="font-medium text-gray-900 truncate group-hover:text-teal-600 transition-colors text-sm sm:text-base">
                               {result.title}
                             </h4>
-                            <Badge className={`text-xs ${getTypeBadgeColor(result.type)}`}>
+                            <Badge className={`text-xs w-fit ${getTypeBadgeColor(result.type)}`}>
                               {result.type.replace('_', ' ')}
                             </Badge>
                           </div>
@@ -348,7 +360,7 @@ export default function GlobalSearch({
                             {result.description}
                           </p>
                           
-                          <div className="flex items-center space-x-4 text-xs text-gray-500">
+                          <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-gray-500">
                             {result.category && (
                               <div className="flex items-center space-x-1">
                                 <Tag className="h-3 w-3" />
@@ -368,23 +380,23 @@ export default function GlobalSearch({
                           </div>
                         </div>
                         
-                        <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-teal-600 transition-colors opacity-0 group-hover:opacity-100" />
+                        <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-teal-600 transition-colors opacity-0 group-hover:opacity-100 flex-shrink-0" />
                       </div>
                     </div>
                   ))}
                 </div>
               )}
 
-              {/* Search Suggestions */}
+              {/* Search Suggestions - Mobile Optimized */}
               {suggestions.length > 0 && (
-                <div className="border-t border-gray-100 p-4">
+                <div className="border-t border-gray-100 p-3 sm:p-4">
                   <h4 className="text-sm font-medium text-gray-700 mb-3">Suggestions</h4>
                   <div className="flex flex-wrap gap-2">
                     {suggestions.map((suggestion, index) => (
                       <button
                         key={index}
                         onClick={() => handleSuggestionClick(suggestion)}
-                        className="text-sm px-3 py-1 bg-gray-100 hover:bg-teal-100 hover:text-teal-700 rounded-full transition-colors"
+                        className="text-sm px-3 py-2 bg-gray-100 hover:bg-teal-100 hover:text-teal-700 rounded-full transition-colors active:bg-teal-200"
                       >
                         {suggestion}
                       </button>
@@ -394,27 +406,39 @@ export default function GlobalSearch({
               )}
             </div>
 
-            {/* Search Tips */}
+            {/* Search Tips - Mobile Optimized */}
             {query.length === 0 && (
-              <div className="p-6 border-t border-gray-100 bg-gray-50">
+              <div className="p-4 sm:p-6 border-t border-gray-100 bg-gray-50">
                 <h4 className="text-sm font-medium text-gray-700 mb-3">Search Tips</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+                <div className="grid grid-cols-1 gap-4 text-sm text-gray-600">
                   <div>
-                    <p className="font-medium mb-1">Popular searches:</p>
-                    <ul className="space-y-1">
-                      <li>• "agile training"</li>
-                      <li>• "scrum master"</li>
-                      <li>• "leadership development"</li>
-                    </ul>
+                    <p className="font-medium mb-2">Popular searches:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {['agile training', 'scrum master', 'leadership development'].map((term) => (
+                        <button
+                          key={term}
+                          onClick={() => setQuery(term)}
+                          className="text-xs px-2 py-1 bg-teal-100 text-teal-700 rounded-md hover:bg-teal-200 transition-colors"
+                        >
+                          {term}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                   <div>
                     <p className="font-medium mb-1">Search across:</p>
-                    <ul className="space-y-1">
+                    <ul className="space-y-1 text-xs">
                       <li>• Training courses</li>
                       <li>• Blog articles</li>
                       <li>• Site pages</li>
                     </ul>
                   </div>
+                  {speechSupported && (
+                    <div className="sm:hidden">
+                      <p className="font-medium mb-1">Voice search:</p>
+                      <p className="text-xs">Tap the microphone icon to search using your voice</p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

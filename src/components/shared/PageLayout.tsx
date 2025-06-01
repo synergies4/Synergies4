@@ -57,7 +57,7 @@ function ScrollToTop() {
   return (
     <button
       onClick={scrollToTop}
-      className="fixed bottom-8 right-8 z-50 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
+      className="fixed bottom-8 right-8 z-50 bg-teal-600 hover:bg-teal-700 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
     >
       <ChevronUp className="h-6 w-6" />
     </button>
@@ -65,23 +65,27 @@ function ScrollToTop() {
 }
 
 // Navigation Component
-function Navigation() {
+interface NavigationProps {
+  isSearchOpen: boolean;
+  setIsSearchOpen: (open: boolean) => void;
+}
+
+function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
   const { user, signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   return (
     <>
-      {/* Countdown Banner */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-center">
-            <p className="text-sm md:text-base">
+      {/* Countdown Banner - Fixed Mobile Layout */}
+      <div className="bg-gradient-to-r from-teal-600 to-emerald-600 text-white py-3 px-4">
+        <div className="container mx-auto">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-center">
+            <p className="text-sm sm:text-base font-medium">
               🚀 Expand your potential through learning. Offering earlybirds a discount of $295.00.
             </p>
-            <div className="flex gap-2">
+            <div className="flex gap-1 sm:gap-2 text-xs sm:text-sm">
               {['00 Days', '00 Hours', '00 Minutes', '00 Seconds'].map((time, index) => (
-                <Badge key={index} variant="secondary" className="bg-white/20 text-white border-white/30">
+                <Badge key={index} variant="secondary" className="bg-white/20 text-white border-white/30 px-2 py-1 text-xs">
                   {time}
                 </Badge>
               ))}
@@ -94,17 +98,17 @@ function Navigation() {
       <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b shadow-sm">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
-            {/* Logo - Fixed width for consistent spacing */}
-            <div className="flex-shrink-0 w-32">
+            {/* Logo */}
+            <div className="flex-shrink-0">
               <Link href="/" className="flex items-center">
-                <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover:from-blue-700 hover:to-purple-700 transition-all duration-300">
+                <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent hover:from-teal-700 hover:to-emerald-700 transition-all duration-300">
                   Synergies4
                 </span>
               </Link>
             </div>
             
-            {/* Desktop Navigation - Centered */}
-            <div className="hidden xl:flex items-center justify-center flex-1 space-x-6">
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex items-center justify-center flex-1 space-x-6 mx-8">
               {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item) => (
                 <Link 
                   key={item}
@@ -116,85 +120,84 @@ function Navigation() {
                     item === 'Industry Insight' ? '/industry-insight' :
                     `/${item.toLowerCase().replace(' ', '-')}`
                   } 
-                  className="text-gray-600 hover:text-blue-600 transition-colors font-medium whitespace-nowrap text-sm"
+                  className="text-gray-600 hover:text-teal-600 transition-colors font-medium whitespace-nowrap text-sm"
                 >
                   {item}
                 </Link>
               ))}
             </div>
             
-            {/* Desktop Action Buttons - Right side with consistent spacing */}
-            <div className="hidden xl:flex items-center space-x-2 flex-shrink-0">
-              <div className="flex items-center space-x-3">
-                <Link href="/synergize" className="group">
-                  <Button 
-                    className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-sm px-4 py-2"
-                  >
-                    <Brain className="w-4 h-4 mr-2" />
-                    Synergize AI
-                    <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </Link>
-                
-                {/* Search Button */}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsSearchOpen(true)}
-                  className="hidden md:flex items-center space-x-2 text-gray-600 hover:text-gray-900 border-gray-300 hover:border-gray-400 px-3 py-2"
+            {/* Desktop Action Buttons */}
+            <div className="hidden lg:flex items-center space-x-3 flex-shrink-0">
+              <Link href="/synergize" className="group">
+                <Button 
+                  className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-sm px-4 py-2"
                 >
-                  <Search className="w-4 h-4" />
-                  <span className="hidden lg:inline">Search</span>
-                  <kbd className="hidden lg:inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 ml-2">
-                    <span className="text-xs">⌘</span>K
-                  </kbd>
+                  <Brain className="w-4 h-4 mr-2" />
+                  Synergize AI
+                  <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
-                
-                {/* Mobile Search Button */}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsSearchOpen(true)}
-                  className="md:hidden p-2"
-                >
-                  <Search className="w-4 h-4" />
-                </Button>
+              </Link>
+              
+              {/* Desktop Search Button */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsSearchOpen(true)}
+                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 border-gray-300 hover:border-gray-400 px-3 py-2"
+              >
+                <Search className="w-4 h-4" />
+                <span className="hidden xl:inline">Search</span>
+                <kbd className="hidden xl:inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 ml-2">
+                  <span className="text-xs">⌘</span>K
+                </kbd>
+              </Button>
 
-                {user ? (
-                  <div className="flex items-center space-x-2">
-                    <Link href="/dashboard">
-                      <Button variant="outline" size="sm">
-                        Dashboard
-                      </Button>
-                    </Link>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => signOut()}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                    >
-                      <LogOut className="w-4 h-4" />
+              {user ? (
+                <div className="flex items-center space-x-2">
+                  <Link href="/dashboard">
+                    <Button variant="outline" size="sm">
+                      Dashboard
                     </Button>
-                  </div>
-                ) : (
-                  <>
-                    <Link href="/login">
-                      <Button variant="outline" size="sm">
-                        Login
-                      </Button>
-                    </Link>
-                    <Link href="/signup">
-                      <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
-                        Sign Up
-                      </Button>
-                    </Link>
-                  </>
-                )}
-              </div>
+                  </Link>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => signOut()}
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                  >
+                    <LogOut className="w-4 h-4" />
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <Link href="/login">
+                    <Button variant="outline" size="sm">
+                      Login
+                    </Button>
+                  </Link>
+                  <Link href="/signup">
+                    <Button size="sm" className="bg-teal-600 hover:bg-teal-700 text-white">
+                      Sign Up
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
 
-            {/* Mobile Menu Button */}
-            <div className="xl:hidden">
+            {/* Mobile/Tablet Action Buttons */}
+            <div className="lg:hidden flex items-center space-x-2">
+              {/* Mobile Search Button - Always Visible */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsSearchOpen(true)}
+                className="p-2 border-gray-300 hover:border-teal-500 hover:text-teal-600"
+              >
+                <Search className="w-5 h-5" />
+              </Button>
+
+              {/* Mobile Menu Button */}
               <Button
                 variant="ghost"
                 size="sm"
@@ -212,7 +215,7 @@ function Navigation() {
 
           {/* Mobile Menu */}
           {mobileMenuOpen && (
-            <div className="xl:hidden border-t bg-white/95 backdrop-blur-md">
+            <div className="lg:hidden border-t bg-white/95 backdrop-blur-md">
               <div className="px-4 py-4 space-y-4">
                 {/* Navigation Links */}
                 {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item) => (
@@ -226,51 +229,83 @@ function Navigation() {
                       item === 'Industry Insight' ? '/industry-insight' :
                       `/${item.toLowerCase().replace(' ', '-')}`
                     }
-                    className="block text-gray-600 hover:text-blue-600 transition-colors font-medium py-2 text-lg"
+                    className="block text-gray-600 hover:text-teal-600 transition-colors font-medium py-3 text-lg border-b border-gray-100 last:border-0"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {item}
                   </Link>
                 ))}
                 
+                {/* Mobile Search - Additional Option */}
+                <button
+                  onClick={() => {
+                    setIsSearchOpen(true);
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full flex items-center text-gray-600 hover:text-teal-600 transition-colors font-medium py-3 text-lg border-b border-gray-100"
+                >
+                  <Search className="w-5 h-5 mr-3" />
+                  Search
+                </button>
+                
                 {/* Action Buttons */}
-                <div className="pt-4 border-t space-y-3">
+                <div className="pt-4 space-y-3">
                   <Button 
                     asChild 
-                    className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 text-lg py-3"
+                    className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 text-lg py-3 h-auto"
                   >
                     <Link href="/synergize" onClick={() => setMobileMenuOpen(false)}>
-                      <Brain className="w-4 h-4 mr-2" />
-                      Synergize
+                      <Brain className="w-5 h-5 mr-2" />
+                      Synergize AI
                     </Link>
                   </Button>
                   
                   <Button 
                     asChild 
-                    className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 text-lg py-3"
+                    className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 text-lg py-3 h-auto"
                   >
                     <Link href="/contact" onClick={() => setMobileMenuOpen(false)}>
-                      <MessageSquare className="w-4 h-4 mr-2" />
+                      <MessageSquare className="w-5 h-5 mr-2" />
                       Contact Us
                     </Link>
                   </Button>
                 </div>
                 
-                {/* Auth Section - Always in mobile menu */}
+                {/* Auth Section */}
                 <div className="pt-4 border-t space-y-3">
                   {user ? (
-                    <div className="flex items-center space-x-2 py-2">
-                      <UserAvatar />
-                      <span className="text-gray-700">Welcome back!</span>
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-3 py-2">
+                        <UserAvatar />
+                        <span className="text-gray-700 font-medium">Welcome back!</span>
+                      </div>
+                      <Button variant="outline" className="w-full text-lg py-3 h-auto" asChild>
+                        <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
+                          <BarChart3 className="w-5 h-5 mr-2" />
+                          Dashboard
+                        </Link>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 text-lg py-3 h-auto"
+                        onClick={() => {
+                          signOut();
+                          setMobileMenuOpen(false);
+                        }}
+                      >
+                        <LogOut className="w-5 h-5 mr-2" />
+                        Sign Out
+                      </Button>
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      <Button variant="ghost" className="w-full justify-start text-lg py-3" asChild>
+                      <Button variant="outline" className="w-full text-lg py-3 h-auto" asChild>
                         <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                          <User className="w-5 h-5 mr-2" />
                           Login
                         </Link>
                       </Button>
-                      <Button className="w-full text-lg py-3" asChild>
+                      <Button className="w-full bg-teal-600 hover:bg-teal-700 text-white text-lg py-3 h-auto" asChild>
                         <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
                           Sign Up
                         </Link>
@@ -294,7 +329,7 @@ function Footer() {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-xl font-bold mb-4">Synergies4</h3>
+            <h3 className="text-xl font-bold mb-4 bg-gradient-to-r from-teal-400 to-emerald-400 bg-clip-text text-transparent">Synergies4</h3>
             <p className="text-gray-400">
               AI-powered learning platform for professional development
             </p>
@@ -303,29 +338,29 @@ function Footer() {
           <div>
             <h4 className="font-semibold mb-4">Courses</h4>
             <ul className="space-y-2 text-gray-400">
-              <li><Link href="/courses" className="hover:text-white transition-colors">All Courses</Link></li>
-              <li><Link href="/courses" className="hover:text-white transition-colors">Agile & Scrum</Link></li>
-              <li><Link href="/courses" className="hover:text-white transition-colors">Leadership</Link></li>
-              <li><Link href="/courses" className="hover:text-white transition-colors">Product Management</Link></li>
+              <li><Link href="/courses" className="hover:text-teal-400 transition-colors">All Courses</Link></li>
+              <li><Link href="/courses" className="hover:text-teal-400 transition-colors">Agile & Scrum</Link></li>
+              <li><Link href="/courses" className="hover:text-teal-400 transition-colors">Leadership</Link></li>
+              <li><Link href="/courses" className="hover:text-teal-400 transition-colors">Product Management</Link></li>
             </ul>
           </div>
           
           <div>
             <h4 className="font-semibold mb-4">Company</h4>
             <ul className="space-y-2 text-gray-400">
-              <li><Link href="/about-us" className="hover:text-white transition-colors">About Us</Link></li>
-              <li><Link href="/contact" className="hover:text-white transition-colors">Contact</Link></li>
-              <li><Link href="/coaching" className="hover:text-white transition-colors">Coaching</Link></li>
-              <li><Link href="/consulting" className="hover:text-white transition-colors">Consulting</Link></li>
+              <li><Link href="/about-us" className="hover:text-teal-400 transition-colors">About Us</Link></li>
+              <li><Link href="/contact" className="hover:text-teal-400 transition-colors">Contact</Link></li>
+              <li><Link href="/coaching" className="hover:text-teal-400 transition-colors">Coaching</Link></li>
+              <li><Link href="/consulting" className="hover:text-teal-400 transition-colors">Consulting</Link></li>
             </ul>
           </div>
           
           <div>
             <h4 className="font-semibold mb-4">Support</h4>
             <ul className="space-y-2 text-gray-400">
-              <li><Link href="/contact" className="hover:text-white transition-colors">Help Center</Link></li>
-              <li><Link href="/contact" className="hover:text-white transition-colors">Contact Support</Link></li>
-              <li><Link href="/synergize" className="hover:text-white transition-colors">AI Assistant</Link></li>
+              <li><Link href="/contact" className="hover:text-teal-400 transition-colors">Help Center</Link></li>
+              <li><Link href="/contact" className="hover:text-teal-400 transition-colors">Contact Support</Link></li>
+              <li><Link href="/synergize" className="hover:text-teal-400 transition-colors">AI Assistant</Link></li>
             </ul>
           </div>
         </div>
@@ -337,8 +372,8 @@ function Footer() {
             © 2024 Synergies4. All rights reserved.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
-            <Link href="/contact" className="text-gray-400 hover:text-white transition-colors">Privacy Policy</Link>
-            <Link href="/contact" className="text-gray-400 hover:text-white transition-colors">Terms of Service</Link>
+            <Link href="/contact" className="text-gray-400 hover:text-teal-400 transition-colors">Privacy Policy</Link>
+            <Link href="/contact" className="text-gray-400 hover:text-teal-400 transition-colors">Terms of Service</Link>
           </div>
         </div>
       </div>
@@ -356,18 +391,18 @@ export function StatsSection() {
   ];
 
   return (
-    <section className="py-16 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+    <section className="py-16 bg-gradient-to-r from-teal-600 to-emerald-600 text-white">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {stats.map((stat, index) => (
             <div key={index} className="text-center hover:scale-105 transition-transform duration-300">
-              <div className="flex justify-center mb-3 text-blue-200">
+              <div className="flex justify-center mb-3 text-teal-200">
                 {stat.icon}
               </div>
               <div className="text-3xl md:text-4xl font-bold mb-2">
                 {stat.number}
               </div>
-              <div className="text-blue-100 text-sm md:text-base">{stat.label}</div>
+              <div className="text-teal-100 text-sm md:text-base">{stat.label}</div>
             </div>
           ))}
         </div>
@@ -384,7 +419,6 @@ interface PageLayoutProps {
 
 export default function PageLayout({ children, showStats = false }: PageLayoutProps) {
   const { user, userProfile, signOut } = useAuth();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
@@ -424,8 +458,7 @@ export default function PageLayout({ children, showStats = false }: PageLayoutPr
 
   return (
     <main className="min-h-screen">
-      <ScrollToTop />
-      <Navigation />
+      <Navigation isSearchOpen={isSearchOpen} setIsSearchOpen={setIsSearchOpen} />
       {children}
       {showStats && <StatsSection />}
       <Footer />
