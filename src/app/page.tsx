@@ -25,10 +25,14 @@ import {
   Rocket,
   Clock,
   MessageSquare,
-  GraduationCap
+  GraduationCap,
+  Globe,
+  BarChart3
 } from 'lucide-react';
+import HeroSection from '@/components/shared/HeroSection';
 
-export default function Home() {
+// Updated with AI assistance features - Build trigger
+export default function HomePage() {
   return (
     <PageLayout>
       {/* Hero Section */}
