@@ -38,7 +38,10 @@ import {
   Sparkles,
   Brain,
   Lightbulb,
-  Copy
+  Copy,
+  Image as ImageIcon,
+  Play,
+  TrendingUp
 } from 'lucide-react';
 
 interface ModuleContent {
@@ -106,10 +109,12 @@ export default function CreateCourse() {
   
   // AI Assistant State
   const [showAIAssistant, setShowAIAssistant] = useState(false);
-  const [aiLoading, setAiLoading] = useState(false);
+  const [aiMode, setAiMode] = useState('description');
   const [aiContext, setAiContext] = useState('');
   const [aiSuggestions, setAiSuggestions] = useState('');
-  const [aiMode, setAiMode] = useState<'description' | 'modules' | 'quiz' | 'content'>('description');
+  const [aiLoading, setAiLoading] = useState(false);
+  const [moduleAiSuggestions, setModuleAiSuggestions] = useState<{[key: string]: any}>({});
+  const [showModuleAI, setShowModuleAI] = useState<{[key: string]: boolean}>({});
   
   const [formData, setFormData] = useState<CourseFormData>({
     title: '',
@@ -276,22 +281,143 @@ export default function CreateCourse() {
 
   // AI Assistant Functions
   const generateAISuggestions = async () => {
+    if (!formData.title && aiMode !== 'title') {
+      alert('Please enter a course title first');
+      return;
+    }
+
     setAiLoading(true);
     try {
       let prompt = '';
       
       switch (aiMode) {
+        case 'title':
+          prompt = `Generate 5 compelling course titles for a ${formData.category || 'general'} course at ${formData.level || 'beginner'} level. Context: ${aiContext}. Make them engaging and SEO-friendly.`;
+          break;
         case 'description':
-          prompt = `Create a compelling course description for a course titled "${formData.title}" in the ${formData.category} category at ${formData.level} level. Context: ${aiContext}. Include learning objectives, target audience, and key benefits. Make it engaging and professional.`;
+          prompt = `Create a comprehensive course description for "${formData.title}" - a ${formData.category} course for ${formData.level} level students. Include learning objectives, what students will gain, and why they should take this course. Context: ${aiContext}`;
           break;
         case 'modules':
-          prompt = `Create a detailed course module structure for "${formData.title}" - a ${formData.level} level ${formData.category} course. Context: ${aiContext}. Provide 4-6 modules with titles, descriptions, and suggested content types (videos, documents, exercises). Format as a structured list.`;
+          prompt = `Create a detailed module structure for the course "${formData.title}" (${formData.category}, ${formData.level} level). Include 6-8 modules with titles, descriptions, and learning objectives. Format as JSON with this structure:
+          {
+            "modules": [
+              {
+                "title": "Module Title",
+                "description": "Module description",
+                "learningObjectives": ["Objective 1", "Objective 2"],
+                "estimatedDuration": "2 hours"
+              }
+            ]
+          }
+          Context: ${aiContext}`;
           break;
         case 'quiz':
-          prompt = `Create 5-8 quiz questions for a course titled "${formData.title}" in ${formData.category}. Context: ${aiContext}. Include multiple choice questions with 4 options each, correct answers, and explanations. Make them practical and test real understanding.`;
+          prompt = `Generate 10 quiz questions for the course "${formData.title}" (${formData.category}, ${formData.level} level). Include multiple choice, true/false, and short answer questions. Format as JSON:
+          {
+            "questions": [
+              {
+                "question": "Question text",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
+                "correctAnswer": "Option 1",
+                "explanation": "Why this is correct",
+                "points": 5
+              }
+            ]
+          }
+          Context: ${aiContext}`;
           break;
         case 'content':
-          prompt = `Generate content ideas and learning materials for "${formData.title}" course. Context: ${aiContext}. Suggest specific videos, readings, exercises, and practical activities that would help students master the subject. Be specific and actionable.`;
+          prompt = `Suggest specific content ideas for the course "${formData.title}" including:
+          1. Video topics and scripts
+          2. Interactive exercises
+          3. Real-world projects
+          4. Reading materials
+          5. Practical assignments
+          6. Case studies
+          Context: ${aiContext}`;
+          break;
+        case 'pricing':
+          prompt = `Suggest appropriate pricing for the course "${formData.title}" (${formData.category}, ${formData.level} level). Consider market rates, course value, target audience, and competition. Provide 3 pricing options with justification.`;
+          break;
+        case 'marketing':
+          prompt = `Create marketing copy for the course "${formData.title}" including:
+          1. Compelling tagline
+          2. Key selling points
+          3. Target audience description
+          4. Social media posts
+          5. Email marketing subject lines
+          Context: ${aiContext}`;
+          break;
+        default:
+          prompt = `Provide suggestions for improving the course "${formData.title}" in the ${formData.category} category.`;
+      }
+
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [
+            { role: 'system', content: 'You are an expert course creation assistant. Provide detailed, actionable suggestions for online course development.' },
+            { role: 'user', content: prompt }
+          ],
+          provider: 'anthropic'
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to generate suggestions');
+      
+      const data = await response.json();
+      setAiSuggestions(data.content || data.response);
+    } catch (error) {
+      console.error('AI Generation Error:', error);
+      alert('Failed to generate AI suggestions. Please try again.');
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const generateModuleContent = async (moduleId: string, contentType: 'video' | 'text' | 'exercise' | 'image') => {
+    const module = formData.modules.find(m => m.id === moduleId);
+    if (!module) return;
+
+    setAiLoading(true);
+    try {
+      let prompt = '';
+      
+      switch (contentType) {
+        case 'video':
+          prompt = `Create a detailed video script for the module "${module.title}" in the course "${formData.title}". Include:
+          1. Video title and description
+          2. Detailed script with timestamps
+          3. Key points to emphasize
+          4. Visual suggestions
+          5. Recommended video length
+          6. Equipment/setup recommendations`;
+          break;
+        case 'text':
+          prompt = `Create comprehensive text content for the module "${module.title}" in the course "${formData.title}". Include:
+          1. Detailed explanations
+          2. Examples and case studies
+          3. Key takeaways
+          4. Action items
+          5. Further reading suggestions`;
+          break;
+        case 'exercise':
+          prompt = `Design interactive exercises for the module "${module.title}" in the course "${formData.title}". Include:
+          1. Hands-on activities
+          2. Practice problems
+          3. Real-world scenarios
+          4. Group exercises
+          5. Self-assessment tools`;
+          break;
+        case 'image':
+          prompt = `Suggest visual content for the module "${module.title}" in the course "${formData.title}". Include:
+          1. Infographic ideas
+          2. Diagram suggestions
+          3. Image prompts for AI generation
+          4. Chart and graph recommendations
+          5. Visual metaphors and illustrations`;
           break;
       }
 
@@ -300,35 +426,155 @@ export default function CreateCourse() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: [
-            { role: 'system', content: 'You are an expert course designer and educational content creator. Provide detailed, practical suggestions for online course development.' },
+            { role: 'system', content: 'You are an expert instructional designer. Create detailed, engaging educational content.' },
             { role: 'user', content: prompt }
           ],
           provider: 'anthropic'
         }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        setAiSuggestions(data.content || data.response);
-      } else {
-        setAiSuggestions('Sorry, I encountered an error generating suggestions. Please try again.');
+      if (!response.ok) throw new Error('Failed to generate content');
+      
+      const data = await response.json();
+      setModuleAiSuggestions(prev => ({
+        ...prev,
+        [moduleId]: {
+          ...prev[moduleId],
+          [contentType]: data.content || data.response
+        }
+      }));
+    } catch (error) {
+      console.error('Content Generation Error:', error);
+      alert('Failed to generate content suggestions. Please try again.');
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const generateImagePrompt = async (description: string) => {
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [
+            { role: 'system', content: 'You are an expert at creating detailed image prompts for AI image generation. Create specific, detailed prompts that will generate high-quality educational images.' },
+            { role: 'user', content: `Create a detailed image generation prompt for: ${description}. Make it specific, include style, composition, colors, and educational context.` }
+          ],
+          provider: 'anthropic'
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to generate image prompt');
+      
+      const data = await response.json();
+      return data.content || data.response;
+    } catch (error) {
+      console.error('Image Prompt Generation Error:', error);
+      return description;
+    }
+  };
+
+  const generateCourseImage = async () => {
+    if (!formData.title) {
+      alert('Please enter a course title first');
+      return;
+    }
+
+    setAiLoading(true);
+    try {
+      // First generate a detailed prompt
+      const imagePrompt = await generateImagePrompt(`Professional course thumbnail for "${formData.title}" - ${formData.category} course`);
+      
+      // Then generate the image
+      const response = await fetch('/api/generate-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: imagePrompt,
+          provider: 'openai'
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to generate image');
+      
+      const data = await response.json();
+      if (data.imageUrl) {
+        handleInputChange('image', data.imageUrl);
+        alert('Course image generated successfully!');
       }
     } catch (error) {
-      console.error('AI suggestion error:', error);
-      setAiSuggestions('Sorry, I encountered an error generating suggestions. Please try again.');
+      console.error('Image Generation Error:', error);
+      alert('Failed to generate course image. Please try again.');
     } finally {
       setAiLoading(false);
     }
   };
 
   const applyAISuggestion = (field: string) => {
-    if (field === 'description') {
-      setFormData(prev => ({ ...prev, description: aiSuggestions }));
-    } else if (field === 'shortDesc') {
-      // Extract first paragraph or first 200 chars for short description
-      const shortDesc = aiSuggestions.split('\n')[0].substring(0, 200) + '...';
-      setFormData(prev => ({ ...prev, shortDesc }));
+    if (!aiSuggestions) return;
+    
+    switch (field) {
+      case 'description':
+        handleInputChange('description', aiSuggestions);
+        break;
+      case 'shortDesc':
+        // Extract first paragraph or first 200 characters for short description
+        const shortDesc = aiSuggestions.split('\n')[0].substring(0, 200) + '...';
+        handleInputChange('shortDesc', shortDesc);
+        break;
+      case 'title':
+        // If multiple titles are suggested, use the first one
+        const titles = aiSuggestions.split('\n').filter(line => line.trim());
+        if (titles.length > 0) {
+          handleInputChange('title', titles[0].replace(/^\d+\.\s*/, ''));
+        }
+        break;
+      case 'modules':
+        try {
+          const moduleData = JSON.parse(aiSuggestions);
+          if (moduleData.modules) {
+            const newModules = moduleData.modules.map((mod: any, index: number) => ({
+              id: Date.now().toString() + index,
+              title: mod.title,
+              description: mod.description,
+              order: index + 1,
+              contents: []
+            }));
+            setFormData(prev => ({ ...prev, modules: newModules }));
+          }
+        } catch (error) {
+          console.error('Failed to parse module data:', error);
+          alert('Failed to apply module suggestions. Please copy and paste manually.');
+        }
+        break;
+      case 'quiz':
+        try {
+          const quizData = JSON.parse(aiSuggestions);
+          if (quizData.questions) {
+            const newQuiz = {
+              id: Date.now().toString(),
+              title: `${formData.title} Quiz`,
+              description: 'Test your knowledge',
+              questions: quizData.questions.map((q: any, index: number) => ({
+                id: Date.now().toString() + index,
+                question_text: q.question,
+                question_type: q.type,
+                options: q.options || [],
+                correct_answer: q.correctAnswer,
+                explanation: q.explanation,
+                points: q.points || 5
+              }))
+            };
+            setFormData(prev => ({ ...prev, quiz: newQuiz }));
+          }
+        } catch (error) {
+          console.error('Failed to parse quiz data:', error);
+          alert('Failed to apply quiz suggestions. Please copy and paste manually.');
+        }
+        break;
     }
+    
     setShowAIAssistant(false);
   };
 
@@ -597,58 +843,176 @@ export default function CreateCourse() {
         {/* Form Steps */}
         <Card className="mb-6">
           <CardContent className="p-4 sm:p-6">
-            {/* Step 1: Basic Info */}
+            {/* Step 1: Basic Information */}
             {currentStep === 1 && (
               <div className="space-y-4 sm:space-y-6">
-                <div>
-                  <Label htmlFor="title" className="text-sm font-medium">Course Title *</Label>
-                  <Input
-                    id="title"
-                    value={formData.title}
-                    onChange={(e) => handleInputChange('title', e.target.value)}
-                    placeholder="Enter course title"
-                    className="mt-2"
-                  />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="title" className="text-sm font-medium">Course Title *</Label>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setAiMode('title');
+                          setShowAIAssistant(true);
+                        }}
+                        className="text-xs"
+                      >
+                        <Sparkles className="w-3 h-3 mr-1" />
+                        AI Suggest
+                      </Button>
+                    </div>
+                    <Input
+                      id="title"
+                      value={formData.title}
+                      onChange={(e) => handleInputChange('title', e.target.value)}
+                      placeholder="Enter course title"
+                      className="mt-2"
+                    />
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="category" className="text-sm font-medium">Category *</Label>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setAiMode('category');
+                          setShowAIAssistant(true);
+                        }}
+                        className="text-xs"
+                      >
+                        <Sparkles className="w-3 h-3 mr-1" />
+                        AI Suggest
+                      </Button>
+                    </div>
+                    <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
+                      <SelectTrigger className="mt-2">
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="agile">Agile & Scrum</SelectItem>
+                        <SelectItem value="leadership">Leadership</SelectItem>
+                        <SelectItem value="product">Product Management</SelectItem>
+                        <SelectItem value="mental-fitness">Mental Fitness</SelectItem>
+                        <SelectItem value="technology">Technology</SelectItem>
+                        <SelectItem value="business">Business</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
 
                 <div>
-                  <Label htmlFor="description" className="text-sm font-medium">Description *</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="description" className="text-sm font-medium">Course Description *</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setAiMode('description');
+                        setShowAIAssistant(true);
+                      }}
+                      className="text-xs"
+                    >
+                      <Sparkles className="w-3 h-3 mr-1" />
+                      AI Generate
+                    </Button>
+                  </div>
                   <Textarea
                     id="description"
                     value={formData.description}
                     onChange={(e) => handleInputChange('description', e.target.value)}
-                    placeholder="Enter detailed course description"
-                    className="mt-2 min-h-[120px]"
+                    placeholder="Describe what students will learn in this course"
+                    className="mt-2"
+                    rows={4}
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="shortDesc" className="text-sm font-medium">Short Description</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="shortDesc" className="text-sm font-medium">Short Description</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setAiMode('shortDesc');
+                        setShowAIAssistant(true);
+                      }}
+                      className="text-xs"
+                    >
+                      <Sparkles className="w-3 h-3 mr-1" />
+                      AI Generate
+                    </Button>
+                  </div>
                   <Textarea
                     id="shortDesc"
                     value={formData.shortDesc}
                     onChange={(e) => handleInputChange('shortDesc', e.target.value)}
-                    placeholder="Brief course summary for listings"
+                    placeholder="Brief description for course cards"
                     className="mt-2"
-                    rows={3}
+                    rows={2}
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="category" className="text-sm font-medium">Category *</Label>
-                  <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
-                    <SelectTrigger className="mt-2">
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="agile">Agile & Scrum</SelectItem>
-                      <SelectItem value="leadership">Leadership</SelectItem>
-                      <SelectItem value="product">Product Management</SelectItem>
-                      <SelectItem value="mental-fitness">Mental Fitness</SelectItem>
-                      <SelectItem value="technology">Technology</SelectItem>
-                      <SelectItem value="business">Business</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="image" className="text-sm font-medium">Course Image URL</Label>
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={generateCourseImage}
+                        disabled={aiLoading}
+                        className="text-xs"
+                      >
+                        {aiLoading ? (
+                          <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                        ) : (
+                          <ImageIcon className="w-3 h-3 mr-1" />
+                        )}
+                        AI Generate
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setAiMode('imageIdeas');
+                          setShowAIAssistant(true);
+                        }}
+                        className="text-xs"
+                      >
+                        <Lightbulb className="w-3 h-3 mr-1" />
+                        Ideas
+                      </Button>
+                    </div>
+                  </div>
+                  <Input
+                    id="image"
+                    value={formData.image}
+                    onChange={(e) => handleInputChange('image', e.target.value)}
+                    placeholder="Enter image URL or generate with AI"
+                    className="mt-2"
+                  />
+                  {formData.image && (
+                    <div className="mt-2">
+                      <img 
+                        src={formData.image} 
+                        alt="Course preview" 
+                        className="w-32 h-20 object-cover rounded border"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -736,115 +1100,242 @@ export default function CreateCourse() {
               </div>
             )}
 
-            {/* Step 3: Content */}
+            {/* Step 3: Modules */}
             {currentStep === 3 && (
               <div className="space-y-4 sm:space-y-6">
-                <div>
-                  <h3 className="text-lg font-semibold mb-4">Course Modules</h3>
-                  
-                  {/* Add New Module */}
-                  <Card className="mb-4">
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-base">Add New Module</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div>
-                        <Label htmlFor="moduleTitle" className="text-sm font-medium">Module Title</Label>
-                        <Input
-                          id="moduleTitle"
-                          value={newModule.title}
-                          onChange={(e) => setNewModule(prev => ({ ...prev, title: e.target.value }))}
-                          placeholder="Enter module title"
-                          className="mt-2"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="moduleDescription" className="text-sm font-medium">Module Description</Label>
-                        <Textarea
-                          id="moduleDescription"
-                          value={newModule.description}
-                          onChange={(e) => setNewModule(prev => ({ ...prev, description: e.target.value }))}
-                          placeholder="Enter module description"
-                          className="mt-2"
-                          rows={3}
-                        />
-                      </div>
-                      <Button onClick={addModule} className="w-full sm:w-auto">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add Module
-                      </Button>
-                    </CardContent>
-                  </Card>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <h3 className="text-lg font-semibold">Course Modules</h3>
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setAiMode('modules');
+                        setShowAIAssistant(true);
+                      }}
+                      className="text-sm"
+                    >
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      AI Generate Modules
+                    </Button>
+                    <Button onClick={addModule} className="text-sm">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Module
+                    </Button>
+                  </div>
+                </div>
 
-                  {/* Existing Modules */}
+                <div className="space-y-4">
                   {formData.modules.map((module, index) => (
-                    <Card key={module.id} className="mb-4">
+                    <Card key={module.id}>
                       <CardHeader className="pb-3">
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                          <CardTitle className="text-base">
-                            Module {index + 1}: {module.title}
-                          </CardTitle>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => removeModule(module.id)}
-                            className="self-start sm:self-auto"
-                          >
-                            <Trash2 className="w-4 h-4 mr-2" />
-                            Remove
-                          </Button>
-                        </div>
-                        <CardDescription>{module.description}</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        {/* Module Contents */}
-                        {module.contents.length > 0 && (
-                          <div className="mb-4">
-                            <h4 className="font-medium mb-2">Contents:</h4>
-                            <div className="space-y-2">
-                              {module.contents.map((content) => (
-                                <div key={content.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-gray-50 rounded-lg gap-2">
-                                  <div className="flex items-center space-x-2 min-w-0">
-                                    {getContentIcon(content.type)}
-                                    <div className="min-w-0">
-                                      <p className="font-medium text-sm truncate">{content.title}</p>
-                                      <p className="text-xs text-gray-500 truncate">{content.type}</p>
-                                    </div>
-                                  </div>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => removeContentFromModule(module.id, content.id)}
-                                    className="self-start sm:self-auto text-red-600 hover:text-red-700"
-                                  >
-                                    <X className="w-4 h-4" />
-                                  </Button>
-                                </div>
-                              ))}
-                            </div>
+                          <CardTitle className="text-base">Module {index + 1}</CardTitle>
+                          <div className="flex gap-2">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setShowModuleAI(prev => ({
+                                ...prev,
+                                [module.id]: !prev[module.id]
+                              }))}
+                              className="text-xs"
+                            >
+                              <Brain className="w-3 h-3 mr-1" />
+                              AI Assist
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => removeModule(module.id)}
+                              className="text-xs"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </Button>
                           </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div>
+                          <div className="flex items-center justify-between">
+                            <Label className="text-sm font-medium">Module Title</Label>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => generateModuleContent(module.id, 'text')}
+                              disabled={aiLoading}
+                              className="text-xs"
+                            >
+                              <Sparkles className="w-3 h-3 mr-1" />
+                              AI Suggest
+                            </Button>
+                          </div>
+                          <Input
+                            value={module.title}
+                            onChange={(e) => {
+                              const updatedModules = formData.modules.map(m =>
+                                m.id === module.id ? { ...m, title: e.target.value } : m
+                              );
+                              setFormData(prev => ({ ...prev, modules: updatedModules }));
+                            }}
+                            placeholder="Enter module title"
+                            className="mt-2"
+                          />
+                        </div>
+                        <div>
+                          <div className="flex items-center justify-between">
+                            <Label className="text-sm font-medium">Module Description</Label>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => generateModuleContent(module.id, 'text')}
+                              disabled={aiLoading}
+                              className="text-xs"
+                            >
+                              <Sparkles className="w-3 h-3 mr-1" />
+                              AI Generate
+                            </Button>
+                          </div>
+                          <Textarea
+                            value={module.description}
+                            onChange={(e) => {
+                              const updatedModules = formData.modules.map(m =>
+                                m.id === module.id ? { ...m, description: e.target.value } : m
+                              );
+                              setFormData(prev => ({ ...prev, modules: updatedModules }));
+                            }}
+                            placeholder="Describe what this module covers"
+                            className="mt-2"
+                            rows={3}
+                          />
+                        </div>
+
+                        {/* AI Assistant Panel for Module */}
+                        {showModuleAI[module.id] && (
+                          <Card className="bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200">
+                            <CardHeader className="pb-3">
+                              <CardTitle className="text-sm text-purple-800">AI Content Assistant</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => generateModuleContent(module.id, 'video')}
+                                  disabled={aiLoading}
+                                  className="text-xs"
+                                >
+                                  <Play className="w-3 h-3 mr-1" />
+                                  Video Script
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => generateModuleContent(module.id, 'text')}
+                                  disabled={aiLoading}
+                                  className="text-xs"
+                                >
+                                  <FileText className="w-3 h-3 mr-1" />
+                                  Text Content
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => generateModuleContent(module.id, 'exercise')}
+                                  disabled={aiLoading}
+                                  className="text-xs"
+                                >
+                                  <Target className="w-3 h-3 mr-1" />
+                                  Exercises
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => generateModuleContent(module.id, 'image')}
+                                  disabled={aiLoading}
+                                  className="text-xs"
+                                >
+                                  <ImageIcon className="w-3 h-3 mr-1" />
+                                  Visuals
+                                </Button>
+                              </div>
+
+                              {/* Display AI Suggestions for this module */}
+                              {moduleAiSuggestions[module.id] && (
+                                <div className="space-y-2">
+                                  {Object.entries(moduleAiSuggestions[module.id]).map(([type, content]) => (
+                                    <div key={type} className="bg-white rounded p-3 border">
+                                      <div className="flex items-center justify-between mb-2">
+                                        <h5 className="text-sm font-medium capitalize">{type} Suggestions</h5>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={() => copyToClipboard(content as string)}
+                                          className="text-xs"
+                                        >
+                                          <Copy className="w-3 h-3 mr-1" />
+                                          Copy
+                                        </Button>
+                                      </div>
+                                      <div className="text-xs text-gray-600 max-h-32 overflow-y-auto">
+                                        <pre className="whitespace-pre-wrap">{content as string}</pre>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </CardContent>
+                          </Card>
                         )}
 
-                        {/* Add Content */}
+                        {/* Module Content */}
+                        <div>
+                          <div className="flex items-center justify-between mb-3">
+                            <Label className="text-sm font-medium">Module Content</Label>
+                            <span className="text-xs text-gray-500">{module.contents.length} items</span>
+                          </div>
+                          
+                          {module.contents.map((content, contentIndex) => (
+                            <div key={content.id} className="flex items-center justify-between p-3 bg-gray-50 rounded mb-2">
+                              <div className="flex items-center space-x-3">
+                                {getContentIcon(content.type)}
+                                <div>
+                                  <p className="text-sm font-medium">{content.title}</p>
+                                  <p className="text-xs text-gray-500">{content.type}</p>
+                                </div>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeContentFromModule(module.id, content.id)}
+                                className="text-red-600 hover:text-red-700"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+
                         {editingModule === module.id ? (
-                          <div className="space-y-4 p-4 bg-blue-50 rounded-lg">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                               <div>
                                 <Label className="text-sm font-medium">Content Type</Label>
                                 <Select 
                                   value={newContent.type} 
-                                  onValueChange={(value: 'video' | 'link' | 'document' | 'text') => 
-                                    setNewContent(prev => ({ ...prev, type: value }))
-                                  }
+                                  onValueChange={(value) => setNewContent(prev => ({ ...prev, type: value as any }))}
                                 >
-                                  <SelectTrigger className="mt-2">
+                                  <SelectTrigger className="mt-1">
                                     <SelectValue />
                                   </SelectTrigger>
                                   <SelectContent>
                                     <SelectItem value="video">Video</SelectItem>
-                                    <SelectItem value="link">Link</SelectItem>
+                                    <SelectItem value="text">Text Content</SelectItem>
                                     <SelectItem value="document">Document</SelectItem>
-                                    <SelectItem value="text">Text</SelectItem>
+                                    <SelectItem value="link">External Link</SelectItem>
                                   </SelectContent>
                                 </Select>
                               </div>
@@ -854,7 +1345,7 @@ export default function CreateCourse() {
                                   value={newContent.title}
                                   onChange={(e) => setNewContent(prev => ({ ...prev, title: e.target.value }))}
                                   placeholder="Enter content title"
-                                  className="mt-2"
+                                  className="mt-1"
                                 />
                               </div>
                             </div>
@@ -922,140 +1413,152 @@ export default function CreateCourse() {
             {/* Step 4: Quiz */}
             {currentStep === 4 && (
               <div className="space-y-4 sm:space-y-6">
-                <div>
-                  <h3 className="text-lg font-semibold mb-4">Course Quiz (Optional)</h3>
-                  
-                  {!formData.quiz ? (
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <h3 className="text-lg font-semibold">Course Quiz (Optional)</h3>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setAiMode('quiz');
+                      setShowAIAssistant(true);
+                    }}
+                    className="text-sm"
+                  >
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    AI Generate Quiz
+                  </Button>
+                </div>
+
+                {!formData.quiz ? (
+                  <Card>
+                    <CardContent className="p-6 text-center">
+                      <HelpCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <h4 className="text-lg font-medium mb-2">No Quiz Added</h4>
+                      <p className="text-gray-600 mb-4">Add a quiz to test your students' knowledge</p>
+                      <Button onClick={addQuiz}>
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add Quiz
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <div className="space-y-4">
                     <Card>
-                      <CardContent className="p-6 text-center">
-                        <HelpCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                        <h4 className="text-lg font-medium mb-2">No Quiz Added</h4>
-                        <p className="text-gray-600 mb-4">Add a quiz to test your students' knowledge</p>
-                        <Button onClick={addQuiz}>
+                      <CardHeader>
+                        <CardTitle className="text-base">Quiz Questions</CardTitle>
+                        <CardDescription>
+                          Add questions to test student understanding
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <Button onClick={addQuizQuestion} className="w-full sm:w-auto mb-4">
                           <Plus className="w-4 h-4 mr-2" />
-                          Add Quiz
+                          Add Question
                         </Button>
+
+                        {formData.quiz.questions.map((question, index) => (
+                          <Card key={question.id} className="mb-4">
+                            <CardHeader className="pb-3">
+                              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                                <CardTitle className="text-sm">Question {index + 1}</CardTitle>
+                                <Button
+                                  variant="destructive"
+                                  size="sm"
+                                  onClick={() => removeQuizQuestion(question.id)}
+                                  className="self-start sm:self-auto"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                              <div>
+                                <Label className="text-sm font-medium">Question Text</Label>
+                                <Textarea
+                                  value={question.question_text}
+                                  onChange={(e) => updateQuizQuestion(question.id, 'question_text', e.target.value)}
+                                  placeholder="Enter your question"
+                                  className="mt-2"
+                                  rows={3}
+                                />
+                              </div>
+
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                  <Label className="text-sm font-medium">Question Type</Label>
+                                  <Select 
+                                    value={question.question_type} 
+                                    onValueChange={(value) => updateQuizQuestion(question.id, 'question_type', value)}
+                                  >
+                                    <SelectTrigger className="mt-2">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="MULTIPLE_CHOICE">Multiple Choice</SelectItem>
+                                      <SelectItem value="TRUE_FALSE">True/False</SelectItem>
+                                      <SelectItem value="SHORT_ANSWER">Short Answer</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div>
+                                  <Label className="text-sm font-medium">Points</Label>
+                                  <Input
+                                    type="number"
+                                    value={question.points}
+                                    onChange={(e) => updateQuizQuestion(question.id, 'points', parseInt(e.target.value) || 1)}
+                                    className="mt-2"
+                                    min="1"
+                                  />
+                                </div>
+                              </div>
+
+                              {question.question_type === 'MULTIPLE_CHOICE' && (
+                                <div>
+                                  <Label className="text-sm font-medium">Answer Options</Label>
+                                  <div className="space-y-2 mt-2">
+                                    {question.options.map((option, optionIndex) => (
+                                      <Input
+                                        key={optionIndex}
+                                        value={option}
+                                        onChange={(e) => {
+                                          const newOptions = [...question.options];
+                                          newOptions[optionIndex] = e.target.value;
+                                          updateQuizQuestion(question.id, 'options', newOptions);
+                                        }}
+                                        placeholder={`Option ${optionIndex + 1}`}
+                                      />
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              <div>
+                                <Label className="text-sm font-medium">Correct Answer</Label>
+                                <Input
+                                  value={question.correct_answer}
+                                  onChange={(e) => updateQuizQuestion(question.id, 'correct_answer', e.target.value)}
+                                  placeholder="Enter the correct answer"
+                                  className="mt-2"
+                                />
+                              </div>
+
+                              <div>
+                                <Label className="text-sm font-medium">Explanation (Optional)</Label>
+                                <Textarea
+                                  value={question.explanation || ''}
+                                  onChange={(e) => updateQuizQuestion(question.id, 'explanation', e.target.value)}
+                                  placeholder="Explain why this is the correct answer"
+                                  className="mt-2"
+                                  rows={2}
+                                />
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
                       </CardContent>
                     </Card>
-                  ) : (
-                    <div className="space-y-4">
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="text-base">Quiz Questions</CardTitle>
-                          <CardDescription>
-                            Add questions to test student understanding
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          <Button onClick={addQuizQuestion} className="w-full sm:w-auto mb-4">
-                            <Plus className="w-4 h-4 mr-2" />
-                            Add Question
-                          </Button>
-
-                          {formData.quiz.questions.map((question, index) => (
-                            <Card key={question.id} className="mb-4">
-                              <CardHeader className="pb-3">
-                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                                  <CardTitle className="text-sm">Question {index + 1}</CardTitle>
-                                  <Button
-                                    variant="destructive"
-                                    size="sm"
-                                    onClick={() => removeQuizQuestion(question.id)}
-                                    className="self-start sm:self-auto"
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </Button>
-                                </div>
-                              </CardHeader>
-                              <CardContent className="space-y-4">
-                                <div>
-                                  <Label className="text-sm font-medium">Question Text</Label>
-                                  <Textarea
-                                    value={question.question_text}
-                                    onChange={(e) => updateQuizQuestion(question.id, 'question_text', e.target.value)}
-                                    placeholder="Enter your question"
-                                    className="mt-2"
-                                    rows={3}
-                                  />
-                                </div>
-
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                  <div>
-                                    <Label className="text-sm font-medium">Question Type</Label>
-                                    <Select 
-                                      value={question.question_type} 
-                                      onValueChange={(value) => updateQuizQuestion(question.id, 'question_type', value)}
-                                    >
-                                      <SelectTrigger className="mt-2">
-                                        <SelectValue />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="MULTIPLE_CHOICE">Multiple Choice</SelectItem>
-                                        <SelectItem value="TRUE_FALSE">True/False</SelectItem>
-                                        <SelectItem value="SHORT_ANSWER">Short Answer</SelectItem>
-                                      </SelectContent>
-                                    </Select>
-                                  </div>
-                                  <div>
-                                    <Label className="text-sm font-medium">Points</Label>
-                                    <Input
-                                      type="number"
-                                      value={question.points}
-                                      onChange={(e) => updateQuizQuestion(question.id, 'points', parseInt(e.target.value) || 1)}
-                                      className="mt-2"
-                                      min="1"
-                                    />
-                                  </div>
-                                </div>
-
-                                {question.question_type === 'MULTIPLE_CHOICE' && (
-                                  <div>
-                                    <Label className="text-sm font-medium">Answer Options</Label>
-                                    <div className="space-y-2 mt-2">
-                                      {question.options.map((option, optionIndex) => (
-                                        <Input
-                                          key={optionIndex}
-                                          value={option}
-                                          onChange={(e) => {
-                                            const newOptions = [...question.options];
-                                            newOptions[optionIndex] = e.target.value;
-                                            updateQuizQuestion(question.id, 'options', newOptions);
-                                          }}
-                                          placeholder={`Option ${optionIndex + 1}`}
-                                        />
-                                      ))}
-                                    </div>
-                                  </div>
-                                )}
-
-                                <div>
-                                  <Label className="text-sm font-medium">Correct Answer</Label>
-                                  <Input
-                                    value={question.correct_answer}
-                                    onChange={(e) => updateQuizQuestion(question.id, 'correct_answer', e.target.value)}
-                                    placeholder="Enter the correct answer"
-                                    className="mt-2"
-                                  />
-                                </div>
-
-                                <div>
-                                  <Label className="text-sm font-medium">Explanation (Optional)</Label>
-                                  <Textarea
-                                    value={question.explanation || ''}
-                                    onChange={(e) => updateQuizQuestion(question.id, 'explanation', e.target.value)}
-                                    placeholder="Explain why this is the correct answer"
-                                    className="mt-2"
-                                    rows={2}
-                                  />
-                                </div>
-                              </CardContent>
-                            </Card>
-                          ))}
-                        </CardContent>
-                      </Card>
-                    </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -1215,6 +1718,15 @@ export default function CreateCourse() {
                   <Label className="text-sm font-medium">What would you like help with?</Label>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">
                     <Button
+                      variant={aiMode === 'title' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setAiMode('title')}
+                      className="flex flex-col items-center p-4 h-auto"
+                    >
+                      <Sparkles className="w-5 h-5 mb-2" />
+                      <span className="text-xs">Title Ideas</span>
+                    </Button>
+                    <Button
                       variant={aiMode === 'description' ? 'default' : 'outline'}
                       size="sm"
                       onClick={() => setAiMode('description')}
@@ -1250,7 +1762,58 @@ export default function CreateCourse() {
                       <Lightbulb className="w-5 h-5 mb-2" />
                       <span className="text-xs">Content Ideas</span>
                     </Button>
+                    <Button
+                      variant={aiMode === 'pricing' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setAiMode('pricing')}
+                      className="flex flex-col items-center p-4 h-auto"
+                    >
+                      <DollarSign className="w-5 h-5 mb-2" />
+                      <span className="text-xs">Pricing</span>
+                    </Button>
+                    <Button
+                      variant={aiMode === 'marketing' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setAiMode('marketing')}
+                      className="flex flex-col items-center p-4 h-auto"
+                    >
+                      <TrendingUp className="w-5 h-5 mb-2" />
+                      <span className="text-xs">Marketing</span>
+                    </Button>
+                    <Button
+                      variant={aiMode === 'imageIdeas' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setAiMode('imageIdeas')}
+                      className="flex flex-col items-center p-4 h-auto"
+                    >
+                      <ImageIcon className="w-5 h-5 mb-2" />
+                      <span className="text-xs">Image Ideas</span>
+                    </Button>
                   </div>
+                </div>
+
+                {/* Mode-specific instructions */}
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <h4 className="font-medium mb-2 text-blue-800">
+                    {aiMode === 'title' && 'Generate Course Title Ideas'}
+                    {aiMode === 'description' && 'Generate Course Description'}
+                    {aiMode === 'modules' && 'Generate Module Structure'}
+                    {aiMode === 'quiz' && 'Generate Quiz Questions'}
+                    {aiMode === 'content' && 'Generate Content Ideas'}
+                    {aiMode === 'pricing' && 'Get Pricing Recommendations'}
+                    {aiMode === 'marketing' && 'Create Marketing Copy'}
+                    {aiMode === 'imageIdeas' && 'Get Image Suggestions'}
+                  </h4>
+                  <p className="text-sm text-blue-700">
+                    {aiMode === 'title' && 'Get 5 compelling, SEO-friendly course title suggestions based on your category and level.'}
+                    {aiMode === 'description' && 'Create a comprehensive course description with learning objectives and benefits.'}
+                    {aiMode === 'modules' && 'Generate a complete module structure with titles, descriptions, and learning objectives.'}
+                    {aiMode === 'quiz' && 'Create quiz questions with multiple choice, true/false, and short answer formats.'}
+                    {aiMode === 'content' && 'Get specific ideas for videos, exercises, projects, and reading materials.'}
+                    {aiMode === 'pricing' && 'Receive market-based pricing recommendations with justification.'}
+                    {aiMode === 'marketing' && 'Generate taglines, selling points, and social media content.'}
+                    {aiMode === 'imageIdeas' && 'Get suggestions for course thumbnails, diagrams, and visual content.'}
+                  </p>
                 </div>
 
                 {/* Context Input */}
@@ -1341,6 +1904,44 @@ export default function CreateCourse() {
                         >
                           Apply to Short Description
                         </Button>
+                      </div>
+                    )}
+
+                    {aiMode === 'title' && (
+                      <Button
+                        onClick={() => applyAISuggestion('title')}
+                        size="sm"
+                        className="w-full"
+                      >
+                        Apply First Title
+                      </Button>
+                    )}
+
+                    {aiMode === 'modules' && (
+                      <Button
+                        onClick={() => applyAISuggestion('modules')}
+                        size="sm"
+                        className="w-full"
+                      >
+                        Apply Module Structure
+                      </Button>
+                    )}
+
+                    {aiMode === 'quiz' && (
+                      <Button
+                        onClick={() => applyAISuggestion('quiz')}
+                        size="sm"
+                        className="w-full"
+                      >
+                        Apply Quiz Questions
+                      </Button>
+                    )}
+
+                    {(aiMode === 'content' || aiMode === 'pricing' || aiMode === 'marketing' || aiMode === 'imageIdeas') && (
+                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                        <p className="text-sm text-yellow-800">
+                          Copy the suggestions above and use them as reference for your course content.
+                        </p>
                       </div>
                     )}
                   </div>
