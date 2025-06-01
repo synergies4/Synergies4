@@ -62,21 +62,20 @@ export default function HeroSection({
       {/* Floating Background Elements for gradient variant */}
       {backgroundVariant === 'gradient' && (
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-lg blur-xl floating" />
-          <div className="absolute top-32 right-20 w-24 h-24 bg-gradient-to-br from-purple-400/25 to-pink-400/25 rounded-full blur-lg floating-delayed" />
-          <div className="absolute bottom-20 left-1/4 w-40 h-40 bg-gradient-to-br from-indigo-400/15 to-blue-400/15 rounded-2xl blur-2xl floating" />
-          <div className="absolute top-1/2 right-10 w-28 h-28 bg-gradient-to-br from-cyan-400/20 to-blue-400/20 rounded-lg blur-xl floating-delayed" />
+          <div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-lg blur-xl" />
+          <div className="absolute top-32 right-20 w-24 h-24 bg-gradient-to-br from-purple-400/25 to-pink-400/25 rounded-full blur-lg" />
+          <div className="absolute bottom-20 left-1/4 w-40 h-40 bg-gradient-to-br from-indigo-400/15 to-blue-400/15 rounded-2xl blur-2xl" />
+          <div className="absolute top-1/2 right-10 w-28 h-28 bg-gradient-to-br from-cyan-400/20 to-blue-400/20 rounded-lg blur-xl" />
           
           {/* Mobile-optimized particles */}
           <div className="hidden md:block">
             {Array.from({ length: 8 }).map((_, i) => (
               <div
                 key={`particle-${i}`}
-                className="absolute w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-40 floating"
+                className="absolute w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-40"
                 style={{
                   left: `${(i * 12) % 100}%`,
                   top: `${(i * 15) % 100}%`,
-                  animationDelay: `${i * 0.5}s`,
                 }}
               />
             ))}
@@ -85,15 +84,15 @@ export default function HeroSection({
       )}
 
       <div className="container mx-auto px-4 text-center relative z-10">
-        <div className="fade-in-up">
+        <div>
           {badge && (
-            <Badge className="mb-6 bg-blue-100 text-blue-700 hover:bg-blue-200 scale-in stagger-1">
+            <Badge className="mb-6 bg-blue-100 text-blue-700 hover:bg-blue-200">
               {badge.icon && <span className="mr-2">{badge.icon}</span>}
               {badge.text}
             </Badge>
           )}
           
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight fade-in-up stagger-2">
+          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
             {title}{' '}
             {highlightText && (
               <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -103,17 +102,17 @@ export default function HeroSection({
           </h1>
         </div>
         
-        <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed fade-in-up stagger-3">
+        <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
           {description}
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center fade-in-up stagger-4">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           {primaryCTA && (
             primaryCTA.onClick ? (
               <Button
                 onClick={primaryCTA.onClick}
                 size="lg"
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 text-lg font-semibold hover-lift btn-shine"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105"
               >
                 {primaryCTA.text}
               </Button>
@@ -121,7 +120,7 @@ export default function HeroSection({
               <Button
                 asChild
                 size="lg"
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 text-lg font-semibold hover-lift btn-shine"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105"
               >
                 <Link href={primaryCTA.href}>
                   {primaryCTA.text}
@@ -136,7 +135,7 @@ export default function HeroSection({
                 onClick={secondaryCTA.onClick}
                 variant="outline"
                 size="lg"
-                className="border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-3 text-lg font-semibold hover-lift"
+                className="border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105"
               >
                 {secondaryCTA.text}
                 {secondaryCTA.icon && <span className="ml-2">{secondaryCTA.icon}</span>}
@@ -146,7 +145,7 @@ export default function HeroSection({
                 asChild
                 variant="outline"
                 size="lg"
-                className="border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-3 text-lg font-semibold hover-lift"
+                className="border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105"
               >
                 <Link href={secondaryCTA.href}>
                   {secondaryCTA.text}
