@@ -1622,7 +1622,7 @@ export default function SynergizeAgile() {
             </div>
 
             {/* Configuration Panel */}
-            <Card className="mb-8 bg-gradient-to-r from-blue-50 to-purple-50 border-0 shadow-lg sticky top-4 z-[5]">
+            <Card className="mb-8 bg-gradient-to-r from-blue-50 to-purple-50 border-0 shadow-lg sticky top-4 z-[100]">
               <CardHeader>
                 <CardTitle className="text-center text-xl">Configure Your Training Session</CardTitle>
               </CardHeader>
@@ -1816,7 +1816,7 @@ export default function SynergizeAgile() {
             </Card>
 
             {/* Chat Interface */}
-            <Card className="h-[600px] flex flex-col border-0 shadow-xl overflow-hidden">
+            <Card className="h-[600px] flex flex-col border-0 shadow-xl overflow-hidden relative z-[1]">
               <CardHeader className={`bg-gradient-to-r ${currentRole.color} text-white rounded-t-lg flex-shrink-0`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
