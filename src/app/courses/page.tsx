@@ -341,7 +341,7 @@ function CourseDirectorySection() {
                         </Badge>
                       </div>
                       
-                      course.featured && (
+                      {course.featured && (
                         <div className="absolute bottom-4 left-4">
                           <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0 font-medium shadow-lg">
                             <Star className="w-3 h-3 mr-1 fill-current" />
