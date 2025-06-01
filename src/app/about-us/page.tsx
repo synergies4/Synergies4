@@ -49,6 +49,17 @@ const scaleIn = {
   transition: { duration: 0.5, ease: [0.6, -0.05, 0.01, 0.99] }
 };
 
+// Enhanced button animation variants
+const buttonHover = {
+  scale: 1.02,
+  transition: { type: "spring", stiffness: 400, damping: 25 }
+};
+
+const buttonTap = {
+  scale: 0.98,
+  transition: { type: "spring", stiffness: 400, damping: 25 }
+};
+
 // Scroll-triggered animation hook
 function useScrollAnimation() {
   const ref = useRef(null);
@@ -187,10 +198,10 @@ export default function AboutUs() {
                 <UserAvatar />
               ) : (
                 <>
-                  <Button variant="ghost" asChild>
+                  <Button variant="ghost" asChild className="hover:bg-blue-50 hover:text-blue-600 transition-colors">
                     <Link href="/login">Login</Link>
                   </Button>
-                  <Button asChild>
+                  <Button asChild className="bg-blue-600 hover:bg-blue-700 transition-colors">
                     <Link href="/signup">Sign Up</Link>
                   </Button>
                 </>

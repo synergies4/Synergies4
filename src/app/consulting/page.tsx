@@ -51,6 +51,17 @@ const scaleIn = {
   transition: { duration: 0.5, ease: [0.6, -0.05, 0.01, 0.99] }
 };
 
+// Enhanced button animation variants
+const buttonHover = {
+  scale: 1.02,
+  transition: { type: "spring", stiffness: 400, damping: 25 }
+};
+
+const buttonTap = {
+  scale: 0.98,
+  transition: { type: "spring", stiffness: 400, damping: 25 }
+};
+
 // Scroll-triggered animation hook
 function useScrollAnimation() {
   const ref = useRef(null);
@@ -163,10 +174,10 @@ export default function Consulting() {
                 <UserAvatar />
               ) : (
                 <>
-                  <Button variant="ghost" asChild>
+                  <Button variant="ghost" asChild className="hover:bg-blue-50 hover:text-blue-600 transition-colors">
                     <Link href="/login">Login</Link>
                   </Button>
-                  <Button asChild>
+                  <Button asChild className="bg-blue-600 hover:bg-blue-700 transition-colors">
                     <Link href="/signup">Sign Up</Link>
                   </Button>
                 </>
@@ -339,12 +350,35 @@ export default function Consulting() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6, ease: [0.6, -0.05, 0.01, 0.99] }}
           >
-            <Button size="lg" className="text-lg px-8 py-6" asChild>
-              <Link href="/contact">
-                Request Consultation
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
+            <motion.div
+              whileHover={{ 
+                scale: 1.02,
+                y: -2
+              }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ type: "spring", stiffness: 400, damping: 25 }}
+            >
+              <Button 
+                size="lg" 
+                className="text-lg px-8 py-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group" 
+                asChild
+              >
+                <Link href="/contact">
+                  {/* Subtle shine effect */}
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                    initial={{ x: '-100%' }}
+                    whileHover={{ x: '100%' }}
+                    transition={{ duration: 0.6, ease: "easeInOut" }}
+                  />
+                  
+                  <span className="relative z-10 flex items-center">
+                    Request Consultation
+                    <ArrowRight className="h-5 w-5 ml-2 transition-transform group-hover:translate-x-1" />
+                  </span>
+                </Link>
+              </Button>
+            </motion.div>
           </motion.div>
         </motion.div>
       </section>
