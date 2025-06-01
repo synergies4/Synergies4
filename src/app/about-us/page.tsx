@@ -75,7 +75,6 @@ export default function AboutUs() {
           icon: <MessageSquare className="w-4 h-4" />
         }}
         backgroundVariant="gradient"
-        size="large"
       />
 
       {/* Mission Section */}
