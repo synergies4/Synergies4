@@ -42,7 +42,8 @@ import {
   Copy,
   Image as ImageIcon,
   Play,
-  TrendingUp
+  TrendingUp,
+  Tag
 } from 'lucide-react';
 
 interface ModuleContent {
@@ -110,7 +111,7 @@ export default function CreateCourse() {
   
   // AI Assistant State
   const [showAIAssistant, setShowAIAssistant] = useState(false);
-  const [aiMode, setAiMode] = useState<'title' | 'description' | 'modules' | 'quiz' | 'content' | 'pricing' | 'marketing' | 'imageIdeas'>('description');
+  const [aiMode, setAiMode] = useState<'title' | 'description' | 'category' | 'modules' | 'quiz' | 'content' | 'pricing' | 'marketing' | 'imageIdeas'>('description');
   const [aiContext, setAiContext] = useState('');
   const [aiSuggestions, setAiSuggestions] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
@@ -119,12 +120,13 @@ export default function CreateCourse() {
   const [showModuleAI, setShowModuleAI] = useState<{[key: string]: boolean}>({});
 
   // Define AI mode type
-  type AiModeType = 'title' | 'description' | 'modules' | 'quiz' | 'content' | 'pricing' | 'marketing' | 'imageIdeas';
+  type AiModeType = 'title' | 'description' | 'category' | 'modules' | 'quiz' | 'content' | 'pricing' | 'marketing' | 'imageIdeas';
 
   // Memoized AI mode options for performance
   const aiModeOptions = useMemo(() => [
     { mode: 'title' as AiModeType, icon: Sparkles, label: 'Title Ideas', shortLabel: 'Title' },
     { mode: 'description' as AiModeType, icon: FileText, label: 'Description', shortLabel: 'Description' },
+    { mode: 'category' as AiModeType, icon: Tag, label: 'Category', shortLabel: 'Category' },
     { mode: 'modules' as AiModeType, icon: BookOpen, label: 'Modules', shortLabel: 'Modules' },
     { mode: 'quiz' as AiModeType, icon: HelpCircle, label: 'Quiz', shortLabel: 'Quiz' },
     { mode: 'content' as AiModeType, icon: Lightbulb, label: 'Content Ideas', shortLabel: 'Content' },
@@ -142,6 +144,10 @@ export default function CreateCourse() {
     description: {
       title: 'Generate Course Description',
       description: 'Create a comprehensive course description with learning objectives and benefits.'
+    },
+    category: {
+      title: 'Suggest Course Category',
+      description: 'Get AI recommendations for the most appropriate course category based on your title and content.'
     },
     modules: {
       title: 'Generate Module Structure',
@@ -368,6 +374,9 @@ export default function CreateCourse() {
           break;
         case 'description':
           prompt = `Create a comprehensive course description for "${formData.title}" - a ${formData.category} course for ${formData.level} level students. Include learning objectives, what students will gain, and why they should take this course. Context: ${aiContext}`;
+          break;
+        case 'category':
+          prompt = `Based on the course title "${formData.title}" and this context: ${aiContext}, suggest the most appropriate category from these options: Agile & Scrum, Leadership, Product Management, Mental Fitness, Technology, Business. Provide the top 3 category recommendations with brief explanations for why each would be suitable.`;
           break;
         case 'modules':
           prompt = `Create a detailed module structure for the course "${formData.title}" (${formData.category}, ${formData.level} level). Include 6-8 modules with titles, descriptions, and learning objectives. Format as JSON with this structure:
@@ -608,6 +617,23 @@ export default function CreateCourse() {
         const titles = aiSuggestions.split('\n').filter(line => line.trim());
         if (titles.length > 0) {
           handleInputChange('title', titles[0].replace(/^\d+\.\s*/, ''));
+        }
+        break;
+      case 'category':
+        // Extract the first suggested category (assuming AI provides recommendations)
+        const suggestions = aiSuggestions.toLowerCase();
+        if (suggestions.includes('agile') || suggestions.includes('scrum')) {
+          handleInputChange('category', 'agile');
+        } else if (suggestions.includes('leadership')) {
+          handleInputChange('category', 'leadership');
+        } else if (suggestions.includes('product')) {
+          handleInputChange('category', 'product');
+        } else if (suggestions.includes('mental fitness') || suggestions.includes('mental-fitness')) {
+          handleInputChange('category', 'mental-fitness');
+        } else if (suggestions.includes('technology')) {
+          handleInputChange('category', 'technology');
+        } else if (suggestions.includes('business')) {
+          handleInputChange('category', 'business');
         }
         break;
       case 'modules':
