@@ -190,8 +190,131 @@ export default function AboutUs() {
 
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-20 overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute inset-0 overflow-hidden">
+          {/* Floating Gradient Shapes */}
+          <motion.div
+            className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-lg blur-xl"
+            animate={{
+              x: [0, 30, 0],
+              y: [0, -20, 0],
+              rotate: [0, 180, 360],
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+          <motion.div
+            className="absolute top-32 right-20 w-24 h-24 bg-gradient-to-br from-purple-400/25 to-pink-400/25 rounded-full blur-lg"
+            animate={{
+              x: [0, -25, 0],
+              y: [0, 15, 0],
+              scale: [1, 1.2, 1],
+            }}
+            transition={{
+              duration: 6,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 1
+            }}
+          />
+          <motion.div
+            className="absolute bottom-20 left-1/4 w-40 h-40 bg-gradient-to-br from-indigo-400/15 to-blue-400/15 rounded-2xl blur-2xl"
+            animate={{
+              x: [0, 40, 0],
+              y: [0, -30, 0],
+              rotate: [0, -90, 0],
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 2
+            }}
+          />
+          <motion.div
+            className="absolute top-1/2 right-10 w-28 h-28 bg-gradient-to-br from-cyan-400/20 to-blue-400/20 rounded-lg blur-xl"
+            animate={{
+              x: [0, -20, 0],
+              y: [0, 25, 0],
+              rotate: [0, 270, 360],
+            }}
+            transition={{
+              duration: 7,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 0.5
+            }}
+          />
+          <motion.div
+            className="absolute bottom-32 right-1/3 w-36 h-36 bg-gradient-to-br from-violet-400/18 to-purple-400/18 rounded-full blur-2xl"
+            animate={{
+              x: [0, 35, 0],
+              y: [0, -40, 0],
+              scale: [1, 0.8, 1],
+            }}
+            transition={{
+              duration: 9,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 1.5
+            }}
+          />
+          
+          {/* Pixelated Grid Overlay */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="grid grid-cols-12 md:grid-cols-20 lg:grid-cols-32 h-full gap-1">
+              {Array.from({ length: 384 }).map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="bg-gradient-to-br from-blue-500/30 to-purple-500/30 rounded-sm"
+                  initial={{ opacity: 0 }}
+                  animate={{ 
+                    opacity: [0, 0.3, 0],
+                    scale: [0.8, 1, 0.8]
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    delay: i * 0.01,
+                    ease: "easeInOut"
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Floating Particles */}
+          {Array.from({ length: 20 }).map((_, i) => (
+            <motion.div
+              key={`particle-${i}`}
+              className="absolute w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-40"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+              }}
+              animate={{
+                y: [0, -100, 0],
+                x: [0, Math.random() * 50 - 25, 0],
+                opacity: [0.4, 0.8, 0.4],
+              }}
+              transition={{
+                duration: 4 + Math.random() * 4,
+                repeat: Infinity,
+                delay: Math.random() * 2,
+                ease: "easeInOut"
+              }}
+            />
+          ))}
+
+          {/* Gradient Mesh */}
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-pink-500/5 animate-pulse" />
+        </div>
+
         <motion.div 
-          className="container mx-auto px-4 text-center"
+          className="container mx-auto px-4 text-center relative z-10"
           style={{ y: heroY, opacity: heroOpacity }}
         >
           <motion.div
@@ -199,7 +322,7 @@ export default function AboutUs() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: [0.6, -0.05, 0.01, 0.99] }}
           >
-            <Badge className="mb-6 bg-blue-100 text-blue-700 hover:bg-blue-200">
+            <Badge className="mb-6 bg-blue-100/90 backdrop-blur-sm text-blue-700 hover:bg-blue-200/90 border border-blue-200/50">
               <Heart className="w-4 h-4 mr-2" />
               About Synergies4
             </Badge>
