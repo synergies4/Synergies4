@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 import PageLayout from '@/components/shared/PageLayout';
 import HeroSection from '@/components/shared/HeroSection';
 import { 
@@ -135,6 +136,415 @@ interface Message {
   provider?: keyof typeof AI_PROVIDERS;
 }
 
+// Specialized interface components for different modes
+const PresentationGenerator = ({ 
+  currentRole, 
+  inputMessage, 
+  setInputMessage, 
+  handleSendMessage, 
+  isLoading, 
+  messages, 
+  copyMessage, 
+  selectedProvider 
+}: any) => {
+  const [slideCount, setSlideCount] = useState(5);
+  const [presentationTopic, setPresentationTopic] = useState('');
+  const [audience, setAudience] = useState('');
+  const [includeImages, setIncludeImages] = useState(true);
+  const [presentationStyle, setPresentationStyle] = useState('professional');
+
+  const generatePresentation = async () => {
+    const imagePrompt = includeImages ? 
+      `\n\nFor each slide, also generate a detailed image description that I can use to create visuals. Make the image descriptions specific, professional, and relevant to the content.` : '';
+    
+    const prompt = `Create a comprehensive ${slideCount}-slide presentation about "${presentationTopic}" for ${audience} in a ${presentationStyle} style.
+    
+    As a ${currentRole.name}, structure this presentation to be highly effective for your role's perspective.
+    
+    For each slide, provide:
+    1. **Slide Number & Title**
+    2. **Main Content** (3-5 key bullet points)
+    3. **Speaker Notes** (detailed talking points)
+    4. **Visual Elements** (charts, diagrams, or layout suggestions)
+    ${imagePrompt}
+    5. **Transition Notes** (how to move to next slide)
+    
+    Format the presentation with clear slide breaks using "--- SLIDE X ---" headers.
+    
+    Include:
+    - Opening hook and agenda
+    - Clear learning objectives
+    - Interactive elements or discussion points
+    - Strong conclusion with call-to-action
+    - Q&A preparation notes
+    
+    Make this presentation engaging, actionable, and tailored to the ${currentRole.name} perspective.`;
+    
+    setInputMessage(prompt);
+    await handleSendMessage();
+    
+    // If images are requested, generate them after the presentation
+    if (includeImages) {
+      setTimeout(async () => {
+        try {
+          const imagePrompt = `Professional presentation slide image for "${presentationTopic}" - modern, clean design with ${presentationStyle} style, suitable for ${audience}`;
+          
+          const imageResponse = await fetch('/api/generate-image', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              prompt: imagePrompt,
+              provider: 'openai'
+            })
+          });
+          
+          if (imageResponse.ok) {
+            const imageData = await imageResponse.json();
+            const imageMessage = `🎨 **Generated Presentation Visual**\n\n![Presentation Image](${imageData.imageUrl})\n\n*You can use this as inspiration for your slide visuals or as a template image.*`;
+            
+            // Add image message to chat
+            const aiMessage = {
+              id: (Date.now() + Math.random()).toString(),
+              type: 'ai' as const,
+              content: imageMessage,
+              timestamp: new Date(),
+              mode: 'presentation',
+              role: currentRole.name,
+              provider: selectedProvider
+            };
+            
+            // This would need to be passed down as a prop to update messages
+            // For now, we'll just log it
+            console.log('Generated image:', imageData.imageUrl);
+          }
+        } catch (error) {
+          console.error('Failed to generate presentation image:', error);
+        }
+      }, 2000);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
+        <div>
+          <Label htmlFor="topic" className="text-sm font-medium">Presentation Topic</Label>
+          <Input
+            id="topic"
+            value={presentationTopic}
+            onChange={(e) => setPresentationTopic(e.target.value)}
+            placeholder="e.g., Sprint Planning Best Practices"
+            className="mt-1"
+          />
+        </div>
+        <div>
+          <Label htmlFor="audience" className="text-sm font-medium">Target Audience</Label>
+          <Input
+            id="audience"
+            value={audience}
+            onChange={(e) => setAudience(e.target.value)}
+            placeholder="e.g., Development Team"
+            className="mt-1"
+          />
+        </div>
+        <div>
+          <Label htmlFor="slides" className="text-sm font-medium">Number of Slides</Label>
+          <Input
+            id="slides"
+            type="number"
+            value={slideCount}
+            onChange={(e) => setSlideCount(parseInt(e.target.value) || 5)}
+            min="3"
+            max="20"
+            className="mt-1"
+          />
+        </div>
+        <div>
+          <Label htmlFor="style" className="text-sm font-medium">Presentation Style</Label>
+          <Select value={presentationStyle} onValueChange={setPresentationStyle}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="professional">Professional</SelectItem>
+              <SelectItem value="creative">Creative</SelectItem>
+              <SelectItem value="technical">Technical</SelectItem>
+              <SelectItem value="executive">Executive</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+      
+      <div className="flex items-center space-x-2 px-4">
+        <input
+          type="checkbox"
+          id="includeImages"
+          checked={includeImages}
+          onChange={(e) => setIncludeImages(e.target.checked)}
+          className="rounded"
+        />
+        <Label htmlFor="includeImages" className="text-sm">
+          Generate visual elements and sample images
+        </Label>
+      </div>
+      
+      <Button 
+        onClick={generatePresentation}
+        disabled={!presentationTopic || !audience || isLoading}
+        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+      >
+        {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Presentation className="h-4 w-4 mr-2" />}
+        Generate {slideCount}-Slide Presentation
+      </Button>
+    </div>
+  );
+};
+
+const ScenarioSimulator = ({ 
+  currentRole, 
+  inputMessage, 
+  setInputMessage, 
+  handleSendMessage, 
+  isLoading, 
+  messages, 
+  copyMessage, 
+  selectedProvider 
+}: any) => {
+  const [person1Role, setPerson1Role] = useState('Scrum Master');
+  const [person2Role, setPerson2Role] = useState('Product Owner');
+  const [scenarioContext, setScenarioContext] = useState('');
+  const [person1Context, setPerson1Context] = useState('');
+  const [person2Context, setPerson2Context] = useState('');
+
+  const startScenario = async () => {
+    const prompt = `Create a realistic Agile scenario simulation between a ${person1Role} and a ${person2Role}.
+    
+    Scenario Context: ${scenarioContext}
+    
+    ${person1Role} Context: ${person1Context}
+    ${person2Role} Context: ${person2Context}
+    
+    Generate a dialogue with:
+    1. Initial situation setup
+    2. 3-4 exchanges between both roles
+    3. Challenges that arise
+    4. Resolution approach
+    5. Learning outcomes
+    
+    Format as a realistic conversation with clear speaker labels and include decision points where the user can choose different paths.`;
+    
+    setInputMessage(prompt);
+    handleSendMessage();
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card className="p-4 bg-green-50">
+          <h4 className="font-semibold text-green-800 mb-3">Person 1</h4>
+          <div className="space-y-3">
+            <div>
+              <Label className="text-sm font-medium">Role</Label>
+              <Select value={person1Role} onValueChange={setPerson1Role}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Scrum Master">Scrum Master</SelectItem>
+                  <SelectItem value="Product Owner">Product Owner</SelectItem>
+                  <SelectItem value="Developer">Developer</SelectItem>
+                  <SelectItem value="Stakeholder">Stakeholder</SelectItem>
+                  <SelectItem value="Team Lead">Team Lead</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-sm font-medium">Context & Goals</Label>
+              <Textarea
+                value={person1Context}
+                onChange={(e) => setPerson1Context(e.target.value)}
+                placeholder="What is this person's perspective, goals, and concerns?"
+                className="mt-1"
+                rows={3}
+              />
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-4 bg-blue-50">
+          <h4 className="font-semibold text-blue-800 mb-3">Person 2</h4>
+          <div className="space-y-3">
+            <div>
+              <Label className="text-sm font-medium">Role</Label>
+              <Select value={person2Role} onValueChange={setPerson2Role}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Scrum Master">Scrum Master</SelectItem>
+                  <SelectItem value="Product Owner">Product Owner</SelectItem>
+                  <SelectItem value="Developer">Developer</SelectItem>
+                  <SelectItem value="Stakeholder">Stakeholder</SelectItem>
+                  <SelectItem value="Team Lead">Team Lead</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-sm font-medium">Context & Goals</Label>
+              <Textarea
+                value={person2Context}
+                onChange={(e) => setPerson2Context(e.target.value)}
+                placeholder="What is this person's perspective, goals, and concerns?"
+                className="mt-1"
+                rows={3}
+              />
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      <div>
+        <Label className="text-sm font-medium">Scenario Context</Label>
+        <Textarea
+          value={scenarioContext}
+          onChange={(e) => setScenarioContext(e.target.value)}
+          placeholder="Describe the situation, challenge, or meeting context..."
+          className="mt-1"
+          rows={3}
+        />
+      </div>
+
+      <Button 
+        onClick={startScenario}
+        disabled={!scenarioContext || !person1Context || !person2Context || isLoading}
+        className="w-full bg-gradient-to-r from-green-600 to-blue-600"
+      >
+        {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <PlayCircle className="h-4 w-4 mr-2" />}
+        Start Scenario Simulation
+      </Button>
+    </div>
+  );
+};
+
+const RoleBasedAdvisor = ({ 
+  currentRole, 
+  inputMessage, 
+  setInputMessage, 
+  handleSendMessage, 
+  isLoading, 
+  messages, 
+  copyMessage, 
+  selectedProvider 
+}: any) => {
+  const [selectedChallenge, setSelectedChallenge] = useState('');
+  const [experienceLevel, setExperienceLevel] = useState('');
+  const [specificSituation, setSpecificSituation] = useState('');
+
+  const challenges = {
+    'scrum-master': [
+      'Team not following Scrum practices',
+      'Stakeholder interference in sprints',
+      'Team members missing ceremonies',
+      'Difficulty removing impediments',
+      'Conflict resolution within team'
+    ],
+    'product-owner': [
+      'Unclear product vision',
+      'Stakeholder alignment issues',
+      'Backlog prioritization challenges',
+      'User story writing difficulties',
+      'Managing technical debt'
+    ],
+    'developer': [
+      'Code quality concerns',
+      'Sprint commitment issues',
+      'Technical debt management',
+      'Cross-functional collaboration',
+      'Estimation accuracy'
+    ],
+    'agile-coach': [
+      'Organizational resistance to change',
+      'Scaling Agile practices',
+      'Team maturity assessment',
+      'Leadership buy-in',
+      'Cultural transformation'
+    ]
+  };
+
+  const getGuidedAdvice = async () => {
+    const prompt = `As an expert ${currentRole.name}, provide guided advice for this situation:
+    
+    Challenge: ${selectedChallenge}
+    Experience Level: ${experienceLevel}
+    Specific Situation: ${specificSituation}
+    
+    Please provide:
+    1. Root cause analysis questions to ask
+    2. Step-by-step action plan
+    3. Potential pitfalls to avoid
+    4. Success metrics to track
+    5. Follow-up questions for deeper insight
+    
+    Make this interactive by asking me clarifying questions about my specific context.`;
+    
+    setInputMessage(prompt);
+    handleSendMessage();
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label className="text-sm font-medium">Common Challenge</Label>
+          <Select value={selectedChallenge} onValueChange={setSelectedChallenge}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select a challenge..." />
+            </SelectTrigger>
+            <SelectContent>
+              {challenges[currentRole.name.toLowerCase().replace(' ', '-') as keyof typeof challenges]?.map((challenge, idx) => (
+                <SelectItem key={idx} value={challenge}>{challenge}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Label className="text-sm font-medium">Experience Level</Label>
+          <Select value={experienceLevel} onValueChange={setExperienceLevel}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select experience..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="beginner">Beginner (0-1 years)</SelectItem>
+              <SelectItem value="intermediate">Intermediate (1-3 years)</SelectItem>
+              <SelectItem value="advanced">Advanced (3+ years)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <div>
+        <Label className="text-sm font-medium">Describe Your Specific Situation</Label>
+        <Textarea
+          value={specificSituation}
+          onChange={(e) => setSpecificSituation(e.target.value)}
+          placeholder="Provide context about your team, organization, and specific challenges..."
+          className="mt-1"
+          rows={4}
+        />
+      </div>
+
+      <Button 
+        onClick={getGuidedAdvice}
+        disabled={!selectedChallenge || !experienceLevel || !specificSituation || isLoading}
+        className="w-full bg-gradient-to-r from-orange-600 to-red-600"
+      >
+        {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Brain className="h-4 w-4 mr-2" />}
+        Get Personalized Advice
+      </Button>
+    </div>
+  );
+};
+
 export default function SynergizeAgile() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
@@ -153,12 +563,15 @@ export default function SynergizeAgile() {
     }
   };
 
-  // Only scroll to bottom when new messages are added (not on role/mode changes)
+  // Only scroll to bottom when new AI messages are added (not user messages)
   useEffect(() => {
     if (messages.length > 0 && hasInitialized) {
-      scrollToBottom();
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessage.type === 'ai') {
+        scrollToBottom();
+      }
     }
-  }, [messages.length, hasInitialized]);
+  }, [messages, hasInitialized]);
 
   // Initialize with a single welcome message only once
   useEffect(() => {
@@ -652,65 +1065,107 @@ export default function SynergizeAgile() {
                   <div ref={messagesEndRef} />
                 </div>
 
-                {/* File Upload Area */}
-                {files.length > 0 && (
-                  <div className="border-t bg-gray-50 p-4 flex-shrink-0">
-                    <div className="flex flex-wrap gap-2">
-                      {files.map((file, index) => (
-                        <div key={index} className="flex items-center bg-white rounded-lg p-2 border">
-                          <FileText className="h-4 w-4 text-gray-500 mr-2" />
-                          <span className="text-sm text-gray-700 truncate max-w-[150px]">
-                            {file.name}
-                          </span>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeFile(index)}
-                            className="h-6 w-6 p-0 ml-2 hover:bg-gray-100"
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Input Area */}
+                {/* Specialized Mode Interface */}
                 <div className="border-t bg-white p-4 flex-shrink-0">
-                  <div className="flex space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="flex-shrink-0"
-                    >
-                      <Upload className="h-4 w-4" />
-                    </Button>
-                    <Textarea
-                      value={inputMessage}
-                      onChange={(e) => setInputMessage(e.target.value)}
-                      placeholder={`Ask your ${currentRole.name} assistant anything about Agile...`}
-                      className="flex-1 min-h-[60px] max-h-[120px] resize-none"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                          e.preventDefault();
-                          handleSendMessage();
-                        }
-                      }}
+                  {selectedMode === 'presentation' && (
+                    <PresentationGenerator
+                      currentRole={currentRole}
+                      inputMessage={inputMessage}
+                      setInputMessage={setInputMessage}
+                      handleSendMessage={handleSendMessage}
+                      isLoading={isLoading}
+                      messages={messages}
+                      copyMessage={copyMessage}
+                      selectedProvider={selectedProvider}
                     />
-                    <Button
-                      onClick={handleSendMessage}
-                      disabled={isLoading || (!inputMessage.trim() && files.length === 0)}
-                      className={`flex-shrink-0 bg-gradient-to-r ${currentRole.color} hover:opacity-90`}
-                    >
-                      {isLoading ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Send className="h-4 w-4" />
+                  )}
+                  
+                  {selectedMode === 'scenario' && (
+                    <ScenarioSimulator
+                      currentRole={currentRole}
+                      inputMessage={inputMessage}
+                      setInputMessage={setInputMessage}
+                      handleSendMessage={handleSendMessage}
+                      isLoading={isLoading}
+                      messages={messages}
+                      copyMessage={copyMessage}
+                      selectedProvider={selectedProvider}
+                    />
+                  )}
+                  
+                  {selectedMode === 'advisor' && (
+                    <RoleBasedAdvisor
+                      currentRole={currentRole}
+                      inputMessage={inputMessage}
+                      setInputMessage={setInputMessage}
+                      handleSendMessage={handleSendMessage}
+                      isLoading={isLoading}
+                      messages={messages}
+                      copyMessage={copyMessage}
+                      selectedProvider={selectedProvider}
+                    />
+                  )}
+                  
+                  {selectedMode === 'chat' && (
+                    <div className="space-y-4">
+                      {/* File Upload Area for Chat Mode */}
+                      {files.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {files.map((file, index) => (
+                            <div key={index} className="flex items-center bg-gray-100 rounded-lg p-2 border">
+                              <FileText className="h-4 w-4 text-gray-500 mr-2" />
+                              <span className="text-sm text-gray-700 truncate max-w-[150px]">
+                                {file.name}
+                              </span>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeFile(index)}
+                                className="h-6 w-6 p-0 ml-2 hover:bg-gray-100"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
                       )}
-                    </Button>
-                  </div>
+                      
+                      {/* Chat Input */}
+                      <div className="flex space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="flex-shrink-0"
+                        >
+                          <Upload className="h-4 w-4" />
+                        </Button>
+                        <Textarea
+                          value={inputMessage}
+                          onChange={(e) => setInputMessage(e.target.value)}
+                          placeholder={`Ask your ${currentRole.name} assistant anything about Agile...`}
+                          className="flex-1 min-h-[60px] max-h-[120px] resize-none"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && !e.shiftKey) {
+                              e.preventDefault();
+                              handleSendMessage();
+                            }
+                          }}
+                        />
+                        <Button
+                          onClick={handleSendMessage}
+                          disabled={isLoading || (!inputMessage.trim() && files.length === 0)}
+                          className={`flex-shrink-0 bg-gradient-to-r ${currentRole.color} hover:opacity-90`}
+                        >
+                          {isLoading ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Send className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
