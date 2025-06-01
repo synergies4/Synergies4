@@ -24,32 +24,23 @@ export const metadata: Metadata = {
     shortcut: "/synergies4_logo.svg"
   },
   
-  // Open Graph / Facebook
+  // Open Graph / Facebook - Removed specific image to use defaults
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "https://synergies4.com",
     siteName: "Synergies4",
     title: "Synergies4 - AI-Powered Learning Platform",
-    description: "Transform your career with AI-powered learning. Master Agile, leadership, and mental fitness with expert-led training programs.",
-    images: [
-      {
-        url: "/synergies4_logo.jpeg",
-        width: 1200,
-        height: 630,
-        alt: "Synergies4 - AI-Powered Learning Platform"
-      }
-    ]
+    description: "Transform your career with AI-powered learning. Master Agile, leadership, and mental fitness with expert-led training programs."
   },
   
-  // Twitter
+  // Twitter - Removed specific image to use defaults
   twitter: {
-    card: "summary_large_image",
+    card: "summary",
     site: "@synergies4",
     creator: "@synergies4",
     title: "Synergies4 - AI-Powered Learning Platform",
-    description: "Transform your career with AI-powered learning. Master Agile, leadership, and mental fitness with expert-led training programs.",
-    images: ["/synergies4_logo.jpeg"]
+    description: "Transform your career with AI-powered learning. Master Agile, leadership, and mental fitness with expert-led training programs."
   },
   
   // Additional metadata
