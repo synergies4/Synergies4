@@ -25,12 +25,11 @@ import {
   Target,
   Award,
   Loader2,
-  Eye,
+  X,
   Edit,
-  FileText,
-  Video,
-  Link as LinkIcon,
-  CheckCircle
+  HelpCircle,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 
 interface ModuleContent {

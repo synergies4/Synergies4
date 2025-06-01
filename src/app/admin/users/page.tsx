@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
   Users, 
@@ -20,7 +21,10 @@ import {
   Shield,
   Mail,
   Calendar,
-  Loader2
+  Loader2,
+  Home,
+  User,
+  Trash2
 } from 'lucide-react';
 import { UserAvatar } from '@/components/UserAvatar';
 import {
