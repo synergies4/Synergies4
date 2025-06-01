@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -601,10 +602,10 @@ export default function SynergizeAgile() {
               className="text-lg px-8 py-6 border-2 border-white text-white hover:bg-white hover:text-blue-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
               asChild
             >
-              <a href="/courses">
+              <Link href="/courses">
                 Explore Courses
                 <BookOpen className="h-5 w-5 ml-2" />
-              </a>
+              </Link>
             </Button>
           </div>
         </div>
