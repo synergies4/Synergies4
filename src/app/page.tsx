@@ -118,65 +118,146 @@ export default function HomePage() {
 // Value Propositions Section
 function ValuePropositionsSection() {
   return (
-    <section className="py-20 bg-white relative overflow-hidden">
-      {/* Simple Background Pattern */}
-      <div className="absolute inset-0 opacity-5">
+    <section className="py-24 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-blue-400/20 to-purple-600/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-br from-cyan-400/20 to-blue-600/20 rounded-full blur-3xl animate-pulse animation-delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-br from-purple-400/10 to-pink-600/10 rounded-full blur-2xl animate-pulse animation-delay-2000"></div>
+      </div>
+
+      {/* Sophisticated Grid Pattern */}
+      <div className="absolute inset-0 opacity-10">
         <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle at 25% 25%, #3B82F6 2px, transparent 2px),
-                           radial-gradient(circle at 75% 75%, #8B5CF6 2px, transparent 2px)`,
-          backgroundSize: '60px 60px'
+          backgroundImage: `radial-gradient(circle at 25% 25%, #60A5FA 1px, transparent 1px),
+                           radial-gradient(circle at 75% 75%, #A78BFA 1px, transparent 1px),
+                           radial-gradient(circle at 50% 50%, #34D399 0.5px, transparent 0.5px)`,
+          backgroundSize: '60px 60px, 80px 80px, 40px 40px'
         }} />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-            Why Choose Synergies4?
+        {/* Enhanced Header */}
+        <div className="text-center mb-20">
+          <div className="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 mb-6">
+            <span className="w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full mr-3 animate-pulse"></span>
+            <span className="text-white/90 text-sm font-medium">Why Choose Synergies4?</span>
+          </div>
+          
+          <h2 className="text-4xl md:text-6xl font-bold mb-8 leading-tight">
+            <span className="bg-gradient-to-r from-white via-blue-100 to-cyan-200 bg-clip-text text-transparent">
+              Your AI-Powered
+            </span>
+            <br />
+            <span className="bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 bg-clip-text text-transparent">
+              Learning Partner
+            </span>
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            We're not just another training company. We're your AI-powered partners in creating personalized learning journeys.
+          
+          <p className="text-xl md:text-2xl text-blue-100/90 max-w-4xl mx-auto leading-relaxed font-light">
+            We're not just another training company. We're your intelligent partners in creating 
+            <span className="text-cyan-300 font-medium"> personalized learning journeys </span>
+            that adapt to your unique goals and accelerate your professional growth.
           </p>
         </div>
 
+        {/* Revolutionary Card Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {[
             {
-              icon: <Brain className="h-8 w-8" />,
+              icon: <Brain className="h-10 w-10" />,
               title: "AI-Powered Learning",
-              description: "Personalized learning paths powered by artificial intelligence to accelerate your growth."
+              description: "Personalized learning paths powered by cutting-edge AI that understands your unique style and accelerates your growth trajectory.",
+              gradient: "from-blue-500 to-cyan-400",
+              glowColor: "blue-400/30",
+              delay: "0"
             },
             {
-              icon: <Target className="h-8 w-8" />,
+              icon: <Target className="h-10 w-10" />,
               title: "Practical Skills",
-              description: "Learn frameworks and methodologies that you can immediately apply in your work."
+              description: "Learn frameworks and methodologies that you can immediately apply in your work, with real-world projects and hands-on experience.",
+              gradient: "from-purple-500 to-pink-400",
+              glowColor: "purple-400/30",
+              delay: "200"
             },
             {
-              icon: <Users className="h-8 w-8" />,
+              icon: <Users className="h-10 w-10" />,
               title: "Expert Instructors",
-              description: "Learn from industry leaders with real-world experience in their fields."
+              description: "Learn from industry leaders with real-world experience, offering mentorship and insights you can't find anywhere else.",
+              gradient: "from-emerald-500 to-teal-400",
+              glowColor: "emerald-400/30",
+              delay: "400"
             },
             {
-              icon: <Award className="h-8 w-8" />,
+              icon: <Award className="h-10 w-10" />,
               title: "Recognized Certifications",
-              description: "Earn certificates that are valued by employers and industry professionals."
+              description: "Earn globally recognized certificates that are valued by top employers and respected by industry professionals worldwide.",
+              gradient: "from-orange-500 to-red-400",
+              glowColor: "orange-400/30",
+              delay: "600"
             }
           ].map((item, index) => (
-            <Card key={index} className="h-full text-center hover:shadow-xl transition-all duration-300 group border-0 shadow-lg bg-white/80 backdrop-blur-sm hover:scale-105">
-              <CardHeader>
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 group-hover:scale-110 transition-transform duration-300">
-                  {item.icon}
+            <div 
+              key={index} 
+              className={`group relative animate-fade-in-up animation-delay-${item.delay}`}
+            >
+              {/* Glow Effect */}
+              <div className={`absolute -inset-1 bg-gradient-to-r ${item.gradient} rounded-2xl blur opacity-0 group-hover:opacity-75 transition duration-1000 group-hover:duration-200`}></div>
+              
+              {/* Main Card */}
+              <div className="relative bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 p-8 h-full hover:bg-white/15 transition-all duration-500 group-hover:scale-105 group-hover:-translate-y-2">
+                {/* Icon Container */}
+                <div className="relative mb-6">
+                  <div className={`w-20 h-20 bg-gradient-to-br ${item.gradient} rounded-2xl flex items-center justify-center mx-auto mb-6 text-white shadow-2xl group-hover:scale-110 group-hover:rotate-3 transition-all duration-500`}>
+                    {item.icon}
+                  </div>
+                  {/* Floating particles effect */}
+                  <div className={`absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-24 bg-${item.glowColor} rounded-full blur-xl opacity-0 group-hover:opacity-100 group-hover:scale-150 transition-all duration-700`}></div>
                 </div>
-                <CardTitle className="text-xl group-hover:text-blue-600 transition-colors">
-                  {item.title}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-base leading-relaxed">
-                  {item.description}
-                </CardDescription>
-              </CardContent>
-            </Card>
+
+                {/* Content */}
+                <div className="text-center">
+                  <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-cyan-200 transition-colors duration-300">
+                    {item.title}
+                  </h3>
+                  <p className="text-blue-100/80 leading-relaxed text-base group-hover:text-white/90 transition-colors duration-300">
+                    {item.description}
+                  </p>
+                </div>
+
+                {/* Hover indicator */}
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-white to-transparent group-hover:w-16 transition-all duration-500 rounded-full"></div>
+              </div>
+            </div>
           ))}
+        </div>
+
+        {/* Call-to-Action */}
+        <div className="text-center mt-16">
+          <div className="inline-flex items-center space-x-4">
+            <Button 
+              size="lg" 
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 hover:scale-105 border-0"
+              asChild
+            >
+              <Link href="/courses">
+                Explore Our Courses
+                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </Button>
+            
+            <Button 
+              size="lg" 
+              variant="outline"
+              className="border-2 border-white/30 text-white hover:bg-white/10 px-8 py-4 rounded-xl backdrop-blur-sm hover:border-white/50 transition-all duration-300 hover:scale-105"
+              asChild
+            >
+              <Link href="/synergize">
+                Try AI Assistant
+                <Brain className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
+          </div>
         </div>
       </div>
     </section>
@@ -199,10 +280,10 @@ function FeaturedCoursesSection() {
 
   const getLevelColor = (level: string) => {
     switch (level?.toLowerCase()) {
-      case 'beginner': return 'bg-green-100 text-green-800 border-green-200';
-      case 'intermediate': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'advanced': return 'bg-purple-100 text-purple-800 border-purple-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'beginner': return 'from-emerald-500 to-green-600';
+      case 'intermediate': return 'from-blue-500 to-indigo-600';
+      case 'advanced': return 'from-purple-500 to-pink-600';
+      default: return 'from-gray-500 to-slate-600';
     }
   };
 
@@ -230,12 +311,12 @@ function FeaturedCoursesSection() {
     fetchCourses();
   }, []);
 
-  // Fallback courses with better styling
+  // Enhanced fallback courses
   const fallbackCourses = [
     {
       id: 'fallback-1',
       title: "AI-Powered Executive Leadership",
-      short_desc: "Master AI strategy from an executive perspective and lead digital transformation",
+      short_desc: "Master AI strategy from an executive perspective and lead digital transformation with confidence and vision.",
       level: "Advanced",
       duration: "8 weeks",
       rating: 4.9,
@@ -246,7 +327,7 @@ function FeaturedCoursesSection() {
     {
       id: 'fallback-2',
       title: "AI-Powered Scrum Master",
-      short_desc: "Master AI-enhanced Scrum methodologies and lead high-performing agile teams",
+      short_desc: "Master AI-enhanced Scrum methodologies and lead high-performing agile teams to unprecedented success.",
       level: "Intermediate",
       duration: "6 weeks",
       rating: 4.8,
@@ -257,7 +338,7 @@ function FeaturedCoursesSection() {
     {
       id: 'fallback-3',
       title: "AI Product Owner Mastery",
-      short_desc: "Drive product excellence using AI-enhanced strategies and data-driven decisions",
+      short_desc: "Drive product excellence using AI-enhanced strategies and data-driven decisions that deliver real impact.",
       level: "Intermediate",
       duration: "7 weeks",
       rating: 4.7,
@@ -268,7 +349,7 @@ function FeaturedCoursesSection() {
     {
       id: 'fallback-4',
       title: "Mental Fitness for Leaders",
-      short_desc: "Build resilience and mental agility for high-performance leadership",
+      short_desc: "Build resilience and mental agility for high-performance leadership in today's complex world.",
       level: "Beginner",
       duration: "4 weeks",
       rating: 4.9,
@@ -281,44 +362,62 @@ function FeaturedCoursesSection() {
   const displayCourses = courses.length > 0 ? courses : fallbackCourses;
 
   return (
-    <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50 relative overflow-hidden">
-      {/* Background Pattern */}
+    <section className="py-24 bg-gradient-to-br from-indigo-950 via-slate-900 to-gray-900 relative overflow-hidden">
+      {/* Dynamic Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-blue-500/10 to-purple-600/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/3 left-1/3 w-80 h-80 bg-gradient-to-br from-cyan-500/10 to-blue-600/10 rounded-full blur-3xl animate-pulse animation-delay-1000"></div>
+        <div className="absolute top-2/3 left-1/4 w-64 h-64 bg-gradient-to-br from-emerald-500/10 to-teal-600/10 rounded-full blur-2xl animate-pulse animation-delay-2000"></div>
+      </div>
+
+      {/* Geometric Pattern */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle at 20% 80%, #3B82F6 2px, transparent 2px),
-                           radial-gradient(circle at 80% 20%, #8B5CF6 2px, transparent 2px),
-                           radial-gradient(circle at 40% 40%, #06B6D4 2px, transparent 2px)`,
-          backgroundSize: '100px 100px'
+          backgroundImage: `conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(59, 130, 246, 0.3) 60deg, transparent 120deg),
+                           conic-gradient(from 180deg at 25% 75%, transparent 0deg, rgba(168, 85, 247, 0.3) 60deg, transparent 120deg),
+                           conic-gradient(from 90deg at 75% 25%, transparent 0deg, rgba(34, 197, 94, 0.3) 60deg, transparent 120deg)`,
+          backgroundSize: '120px 120px, 80px 80px, 100px 100px'
         }} />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
-        <div className="text-center mb-16">
-          <Badge className="mb-4 bg-blue-100 text-blue-700 hover:bg-blue-200 border-blue-200">
-            <BookOpen className="w-4 h-4 mr-2" />
-            Featured Learning
-          </Badge>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-            Start Your Learning Journey
+        {/* Enhanced Header */}
+        <div className="text-center mb-20">
+          <div className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-sm rounded-full border border-blue-300/30 mb-8">
+            <BookOpen className="w-5 h-5 text-blue-300 mr-3" />
+            <span className="text-blue-100 font-medium">Featured Learning Experiences</span>
+          </div>
+          
+          <h2 className="text-4xl md:text-6xl font-bold mb-8 leading-tight">
+            <span className="bg-gradient-to-r from-white via-blue-200 to-cyan-300 bg-clip-text text-transparent">
+              Start Your Learning
+            </span>
+            <br />
+            <span className="bg-gradient-to-r from-purple-300 via-pink-300 to-orange-300 bg-clip-text text-transparent">
+              Journey Today
+            </span>
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Discover our most popular courses designed by industry experts to accelerate your career growth
+          
+          <p className="text-xl md:text-2xl text-blue-200/90 max-w-4xl mx-auto leading-relaxed font-light">
+            Discover our most popular courses designed by 
+            <span className="text-cyan-300 font-medium"> industry experts </span>
+            to accelerate your career growth and unlock your full potential.
           </p>
         </div>
 
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="bg-white rounded-xl shadow-lg overflow-hidden animate-pulse">
-                <div className="h-48 bg-gray-200"></div>
+              <div key={i} className="bg-white/10 backdrop-blur-xl rounded-2xl shadow-lg overflow-hidden animate-pulse border border-white/20">
+                <div className="h-48 bg-gradient-to-br from-gray-400/20 to-gray-600/20"></div>
                 <div className="p-6">
-                  <div className="h-4 bg-gray-200 rounded mb-3"></div>
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
+                  <div className="h-4 bg-white/20 rounded mb-3"></div>
+                  <div className="h-4 bg-white/20 rounded w-3/4 mb-4"></div>
                   <div className="flex justify-between items-center mb-4">
-                    <div className="h-6 bg-gray-200 rounded w-20"></div>
-                    <div className="h-6 bg-gray-200 rounded w-16"></div>
+                    <div className="h-6 bg-white/20 rounded w-20"></div>
+                    <div className="h-6 bg-white/20 rounded w-16"></div>
                   </div>
-                  <div className="h-10 bg-gray-200 rounded"></div>
+                  <div className="h-10 bg-white/20 rounded"></div>
                 </div>
               </div>
             ))}
@@ -326,71 +425,91 @@ function FeaturedCoursesSection() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {displayCourses.map((course, index) => (
-              <Card key={course.id} className="group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white/90 backdrop-blur-sm border-0 shadow-lg overflow-hidden rounded-xl flex flex-col h-full">
-                {/* Course Image */}
-                <div className="relative h-48 overflow-hidden flex-shrink-0">
-                  <img 
-                    src={course.image || `https://images.unsplash.com/photo-${1560472354 + index}?w=400&h=250&fit=crop&auto=format`}
-                    alt={course.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  <div className="absolute top-4 left-4">
-                    <Badge className={`${getLevelColor(course.level)} border font-medium`}>
-                      {course.level}
-                    </Badge>
-                  </div>
-                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 text-sm font-semibold text-gray-700">
-                    {course.duration || '6 weeks'}
-                  </div>
-                </div>
+              <div 
+                key={course.id} 
+                className={`group relative animate-fade-in-up animation-delay-${index * 200}`}
+              >
+                {/* Card Glow Effect */}
+                <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 rounded-2xl blur opacity-0 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
+                
+                {/* Main Card */}
+                <div className="relative bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden shadow-2xl hover:bg-white/15 transition-all duration-500 group-hover:scale-105 group-hover:-translate-y-3 flex flex-col h-full">
+                  {/* Course Image with Enhanced Overlay */}
+                  <div className="relative h-48 overflow-hidden flex-shrink-0">
+                    <img 
+                      src={course.image || `https://images.unsplash.com/photo-${1560472354 + index}?w=400&h=250&fit=crop&auto=format`}
+                      alt={course.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                    
+                    {/* Gradient Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent group-hover:from-black/40 transition-all duration-500"></div>
+                    
+                    {/* Level Badge */}
+                    <div className="absolute top-4 left-4">
+                      <div className={`px-3 py-1 bg-gradient-to-r ${getLevelColor(course.level)} rounded-full text-white text-sm font-semibold shadow-lg backdrop-blur-sm`}>
+                        {course.level}
+                      </div>
+                    </div>
+                    
+                    {/* Duration Badge */}
+                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-semibold text-gray-800 shadow-lg">
+                      {course.duration || '6 weeks'}
+                    </div>
 
-                {/* Card Content - Flexible */}
-                <div className="flex flex-col flex-1 p-6">
-                  <CardHeader className="p-0 mb-4 flex-shrink-0">
-                    <CardTitle className="text-lg font-bold group-hover:text-blue-600 transition-colors line-clamp-2 min-h-[3.5rem] flex items-center">
+                    {/* Floating Icon */}
+                    <div className="absolute bottom-4 right-4 w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
+                      <BookOpen className="w-6 h-6" />
+                    </div>
+                  </div>
+
+                  {/* Card Content */}
+                  <div className="flex flex-col flex-1 p-6">
+                    {/* Title */}
+                    <h3 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-200 transition-colors duration-300 line-clamp-2 min-h-[3.5rem] flex items-start">
                       {course.title}
-                    </CardTitle>
-                    <CardDescription className="text-gray-600 line-clamp-3 leading-relaxed min-h-[4.5rem]">
+                    </h3>
+                    
+                    {/* Description */}
+                    <p className="text-blue-200/80 text-sm leading-relaxed mb-4 flex-1 group-hover:text-white/90 transition-colors duration-300">
                       {course.short_desc}
-                    </CardDescription>
-                  </CardHeader>
+                    </p>
 
-                  {/* Rating and Students - Fixed Height */}
-                  <div className="flex items-center justify-between mb-4 text-sm flex-shrink-0">
-                    <div className="flex items-center space-x-1">
-                      <div className="flex">
-                        {[...Array(5)].map((_, i) => (
-                          <Star 
-                            key={i} 
-                            className={`h-4 w-4 ${i < Math.floor(course.rating || 4.8) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} 
-                          />
-                        ))}
+                    {/* Rating and Students */}
+                    <div className="flex items-center justify-between mb-4 text-sm">
+                      <div className="flex items-center space-x-1">
+                        <div className="flex">
+                          {[...Array(5)].map((_, i) => (
+                            <Star 
+                              key={i} 
+                              className={`h-4 w-4 ${i < Math.floor(course.rating || 4.8) ? 'text-yellow-400 fill-current' : 'text-gray-400'}`} 
+                            />
+                          ))}
+                        </div>
+                        <span className="text-blue-200 font-medium ml-1">{course.rating || '4.8'}</span>
                       </div>
-                      <span className="text-gray-600 font-medium">{course.rating || '4.8'}</span>
-                    </div>
-                    <div className="flex items-center text-gray-500">
-                      <Users className="h-4 w-4 mr-1" />
-                      <span>{course.students || '1,200'}+</span>
-                    </div>
-                  </div>
-
-                  {/* Price - Fixed Height */}
-                  <div className="flex items-center justify-between mb-4 flex-shrink-0">
-                    <div className="text-2xl font-bold text-blue-600">
-                      {formatPrice(course.price)}
-                    </div>
-                    {course.price && course.price > 0 && (
-                      <div className="text-sm text-gray-500 line-through">
-                        ${Math.round(course.price * 1.4)}
+                      <div className="flex items-center text-blue-300/80">
+                        <Users className="h-4 w-4 mr-1" />
+                        <span>{course.students || '1,200'}+</span>
                       </div>
-                    )}
-                  </div>
+                    </div>
 
-                  {/* CTA Button - Always at bottom */}
-                  <div className="mt-auto">
+                    {/* Price */}
+                    <div className="flex items-center justify-between mb-6">
+                      <div className="text-2xl font-bold bg-gradient-to-r from-cyan-300 to-blue-400 bg-clip-text text-transparent">
+                        {formatPrice(course.price)}
+                      </div>
+                      {course.price && course.price > 0 && (
+                        <div className="text-sm text-blue-300/60 line-through">
+                          ${Math.round(course.price * 1.4)}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* CTA Button */}
                     <Button 
                       asChild 
-                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-105"
+                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-105 rounded-xl border-0"
                     >
                       <Link href={`/courses/${createCourseSlug(course.title)}`}>
                         <span className="flex items-center justify-center">
@@ -401,24 +520,29 @@ function FeaturedCoursesSection() {
                     </Button>
                   </div>
                 </div>
-              </Card>
+              </div>
             ))}
           </div>
         )}
 
-        {/* View All Courses CTA */}
-        <div className="text-center mt-12">
-          <Button 
-            size="lg" 
-            variant="outline" 
-            className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-            asChild
-          >
-            <Link href="/courses">
-              View All Courses
-              <ArrowRight className="h-5 w-5 ml-2" />
-            </Link>
-          </Button>
+        {/* Enhanced CTA */}
+        <div className="text-center mt-16">
+          <div className="inline-flex items-center space-x-4">
+            <Button 
+              size="lg" 
+              className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-8 py-4 rounded-xl shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 hover:scale-105 border-0"
+              asChild
+            >
+              <Link href="/courses">
+                View All Courses
+                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </Button>
+            
+            <div className="text-blue-200/60 text-sm">
+              Join <span className="font-semibold text-cyan-300">10,000+</span> learners worldwide
+            </div>
+          </div>
         </div>
       </div>
     </section>
