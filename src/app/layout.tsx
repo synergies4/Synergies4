@@ -14,14 +14,18 @@ export const metadata: Metadata = {
   creator: "Synergies4",
   publisher: "Synergies4 LLC",
   
-  // Favicon and icons
+  // Favicon and icons - Updated for better browser support
   icons: {
     icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
       { url: "/synergies4_logo.svg", type: "image/svg+xml" },
       { url: "/favicon.ico", sizes: "any" }
     ],
-    apple: "/synergies4_logo.svg",
-    shortcut: "/synergies4_logo.svg"
+    apple: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/synergies4_logo.svg", type: "image/svg+xml" }
+    ],
+    shortcut: "/favicon.svg"
   },
   
   // Open Graph / Facebook - Removed specific image to use defaults
@@ -81,6 +85,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        {/* Additional favicon links for better browser support */}
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="apple-touch-icon" href="/favicon.svg" />
+      </head>
       <body className={inter.className} suppressHydrationWarning>
         <PerformanceOptimizer />
         <AuthProvider>{children}</AuthProvider>
