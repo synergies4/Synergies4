@@ -1504,12 +1504,16 @@ export default function SynergizeAgile() {
                     </label>
                     <div className="relative">
                       <Select value={selectedRole} onValueChange={handleRoleChange}>
-                        <SelectTrigger className="w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <SelectTrigger className="w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent touch-manipulation">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent className="z-50 max-h-60 overflow-y-auto">
+                        <SelectContent 
+                          className="z-[9999] max-h-60 overflow-y-auto"
+                          position="popper"
+                          sideOffset={4}
+                        >
                           {Object.entries(AGILE_ROLES).map(([key, role]) => (
-                            <SelectItem key={key} value={key} className="focus:bg-blue-50">
+                            <SelectItem key={key} value={key} className="focus:bg-blue-50 cursor-pointer">
                               <div className="flex items-center">
                                 {role.icon}
                                 <span className="ml-2">{role.name}</span>
@@ -1528,12 +1532,16 @@ export default function SynergizeAgile() {
                     </label>
                     <div className="relative">
                       <Select value={selectedMode} onValueChange={handleModeChange}>
-                        <SelectTrigger className="w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <SelectTrigger className="w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent touch-manipulation">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent className="z-50 max-h-60 overflow-y-auto">
+                        <SelectContent 
+                          className="z-[9999] max-h-60 overflow-y-auto"
+                          position="popper"
+                          sideOffset={4}
+                        >
                           {Object.entries(INTERACTION_MODES).map(([key, mode]) => (
-                            <SelectItem key={key} value={key} className="focus:bg-blue-50">
+                            <SelectItem key={key} value={key} className="focus:bg-blue-50 cursor-pointer">
                               <div className="flex items-center">
                                 {mode.icon}
                                 <span className="ml-2">{mode.name}</span>
@@ -1552,12 +1560,16 @@ export default function SynergizeAgile() {
                     </label>
                     <div className="relative">
                       <Select value={selectedProvider} onValueChange={handleProviderChange}>
-                        <SelectTrigger className="w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <SelectTrigger className="w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent touch-manipulation">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent className="z-50 max-h-60 overflow-y-auto">
+                        <SelectContent 
+                          className="z-[9999] max-h-60 overflow-y-auto"
+                          position="popper"
+                          sideOffset={4}
+                        >
                           {Object.entries(AI_PROVIDERS).map(([key, provider]) => (
-                            <SelectItem key={key} value={key} className="focus:bg-blue-50">
+                            <SelectItem key={key} value={key} className="focus:bg-blue-50 cursor-pointer">
                               <div className="flex items-center">
                                 {provider.icon}
                                 <span className="ml-2">{provider.name}</span>

@@ -1,0 +1,8 @@
+# Ignore files that don't affect the build
+*.md
+.git/
+.gitignore
+*.sql
+COURSE_CREATION_GUIDE.md
+SYNERGIZE_SETUP.md
+LICENSE 
