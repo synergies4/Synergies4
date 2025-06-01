@@ -17,8 +17,16 @@ import {
   Users,
   Award,
   TrendingUp,
-  CheckCircle
+  CheckCircle,
+  Search,
+  User,
+  LogOut,
+  BarChart3,
+  BookOpen,
+  Settings,
+  FileText
 } from 'lucide-react';
+import GlobalSearch from '@/components/shared/GlobalSearch';
 
 // Scroll to top component
 function ScrollToTop() {
@@ -58,8 +66,9 @@ function ScrollToTop() {
 
 // Navigation Component
 function Navigation() {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   return (
     <>
@@ -116,43 +125,72 @@ function Navigation() {
             
             {/* Desktop Action Buttons - Right side with consistent spacing */}
             <div className="hidden xl:flex items-center space-x-2 flex-shrink-0">
-              {/* Synergize Button */}
-              <Button 
-                asChild 
-                size="sm"
-                className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-              >
-                <Link href="/synergize">
-                  <Brain className="w-3 h-3 mr-1" />
-                  Synergize
+              <div className="flex items-center space-x-3">
+                <Link href="/synergize" className="group">
+                  <Button 
+                    className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-sm px-4 py-2"
+                  >
+                    <Brain className="w-4 h-4 mr-2" />
+                    Synergize AI
+                    <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </Button>
                 </Link>
-              </Button>
-              
-              {/* Contact Button */}
-              <Button 
-                asChild 
-                size="sm"
-                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-              >
-                <Link href="/contact">
-                  <MessageSquare className="w-3 h-3 mr-1" />
-                  Contact
-                </Link>
-              </Button>
+                
+                {/* Search Button */}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsSearchOpen(true)}
+                  className="hidden md:flex items-center space-x-2 text-gray-600 hover:text-gray-900 border-gray-300 hover:border-gray-400 px-3 py-2"
+                >
+                  <Search className="w-4 h-4" />
+                  <span className="hidden lg:inline">Search</span>
+                  <kbd className="hidden lg:inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 ml-2">
+                    <span className="text-xs">⌘</span>K
+                  </kbd>
+                </Button>
+                
+                {/* Mobile Search Button */}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsSearchOpen(true)}
+                  className="md:hidden p-2"
+                >
+                  <Search className="w-4 h-4" />
+                </Button>
 
-              {/* Auth Buttons */}
-              {user ? (
-                <UserAvatar />
-              ) : (
-                <div className="flex items-center space-x-1 ml-3 pl-3 border-l border-gray-200">
-                  <Button variant="ghost" size="sm" asChild className="hover:bg-blue-50 hover:text-blue-600 transition-colors">
-                    <Link href="/login">Login</Link>
-                  </Button>
-                  <Button size="sm" asChild className="bg-blue-600 hover:bg-blue-700 transition-colors">
-                    <Link href="/signup">Sign Up</Link>
-                  </Button>
-                </div>
-              )}
+                {user ? (
+                  <div className="flex items-center space-x-2">
+                    <Link href="/dashboard">
+                      <Button variant="outline" size="sm">
+                        Dashboard
+                      </Button>
+                    </Link>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => signOut()}
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <LogOut className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <Link href="/login">
+                      <Button variant="outline" size="sm">
+                        Login
+                      </Button>
+                    </Link>
+                    <Link href="/signup">
+                      <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+                        Sign Up
+                      </Button>
+                    </Link>
+                  </>
+                )}
+              </div>
             </div>
 
             {/* Mobile Menu Button */}
@@ -345,6 +383,37 @@ interface PageLayoutProps {
 }
 
 export default function PageLayout({ children, showStats = false }: PageLayoutProps) {
+  const { user, userProfile, signOut } = useAuth();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 300);
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Open search with Cmd/Ctrl + K
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsSearchOpen(true);
+      }
+      // Close search with Escape
+      if (e.key === 'Escape') {
+        setIsSearchOpen(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('keydown', handleKeyDown);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
   // Add smooth scroll behavior
   useEffect(() => {
     document.documentElement.style.scrollBehavior = 'smooth';
@@ -360,6 +429,19 @@ export default function PageLayout({ children, showStats = false }: PageLayoutPr
       {children}
       {showStats && <StatsSection />}
       <Footer />
+      
+      {/* Scroll to Top Button */}
+      {showScrollTop && (
+        <ScrollToTop />
+      )}
+      
+      {/* Global Search Modal */}
+      <GlobalSearch 
+        isOpen={isSearchOpen} 
+        onClose={() => setIsSearchOpen(false)}
+        placeholder="Search courses, articles, pages..."
+        showFilters={true}
+      />
     </main>
   );
 } 

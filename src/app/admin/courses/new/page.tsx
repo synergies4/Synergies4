@@ -91,6 +91,12 @@ interface CourseFormData {
   status: string;
   image: string;
   featured: boolean;
+  course_type: string; // New field for course type
+  max_participants: string; // New field for in-person courses
+  location: string; // New field for in-person courses
+  instructor_name: string; // New field for in-person courses
+  materials_included: string; // New field for in-person courses
+  prerequisites: string; // New field for in-person courses
   modules: CourseModule[];
   quiz?: Quiz;
 }
@@ -207,6 +213,12 @@ export default function CreateCourse() {
     status: 'DRAFT',
     image: '',
     featured: false,
+    course_type: 'digital', // New field for course type
+    max_participants: '', // New field for in-person courses
+    location: '', // New field for in-person courses
+    instructor_name: '', // New field for in-person courses
+    materials_included: '', // New field for in-person courses
+    prerequisites: '', // New field for in-person courses
     modules: []
   });
 
@@ -1079,6 +1091,25 @@ export default function CreateCourse() {
 
                   <div>
                     <div className="flex items-center justify-between">
+                      <Label htmlFor="course_type" className="text-sm font-medium">Course Type *</Label>
+                    </div>
+                    <Select value={formData.course_type} onValueChange={(value) => handleInputChange('course_type', value)}>
+                      <SelectTrigger className="mt-2">
+                        <SelectValue placeholder="Select course type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="digital">Digital Course (Online)</SelectItem>
+                        <SelectItem value="in_person">In-Person Course</SelectItem>
+                        <SelectItem value="hybrid">Hybrid (Digital + In-Person)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Digital courses include modules and quizzes. In-person courses focus on scheduling and logistics.
+                    </p>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between">
                       <Label htmlFor="category" className="text-sm font-medium">Category *</Label>
                       <Button
                         type="button"
@@ -1301,6 +1332,83 @@ export default function CreateCourse() {
                   />
                   <Label htmlFor="featured" className="text-sm font-medium">Featured Course</Label>
                 </div>
+
+                {/* Conditional fields for in-person courses */}
+                {(formData.course_type === 'in_person' || formData.course_type === 'hybrid') && (
+                  <div className="space-y-4 p-4 bg-amber-50 rounded-lg border border-amber-200">
+                    <div>
+                      <h4 className="text-lg font-semibold text-amber-800 mb-4">In-Person Course Details</h4>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="max_participants" className="text-sm font-medium">Max Participants</Label>
+                        <Input
+                          id="max_participants"
+                          type="number"
+                          value={formData.max_participants}
+                          onChange={(e) => handleInputChange('max_participants', e.target.value)}
+                          placeholder="e.g., 20"
+                          className="mt-2"
+                          min="1"
+                          max="100"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">Maximum number of participants for this course</p>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="location" className="text-sm font-medium">Location</Label>
+                        <Input
+                          id="location"
+                          value={formData.location}
+                          onChange={(e) => handleInputChange('location', e.target.value)}
+                          placeholder="e.g., Conference Room A, Sydney Office"
+                          className="mt-2"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">Where the course will be conducted</p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="instructor_name" className="text-sm font-medium">Instructor Name</Label>
+                        <Input
+                          id="instructor_name"
+                          value={formData.instructor_name}
+                          onChange={(e) => handleInputChange('instructor_name', e.target.value)}
+                          placeholder="e.g., Dr. Sarah Johnson"
+                          className="mt-2"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">Name of the course instructor</p>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="prerequisites" className="text-sm font-medium">Prerequisites</Label>
+                        <Input
+                          id="prerequisites"
+                          value={formData.prerequisites}
+                          onChange={(e) => handleInputChange('prerequisites', e.target.value)}
+                          placeholder="e.g., Basic project management knowledge"
+                          className="mt-2"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">Any prerequisites for participants</p>
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="materials_included" className="text-sm font-medium">Materials Included</Label>
+                      <Textarea
+                        id="materials_included"
+                        value={formData.materials_included}
+                        onChange={(e) => handleInputChange('materials_included', e.target.value)}
+                        placeholder="e.g., Workbook, certificate, refreshments, laptop (if needed)"
+                        className="mt-2"
+                        rows={3}
+                      />
+                      <p className="text-xs text-gray-500 mt-1">List all materials and resources included with the course</p>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 

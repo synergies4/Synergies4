@@ -1,0 +1,426 @@
+'use client';
+
+import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import { 
+  Search, 
+  X, 
+  FileText, 
+  BookOpen, 
+  User, 
+  Globe, 
+  Loader2,
+  ArrowRight,
+  Clock,
+  Star,
+  Tag,
+  Filter,
+  Mic,
+  MicOff
+} from 'lucide-react';
+
+interface SearchResult {
+  id: string;
+  title: string;
+  description: string;
+  content?: string;
+  type: 'course' | 'blog_post' | 'page' | 'user';
+  url: string;
+  category?: string;
+  tags?: string[];
+  image?: string;
+  author?: string;
+  created_at: string;
+  relevance_score: number;
+}
+
+interface SearchResponse {
+  results: SearchResult[];
+  total: number;
+  query: string;
+  suggestions: string[];
+  categories: string[];
+  types: string[];
+}
+
+interface GlobalSearchProps {
+  isOpen: boolean;
+  onClose: () => void;
+  placeholder?: string;
+  showFilters?: boolean;
+}
+
+export default function GlobalSearch({ 
+  isOpen, 
+  onClose, 
+  placeholder = "Search courses, articles, pages...",
+  showFilters = true 
+}: GlobalSearchProps) {
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedType, setSelectedType] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [types, setTypes] = useState<string[]>([]);
+  const [isListening, setIsListening] = useState(false);
+  const [speechSupported, setSpeechSupported] = useState(false);
+  
+  const router = useRouter();
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchTimeoutRef = useRef<NodeJS.Timeout>();
+  const recognitionRef = useRef<any>(null);
+
+  // Check for speech recognition support
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
+      if (SpeechRecognition) {
+        setSpeechSupported(true);
+        recognitionRef.current = new SpeechRecognition();
+        recognitionRef.current.continuous = false;
+        recognitionRef.current.interimResults = false;
+        recognitionRef.current.lang = 'en-US';
+
+        recognitionRef.current.onresult = (event: any) => {
+          const transcript = event.results[0][0].transcript;
+          setQuery(transcript);
+          setIsListening(false);
+        };
+
+        recognitionRef.current.onerror = () => {
+          setIsListening(false);
+        };
+
+        recognitionRef.current.onend = () => {
+          setIsListening(false);
+        };
+      }
+    }
+  }, []);
+
+  // Focus search input when opened
+  useEffect(() => {
+    if (isOpen && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [isOpen]);
+
+  // Debounced search
+  useEffect(() => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    if (query.trim().length > 1) {
+      searchTimeoutRef.current = setTimeout(() => {
+        performSearch();
+      }, 300);
+    } else {
+      setResults([]);
+      setSuggestions([]);
+    }
+
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [query, selectedType, selectedCategory]);
+
+  const performSearch = async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams({
+        q: query,
+        limit: '10'
+      });
+
+      if (selectedType !== 'all') {
+        params.append('type', selectedType);
+      }
+
+      if (selectedCategory !== 'all') {
+        params.append('category', selectedCategory);
+      }
+
+      const response = await fetch(`/api/search?${params}`);
+      const data: SearchResponse = await response.json();
+
+      setResults(data.results);
+      setSuggestions(data.suggestions);
+      setCategories(['all', ...data.categories]);
+      setTypes(['all', ...data.types]);
+    } catch (error) {
+      console.error('Search error:', error);
+      setResults([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResultClick = (result: SearchResult) => {
+    router.push(result.url);
+    onClose();
+    setQuery('');
+    setResults([]);
+  };
+
+  const handleSuggestionClick = (suggestion: string) => {
+    setQuery(suggestion);
+  };
+
+  const startVoiceSearch = () => {
+    if (recognitionRef.current && speechSupported) {
+      setIsListening(true);
+      recognitionRef.current.start();
+    }
+  };
+
+  const stopVoiceSearch = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    }
+  };
+
+  const getResultIcon = (type: string) => {
+    switch (type) {
+      case 'course':
+        return <BookOpen className="w-4 h-4 text-blue-600" />;
+      case 'blog_post':
+        return <FileText className="w-4 h-4 text-green-600" />;
+      case 'user':
+        return <User className="w-4 h-4 text-purple-600" />;
+      case 'page':
+        return <Globe className="w-4 h-4 text-orange-600" />;
+      default:
+        return <Search className="w-4 h-4 text-gray-600" />;
+    }
+  };
+
+  const getTypeBadgeColor = (type: string) => {
+    switch (type) {
+      case 'course':
+        return 'bg-blue-100 text-blue-800';
+      case 'blog_post':
+        return 'bg-green-100 text-green-800';
+      case 'user':
+        return 'bg-purple-100 text-purple-800';
+      case 'page':
+        return 'bg-orange-100 text-orange-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm">
+      <div className="flex items-start justify-center min-h-screen pt-[10vh] px-4">
+        <Card className="w-full max-w-3xl bg-white shadow-2xl border-0 rounded-2xl overflow-hidden">
+          <CardContent className="p-0">
+            {/* Search Header */}
+            <div className="p-6 border-b border-gray-100">
+              <div className="flex items-center space-x-4">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                  <Input
+                    ref={searchInputRef}
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder={placeholder}
+                    className="pl-12 pr-12 h-14 text-lg border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 rounded-xl"
+                  />
+                  {speechSupported && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={isListening ? stopVoiceSearch : startVoiceSearch}
+                      className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-2 ${
+                        isListening ? 'text-red-600 hover:text-red-700' : 'text-gray-400 hover:text-gray-600'
+                      }`}
+                    >
+                      {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                    </Button>
+                  )}
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onClose}
+                  className="h-14 w-14 rounded-xl"
+                >
+                  <X className="h-5 w-5" />
+                </Button>
+              </div>
+
+              {/* Filters */}
+              {showFilters && (categories.length > 1 || types.length > 1) && (
+                <div className="flex flex-wrap gap-3 mt-4">
+                  {types.length > 1 && (
+                    <div className="flex items-center space-x-2">
+                      <Filter className="h-4 w-4 text-gray-500" />
+                      <select
+                        value={selectedType}
+                        onChange={(e) => setSelectedType(e.target.value)}
+                        className="text-sm border border-gray-300 rounded-lg px-3 py-1 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                      >
+                        <option value="all">All Types</option>
+                        <option value="course">Courses</option>
+                        <option value="blog_post">Articles</option>
+                        <option value="page">Pages</option>
+                      </select>
+                    </div>
+                  )}
+
+                  {categories.length > 1 && (
+                    <select
+                      value={selectedCategory}
+                      onChange={(e) => setSelectedCategory(e.target.value)}
+                      className="text-sm border border-gray-300 rounded-lg px-3 py-1 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    >
+                      <option value="all">All Categories</option>
+                      {categories.filter(cat => cat !== 'all').map(category => (
+                        <option key={category} value={category}>{category}</option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+              )}
+
+              {/* Voice feedback */}
+              {isListening && (
+                <div className="mt-4 flex items-center space-x-2 text-red-600">
+                  <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
+                  <span className="text-sm">Listening...</span>
+                </div>
+              )}
+            </div>
+
+            {/* Search Results */}
+            <div className="max-h-[60vh] overflow-y-auto">
+              {loading && (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-6 w-6 animate-spin text-teal-600 mr-2" />
+                  <span className="text-gray-600">Searching...</span>
+                </div>
+              )}
+
+              {!loading && query.length > 1 && results.length === 0 && (
+                <div className="text-center py-12">
+                  <Search className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No results found</h3>
+                  <p className="text-gray-500">Try adjusting your search terms or filters</p>
+                </div>
+              )}
+
+              {results.length > 0 && (
+                <div className="p-4 space-y-2">
+                  {results.map((result) => (
+                    <div
+                      key={result.id}
+                      onClick={() => handleResultClick(result)}
+                      className="group p-4 rounded-xl hover:bg-gray-50 cursor-pointer transition-all duration-200 border border-transparent hover:border-gray-200"
+                    >
+                      <div className="flex items-start space-x-3">
+                        <div className="flex-shrink-0 p-2 bg-gray-100 rounded-lg group-hover:bg-white transition-colors">
+                          {getResultIcon(result.type)}
+                        </div>
+                        
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center space-x-2 mb-2">
+                            <h4 className="font-medium text-gray-900 truncate group-hover:text-teal-600 transition-colors">
+                              {result.title}
+                            </h4>
+                            <Badge className={`text-xs ${getTypeBadgeColor(result.type)}`}>
+                              {result.type.replace('_', ' ')}
+                            </Badge>
+                          </div>
+                          
+                          <p className="text-sm text-gray-600 line-clamp-2 mb-2">
+                            {result.description}
+                          </p>
+                          
+                          <div className="flex items-center space-x-4 text-xs text-gray-500">
+                            {result.category && (
+                              <div className="flex items-center space-x-1">
+                                <Tag className="h-3 w-3" />
+                                <span>{result.category}</span>
+                              </div>
+                            )}
+                            {result.author && (
+                              <div className="flex items-center space-x-1">
+                                <User className="h-3 w-3" />
+                                <span>{result.author}</span>
+                              </div>
+                            )}
+                            <div className="flex items-center space-x-1">
+                              <Clock className="h-3 w-3" />
+                              <span>{new Date(result.created_at).toLocaleDateString()}</span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-teal-600 transition-colors opacity-0 group-hover:opacity-100" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Search Suggestions */}
+              {suggestions.length > 0 && (
+                <div className="border-t border-gray-100 p-4">
+                  <h4 className="text-sm font-medium text-gray-700 mb-3">Suggestions</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {suggestions.map((suggestion, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleSuggestionClick(suggestion)}
+                        className="text-sm px-3 py-1 bg-gray-100 hover:bg-teal-100 hover:text-teal-700 rounded-full transition-colors"
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Search Tips */}
+            {query.length === 0 && (
+              <div className="p-6 border-t border-gray-100 bg-gray-50">
+                <h4 className="text-sm font-medium text-gray-700 mb-3">Search Tips</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+                  <div>
+                    <p className="font-medium mb-1">Popular searches:</p>
+                    <ul className="space-y-1">
+                      <li>• "agile training"</li>
+                      <li>• "scrum master"</li>
+                      <li>• "leadership development"</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <p className="font-medium mb-1">Search across:</p>
+                    <ul className="space-y-1">
+                      <li>• Training courses</li>
+                      <li>• Blog articles</li>
+                      <li>• Site pages</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+} 

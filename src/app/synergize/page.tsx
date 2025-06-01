@@ -37,7 +37,9 @@ import {
   TrendingUp,
   Award,
   Globe,
-  Download
+  Download,
+  Mic,
+  MicOff
 } from 'lucide-react';
 
 // Agile roles and their specific capabilities - Updated with professional color scheme
@@ -1280,8 +1282,73 @@ export default function SynergizeAgile() {
   const [isLoading, setIsLoading] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [hasInitialized, setHasInitialized] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [speechSupported, setSpeechSupported] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const recognitionRef = useRef<any>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  // Check for mobile device and speech recognition support
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
+    // Initialize speech recognition
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
+      if (SpeechRecognition) {
+        setSpeechSupported(true);
+        recognitionRef.current = new SpeechRecognition();
+        recognitionRef.current.continuous = false;
+        recognitionRef.current.interimResults = false;
+        recognitionRef.current.lang = 'en-US';
+
+        recognitionRef.current.onresult = (event: any) => {
+          const transcript = event.results[0][0].transcript;
+          setInputMessage(transcript);
+          setIsListening(false);
+        };
+
+        recognitionRef.current.onerror = (event: any) => {
+          console.error('Speech recognition error:', event.error);
+          setIsListening(false);
+        };
+
+        recognitionRef.current.onend = () => {
+          setIsListening(false);
+        };
+      }
+    }
+
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
+
+  const startVoiceInput = () => {
+    if (recognitionRef.current && speechSupported) {
+      try {
+        setIsListening(true);
+        recognitionRef.current.start();
+      } catch (error) {
+        console.error('Error starting speech recognition:', error);
+        setIsListening(false);
+      }
+    }
+  };
+
+  const stopVoiceInput = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    }
+  };
 
   const scrollToBottom = () => {
     if (messagesEndRef.current) {
@@ -1401,7 +1468,14 @@ export default function SynergizeAgile() {
       Role context: ${role.description}
       Key capabilities: ${role.capabilities.join(', ')}
       
-      Based on the user's role as ${role.name} and the current mode (${mode.name}), provide specific, actionable advice.`;
+      Based on the user's role as ${role.name} and the current mode (${mode.name}), provide specific, actionable advice.
+      
+      Important guidelines:
+      - Keep responses clear and actionable
+      - Use bullet points for complex information
+      - Provide practical examples when helpful
+      - If asked about technical topics outside your expertise, politely redirect to your core areas
+      - Be encouraging and supportive while maintaining professionalism`;
 
       if (selectedMode === 'presentation') {
         systemPrompt += ` Generate presentation content with clear slides, talking points, and visual suggestions.`;
@@ -1455,15 +1529,21 @@ export default function SynergizeAgile() {
     } catch (error) {
       console.error('Chat Error:', error);
       
-      let errorContent = 'Sorry, I encountered an error. Please try again.';
+      let errorContent = 'I apologize, but I encountered an issue. Please try again.';
       
       if (error instanceof Error) {
         if (error.message.includes('Failed to fetch')) {
-          errorContent = 'Unable to connect to the AI service. Please check your internet connection and try again.';
+          errorContent = isMobile 
+            ? 'Connection issue. Please check your network and try again.'
+            : 'Unable to connect to the AI service. Please check your internet connection and try again.';
         } else if (error.message.includes('API request failed')) {
-          errorContent = `There was an issue with the ${selectedProvider} service. Please try switching to a different AI provider or try again later.`;
+          errorContent = isMobile
+            ? `${selectedProvider} service unavailable. Try switching providers or try again later.`
+            : `There was an issue with the ${selectedProvider} service. Please try switching to a different AI provider or try again later.`;
         } else if (error.message.includes('Invalid response format')) {
-          errorContent = 'Received an unexpected response from the AI service. Please try again or contact support if the issue persists.';
+          errorContent = isMobile
+            ? 'Received an unexpected response. Please try again.'
+            : 'Received an unexpected response from the AI service. Please try again or contact support if the issue persists.';
         }
       }
       
@@ -1479,6 +1559,7 @@ export default function SynergizeAgile() {
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
+      setFiles([]); // Clear files after sending
     }
   };
 
@@ -2032,26 +2113,55 @@ export default function SynergizeAgile() {
                           variant="outline"
                           size="sm"
                           onClick={() => fileInputRef.current?.click()}
-                          className="flex-shrink-0"
+                          className="flex-shrink-0 min-h-[44px] min-w-[44px]"
+                          title="Upload file"
                         >
                           <Upload className="h-4 w-4" />
                         </Button>
-                        <Textarea
-                          value={inputMessage}
-                          onChange={(e) => setInputMessage(e.target.value)}
-                          placeholder={`Ask your ${currentRole.name} assistant anything about Agile...`}
-                          className="flex-1 min-h-[60px] max-h-[120px] resize-none"
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' && !e.shiftKey) {
-                              e.preventDefault();
-                              handleSendMessage();
-                            }
-                          }}
-                        />
+                        
+                        {speechSupported && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={isListening ? stopVoiceInput : startVoiceInput}
+                            className={`flex-shrink-0 min-h-[44px] min-w-[44px] ${
+                              isListening ? 'bg-red-50 border-red-300 text-red-600' : ''
+                            }`}
+                            title={isListening ? "Stop voice input" : "Start voice input"}
+                          >
+                            {isListening ? <MicOff className="h-4 w-4 animate-pulse" /> : <Mic className="h-4 w-4" />}
+                          </Button>
+                        )}
+                        
+                        <div className="flex-1 relative">
+                          <Textarea
+                            value={inputMessage}
+                            onChange={(e) => setInputMessage(e.target.value)}
+                            placeholder={`Ask your ${currentRole.name} assistant anything about Agile...`}
+                            className={`min-h-[44px] max-h-[120px] resize-none pr-12 ${isMobile ? 'text-base' : ''}`}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' && !e.shiftKey) {
+                                e.preventDefault();
+                                handleSendMessage();
+                              }
+                            }}
+                            rows={isMobile ? 2 : 1}
+                          />
+                          
+                          {/* Voice feedback indicator */}
+                          {isListening && (
+                            <div className="absolute top-2 right-14 flex items-center space-x-1 text-red-600">
+                              <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
+                              <span className="text-xs">Listening...</span>
+                            </div>
+                          )}
+                        </div>
+                        
                         <Button
                           onClick={handleSendMessage}
                           disabled={isLoading || (!inputMessage.trim() && files.length === 0)}
-                          className={`flex-shrink-0 bg-gradient-to-r ${currentRole.color} hover:opacity-90`}
+                          className={`flex-shrink-0 min-h-[44px] min-w-[44px] bg-gradient-to-r ${currentRole.color} hover:opacity-90 transition-opacity`}
+                          title="Send message"
                         >
                           {isLoading ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
@@ -2060,6 +2170,30 @@ export default function SynergizeAgile() {
                           )}
                         </Button>
                       </div>
+                      
+                      {/* Mobile-specific voice input feedback */}
+                      {isMobile && isListening && (
+                        <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                          <div className="flex items-center space-x-2 text-red-700">
+                            <div className="w-3 h-3 bg-red-500 rounded-full animate-bounce"></div>
+                            <span className="text-sm font-medium">Listening for your voice...</span>
+                          </div>
+                          <p className="text-xs text-red-600 mt-1">Speak clearly and pause when finished</p>
+                        </div>
+                      )}
+                      
+                      {/* Enhanced mobile tips */}
+                      {isMobile && !hasInitialized && (
+                        <div className="mt-2 p-3 bg-teal-50 border border-teal-200 rounded-lg">
+                          <h4 className="text-sm font-medium text-teal-800 mb-2">Mobile Tips:</h4>
+                          <ul className="text-xs text-teal-700 space-y-1">
+                            <li>• Tap the microphone to use voice input</li>
+                            <li>• Swipe up to scroll through messages</li>
+                            <li>• Long-press messages to copy them</li>
+                            {speechSupported && <li>• Voice input works best in quiet environments</li>}
+                          </ul>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
