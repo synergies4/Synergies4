@@ -40,32 +40,32 @@ import {
   Download
 } from 'lucide-react';
 
-// Agile roles and their specific capabilities
+// Agile roles and their specific capabilities - Updated with professional color scheme
 const AGILE_ROLES = {
   'scrum-master': {
     name: 'Scrum Master',
-    color: 'from-blue-500 to-blue-600',
+    color: 'from-teal-600 to-emerald-600',
     icon: <Users className="w-5 h-5" />,
     description: 'Facilitate team processes and remove impediments',
     capabilities: ['Team Facilitation', 'Impediment Removal', 'Process Coaching', 'Metrics Analysis']
   },
   'product-owner': {
     name: 'Product Owner',
-    color: 'from-green-500 to-green-600',
+    color: 'from-emerald-600 to-cyan-600',
     icon: <Target className="w-5 h-5" />,
     description: 'Maximize product value and manage backlog',
     capabilities: ['Backlog Management', 'Stakeholder Communication', 'Value Prioritization', 'User Story Creation']
   },
   'developer': {
     name: 'Developer',
-    color: 'from-purple-500 to-purple-600',
+    color: 'from-slate-600 to-gray-700',
     icon: <Settings className="w-5 h-5" />,
     description: 'Build high-quality product increments',
     capabilities: ['Sprint Planning', 'Code Quality', 'Technical Debt Management', 'Cross-functional Collaboration']
   },
   'agile-coach': {
     name: 'Agile Coach',
-    color: 'from-orange-500 to-orange-600',
+    color: 'from-cyan-600 to-teal-600',
     icon: <Lightbulb className="w-5 h-5" />,
     description: 'Guide organizational agile transformation',
     capabilities: ['Organizational Change', 'Team Coaching', 'Agile Scaling', 'Culture Transformation']
@@ -96,33 +96,33 @@ const INTERACTION_MODES = {
   }
 };
 
-// AI Provider configurations
+// AI Provider configurations - Updated with professional colors
 const AI_PROVIDERS = {
   anthropic: {
     name: 'Claude',
-    color: 'from-orange-500 to-red-500',
-    bgColor: 'bg-orange-50',
-    textColor: 'text-orange-700',
+    color: 'from-amber-600 to-orange-600',
+    bgColor: 'bg-amber-50',
+    textColor: 'text-amber-700',
     badge: 'Anthropic',
-    badgeColor: 'bg-orange-100 text-orange-800',
+    badgeColor: 'bg-amber-100 text-amber-800',
     icon: <Brain className="w-4 h-4" />
   },
   openai: {
     name: 'GPT',
-    color: 'from-green-500 to-emerald-500',
-    bgColor: 'bg-green-50',
-    textColor: 'text-green-700',
+    color: 'from-emerald-600 to-teal-600',
+    bgColor: 'bg-emerald-50',
+    textColor: 'text-emerald-700',
     badge: 'OpenAI',
-    badgeColor: 'bg-green-100 text-green-800',
+    badgeColor: 'bg-emerald-100 text-emerald-800',
     icon: <Zap className="w-4 h-4" />
   },
   google: {
     name: 'Gemini',
-    color: 'from-blue-500 to-purple-500',
-    bgColor: 'bg-blue-50',
-    textColor: 'text-blue-700',
+    color: 'from-slate-600 to-gray-700',
+    bgColor: 'bg-slate-50',
+    textColor: 'text-slate-700',
     badge: 'Google',
-    badgeColor: 'bg-blue-100 text-blue-800',
+    badgeColor: 'bg-slate-100 text-slate-800',
     icon: <Sparkles className="w-4 h-4" />
   }
 };
@@ -137,7 +137,7 @@ interface Message {
   provider?: keyof typeof AI_PROVIDERS;
 }
 
-// Slide Presentation Component - replaces chat interface for presentation mode
+// Enhanced Slide Presentation Component with better mobile support
 const SlidePresentation = ({ 
   slides, 
   onClose, 
@@ -201,78 +201,84 @@ const SlidePresentation = ({
   const slide = slides[currentSlide];
 
   return (
-    <div className={`${isFullscreen ? 'fixed inset-0 z-50 bg-black' : 'relative'}`}>
-      {/* Presentation Header */}
+    <div className={`${isFullscreen ? 'fixed inset-0 z-50 bg-slate-900' : 'relative'}`}>
+      {/* Enhanced Presentation Header - Mobile Optimized */}
       {!isFullscreen && (
-        <div className="flex items-center justify-between p-4 bg-gray-900 text-white">
-          <div className="flex items-center space-x-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 bg-slate-900 text-white space-y-2 sm:space-y-0">
+          <div className="flex items-center space-x-3 w-full sm:w-auto">
             <Button
               variant="ghost"
               size="sm"
               onClick={onClose}
-              className="text-white hover:bg-gray-700"
+              className="text-white hover:bg-slate-700 flex-shrink-0"
             >
-              <ArrowRight className="h-4 w-4 rotate-180 mr-2" />
-              Back to Generator
+              <ArrowRight className="h-4 w-4 rotate-180 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Back to Generator</span>
+              <span className="sm:hidden">Back</span>
             </Button>
-            <h2 className="text-lg font-semibold">{presentationTitle}</h2>
+            <h2 className="text-base sm:text-lg font-semibold truncate">{presentationTitle}</h2>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-1 sm:space-x-2 w-full sm:w-auto overflow-x-auto">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setShowNotes(!showNotes)}
-              className="text-white hover:bg-gray-700"
+              className="text-white hover:bg-slate-700 flex-shrink-0 text-xs sm:text-sm"
             >
-              <FileText className="h-4 w-4 mr-2" />
-              {showNotes ? 'Hide' : 'Show'} Notes
+              <FileText className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+              <span className="hidden sm:inline">{showNotes ? 'Hide' : 'Show'} Notes</span>
+              <span className="sm:hidden">Notes</span>
             </Button>
             <Button
               variant="ghost"
               size="sm"
               onClick={toggleFullscreen}
-              className="text-white hover:bg-gray-700"
+              className="text-white hover:bg-slate-700 flex-shrink-0 text-xs sm:text-sm"
             >
-              <Presentation className="h-4 w-4 mr-2" />
-              Present
+              <Presentation className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+              <span className="hidden sm:inline">Present</span>
+              <span className="sm:hidden">Full</span>
             </Button>
             <Button
               variant="ghost"
               size="sm"
               onClick={onExportPDF}
-              className="text-white hover:bg-gray-700"
+              className="text-white hover:bg-slate-700 flex-shrink-0 text-xs sm:text-sm"
             >
-              <Download className="h-4 w-4 mr-2" />
-              Export PDF
+              <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+              <span className="hidden sm:inline">Export PDF</span>
+              <span className="sm:hidden">PDF</span>
             </Button>
           </div>
         </div>
       )}
 
-      <div className={`flex ${isFullscreen ? 'h-screen' : 'h-[600px]'}`}>
-        {/* Slide Thumbnails */}
+      <div className={`flex flex-col lg:flex-row ${isFullscreen ? 'h-screen' : 'h-[500px] sm:h-[600px]'}`}>
+        {/* Mobile-First Slide Thumbnails */}
         {!isFullscreen && (
-          <div className="w-64 bg-gray-100 border-r overflow-y-auto">
-            <div className="p-4">
-              <h3 className="text-sm font-semibold text-gray-700 mb-3">Slides ({slides.length})</h3>
-              <div className="space-y-2">
+          <div className="w-full lg:w-64 bg-gray-100 border-b lg:border-r lg:border-b-0 max-h-32 lg:max-h-none overflow-y-auto">
+            <div className="p-2 lg:p-4">
+              <h3 className="text-xs lg:text-sm font-semibold text-gray-700 mb-2 lg:mb-3">
+                Slides ({slides.length})
+              </h3>
+              <div className="flex lg:flex-col space-x-2 lg:space-x-0 lg:space-y-2 overflow-x-auto lg:overflow-x-visible">
                 {slides.map((slideItem, index) => (
                   <div
                     key={index}
                     onClick={() => goToSlide(index)}
-                    className={`p-3 rounded cursor-pointer transition-all ${
+                    className={`flex-shrink-0 lg:flex-shrink p-2 lg:p-3 rounded cursor-pointer transition-all ${
                       currentSlide === index 
-                        ? 'bg-blue-100 border-2 border-blue-500' 
+                        ? 'bg-teal-100 border-2 border-teal-500' 
                         : 'bg-white border border-gray-200 hover:bg-gray-50'
-                    }`}
+                    } min-w-[120px] lg:min-w-0`}
                   >
                     <div className="text-xs font-medium text-gray-600 mb-1">
                       Slide {slideItem.slideNumber}
                     </div>
-                    <div className="text-sm font-semibold text-gray-900 truncate">
+                    <div className="text-xs lg:text-sm font-semibold text-gray-900 truncate">
                       {slideItem.title}
                     </div>
-                    <div className="text-xs text-gray-500 mt-1">
+                    <div className="text-xs text-gray-500 mt-1 hidden lg:block">
                       {slideItem.layout}
                     </div>
                   </div>
@@ -282,35 +288,35 @@ const SlidePresentation = ({
           </div>
         )}
 
-        {/* Main Slide Display */}
-        <div className="flex-1 flex flex-col">
+        {/* Enhanced Main Slide Display - Mobile Optimized */}
+        <div className="flex-1 flex flex-col min-h-0">
           {/* Slide Content */}
-          <div className={`flex-1 bg-white flex items-center justify-center p-8 ${isFullscreen ? 'text-white bg-gray-900' : ''}`}>
+          <div className={`flex-1 bg-white flex items-center justify-center p-4 sm:p-6 lg:p-8 overflow-y-auto ${isFullscreen ? 'text-white bg-slate-900' : ''}`}>
             <div className="w-full max-w-4xl">
               {slide.layout === 'title-slide' ? (
                 <div className="text-center">
-                  <h1 className={`text-4xl md:text-6xl font-bold mb-8 ${isFullscreen ? 'text-white' : 'text-gray-900'}`}>
+                  <h1 className={`text-2xl sm:text-4xl lg:text-6xl font-bold mb-4 sm:mb-6 lg:mb-8 ${isFullscreen ? 'text-white' : 'text-gray-900'} leading-tight`}>
                     {slide.title}
                   </h1>
-                  <div className="space-y-4">
+                  <div className="space-y-2 sm:space-y-3 lg:space-y-4">
                     {slide.content.map((item: string, idx: number) => (
-                      <p key={idx} className={`text-xl md:text-2xl ${isFullscreen ? 'text-gray-300' : 'text-gray-600'}`}>
+                      <p key={idx} className={`text-base sm:text-xl lg:text-2xl ${isFullscreen ? 'text-gray-300' : 'text-gray-600'} leading-relaxed`}>
                         {item}
                       </p>
                     ))}
                   </div>
                 </div>
               ) : (
-                <div className={`${slide.layout === 'two-column' ? 'grid grid-cols-2 gap-8' : ''}`}>
-                  <div className={slide.layout === 'two-column' ? '' : 'mb-8'}>
-                    <h2 className={`text-3xl md:text-4xl font-bold mb-6 ${isFullscreen ? 'text-white' : 'text-gray-900'} border-b-2 ${isFullscreen ? 'border-gray-600' : 'border-gray-200'} pb-4`}>
+                <div className={`${slide.layout === 'two-column' ? 'grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8' : ''}`}>
+                  <div className={slide.layout === 'two-column' ? '' : 'mb-4 sm:mb-6 lg:mb-8'}>
+                    <h2 className={`text-xl sm:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4 lg:mb-6 ${isFullscreen ? 'text-white' : 'text-gray-900'} border-b-2 ${isFullscreen ? 'border-slate-600' : 'border-gray-200'} pb-2 sm:pb-3 lg:pb-4 leading-tight`}>
                       {slide.title}
                     </h2>
-                    <ul className="space-y-4">
+                    <ul className="space-y-2 sm:space-y-3 lg:space-y-4">
                       {slide.content.map((item: string, idx: number) => (
                         <li key={idx} className="flex items-start">
-                          <span className={`w-3 h-3 rounded-full mt-2 mr-4 flex-shrink-0 ${isFullscreen ? 'bg-blue-400' : 'bg-blue-500'}`}></span>
-                          <span className={`text-lg md:text-xl ${isFullscreen ? 'text-gray-200' : 'text-gray-700'}`}>
+                          <span className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full mt-2 sm:mt-2 mr-2 sm:mr-3 lg:mr-4 flex-shrink-0 ${isFullscreen ? 'bg-teal-400' : 'bg-teal-500'}`}></span>
+                          <span className={`text-sm sm:text-lg lg:text-xl ${isFullscreen ? 'text-gray-200' : 'text-gray-700'} leading-relaxed`}>
                             {item}
                           </span>
                         </li>
@@ -318,11 +324,11 @@ const SlidePresentation = ({
                     </ul>
                   </div>
                   {slide.imageUrl && (
-                    <div className="flex items-center justify-center">
+                    <div className="flex items-center justify-center mt-4 lg:mt-0">
                       <img 
                         src={slide.imageUrl} 
                         alt={`Slide ${slide.slideNumber}`}
-                        className="max-w-full max-h-96 object-contain rounded-lg shadow-lg"
+                        className="max-w-full max-h-48 sm:max-h-64 lg:max-h-96 object-contain rounded-lg shadow-lg"
                       />
                     </div>
                   )}
@@ -331,35 +337,38 @@ const SlidePresentation = ({
             </div>
           </div>
 
-          {/* Navigation Controls */}
-          <div className={`flex items-center justify-between p-4 ${isFullscreen ? 'bg-gray-800 text-white' : 'bg-gray-50 border-t'}`}>
+          {/* Enhanced Navigation Controls - Mobile Optimized */}
+          <div className={`flex items-center justify-between p-3 sm:p-4 ${isFullscreen ? 'bg-slate-800 text-white' : 'bg-gray-50 border-t'}`}>
             <Button
               variant={isFullscreen ? "ghost" : "outline"}
               size="sm"
               onClick={prevSlide}
               disabled={currentSlide === 0}
-              className={isFullscreen ? "text-white hover:bg-gray-700" : ""}
+              className={`${isFullscreen ? "text-white hover:bg-slate-700" : ""} flex-shrink-0`}
             >
-              <ArrowRight className="h-4 w-4 rotate-180 mr-2" />
-              Previous
+              <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 rotate-180 mr-1 sm:mr-2" />
+              <span className="text-xs sm:text-sm">Prev</span>
             </Button>
 
-            <div className="flex items-center space-x-4">
-              <span className={`text-sm ${isFullscreen ? 'text-gray-300' : 'text-gray-600'}`}>
+            <div className="flex items-center space-x-2 sm:space-x-4 mx-2 sm:mx-4">
+              <span className={`text-xs sm:text-sm ${isFullscreen ? 'text-gray-300' : 'text-gray-600'} whitespace-nowrap`}>
                 {currentSlide + 1} of {slides.length}
               </span>
-              <div className="flex space-x-1">
-                {slides.map((_, index) => (
+              <div className="flex space-x-1 max-w-[120px] sm:max-w-none overflow-hidden">
+                {slides.slice(0, 8).map((_, index) => (
                   <button
                     key={index}
                     onClick={() => goToSlide(index)}
-                    className={`w-2 h-2 rounded-full transition-all ${
+                    className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition-all flex-shrink-0 ${
                       currentSlide === index 
-                        ? (isFullscreen ? 'bg-blue-400' : 'bg-blue-500')
-                        : (isFullscreen ? 'bg-gray-600' : 'bg-gray-300')
+                        ? (isFullscreen ? 'bg-teal-400' : 'bg-teal-500')
+                        : (isFullscreen ? 'bg-slate-600' : 'bg-gray-300')
                     }`}
                   />
                 ))}
+                {slides.length > 8 && (
+                  <span className={`text-xs ${isFullscreen ? 'text-gray-400' : 'text-gray-500'}`}>...</span>
+                )}
               </div>
             </div>
 
@@ -368,19 +377,19 @@ const SlidePresentation = ({
               size="sm"
               onClick={nextSlide}
               disabled={currentSlide === slides.length - 1}
-              className={isFullscreen ? "text-white hover:bg-gray-700" : ""}
+              className={`${isFullscreen ? "text-white hover:bg-slate-700" : ""} flex-shrink-0`}
             >
-              Next
-              <ArrowRight className="h-4 w-4 ml-2" />
+              <span className="text-xs sm:text-sm">Next</span>
+              <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
             </Button>
           </div>
         </div>
 
-        {/* Speaker Notes Panel */}
+        {/* Enhanced Speaker Notes Panel - Mobile Optimized */}
         {showNotes && !isFullscreen && slide.speakerNotes && (
-          <div className="w-80 bg-yellow-50 border-l p-4 overflow-y-auto">
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Speaker Notes</h3>
-            <p className="text-sm text-gray-600 leading-relaxed">
+          <div className="w-full lg:w-80 bg-amber-50 border-t lg:border-l lg:border-t-0 p-3 sm:p-4 max-h-48 lg:max-h-none overflow-y-auto">
+            <h3 className="text-sm font-semibold text-gray-700 mb-2 sm:mb-3">Speaker Notes</h3>
+            <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
               {slide.speakerNotes}
             </p>
           </div>
@@ -389,7 +398,7 @@ const SlidePresentation = ({
 
       {/* Fullscreen Exit Hint */}
       {isFullscreen && (
-        <div className="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded text-sm">
+        <div className="absolute top-2 sm:top-4 right-2 sm:right-4 bg-black bg-opacity-50 text-white px-2 sm:px-3 py-1 rounded text-xs sm:text-sm">
           Press ESC to exit fullscreen
         </div>
       )}
@@ -545,14 +554,14 @@ const PresentationGenerator = ({
         <div style="display: flex; height: 100%; ${slide.layout === 'two-column' ? 'flex-direction: row;' : 'flex-direction: column;'}">
           ${slide.layout === 'title-slide' ? `
             <div style="text-align: center; display: flex; flex-direction: column; justify-content: center; height: 100%;">
-              <h1 style="font-size: 36px; color: #1e40af; margin-bottom: 20px;">${slide.title}</h1>
+              <h1 style="font-size: 36px; color: #059669; margin-bottom: 20px;">${slide.title}</h1>
               <div style="font-size: 18px; color: #666;">
                 ${slide.content.map((item: string) => `<p style="margin: 10px 0;">${item}</p>`).join('')}
               </div>
             </div>
           ` : `
             <div style="${slide.layout === 'two-column' ? 'flex: 1; padding-right: 20px;' : 'flex: 1;'}">
-              <h2 style="font-size: 28px; color: #1e40af; margin-bottom: 20px; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">${slide.title}</h2>
+              <h2 style="font-size: 28px; color: #059669; margin-bottom: 20px; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">${slide.title}</h2>
               <ul style="font-size: 16px; line-height: 1.6; color: #374151;">
                 ${slide.content.map((item: string) => `<li style="margin-bottom: 10px;">${item}</li>`).join('')}
               </ul>
@@ -683,57 +692,80 @@ const PresentationGenerator = ({
   }
 
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
+    <div className="space-y-4 sm:space-y-6 p-4 sm:p-6 bg-gradient-to-br from-teal-50 to-emerald-50 rounded-lg">
+      <div className="text-center">
+        <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">
+          AI Presentation Generator
+        </h3>
+        <p className="text-sm sm:text-base text-gray-600">
+          Generate professional presentations tailored to your {currentRole.name} role
+        </p>
+      </div>
+      
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div>
-          <Label htmlFor="topic" className="text-sm font-medium">Presentation Topic</Label>
+          <Label htmlFor="topic" className="text-sm font-medium text-gray-700">
+            Presentation Topic *
+          </Label>
           <Input
             id="topic"
             value={presentationTopic}
             onChange={(e) => setPresentationTopic(e.target.value)}
             placeholder="e.g., Sprint Planning Best Practices"
-            className="mt-1"
+            className="mt-1 text-sm sm:text-base min-h-[44px]"
           />
         </div>
+        
         <div>
-          <Label htmlFor="audience" className="text-sm font-medium">Target Audience</Label>
+          <Label htmlFor="audience" className="text-sm font-medium text-gray-700">
+            Target Audience *
+          </Label>
           <Input
             id="audience"
             value={audience}
             onChange={(e) => setAudience(e.target.value)}
-            placeholder="e.g., Development Team"
-            className="mt-1"
+            placeholder="e.g., Development teams"
+            className="mt-1 text-sm sm:text-base min-h-[44px]"
           />
         </div>
+        
         <div>
-          <Label htmlFor="slides" className="text-sm font-medium">Number of Slides</Label>
-          <Input
-            id="slides"
-            type="number"
-            value={slideCount}
-            onChange={(e) => setSlideCount(parseInt(e.target.value) || 5)}
-            min="3"
-            max="20"
-            className="mt-1"
-          />
+          <Label htmlFor="slideCount" className="text-sm font-medium text-gray-700">
+            Number of Slides
+          </Label>
+          <Select value={slideCount.toString()} onValueChange={(value) => setSlideCount(parseInt(value))}>
+            <SelectTrigger className="mt-1 min-h-[44px] text-sm sm:text-base">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {[3, 5, 7, 10, 15].map(count => (
+                <SelectItem key={count} value={count.toString()}>
+                  {count} slides
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
+        
         <div>
-          <Label htmlFor="style" className="text-sm font-medium">Presentation Style</Label>
+          <Label htmlFor="style" className="text-sm font-medium text-gray-700">
+            Presentation Style
+          </Label>
           <Select value={presentationStyle} onValueChange={setPresentationStyle}>
-            <SelectTrigger>
+            <SelectTrigger className="mt-1 min-h-[44px] text-sm sm:text-base">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="professional">Professional</SelectItem>
               <SelectItem value="creative">Creative</SelectItem>
-              <SelectItem value="technical">Technical</SelectItem>
-              <SelectItem value="executive">Executive</SelectItem>
+              <SelectItem value="minimalist">Minimalist</SelectItem>
+              <SelectItem value="engaging">Engaging</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </div>
       
-      <div className="flex items-center justify-between px-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-4 space-y-4 sm:space-y-0">
         <div className="flex items-center space-x-2">
           <input
             type="checkbox"
@@ -748,10 +780,10 @@ const PresentationGenerator = ({
         </div>
         
         {generatedSlides.length > 0 && (
-          <div className="flex space-x-2">
+          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
             <Button 
               onClick={() => setShowPresentation(true)}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-teal-600 hover:bg-teal-700 text-sm sm:text-base min-h-[44px]"
             >
               <Presentation className="h-4 w-4 mr-2" />
               Present Slides
@@ -759,7 +791,7 @@ const PresentationGenerator = ({
             <Button 
               onClick={exportToPDF}
               variant="outline"
-              className="bg-green-50 hover:bg-green-100 border-green-200"
+              className="bg-emerald-50 hover:bg-emerald-100 border-emerald-200 text-sm sm:text-base min-h-[44px]"
             >
               <Download className="h-4 w-4 mr-2" />
               Export PDF
@@ -769,7 +801,7 @@ const PresentationGenerator = ({
       </div>
       
       {isGeneratingImages && (
-        <div className="p-4 bg-blue-50 rounded-lg">
+        <div className="p-4 bg-teal-50 rounded-lg">
           <div className="flex items-center space-x-2">
             <Loader2 className="h-4 w-4 animate-spin" />
             <span className="text-sm">Generating images for slide {currentImageIndex} of {slideCount}...</span>
@@ -780,35 +812,35 @@ const PresentationGenerator = ({
       <Button 
         onClick={generatePresentation}
         disabled={!presentationTopic || !audience || isLoading}
-        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+        className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-sm sm:text-base min-h-[44px]"
       >
         {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Presentation className="h-4 w-4 mr-2" />}
         Generate {slideCount}-Slide Presentation
       </Button>
       
-      {/* Slide Preview */}
+      {/* Enhanced Slide Preview - Mobile Optimized */}
       {generatedSlides.length > 0 && (
         <div className="mt-6 space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0">
             <h3 className="text-lg font-semibold">Presentation Preview</h3>
-            <Badge variant="outline" className="bg-blue-50 text-blue-700">
+            <Badge variant="outline" className="bg-teal-50 text-teal-700 border-teal-200">
               {generatedSlides.length} slides ready
             </Badge>
           </div>
           <div className="space-y-4 max-w-full overflow-hidden">
             {generatedSlides.slice(0, 3).map((slide, index) => (
-              <Card key={index} className="p-4 border-l-4 border-blue-500 w-full">
-                <div className="flex items-start justify-between mb-2">
-                  <h4 className="font-semibold text-lg break-words">Slide {slide.slideNumber}: {slide.title}</h4>
-                  <Badge variant="outline" className="ml-2 flex-shrink-0">{slide.layout}</Badge>
+              <Card key={index} className="p-4 border-l-4 border-teal-500 w-full shadow-sm">
+                <div className="flex flex-col sm:flex-row items-start justify-between mb-2 space-y-2 sm:space-y-0">
+                  <h4 className="font-semibold text-base sm:text-lg break-words">Slide {slide.slideNumber}: {slide.title}</h4>
+                  <Badge variant="outline" className="ml-0 sm:ml-2 flex-shrink-0 text-xs sm:text-sm">{slide.layout}</Badge>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   <div className="min-w-0">
                     <ul className="space-y-1 text-sm">
                       {slide.content.slice(0, 3).map((item: string, idx: number) => (
                         <li key={idx} className="flex items-start">
-                          <span className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-2 flex-shrink-0"></span>
-                          <span className="break-words">{item}</span>
+                          <span className="w-2 h-2 bg-teal-500 rounded-full mt-2 mr-2 flex-shrink-0"></span>
+                          <span className="break-words text-xs sm:text-sm">{item}</span>
                         </li>
                       ))}
                       {slide.content.length > 3 && (
@@ -821,15 +853,15 @@ const PresentationGenerator = ({
                       <img 
                         src={slide.imageUrl} 
                         alt={`Slide ${slide.slideNumber}`}
-                        className="max-w-full h-32 object-cover rounded border mx-auto"
+                        className="max-w-full h-24 sm:h-32 object-cover rounded border mx-auto"
                       />
                     </div>
                   )}
                   {!slide.imageUrl && includeImages && (
                     <div className="text-center">
-                      <div className="w-full h-32 bg-gray-100 rounded border flex items-center justify-center">
+                      <div className="w-full h-24 sm:h-32 bg-gray-100 rounded border flex items-center justify-center">
                         <div className="text-gray-500 text-sm">
-                          <ImageIcon className="h-8 w-8 mx-auto mb-2" />
+                          <ImageIcon className="h-6 w-6 sm:h-8 sm:w-8 mx-auto mb-2" />
                           Image generating...
                         </div>
                       </div>
@@ -840,11 +872,11 @@ const PresentationGenerator = ({
             ))}
             {generatedSlides.length > 3 && (
               <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <p className="text-gray-600">...and {generatedSlides.length - 3} more slides</p>
+                <p className="text-gray-600 text-sm sm:text-base">...and {generatedSlides.length - 3} more slides</p>
                 <Button 
                   onClick={() => setShowPresentation(true)}
                   variant="outline"
-                  className="mt-2"
+                  className="mt-2 text-sm sm:text-base"
                 >
                   View All Slides
                 </Button>
@@ -895,19 +927,28 @@ const ScenarioSimulator = ({
   };
 
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card className="p-4 bg-green-50">
-          <h4 className="font-semibold text-green-800 mb-3">Person 1</h4>
-          <div className="space-y-3">
+    <div className="space-y-4 sm:space-y-6 p-4 sm:p-6 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-lg">
+      <div className="text-center">
+        <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">
+          AI Scenario Simulator
+        </h3>
+        <p className="text-sm sm:text-base text-gray-600">
+          Practice real-world Agile scenarios with AI-powered role-playing
+        </p>
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        <Card className="p-4 sm:p-6 bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200">
+          <h4 className="font-semibold text-emerald-800 mb-4 text-base sm:text-lg">Person 1</h4>
+          <div className="space-y-4">
             <div>
-              <Label className="text-sm font-medium">Role</Label>
+              <Label className="text-sm font-medium text-gray-700">Role</Label>
               {/* Mobile: Use native select */}
               <div className="block md:hidden relative">
                 <select
                   value={person1Role}
                   onChange={(e) => setPerson1Role(e.target.value)}
-                  className="w-full min-h-[44px] text-base px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent appearance-none mt-1"
+                  className="w-full min-h-[44px] text-base px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent appearance-none mt-1"
                 >
                   <option value="Scrum Master">Scrum Master</option>
                   <option value="Product Owner">Product Owner</option>
@@ -925,7 +966,7 @@ const ScenarioSimulator = ({
               {/* Desktop: Use Radix UI Select */}
               <div className="hidden md:block">
                 <Select value={person1Role} onValueChange={setPerson1Role}>
-                  <SelectTrigger className="touch-manipulation min-h-[44px] text-base">
+                  <SelectTrigger className="touch-manipulation min-h-[44px] text-base mt-1">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent 
@@ -937,40 +978,40 @@ const ScenarioSimulator = ({
                     onEscapeKeyDown={(e) => e.preventDefault()}
                   >
                     <div className="max-h-[250px] overflow-y-auto">
-                      <SelectItem value="Scrum Master" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-green-50 data-[state=checked]:bg-green-100">Scrum Master</SelectItem>
-                      <SelectItem value="Product Owner" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-green-50 data-[state=checked]:bg-green-100">Product Owner</SelectItem>
-                      <SelectItem value="Developer" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-green-50 data-[state=checked]:bg-green-100">Developer</SelectItem>
-                      <SelectItem value="Stakeholder" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-green-50 data-[state=checked]:bg-green-100">Stakeholder</SelectItem>
-                      <SelectItem value="Team Lead" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-green-50 data-[state=checked]:bg-green-100">Team Lead</SelectItem>
+                      <SelectItem value="Scrum Master" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-emerald-50 data-[state=checked]:bg-emerald-100">Scrum Master</SelectItem>
+                      <SelectItem value="Product Owner" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-emerald-50 data-[state=checked]:bg-emerald-100">Product Owner</SelectItem>
+                      <SelectItem value="Developer" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-emerald-50 data-[state=checked]:bg-emerald-100">Developer</SelectItem>
+                      <SelectItem value="Stakeholder" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-emerald-50 data-[state=checked]:bg-emerald-100">Stakeholder</SelectItem>
+                      <SelectItem value="Team Lead" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-emerald-50 data-[state=checked]:bg-emerald-100">Team Lead</SelectItem>
                     </div>
                   </SelectContent>
                 </Select>
               </div>
             </div>
             <div>
-              <Label className="text-sm font-medium">Context & Goals</Label>
+              <Label className="text-sm font-medium text-gray-700">Context & Goals</Label>
               <Textarea
                 value={person1Context}
                 onChange={(e) => setPerson1Context(e.target.value)}
                 placeholder="What is this person's perspective, goals, and concerns?"
-                className="mt-1"
+                className="mt-1 text-sm sm:text-base min-h-[80px]"
                 rows={3}
               />
             </div>
           </div>
         </Card>
 
-        <Card className="p-4 bg-blue-50">
-          <h4 className="font-semibold text-blue-800 mb-3">Person 2</h4>
-          <div className="space-y-3">
+        <Card className="p-4 sm:p-6 bg-gradient-to-br from-teal-50 to-teal-100 border-teal-200">
+          <h4 className="font-semibold text-teal-800 mb-4 text-base sm:text-lg">Person 2</h4>
+          <div className="space-y-4">
             <div>
-              <Label className="text-sm font-medium">Role</Label>
+              <Label className="text-sm font-medium text-gray-700">Role</Label>
               {/* Mobile: Use native select */}
               <div className="block md:hidden relative">
                 <select
                   value={person2Role}
                   onChange={(e) => setPerson2Role(e.target.value)}
-                  className="w-full min-h-[44px] text-base px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none mt-1"
+                  className="w-full min-h-[44px] text-base px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent appearance-none mt-1"
                 >
                   <option value="Scrum Master">Scrum Master</option>
                   <option value="Product Owner">Product Owner</option>
@@ -988,7 +1029,7 @@ const ScenarioSimulator = ({
               {/* Desktop: Use Radix UI Select */}
               <div className="hidden md:block">
                 <Select value={person2Role} onValueChange={setPerson2Role}>
-                  <SelectTrigger className="touch-manipulation min-h-[44px] text-base">
+                  <SelectTrigger className="touch-manipulation min-h-[44px] text-base mt-1">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent 
@@ -1000,6 +1041,8 @@ const ScenarioSimulator = ({
                     onEscapeKeyDown={(e) => e.preventDefault()}
                   >
                     <div className="max-h-[250px] overflow-y-auto">
+                      <SelectItem value="Scrum Master" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-teal-50 data-[state=checked]:bg-teal-100">Scrum Master</SelectItem>
+                      <SelectItem value="Product Owner" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-teal-50 data-[state=checked]:bg-teal-100">Product Owner</SelectItem>
                       <SelectItem value="Scrum Master" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-blue-50 data-[state=checked]:bg-blue-100">Scrum Master</SelectItem>
                       <SelectItem value="Product Owner" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-blue-50 data-[state=checked]:bg-blue-100">Product Owner</SelectItem>
                       <SelectItem value="Developer" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-blue-50 data-[state=checked]:bg-blue-100">Developer</SelectItem>
@@ -1517,10 +1560,10 @@ export default function SynergizeAgile() {
       />
 
       {/* Features Section */}
-      <section id="features" className="py-20 bg-white">
+      <section id="features" className="py-20 bg-gradient-to-br from-slate-50 via-gray-50 to-teal-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <Badge className="mb-4 bg-blue-100 text-blue-700 hover:bg-blue-200 border-blue-200">
+            <Badge className="mb-4 bg-teal-100 text-teal-700 hover:bg-teal-200 border-teal-200">
               <Sparkles className="w-4 h-4 mr-2" />
               AI-Powered Features
             </Badge>
@@ -1536,10 +1579,10 @@ export default function SynergizeAgile() {
             {Object.entries(INTERACTION_MODES).map(([key, mode]) => (
               <Card key={key} className="text-center hover:shadow-xl transition-all duration-300 group border-0 shadow-lg bg-white/90 backdrop-blur-sm hover:scale-105">
                 <CardHeader>
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 group-hover:scale-110 transition-transform duration-300">
+                  <div className="w-16 h-16 bg-gradient-to-br from-teal-100 to-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 text-teal-600 group-hover:scale-110 transition-transform duration-300">
                     {mode.icon}
                   </div>
-                  <CardTitle className="text-xl group-hover:text-blue-600 transition-colors">
+                  <CardTitle className="text-xl group-hover:text-teal-600 transition-colors">
                     {mode.name}
                   </CardTitle>
                 </CardHeader>
@@ -1555,10 +1598,10 @@ export default function SynergizeAgile() {
       </section>
 
       {/* Agile Roles Section */}
-      <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
+      <section className="py-20 bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <Badge className="mb-4 bg-purple-100 text-purple-700 hover:bg-purple-200 border-purple-200">
+            <Badge className="mb-4 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border-emerald-200">
               <Users className="w-4 h-4 mr-2" />
               Role-Based Training
             </Badge>
@@ -1577,7 +1620,7 @@ export default function SynergizeAgile() {
                   <div className={`w-16 h-16 bg-gradient-to-br ${role.color} rounded-full flex items-center justify-center mx-auto mb-4 text-white group-hover:scale-110 transition-transform duration-300`}>
                     {role.icon}
                   </div>
-                  <CardTitle className="text-xl group-hover:text-blue-600 transition-colors">
+                  <CardTitle className="text-xl group-hover:text-teal-600 transition-colors">
                     {role.name}
                   </CardTitle>
                   <p className="text-gray-600 text-sm">
@@ -1588,7 +1631,7 @@ export default function SynergizeAgile() {
                   <div className="space-y-2">
                     {role.capabilities.map((capability, idx) => (
                       <div key={idx} className="flex items-center text-sm text-gray-600">
-                        <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
+                        <CheckCircle className="h-4 w-4 text-emerald-500 mr-2 flex-shrink-0" />
                         <span>{capability}</span>
                       </div>
                     ))}
@@ -1605,7 +1648,7 @@ export default function SynergizeAgile() {
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12">
-              <Badge className="mb-4 bg-green-100 text-green-700 hover:bg-green-200 border-green-200">
+              <Badge className="mb-4 bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200">
                 <Brain className="w-4 h-4 mr-2" />
                 AI Assistant
               </Badge>
@@ -1618,7 +1661,7 @@ export default function SynergizeAgile() {
             </div>
 
             {/* Configuration Panel */}
-            <Card className="mb-8 bg-gradient-to-r from-blue-50 to-purple-50 border-0 shadow-lg relative">
+            <Card className="mb-8 bg-gradient-to-r from-teal-50 to-emerald-50 border-0 shadow-lg relative">
               <CardHeader>
                 <CardTitle className="text-center text-xl">Configure Your Training Session</CardTitle>
               </CardHeader>
@@ -1634,7 +1677,7 @@ export default function SynergizeAgile() {
                         <select
                           value={selectedRole}
                           onChange={(e) => handleRoleChange(e.target.value)}
-                          className="w-full min-h-[44px] text-base px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+                          className="w-full min-h-[44px] text-base px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent appearance-none"
                         >
                           {Object.entries(AGILE_ROLES).map(([key, role]) => (
                             <option key={key} value={key}>
@@ -1652,7 +1695,7 @@ export default function SynergizeAgile() {
                       {/* Desktop: Use Radix UI Select */}
                       <div className="hidden md:block">
                         <Select value={selectedRole} onValueChange={handleRoleChange}>
-                          <SelectTrigger className="w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent touch-manipulation min-h-[44px] text-base">
+                          <SelectTrigger className="w-full focus:ring-2 focus:ring-teal-500 focus:border-transparent touch-manipulation min-h-[44px] text-base">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent 
@@ -1668,7 +1711,7 @@ export default function SynergizeAgile() {
                                 <SelectItem 
                                   key={key} 
                                   value={key} 
-                                  className="focus:bg-blue-50 cursor-pointer min-h-[44px] px-4 py-3 data-[highlighted]:bg-blue-50 data-[state=checked]:bg-blue-100"
+                                  className="focus:bg-teal-50 cursor-pointer min-h-[44px] px-4 py-3 data-[highlighted]:bg-teal-50 data-[state=checked]:bg-teal-100"
                                 >
                                   <div className="flex items-center w-full">
                                     <span className="flex-shrink-0">{role.icon}</span>
@@ -1694,7 +1737,7 @@ export default function SynergizeAgile() {
                         <select
                           value={selectedMode}
                           onChange={(e) => handleModeChange(e.target.value)}
-                          className="w-full min-h-[44px] text-base px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+                          className="w-full min-h-[44px] text-base px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent appearance-none"
                         >
                           {Object.entries(INTERACTION_MODES).map(([key, mode]) => (
                             <option key={key} value={key}>
@@ -1712,7 +1755,7 @@ export default function SynergizeAgile() {
                       {/* Desktop: Use Radix UI Select */}
                       <div className="hidden md:block">
                         <Select value={selectedMode} onValueChange={handleModeChange}>
-                          <SelectTrigger className="w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent touch-manipulation min-h-[44px] text-base">
+                          <SelectTrigger className="w-full focus:ring-2 focus:ring-teal-500 focus:border-transparent touch-manipulation min-h-[44px] text-base">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent 
@@ -1728,7 +1771,7 @@ export default function SynergizeAgile() {
                                 <SelectItem 
                                   key={key} 
                                   value={key} 
-                                  className="focus:bg-blue-50 cursor-pointer min-h-[44px] px-4 py-3 data-[highlighted]:bg-blue-50 data-[state=checked]:bg-blue-100"
+                                  className="focus:bg-teal-50 cursor-pointer min-h-[44px] px-4 py-3 data-[highlighted]:bg-teal-50 data-[state=checked]:bg-teal-100"
                                 >
                                   <div className="flex items-center w-full">
                                     <span className="flex-shrink-0">{mode.icon}</span>
@@ -1754,7 +1797,7 @@ export default function SynergizeAgile() {
                         <select
                           value={selectedProvider}
                           onChange={(e) => handleProviderChange(e.target.value)}
-                          className="w-full min-h-[44px] text-base px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+                          className="w-full min-h-[44px] text-base px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent appearance-none"
                         >
                           {Object.entries(AI_PROVIDERS).map(([key, provider]) => (
                             <option key={key} value={key}>
@@ -1772,7 +1815,7 @@ export default function SynergizeAgile() {
                       {/* Desktop: Use Radix UI Select */}
                       <div className="hidden md:block">
                         <Select value={selectedProvider} onValueChange={handleProviderChange}>
-                          <SelectTrigger className="w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent touch-manipulation min-h-[44px] text-base">
+                          <SelectTrigger className="w-full focus:ring-2 focus:ring-teal-500 focus:border-transparent touch-manipulation min-h-[44px] text-base">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent 
@@ -1788,7 +1831,7 @@ export default function SynergizeAgile() {
                                 <SelectItem 
                                   key={key} 
                                   value={key} 
-                                  className="focus:bg-blue-50 cursor-pointer min-h-[44px] px-4 py-3 data-[highlighted]:bg-blue-50 data-[state=checked]:bg-blue-100"
+                                  className="focus:bg-teal-50 cursor-pointer min-h-[44px] px-4 py-3 data-[highlighted]:bg-teal-50 data-[state=checked]:bg-teal-100"
                                 >
                                   <div className="flex items-center w-full">
                                     <span className="flex-shrink-0">{provider.icon}</span>
@@ -1857,7 +1900,7 @@ export default function SynergizeAgile() {
                       <div
                         className={`max-w-[80%] rounded-lg p-4 break-words ${
                           message.type === 'user'
-                            ? 'bg-blue-600 text-white'
+                            ? 'bg-teal-600 text-white'
                             : 'bg-white border shadow-sm'
                         }`}
                       >
@@ -1873,7 +1916,7 @@ export default function SynergizeAgile() {
                             </p>
                             <div className="flex items-center justify-between mt-2">
                               <div className="flex items-center space-x-2">
-                                <span className={`text-xs ${message.type === 'user' ? 'text-blue-100' : 'text-gray-500'}`}>
+                                <span className={`text-xs ${message.type === 'user' ? 'text-teal-100' : 'text-gray-500'}`}>
                                   {message.timestamp.toLocaleTimeString()}
                                 </span>
                                 {message.type === 'ai' && message.provider && (
@@ -2036,7 +2079,7 @@ export default function SynergizeAgile() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+      <section className="py-20 bg-gradient-to-r from-teal-600 to-emerald-600 text-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             Ready to Master Agile with AI?
@@ -2048,7 +2091,7 @@ export default function SynergizeAgile() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               size="lg" 
-              className="text-lg px-8 py-6 bg-white text-blue-600 hover:bg-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+              className="text-lg px-8 py-6 bg-white text-teal-600 hover:bg-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
               onClick={() => document.getElementById('agile-assistant')?.scrollIntoView({ behavior: 'smooth' })}
             >
               Start Training Now
@@ -2057,7 +2100,7 @@ export default function SynergizeAgile() {
             <Button 
               size="lg" 
               variant="outline" 
-              className="text-lg px-8 py-6 border-2 border-white text-white hover:bg-white hover:text-blue-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+              className="text-lg px-8 py-6 border-2 border-white text-white hover:bg-white hover:text-teal-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
               asChild
             >
               <Link href="/courses">

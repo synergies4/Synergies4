@@ -41,8 +41,8 @@ export default function HomePage() {
         <div className="absolute inset-0 overflow-hidden">
           {/* Animated Orbs */}
           <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-blue-600/30 to-purple-600/30 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-1/3 left-1/3 w-80 h-80 bg-gradient-to-br from-cyan-500/20 to-blue-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-          <div className="absolute top-2/3 left-1/4 w-64 h-64 bg-gradient-to-br from-purple-500/15 to-pink-600/15 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute bottom-1/3 left-1/3 w-80 h-80 bg-gradient-to-br from-cyan-500/20 to-blue-600/20 rounded-full blur-3xl animate-pulse animation-delay-1000"></div>
+          <div className="absolute top-2/3 left-1/4 w-64 h-64 bg-gradient-to-br from-purple-500/15 to-pink-600/15 rounded-full blur-2xl animate-pulse animation-delay-2000"></div>
           
           {/* Geometric Shapes */}
           <div className="absolute top-20 left-20 w-32 h-32 border border-white/10 rounded-full animate-pulse"></div>
@@ -89,15 +89,15 @@ export default function HomePage() {
             that teams and leaders actually use
           </p>
           
-          {/* Enhanced CTA Buttons with Better Contrast */}
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center max-w-2xl mx-auto mb-20">
+          {/* Enhanced CTA Buttons - Fixed Mobile Layout */}
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center max-w-3xl mx-auto mb-16">
             <Button 
               size="lg" 
               className="w-full sm:w-auto text-lg px-10 py-4 bg-white text-black hover:bg-gray-100 transition-all duration-300 font-semibold rounded-xl shadow-2xl hover:shadow-white/25 hover:scale-105 border-0 group" 
               asChild
             >
               <Link href="/courses">
-                <span className="flex items-center">
+                <span className="flex items-center justify-center">
                   Explore Courses
                   <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </span>
@@ -110,7 +110,7 @@ export default function HomePage() {
               asChild
             >
               <Link href="/synergize">
-                <span className="flex items-center">
+                <span className="flex items-center justify-center">
                   <Brain className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
                   Try AI Assistant
                 </span>
@@ -296,26 +296,28 @@ function ValuePropositionsSection() {
 
         {/* Call-to-Action */}
         <div className="text-center mt-16">
-          <div className="inline-flex items-center space-x-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 max-w-3xl mx-auto">
             <Button 
               size="lg" 
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 hover:scale-105 border-0"
+              className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 hover:scale-105 border-0 group"
               asChild
             >
               <Link href="/courses">
-                Explore Our Courses
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                <span className="flex items-center justify-center">
+                  Explore Our Courses
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </span>
               </Link>
             </Button>
             
             <Button 
               size="lg" 
-              className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 rounded-xl shadow-2xl hover:shadow-white/25 transition-all duration-300 hover:scale-105 border-0 font-semibold"
+              className="w-full sm:w-auto bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 rounded-xl shadow-2xl hover:shadow-white/25 transition-all duration-300 hover:scale-105 border-0 font-semibold group"
               asChild
             >
               <Link href="/synergize">
-                <span className="flex items-center">
-                  <Brain className="mr-2 h-5 w-5" />
+                <span className="flex items-center justify-center">
+                  <Brain className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
                   Try AI Assistant
                 </span>
               </Link>
@@ -981,21 +983,93 @@ function PartnersSection() {
 // CTA Section
 function CTASection() {
   return (
-    <section className="py-20 bg-gradient-to-r from-purple-600 to-blue-600 text-white">
-      <div className="container mx-auto px-4 text-center">
-        <h2 className="text-3xl md:text-4xl font-bold mb-6">
-          Ready to Transform Your Career?
+    <section className="py-20 bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-600 text-white relative overflow-hidden">
+      {/* Enhanced Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-white/10 to-purple-300/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/3 left-1/3 w-80 h-80 bg-gradient-to-br from-blue-300/15 to-white/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-2/3 left-1/4 w-64 h-64 bg-gradient-to-br from-indigo-300/10 to-purple-300/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+      </div>
+
+      {/* Geometric Pattern */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `
+            radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 2px, transparent 2px),
+            radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 2px, transparent 2px),
+            radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.05) 1px, transparent 1px)
+          `,
+          backgroundSize: '100px 100px, 80px 80px, 60px 60px'
+        }} />
+      </div>
+
+      <div className="container mx-auto px-4 text-center relative z-10">
+        <div className="inline-flex items-center px-6 py-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 mb-8">
+          <Rocket className="w-5 h-5 text-purple-300 mr-3" />
+          <span className="text-white/90 font-medium">Ready to Get Started?</span>
+        </div>
+        
+        <h2 className="text-4xl md:text-6xl font-bold mb-8 leading-tight">
+          <span className="bg-gradient-to-r from-white via-purple-100 to-blue-200 bg-clip-text text-transparent">
+            Ready to Transform
+          </span>
+          <br />
+          <span className="bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 bg-clip-text text-transparent">
+            Your Career?
+          </span>
         </h2>
-        <p className="text-xl mb-8 max-w-2xl mx-auto">
-          Join thousands of professionals who have accelerated their growth with our AI-powered learning platform
+        
+        <p className="text-xl md:text-2xl text-purple-100/90 max-w-4xl mx-auto leading-relaxed font-light mb-12">
+          Join thousands of professionals who have accelerated their growth with our 
+          <span className="text-white font-medium"> AI-powered learning platform</span>
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button size="lg" className="bg-white text-purple-600 hover:bg-gray-100" asChild>
-            <Link href="/courses">Start Learning Today</Link>
-          </Button>
-          <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-purple-600" asChild>
-            <Link href="/contact">Talk to an Expert</Link>
-          </Button>
+        
+        <div className="text-center mt-16">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 max-w-3xl mx-auto">
+            <Button 
+              size="lg" 
+              className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 hover:scale-105 border-0 group"
+              asChild
+            >
+              <Link href="/courses">
+                <span className="flex items-center justify-center">
+                  Start Learning Today
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </span>
+              </Link>
+            </Button>
+            
+            <Button 
+              size="lg" 
+              className="w-full sm:w-auto bg-gradient-to-r from-white/20 to-white/10 border-2 border-white text-white hover:bg-white hover:text-purple-600 shadow-2xl hover:shadow-white/25 transition-all duration-300 hover:scale-105 font-semibold rounded-xl backdrop-blur-sm group" 
+              asChild
+            >
+              <Link href="/contact">
+                <span className="flex items-center justify-center">
+                  <MessageSquare className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
+                  Talk to an Expert
+                </span>
+              </Link>
+            </Button>
+          </div>
+        </div>
+        
+        {/* Enhanced Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto mt-16">
+          {[
+            { number: "10K+", label: "Happy Learners", icon: <Users className="w-5 h-5" /> },
+            { number: "95%", label: "Success Rate", icon: <TrendingUp className="w-5 h-5" /> },
+            { number: "4.9", label: "Average Rating", icon: <Star className="w-5 h-5" /> },
+            { number: "50+", label: "Expert Courses", icon: <BookOpen className="w-5 h-5" /> }
+          ].map((stat, index) => (
+            <div key={index} className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 hover:bg-white/10 transition-all duration-300 hover:scale-105 group">
+              <div className="flex items-center justify-center mb-3 text-purple-300 group-hover:text-white transition-colors">
+                {stat.icon}
+              </div>
+              <div className="text-2xl md:text-3xl font-bold text-white mb-1 group-hover:scale-110 transition-transform">{stat.number}</div>
+              <div className="text-sm text-purple-200/80 uppercase tracking-wide font-medium group-hover:text-white/90 transition-colors">{stat.label}</div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
