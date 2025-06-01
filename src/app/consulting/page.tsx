@@ -51,7 +51,6 @@ export default function Consulting() {
           icon: <ArrowRight className="w-4 h-4" />
         }}
         backgroundVariant="pattern"
-        size="large"
       />
 
       {/* Services Section */}
