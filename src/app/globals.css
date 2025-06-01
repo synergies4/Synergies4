@@ -70,12 +70,109 @@
   }
 }
 
+/* Mobile Performance Optimizations */
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
 body {
   color: var(--text-color);
   background: var(--background);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   line-height: 1.5;
   overflow-x: hidden;
+  /* Improve mobile scrolling performance */
+  -webkit-overflow-scrolling: touch;
+  /* Prevent font size adjustment on mobile */
+  -webkit-text-size-adjust: 100%;
+  /* Improve touch responsiveness */
+  touch-action: manipulation;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Mobile-specific optimizations */
+@media (max-width: 768px) {
+  /* Reduce complex animations on mobile */
+  .animate-bounce,
+  .animate-pulse,
+  .animate-spin {
+    animation-duration: 1s;
+  }
+  
+  /* Optimize chat container for mobile */
+  .chat-container {
+    height: calc(100vh - 200px);
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Improve mobile text rendering */
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeSpeed;
+  }
+  
+  /* Reduce motion blur on mobile */
+  * {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+}
+
+/* Chat interface optimizations */
+.chat-message {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+  max-width: 100%;
+}
+
+.chat-input {
+  resize: none;
+  overflow: hidden;
+  min-height: 40px;
+  max-height: 120px;
+}
+
+/* Improve button touch targets on mobile */
+@media (max-width: 768px) {
+  button, .button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Performance optimizations for animations */
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
+}
+
+/* GPU acceleration for smooth animations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -92,6 +189,9 @@ a {
 img {
   max-width: 100%;
   height: auto;
+  /* Improve image loading performance */
+  loading: lazy;
+  decoding: async;
 }
 
 .container {
@@ -213,6 +313,13 @@ img {
   100% { left: 100%; }
 }
 
+/* Reduce shimmer animation on mobile for performance */
+@media (max-width: 768px) {
+  .countdown-banner::before {
+    animation: none;
+  }
+}
+
 .countdown-timers {
   display: flex;
   justify-content: center;
@@ -328,6 +435,17 @@ img {
   box-shadow: 0 8px 25px rgba(30, 58, 138, 0.3);
 }
 
+/* Reduce button animations on mobile */
+@media (max-width: 768px) {
+  .primary-button:hover {
+    transform: none;
+  }
+  
+  .primary-button::before {
+    display: none;
+  }
+}
+
 .secondary-button {
   background: linear-gradient(135deg, var(--secondary-green) 0%, #16a34a 100%);
   color: white;
@@ -361,6 +479,17 @@ img {
 .secondary-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(21, 128, 61, 0.3);
+}
+
+/* Reduce button animations on mobile */
+@media (max-width: 768px) {
+  .secondary-button:hover {
+    transform: none;
+  }
+  
+  .secondary-button::before {
+    display: none;
+  }
 }
 
 .hero-section {

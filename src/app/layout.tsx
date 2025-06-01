@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { PerformanceOptimizer } from "@/components/PerformanceOptimizer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -78,6 +79,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
+  maximumScale: 1,
+  userScalable: false, // Prevent zoom on mobile for better UX
 };
 
 export default function RootLayout({
@@ -88,6 +91,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className} suppressHydrationWarning>
+        <PerformanceOptimizer />
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
