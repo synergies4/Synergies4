@@ -929,7 +929,7 @@ const ScenarioSimulator = ({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent 
-                    className="z-[99999] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
+                    className="z-[9999999] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
                     position="popper"
                     sideOffset={4}
                     align="start"
@@ -993,7 +993,7 @@ const ScenarioSimulator = ({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent 
-                    className="z-[99999] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
+                    className="z-[9999999] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
                     position="popper"
                     sideOffset={4}
                     align="start"
@@ -1145,7 +1145,7 @@ const RoleBasedAdvisor = ({
                 <SelectValue placeholder="Select a challenge..." />
               </SelectTrigger>
               <SelectContent 
-                className="z-[99999] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
+                className="z-[9999999] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
                 position="popper"
                 sideOffset={4}
                 align="start"
@@ -1190,7 +1190,7 @@ const RoleBasedAdvisor = ({
                 <SelectValue placeholder="Select experience..." />
               </SelectTrigger>
               <SelectContent 
-                className="z-[99999] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
+                className="z-[9999999] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
                 position="popper"
                 sideOffset={4}
                 align="start"
@@ -1660,7 +1660,7 @@ export default function SynergizeAgile() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent 
-                            className="z-[99999] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
+                            className="z-[9999999] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
                             position="popper"
                             sideOffset={4}
                             align="start"
@@ -1721,7 +1721,7 @@ export default function SynergizeAgile() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent 
-                            className="z-[99999] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
+                            className="z-[9999999] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
                             position="popper"
                             sideOffset={4}
                             align="start"
@@ -1782,7 +1782,7 @@ export default function SynergizeAgile() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent 
-                            className="z-[99999] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
+                            className="z-[9999999] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
                             position="popper"
                             sideOffset={4}
                             align="start"
@@ -1926,7 +1926,7 @@ export default function SynergizeAgile() {
                 </div>
 
                 {/* Specialized Mode Interface */}
-                <div className="border-t bg-white p-4 flex-shrink-0 max-h-[300px] overflow-y-auto">
+                <div className="border-t bg-white p-4 flex-shrink-0 max-h-[300px] overflow-y-auto relative z-[200]">
                   {selectedMode === 'presentation' && (
                     <PresentationGenerator
                       currentRole={currentRole}
