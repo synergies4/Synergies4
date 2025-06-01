@@ -466,8 +466,12 @@ const PresentationGenerator = ({
   };
 
   const generateSlideImages = async (slides: any[]) => {
-    if (!includeImages) return slides;
+    if (!includeImages || slides.length === 0) {
+      console.log('Image generation skipped - includeImages:', includeImages, 'slides length:', slides.length);
+      return slides;
+    }
     
+    console.log('Starting image generation for', slides.length, 'slides');
     setIsGeneratingImages(true);
     const updatedSlides = [...slides];
     
@@ -475,8 +479,12 @@ const PresentationGenerator = ({
       setCurrentImageIndex(i + 1);
       const slide = slides[i];
       
+      console.log(`Generating image for slide ${i + 1}:`, slide.title);
+      
       try {
         const imagePrompt = `Professional business presentation slide: ${slide.imagePrompt}. Modern, clean design with ${presentationStyle} style. High quality, suitable for corporate presentation. 16:9 aspect ratio.`;
+        
+        console.log('Sending image generation request with prompt:', imagePrompt);
         
         const imageResponse = await fetch('/api/generate-image', {
           method: 'POST',
@@ -487,12 +495,18 @@ const PresentationGenerator = ({
           })
         });
         
+        console.log('Image API response status:', imageResponse.status);
+        
         if (imageResponse.ok) {
           const imageData = await imageResponse.json();
+          console.log('Image generated successfully for slide', i + 1, ':', imageData.imageUrl);
           updatedSlides[i] = {
             ...slide,
             imageUrl: imageData.imageUrl
           };
+        } else {
+          const errorText = await imageResponse.text();
+          console.error(`Failed to generate image for slide ${i + 1}:`, imageResponse.status, errorText);
         }
       } catch (error) {
         console.error(`Failed to generate image for slide ${i + 1}:`, error);
@@ -504,6 +518,7 @@ const PresentationGenerator = ({
     
     setIsGeneratingImages(false);
     setCurrentImageIndex(0);
+    console.log('Image generation completed. Updated slides:', updatedSlides);
     return updatedSlides;
   };
 
@@ -636,7 +651,13 @@ const PresentationGenerator = ({
             
             // Generate images if requested
             if (includeImages) {
-              generateSlideImages(presentationData.slides).then(setGeneratedSlides);
+              console.log('Starting image generation for slides...');
+              generateSlideImages(presentationData.slides).then((updatedSlides) => {
+                console.log('Image generation completed, updating slides:', updatedSlides);
+                setGeneratedSlides(updatedSlides);
+              }).catch((error) => {
+                console.error('Image generation failed:', error);
+              });
             }
           } else {
             console.log('No valid presentation data found in response');
@@ -774,20 +795,20 @@ const PresentationGenerator = ({
               {generatedSlides.length} slides ready
             </Badge>
           </div>
-          <div className="grid gap-4">
+          <div className="space-y-4 max-w-full overflow-hidden">
             {generatedSlides.slice(0, 3).map((slide, index) => (
-              <Card key={index} className="p-4 border-l-4 border-blue-500">
+              <Card key={index} className="p-4 border-l-4 border-blue-500 w-full">
                 <div className="flex items-start justify-between mb-2">
-                  <h4 className="font-semibold text-lg">Slide {slide.slideNumber}: {slide.title}</h4>
-                  <Badge variant="outline">{slide.layout}</Badge>
+                  <h4 className="font-semibold text-lg break-words">Slide {slide.slideNumber}: {slide.title}</h4>
+                  <Badge variant="outline" className="ml-2 flex-shrink-0">{slide.layout}</Badge>
                 </div>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="min-w-0">
                     <ul className="space-y-1 text-sm">
                       {slide.content.slice(0, 3).map((item: string, idx: number) => (
                         <li key={idx} className="flex items-start">
                           <span className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-2 flex-shrink-0"></span>
-                          {item}
+                          <span className="break-words">{item}</span>
                         </li>
                       ))}
                       {slide.content.length > 3 && (
@@ -800,8 +821,18 @@ const PresentationGenerator = ({
                       <img 
                         src={slide.imageUrl} 
                         alt={`Slide ${slide.slideNumber}`}
-                        className="max-w-full h-32 object-cover rounded border"
+                        className="max-w-full h-32 object-cover rounded border mx-auto"
                       />
+                    </div>
+                  )}
+                  {!slide.imageUrl && includeImages && (
+                    <div className="text-center">
+                      <div className="w-full h-32 bg-gray-100 rounded border flex items-center justify-center">
+                        <div className="text-gray-500 text-sm">
+                          <ImageIcon className="h-8 w-8 mx-auto mb-2" />
+                          Image generating...
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -1544,7 +1575,7 @@ export default function SynergizeAgile() {
             </Card>
 
             {/* Chat Interface */}
-            <Card className="h-[600px] flex flex-col border-0 shadow-xl">
+            <Card className="h-[600px] flex flex-col border-0 shadow-xl overflow-hidden">
               <CardHeader className={`bg-gradient-to-r ${currentRole.color} text-white rounded-t-lg flex-shrink-0`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
@@ -1565,7 +1596,7 @@ export default function SynergizeAgile() {
                 </div>
               </CardHeader>
 
-              <CardContent className="flex-1 flex flex-col p-0 min-h-0">
+              <CardContent className="flex-1 flex flex-col p-0 min-h-0 overflow-hidden">
                 {/* Messages */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 min-h-0">
                   {messages.length === 0 && (
@@ -1590,7 +1621,7 @@ export default function SynergizeAgile() {
                       className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
                     >
                       <div
-                        className={`max-w-[80%] rounded-lg p-4 ${
+                        className={`max-w-[80%] rounded-lg p-4 break-words ${
                           message.type === 'user'
                             ? 'bg-blue-600 text-white'
                             : 'bg-white border shadow-sm'
@@ -1603,7 +1634,7 @@ export default function SynergizeAgile() {
                             </div>
                           )}
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+                            <p className="text-sm leading-relaxed whitespace-pre-wrap break-words overflow-wrap-anywhere">
                               {message.content}
                             </p>
                             <div className="flex items-center justify-between mt-2">
@@ -1622,7 +1653,7 @@ export default function SynergizeAgile() {
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => copyMessage(message.content)}
-                                  className="h-6 w-6 p-0 hover:bg-gray-100"
+                                  className="h-6 w-6 p-0 hover:bg-gray-100 flex-shrink-0"
                                 >
                                   <Copy className="h-3 w-3" />
                                 </Button>
@@ -1654,7 +1685,7 @@ export default function SynergizeAgile() {
                 </div>
 
                 {/* Specialized Mode Interface */}
-                <div className="border-t bg-white p-4 flex-shrink-0">
+                <div className="border-t bg-white p-4 flex-shrink-0 max-h-[300px] overflow-y-auto">
                   {selectedMode === 'presentation' && (
                     <PresentationGenerator
                       currentRole={currentRole}
