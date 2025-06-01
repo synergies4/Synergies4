@@ -49,7 +49,6 @@ export default function Coaching() {
           icon: <ArrowRight className="w-4 h-4" />
         }}
         backgroundVariant="gradient"
-        size="large"
       />
 
       {/* Why Choose Section */}
