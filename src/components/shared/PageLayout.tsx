@@ -90,8 +90,8 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
       
       // Calculate actual header height dynamically
       const calculateHeaderHeight = () => {
-        const banner = document.querySelector('[role="banner"]');
-        const nav = document.querySelector('[role="navigation"]');
+        const banner = document.querySelector('[role="banner"]') as HTMLElement;
+        const nav = document.querySelector('[role="navigation"]') as HTMLElement;
         if (banner && nav) {
           const totalHeight = banner.offsetHeight + nav.offsetHeight;
           document.documentElement.style.setProperty('--header-height', `${totalHeight}px`);
