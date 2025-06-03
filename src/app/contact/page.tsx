@@ -406,7 +406,7 @@ export default function Contact() {
                       {/* Icon Container */}
                       <div className="relative mb-6">
                         <div className={`w-16 h-16 bg-gradient-to-br ${item.gradient} rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:shadow-xl transition-shadow duration-150`}>
-                          <item.icon className="h-8 w-8" />
+                          {item.icon}
                         </div>
                         
                         {/* Accent Line */}
