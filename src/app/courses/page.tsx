@@ -185,11 +185,11 @@ function CourseDirectorySection() {
           </div>
           
           <h2 className="text-4xl md:text-6xl font-bold mb-8 leading-tight">
-            <span className="bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-gray-900 via-blue-800 to-teal-800 bg-clip-text text-transparent">
               Expertly Designed
             </span>
             <br />
-            <span className="bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-teal-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent">
               Learning Experiences
             </span>
           </h2>
@@ -360,7 +360,7 @@ function CourseDirectorySection() {
                     <div className="lg:col-span-2 flex flex-col justify-between">
                       <div className="flex-1">
                         <CardHeader className="p-0 mb-6">
-                          <CardTitle className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-900 to-blue-800 bg-clip-text text-transparent mb-3 group-hover:from-blue-600 group-hover:to-purple-600 transition-all duration-300 min-h-[3rem] flex items-center leading-tight">
+                          <CardTitle className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-900 to-blue-800 bg-clip-text text-transparent mb-3 group-hover:from-blue-600 group-hover:to-teal-600 transition-all duration-300 min-h-[3rem] flex items-center leading-tight">
                             {course.title}
                           </CardTitle>
                           <div className="flex flex-wrap gap-3 mb-4">
@@ -370,7 +370,7 @@ function CourseDirectorySection() {
                                 {course.duration}
                               </Badge>
                             )}
-                            <Badge variant="outline" className="text-sm border-purple-300 text-purple-700 bg-purple-50">
+                            <Badge variant="outline" className="text-sm border-teal-300 text-teal-700 bg-teal-50">
                               <Target className="w-4 h-4 mr-1" />
                               {course.level}
                             </Badge>

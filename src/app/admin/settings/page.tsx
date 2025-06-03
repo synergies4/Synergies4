@@ -768,7 +768,7 @@ export default function AdminSettings() {
                         <Input
                           value={settings.theme_secondary_color}
                           onChange={(e) => updateSetting('theme_secondary_color', e.target.value)}
-                          placeholder="#7c3aed"
+                          placeholder="#14b8a6"
                           className="flex-1"
                         />
                       </div>

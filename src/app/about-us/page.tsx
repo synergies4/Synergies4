@@ -127,8 +127,8 @@ function MissionSection() {
               icon: <Heart className="h-10 w-10" />,
               title: "Our Values", 
               description: "Human-centered design, continuous learning, and sustainable transformation guide everything we do.",
-              gradient: "from-purple-500 to-pink-400",
-              glowColor: "purple-400/30"
+              gradient: "from-teal-500 to-cyan-400",
+              glowColor: "teal-400/30"
             },
             {
               icon: <Rocket className="h-10 w-10" />,
@@ -196,7 +196,7 @@ function StatisticsSection() {
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-20">
-          <div className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-sm rounded-full border border-blue-300/30 mb-8">
+          <div className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500/20 to-teal-500/20 backdrop-blur-sm rounded-full border border-blue-300/30 mb-8">
             <TrendingUp className="w-5 h-5 text-blue-300 mr-3" />
             <span className="text-blue-100 font-medium">Our Impact in Numbers</span>
           </div>
@@ -206,7 +206,7 @@ function StatisticsSection() {
               Real Results from
             </span>
             <br />
-            <span className="bg-gradient-to-r from-purple-300 via-pink-300 to-orange-300 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-teal-300 via-blue-300 to-emerald-300 bg-clip-text text-transparent">
               Real Organizations
             </span>
           </h2>
@@ -286,24 +286,24 @@ function SpecialSection() {
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-20">
-          <div className="inline-flex items-center px-6 py-3 bg-white/60 backdrop-blur-sm rounded-full border border-purple-200/50 mb-8">
-            <Lightbulb className="w-5 h-5 text-purple-600 mr-3" />
-            <span className="text-purple-700 font-medium">What Makes Us Special</span>
+          <div className="inline-flex items-center px-6 py-3 bg-white/60 backdrop-blur-sm rounded-full border border-teal-200/50 mb-8">
+            <Lightbulb className="w-5 h-5 text-teal-600 mr-3" />
+            <span className="text-teal-700 font-medium">What Makes Us Special</span>
           </div>
           
           <h2 className="text-4xl md:text-6xl font-bold mb-8 leading-tight">
-            <span className="bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-gray-900 via-blue-800 to-teal-800 bg-clip-text text-transparent">
               Beyond Traditional
             </span>
             <br />
-            <span className="bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-teal-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent">
               Training
             </span>
           </h2>
           
           <p className="text-xl md:text-2xl text-gray-700 max-w-4xl mx-auto leading-relaxed font-light">
             We don't just teach concepts - we 
-            <span className="text-purple-600 font-medium"> transform how people think, </span>
+            <span className="text-teal-600 font-medium"> transform how people think, </span>
             work, and lead
           </p>
         </div>
@@ -366,7 +366,7 @@ function SpecialSection() {
                   </div>
                   
                   {/* Floating ring effect */}
-                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-24 border-2 border-current rounded-full opacity-0 group-hover:opacity-20 group-hover:scale-150 transition-all duration-700" style={{ color: item.gradient.includes('blue') ? '#3B82F6' : item.gradient.includes('purple') ? '#8B5CF6' : '#10B981' }}></div>
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-24 border-2 border-current rounded-full opacity-0 group-hover:opacity-20 group-hover:scale-150 transition-all duration-700" style={{ color: item.gradient.includes('blue') ? '#3B82F6' : item.gradient.includes('teal') ? '#14B8A6' : '#10B981' }}></div>
                 </div>
 
                 {/* Content */}
@@ -384,7 +384,7 @@ function SpecialSection() {
                 <div className="absolute bottom-4 left-4 w-6 h-6 bg-white/20 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-700" style={{ animationDelay: '200ms' }}></div>
                 
                 {/* Bottom highlight */}
-                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-current to-transparent group-hover:w-20 transition-all duration-500 rounded-full" style={{ color: item.gradient.includes('blue') ? '#3B82F6' : item.gradient.includes('purple') ? '#8B5CF6' : '#10B981' }}></div>
+                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-current to-transparent group-hover:w-20 transition-all duration-500 rounded-full" style={{ color: item.gradient.includes('blue') ? '#3B82F6' : item.gradient.includes('teal') ? '#14B8A6' : '#10B981' }}></div>
               </div>
             </div>
           ))}

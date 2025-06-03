@@ -116,7 +116,7 @@ export class EmailService {
 
     // Send to admin
     await this.sendEmail({
-      to: 'admin@synergies4ai.com', // Replace with your admin email
+      to: process.env.ADMIN_EMAIL || 'paul@antimatterai.com', // Replace with your actual admin email
       subject: `[Contact Form] ${subject}`,
       html,
     });

@@ -155,7 +155,7 @@ function ServicesSection() {
                   </div>
                   
                   {/* Floating ring effect */}
-                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-24 border-2 border-current rounded-full opacity-0 group-hover:opacity-20 group-hover:scale-150 transition-all duration-700" style={{ color: service.gradient.includes('blue') ? '#3B82F6' : service.gradient.includes('emerald') ? '#10B981' : '#8B5CF6' }}></div>
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-24 border-2 border-current rounded-full opacity-0 group-hover:opacity-20 group-hover:scale-150 transition-all duration-700" style={{ color: service.gradient.includes('blue') ? '#3B82F6' : service.gradient.includes('emerald') ? '#10B981' : service.gradient.includes('teal') ? '#14B8A6' : '#F97316' }}></div>
                 </div>
 
                 {/* Content */}
@@ -198,7 +198,7 @@ function ServicesSection() {
                 <div className="absolute bottom-4 left-4 w-6 h-6 bg-white/20 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-700" style={{ animationDelay: '200ms' }}></div>
                 
                 {/* Bottom highlight */}
-                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-current to-transparent group-hover:w-20 transition-all duration-500 rounded-full" style={{ color: service.gradient.includes('blue') ? '#3B82F6' : service.gradient.includes('emerald') ? '#10B981' : '#8B5CF6' }}></div>
+                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-current to-transparent group-hover:w-20 transition-all duration-500 rounded-full" style={{ color: service.gradient.includes('blue') ? '#3B82F6' : service.gradient.includes('emerald') ? '#10B981' : service.gradient.includes('teal') ? '#14B8A6' : '#F97316' }}></div>
               </div>
             </div>
           ))}
@@ -234,7 +234,7 @@ function WhyChooseSection() {
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-20">
           <div className="inline-flex items-center px-6 py-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 mb-8">
-            <Award className="w-5 h-5 text-purple-300 mr-3" />
+            <Award className="w-5 h-5 text-teal-300 mr-3" />
             <span className="text-white/90 font-medium">Why Choose Us</span>
           </div>
           
@@ -243,7 +243,7 @@ function WhyChooseSection() {
               Proven Expertise,
             </span>
             <br />
-            <span className="bg-gradient-to-r from-purple-300 via-pink-300 to-orange-300 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-teal-300 via-blue-300 to-emerald-300 bg-clip-text text-transparent">
               Measurable Results
             </span>
           </h2>
@@ -299,7 +299,7 @@ function WhyChooseSection() {
                   </div>
                   
                   {/* Floating ring effect */}
-                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-24 border-2 border-current rounded-full opacity-0 group-hover:opacity-20 group-hover:scale-150 transition-all duration-700" style={{ color: item.gradient.includes('blue') ? '#3B82F6' : item.gradient.includes('emerald') ? '#10B981' : item.gradient.includes('purple') ? '#8B5CF6' : '#F97316' }}></div>
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-24 border-2 border-current rounded-full opacity-0 group-hover:opacity-20 group-hover:scale-150 transition-all duration-700" style={{ color: item.gradient.includes('blue') ? '#3B82F6' : item.gradient.includes('emerald') ? '#10B981' : item.gradient.includes('teal') ? '#14B8A6' : '#F97316' }}></div>
                 </div>
 
                 {/* Content */}
@@ -317,7 +317,7 @@ function WhyChooseSection() {
                 <div className="absolute bottom-4 left-4 w-6 h-6 bg-white/10 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-700" style={{ animationDelay: '200ms' }}></div>
                 
                 {/* Bottom highlight */}
-                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-current to-transparent group-hover:w-20 transition-all duration-500 rounded-full" style={{ color: item.gradient.includes('blue') ? '#3B82F6' : item.gradient.includes('emerald') ? '#10B981' : item.gradient.includes('purple') ? '#8B5CF6' : '#F97316' }}></div>
+                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-current to-transparent group-hover:w-20 transition-all duration-500 rounded-full" style={{ color: item.gradient.includes('blue') ? '#3B82F6' : item.gradient.includes('emerald') ? '#10B981' : item.gradient.includes('teal') ? '#14B8A6' : '#F97316' }}></div>
               </div>
             </div>
           ))}
@@ -493,21 +493,21 @@ function CTASection() {
 
       <div className="container mx-auto px-4 text-center relative z-10">
         <div className="inline-flex items-center px-6 py-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 mb-8">
-          <Rocket className="w-5 h-5 text-purple-300 mr-3" />
+          <Rocket className="w-5 h-5 text-teal-300 mr-3" />
           <span className="text-white/90 font-medium">Ready to Transform?</span>
         </div>
         
         <h2 className="text-4xl md:text-6xl font-bold mb-8 leading-tight">
-          <span className="bg-gradient-to-r from-white via-purple-100 to-blue-200 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-white via-teal-100 to-blue-200 bg-clip-text text-transparent">
             Ready to Transform
           </span>
           <br />
-          <span className="bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-blue-200 via-teal-200 to-cyan-200 bg-clip-text text-transparent">
             Your Organization?
           </span>
         </h2>
         
-        <p className="text-xl md:text-2xl text-purple-100/90 max-w-4xl mx-auto leading-relaxed font-light mb-12">
+        <p className="text-xl md:text-2xl text-teal-100/90 max-w-4xl mx-auto leading-relaxed font-light mb-12">
           Let's discuss how our consulting services can help you achieve your 
           <span className="text-white font-medium"> transformation goals </span>
           and drive sustainable growth across your organization.

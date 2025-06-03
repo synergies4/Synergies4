@@ -353,16 +353,16 @@ export default function Contact() {
             {/* Contact Information */}
             <div className="space-y-8 animate-fade-in-up animation-delay-200">
               <div className="text-center lg:text-left">
-                <div className="inline-flex items-center px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full border border-purple-200/50 mb-6">
-                  <Phone className="w-4 h-4 text-purple-600 mr-2" />
-                  <span className="text-purple-700 font-medium text-sm">Contact Info</span>
+                <div className="inline-flex items-center px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full border border-teal-200/50 mb-6">
+                  <Phone className="w-4 h-4 text-teal-600 mr-2" />
+                  <span className="text-teal-700 font-medium text-sm">Contact Info</span>
                 </div>
-                <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-gray-900 via-purple-800 to-blue-800 bg-clip-text text-transparent">
+                <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-gray-900 via-teal-800 to-blue-800 bg-clip-text text-transparent">
                   Get in Touch
                 </h2>
                 <p className="text-lg text-gray-700 leading-relaxed">
                   Prefer to reach out directly? Here are all the ways you can 
-                  <span className="text-purple-600 font-medium"> contact us.</span>
+                  <span className="text-teal-600 font-medium"> contact us.</span>
                 </p>
               </div>
 
@@ -414,14 +414,14 @@ export default function Contact() {
                             <Button 
                               variant="outline" 
                               size="sm"
-                              className={`text-purple-600 border-purple-600 hover:bg-purple-50 transition-all duration-300 hover:scale-105`}
+                              className={`text-teal-600 border-teal-600 hover:bg-teal-50 transition-all duration-300 hover:scale-105`}
                             >
                               {item.contact}
                             </Button>
                           ) : (
                             <a 
                               href={item.href} 
-                              className={`font-semibold transition-colors duration-300 hover:underline ${item.gradient.includes('blue') ? 'text-blue-600 hover:text-blue-700' : item.gradient.includes('green') ? 'text-green-600 hover:text-green-700' : 'text-purple-600 hover:text-purple-700'}`}
+                              className={`font-semibold transition-colors duration-300 hover:underline ${item.gradient.includes('blue') ? 'text-blue-600 hover:text-blue-700' : item.gradient.includes('green') ? 'text-green-600 hover:text-green-700' : 'text-teal-600 hover:text-teal-700'}`}
                             >
                               {item.contact}
                             </a>
@@ -430,7 +430,7 @@ export default function Contact() {
                       </div>
                       
                       {/* Decorative element */}
-                      <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-current to-transparent group-hover:w-16 transition-all duration-500 rounded-full" style={{ color: item.gradient.includes('blue') ? '#3B82F6' : item.gradient.includes('green') ? '#10B981' : '#8B5CF6' }}></div>
+                      <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-current to-transparent group-hover:w-16 transition-all duration-500 rounded-full" style={{ color: item.gradient.includes('blue') ? '#3B82F6' : item.gradient.includes('green') ? '#10B981' : '#14B8A6' }}></div>
                     </div>
                   </div>
                 ))}
