@@ -714,7 +714,7 @@ const PresentationGenerator = ({
             value={presentationTopic}
             onChange={(e) => setPresentationTopic(e.target.value)}
             placeholder="e.g., Sprint Planning Best Practices"
-            className="mt-1 text-sm sm:text-base min-h-[44px]"
+            className="mt-1 text-sm sm:text-base min-h-[44px] text-gray-900 bg-white border-gray-300 placeholder:text-gray-500"
           />
         </div>
         
@@ -727,7 +727,7 @@ const PresentationGenerator = ({
             value={audience}
             onChange={(e) => setAudience(e.target.value)}
             placeholder="e.g., Development teams"
-            className="mt-1 text-sm sm:text-base min-h-[44px]"
+            className="mt-1 text-sm sm:text-base min-h-[44px] text-gray-900 bg-white border-gray-300 placeholder:text-gray-500"
           />
         </div>
         
@@ -736,12 +736,12 @@ const PresentationGenerator = ({
             Number of Slides
           </Label>
           <Select value={slideCount.toString()} onValueChange={(value) => setSlideCount(parseInt(value))}>
-            <SelectTrigger className="mt-1 min-h-[44px] text-sm sm:text-base">
+            <SelectTrigger className="mt-1 min-h-[44px] text-sm sm:text-base text-gray-900 bg-white border-gray-300">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white border border-gray-200">
               {[3, 5, 7, 10, 15].map(count => (
-                <SelectItem key={count} value={count.toString()}>
+                <SelectItem key={count} value={count.toString()} className="text-gray-900">
                   {count} slides
                 </SelectItem>
               ))}
@@ -754,14 +754,14 @@ const PresentationGenerator = ({
             Presentation Style
           </Label>
           <Select value={presentationStyle} onValueChange={setPresentationStyle}>
-            <SelectTrigger className="mt-1 min-h-[44px] text-sm sm:text-base">
+            <SelectTrigger className="mt-1 min-h-[44px] text-sm sm:text-base text-gray-900 bg-white border-gray-300">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="professional">Professional</SelectItem>
-              <SelectItem value="creative">Creative</SelectItem>
-              <SelectItem value="minimalist">Minimalist</SelectItem>
-              <SelectItem value="engaging">Engaging</SelectItem>
+            <SelectContent className="bg-white border border-gray-200">
+              <SelectItem value="professional" className="text-gray-900">Professional</SelectItem>
+              <SelectItem value="creative" className="text-gray-900">Creative</SelectItem>
+              <SelectItem value="minimalist" className="text-gray-900">Minimalist</SelectItem>
+              <SelectItem value="engaging" className="text-gray-900">Engaging</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -968,7 +968,7 @@ const ScenarioSimulator = ({
               {/* Desktop: Use Radix UI Select */}
               <div className="hidden md:block">
                 <Select value={person1Role} onValueChange={setPerson1Role}>
-                  <SelectTrigger className="touch-manipulation min-h-[44px] text-base mt-1">
+                  <SelectTrigger className="touch-manipulation min-h-[44px] text-base mt-1 text-gray-900 bg-white border-gray-300">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent 
@@ -980,11 +980,11 @@ const ScenarioSimulator = ({
                     onEscapeKeyDown={(e) => e.preventDefault()}
                   >
                     <div className="max-h-[250px] overflow-y-auto">
-                      <SelectItem value="Scrum Master" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-emerald-50 data-[state=checked]:bg-emerald-100">Scrum Master</SelectItem>
-                      <SelectItem value="Product Owner" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-emerald-50 data-[state=checked]:bg-emerald-100">Product Owner</SelectItem>
-                      <SelectItem value="Developer" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-emerald-50 data-[state=checked]:bg-emerald-100">Developer</SelectItem>
-                      <SelectItem value="Stakeholder" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-emerald-50 data-[state=checked]:bg-emerald-100">Stakeholder</SelectItem>
-                      <SelectItem value="Team Lead" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-emerald-50 data-[state=checked]:bg-emerald-100">Team Lead</SelectItem>
+                      <SelectItem value="Scrum Master" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-emerald-50 data-[state=checked]:bg-emerald-100 text-gray-900">Scrum Master</SelectItem>
+                      <SelectItem value="Product Owner" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-emerald-50 data-[state=checked]:bg-emerald-100 text-gray-900">Product Owner</SelectItem>
+                      <SelectItem value="Developer" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-emerald-50 data-[state=checked]:bg-emerald-100 text-gray-900">Developer</SelectItem>
+                      <SelectItem value="Stakeholder" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-emerald-50 data-[state=checked]:bg-emerald-100 text-gray-900">Stakeholder</SelectItem>
+                      <SelectItem value="Team Lead" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-emerald-50 data-[state=checked]:bg-emerald-100 text-gray-900">Team Lead</SelectItem>
                     </div>
                   </SelectContent>
                 </Select>
@@ -996,7 +996,7 @@ const ScenarioSimulator = ({
                 value={person1Context}
                 onChange={(e) => setPerson1Context(e.target.value)}
                 placeholder="What is this person's perspective, goals, and concerns?"
-                className="mt-1 text-sm sm:text-base min-h-[80px]"
+                className="mt-1 text-sm sm:text-base min-h-[80px] text-gray-900 bg-white border-gray-300 placeholder:text-gray-500"
                 rows={3}
               />
             </div>
@@ -1031,7 +1031,7 @@ const ScenarioSimulator = ({
               {/* Desktop: Use Radix UI Select */}
               <div className="hidden md:block">
                 <Select value={person2Role} onValueChange={setPerson2Role}>
-                  <SelectTrigger className="touch-manipulation min-h-[44px] text-base mt-1">
+                  <SelectTrigger className="touch-manipulation min-h-[44px] text-base mt-1 text-gray-900 bg-white border-gray-300">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent 
@@ -1043,13 +1043,11 @@ const ScenarioSimulator = ({
                     onEscapeKeyDown={(e) => e.preventDefault()}
                   >
                     <div className="max-h-[250px] overflow-y-auto">
-                      <SelectItem value="Scrum Master" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-teal-50 data-[state=checked]:bg-teal-100">Scrum Master</SelectItem>
-                      <SelectItem value="Product Owner" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-teal-50 data-[state=checked]:bg-teal-100">Product Owner</SelectItem>
-                      <SelectItem value="Scrum Master" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-blue-50 data-[state=checked]:bg-blue-100">Scrum Master</SelectItem>
-                      <SelectItem value="Product Owner" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-blue-50 data-[state=checked]:bg-blue-100">Product Owner</SelectItem>
-                      <SelectItem value="Developer" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-blue-50 data-[state=checked]:bg-blue-100">Developer</SelectItem>
-                      <SelectItem value="Stakeholder" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-blue-50 data-[state=checked]:bg-blue-100">Stakeholder</SelectItem>
-                      <SelectItem value="Team Lead" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-blue-50 data-[state=checked]:bg-blue-100">Team Lead</SelectItem>
+                      <SelectItem value="Scrum Master" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-teal-50 data-[state=checked]:bg-teal-100 text-gray-900">Scrum Master</SelectItem>
+                      <SelectItem value="Product Owner" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-teal-50 data-[state=checked]:bg-teal-100 text-gray-900">Product Owner</SelectItem>
+                      <SelectItem value="Developer" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-teal-50 data-[state=checked]:bg-teal-100 text-gray-900">Developer</SelectItem>
+                      <SelectItem value="Stakeholder" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-teal-50 data-[state=checked]:bg-teal-100 text-gray-900">Stakeholder</SelectItem>
+                      <SelectItem value="Team Lead" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-teal-50 data-[state=checked]:bg-teal-100 text-gray-900">Team Lead</SelectItem>
                     </div>
                   </SelectContent>
                 </Select>
@@ -1061,7 +1059,7 @@ const ScenarioSimulator = ({
                 value={person2Context}
                 onChange={(e) => setPerson2Context(e.target.value)}
                 placeholder="What is this person's perspective, goals, and concerns?"
-                className="mt-1"
+                className="mt-1 text-gray-900 bg-white border-gray-300 placeholder:text-gray-500"
                 rows={3}
               />
             </div>
@@ -1075,7 +1073,7 @@ const ScenarioSimulator = ({
           value={scenarioContext}
           onChange={(e) => setScenarioContext(e.target.value)}
           placeholder="Describe the situation, challenge, or meeting context..."
-          className="mt-1"
+          className="mt-1 text-gray-900 bg-white border-gray-300 placeholder:text-gray-500"
           rows={3}
         />
       </div>
@@ -1228,7 +1226,7 @@ const RoleBasedAdvisor = ({
           {/* Desktop: Use Radix UI Select */}
           <div className="hidden md:block">
             <Select value={experienceLevel} onValueChange={setExperienceLevel}>
-              <SelectTrigger className="touch-manipulation min-h-[44px] text-base">
+              <SelectTrigger className="touch-manipulation min-h-[44px] text-base text-gray-900 bg-white border-gray-300">
                 <SelectValue placeholder="Select experience..." />
               </SelectTrigger>
               <SelectContent 
@@ -1240,9 +1238,9 @@ const RoleBasedAdvisor = ({
                 onEscapeKeyDown={(e) => e.preventDefault()}
               >
                 <div className="max-h-[250px] overflow-y-auto">
-                  <SelectItem value="beginner" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-orange-50 data-[state=checked]:bg-orange-100">Beginner (0-1 years)</SelectItem>
-                  <SelectItem value="intermediate" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-orange-50 data-[state=checked]:bg-orange-100">Intermediate (1-3 years)</SelectItem>
-                  <SelectItem value="advanced" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-orange-50 data-[state=checked]:bg-orange-100">Advanced (3+ years)</SelectItem>
+                  <SelectItem value="beginner" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-orange-50 data-[state=checked]:bg-orange-100 text-gray-900">Beginner (0-1 years)</SelectItem>
+                  <SelectItem value="intermediate" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-orange-50 data-[state=checked]:bg-orange-100 text-gray-900">Intermediate (1-3 years)</SelectItem>
+                  <SelectItem value="advanced" className="min-h-[44px] px-4 py-3 data-[highlighted]:bg-orange-50 data-[state=checked]:bg-orange-100 text-gray-900">Advanced (3+ years)</SelectItem>
                 </div>
               </SelectContent>
             </Select>
@@ -1256,7 +1254,7 @@ const RoleBasedAdvisor = ({
           value={specificSituation}
           onChange={(e) => setSpecificSituation(e.target.value)}
           placeholder="Provide context about your team, organization, and specific challenges..."
-          className="mt-1"
+          className="mt-1 text-gray-900 bg-white border-gray-300 placeholder:text-gray-500"
           rows={4}
         />
       </div>
@@ -1776,7 +1774,7 @@ export default function SynergizeAgile() {
                       {/* Desktop: Use Radix UI Select */}
                       <div className="hidden md:block">
                         <Select value={selectedRole} onValueChange={handleRoleChange}>
-                          <SelectTrigger className="w-full focus:ring-2 focus:ring-teal-500 focus:border-transparent touch-manipulation min-h-[44px] text-base">
+                          <SelectTrigger className="w-full focus:ring-2 focus:ring-teal-500 focus:border-transparent touch-manipulation min-h-[44px] text-base text-gray-900 bg-white border-gray-300">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent 
@@ -1792,7 +1790,7 @@ export default function SynergizeAgile() {
                                 <SelectItem 
                                   key={key} 
                                   value={key} 
-                                  className="focus:bg-teal-50 cursor-pointer min-h-[44px] px-4 py-3 data-[highlighted]:bg-teal-50 data-[state=checked]:bg-teal-100"
+                                  className="focus:bg-teal-50 cursor-pointer min-h-[44px] px-4 py-3 data-[highlighted]:bg-teal-50 data-[state=checked]:bg-teal-100 text-gray-900"
                                 >
                                   <div className="flex items-center w-full">
                                     <span className="flex-shrink-0">{role.icon}</span>
@@ -1836,7 +1834,7 @@ export default function SynergizeAgile() {
                       {/* Desktop: Use Radix UI Select */}
                       <div className="hidden md:block">
                         <Select value={selectedMode} onValueChange={handleModeChange}>
-                          <SelectTrigger className="w-full focus:ring-2 focus:ring-teal-500 focus:border-transparent touch-manipulation min-h-[44px] text-base">
+                          <SelectTrigger className="w-full focus:ring-2 focus:ring-teal-500 focus:border-transparent touch-manipulation min-h-[44px] text-base text-gray-900 bg-white border-gray-300">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent 
@@ -1852,7 +1850,7 @@ export default function SynergizeAgile() {
                                 <SelectItem 
                                   key={key} 
                                   value={key} 
-                                  className="focus:bg-teal-50 cursor-pointer min-h-[44px] px-4 py-3 data-[highlighted]:bg-teal-50 data-[state=checked]:bg-teal-100"
+                                  className="focus:bg-teal-50 cursor-pointer min-h-[44px] px-4 py-3 data-[highlighted]:bg-teal-50 data-[state=checked]:bg-teal-100 text-gray-900"
                                 >
                                   <div className="flex items-center w-full">
                                     <span className="flex-shrink-0">{mode.icon}</span>
@@ -1896,7 +1894,7 @@ export default function SynergizeAgile() {
                       {/* Desktop: Use Radix UI Select */}
                       <div className="hidden md:block">
                         <Select value={selectedProvider} onValueChange={handleProviderChange}>
-                          <SelectTrigger className="w-full focus:ring-2 focus:ring-teal-500 focus:border-transparent touch-manipulation min-h-[44px] text-base">
+                          <SelectTrigger className="w-full focus:ring-2 focus:ring-teal-500 focus:border-transparent touch-manipulation min-h-[44px] text-base text-gray-900 bg-white border-gray-300">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent 
@@ -1912,7 +1910,7 @@ export default function SynergizeAgile() {
                                 <SelectItem 
                                   key={key} 
                                   value={key} 
-                                  className="focus:bg-teal-50 cursor-pointer min-h-[44px] px-4 py-3 data-[highlighted]:bg-teal-50 data-[state=checked]:bg-teal-100"
+                                  className="focus:bg-teal-50 cursor-pointer min-h-[44px] px-4 py-3 data-[highlighted]:bg-teal-50 data-[state=checked]:bg-teal-100 text-gray-900"
                                 >
                                   <div className="flex items-center w-full">
                                     <span className="flex-shrink-0">{provider.icon}</span>
@@ -2138,7 +2136,7 @@ export default function SynergizeAgile() {
                             value={inputMessage}
                             onChange={(e) => setInputMessage(e.target.value)}
                             placeholder={`Ask your ${currentRole.name} assistant anything about Agile...`}
-                            className={`min-h-[44px] max-h-[120px] resize-none pr-12 ${isMobile ? 'text-base' : ''}`}
+                            className={`min-h-[44px] max-h-[120px] resize-none pr-12 text-gray-900 bg-white border-gray-300 placeholder:text-gray-500 ${isMobile ? 'text-base' : ''}`}
                             onKeyDown={(e) => {
                               if (e.key === 'Enter' && !e.shiftKey) {
                                 e.preventDefault();
