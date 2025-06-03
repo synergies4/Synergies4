@@ -210,14 +210,14 @@ export default function AdminDashboard() {
           {/* Stats */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
             <div>
-              <Card>
+              <Card className="bg-white border border-gray-200 shadow-sm">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-xs md:text-sm font-medium">Total Courses</CardTitle>
-                  <BookOpen className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
+                  <CardTitle className="text-xs md:text-sm font-medium text-gray-700">Total Courses</CardTitle>
+                  <BookOpen className="h-3 w-3 md:h-4 md:w-4 text-blue-600" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-xl md:text-2xl font-bold">{stats.totalCourses}</div>
-                  <p className="text-xs text-muted-foreground">
+                  <div className="text-xl md:text-2xl font-bold text-gray-900">{stats.totalCourses}</div>
+                  <p className="text-xs text-gray-600">
                     {stats.publishedCourses} published
                   </p>
                 </CardContent>
@@ -225,14 +225,14 @@ export default function AdminDashboard() {
             </div>
 
             <div>
-              <Card>
+              <Card className="bg-white border border-gray-200 shadow-sm">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-xs md:text-sm font-medium">Total Students</CardTitle>
-                  <Users className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
+                  <CardTitle className="text-xs md:text-sm font-medium text-gray-700">Total Students</CardTitle>
+                  <Users className="h-3 w-3 md:h-4 md:w-4 text-green-600" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-xl md:text-2xl font-bold">{stats.totalStudents}</div>
-                  <p className="text-xs text-muted-foreground">
+                  <div className="text-xl md:text-2xl font-bold text-gray-900">{stats.totalStudents}</div>
+                  <p className="text-xs text-gray-600">
                     {stats.totalEnrollments} enrollments
                   </p>
                 </CardContent>
@@ -240,14 +240,14 @@ export default function AdminDashboard() {
             </div>
 
             <div>
-              <Card>
+              <Card className="bg-white border border-gray-200 shadow-sm">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-xs md:text-sm font-medium">Revenue</CardTitle>
-                  <DollarSign className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
+                  <CardTitle className="text-xs md:text-sm font-medium text-gray-700">Revenue</CardTitle>
+                  <DollarSign className="h-3 w-3 md:h-4 md:w-4 text-purple-600" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-xl md:text-2xl font-bold">${stats.totalRevenue.toFixed(2)}</div>
-                  <p className="text-xs text-muted-foreground">
+                  <div className="text-xl md:text-2xl font-bold text-gray-900">${stats.totalRevenue.toFixed(2)}</div>
+                  <p className="text-xs text-gray-600">
                     Total earnings
                   </p>
                 </CardContent>
@@ -255,14 +255,14 @@ export default function AdminDashboard() {
             </div>
 
             <div>
-              <Card>
+              <Card className="bg-white border border-gray-200 shadow-sm">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-xs md:text-sm font-medium">Completion Rate</CardTitle>
-                  <TrendingUp className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
+                  <CardTitle className="text-xs md:text-sm font-medium text-gray-700">Completion Rate</CardTitle>
+                  <TrendingUp className="h-3 w-3 md:h-4 md:w-4 text-orange-600" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-xl md:text-2xl font-bold">{stats.completionRate}%</div>
-                  <p className="text-xs text-muted-foreground">
+                  <div className="text-xl md:text-2xl font-bold text-gray-900">{stats.completionRate}%</div>
+                  <p className="text-xs text-gray-600">
                     Avg quiz score: {stats.averageQuizScore}%
                   </p>
                 </CardContent>
@@ -273,18 +273,18 @@ export default function AdminDashboard() {
           {/* Quick Actions */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
             <div>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-lg transition-shadow cursor-pointer">
                 <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center text-base md:text-lg">
-                    <Plus className="h-4 w-4 md:h-5 md:w-5 mr-2" />
+                  <CardTitle className="flex items-center text-base md:text-lg text-gray-900">
+                    <Plus className="h-4 w-4 md:h-5 md:w-5 mr-2 text-blue-600" />
                     Create Course
                   </CardTitle>
-                  <CardDescription className="text-sm">
+                  <CardDescription className="text-sm text-gray-600">
                     Add a new course to your platform
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button className="w-full text-sm" asChild>
+                  <Button className="w-full text-sm bg-blue-600 hover:bg-blue-700 text-white" asChild>
                     <Link href="/admin/courses/new">
                       Create New Course
                     </Link>
@@ -294,18 +294,18 @@ export default function AdminDashboard() {
             </div>
 
             <div>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-lg transition-shadow cursor-pointer">
                 <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center text-base md:text-lg">
-                    <Users className="h-4 w-4 md:h-5 md:w-5 mr-2" />
+                  <CardTitle className="flex items-center text-base md:text-lg text-gray-900">
+                    <Users className="h-4 w-4 md:h-5 md:w-5 mr-2 text-green-600" />
                     Manage Users
                   </CardTitle>
-                  <CardDescription className="text-sm">
+                  <CardDescription className="text-sm text-gray-600">
                     View and manage user accounts
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button variant="outline" className="w-full text-sm" asChild>
+                  <Button variant="outline" className="w-full text-sm border-gray-300 text-gray-900 hover:bg-gray-50 hover:border-gray-400 bg-white" asChild>
                     <Link href="/admin/users">
                       View Users
                     </Link>
@@ -315,18 +315,18 @@ export default function AdminDashboard() {
             </div>
 
             <div>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-lg transition-shadow cursor-pointer">
                 <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center text-base md:text-lg">
-                    <BarChart3 className="h-4 w-4 md:h-5 md:w-5 mr-2" />
+                  <CardTitle className="flex items-center text-base md:text-lg text-gray-900">
+                    <BarChart3 className="h-4 w-4 md:h-5 md:w-5 mr-2 text-purple-600" />
                     Analytics
                   </CardTitle>
-                  <CardDescription className="text-sm">
+                  <CardDescription className="text-sm text-gray-600">
                     View detailed analytics and reports
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button variant="outline" className="w-full text-sm" asChild>
+                  <Button variant="outline" className="w-full text-sm border-gray-300 text-gray-900 hover:bg-gray-50 hover:border-gray-400 bg-white" asChild>
                     <Link href="/admin/analytics">
                       View Analytics
                     </Link>
@@ -339,24 +339,24 @@ export default function AdminDashboard() {
           {/* Additional Actions */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
             <div>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-lg transition-shadow cursor-pointer">
                 <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center text-base md:text-lg">
-                    <FileText className="h-4 w-4 md:h-5 md:w-5 mr-2" />
+                  <CardTitle className="flex items-center text-base md:text-lg text-gray-900">
+                    <FileText className="h-4 w-4 md:h-5 md:w-5 mr-2 text-orange-600" />
                     Blog Management
                   </CardTitle>
-                  <CardDescription className="text-sm">
+                  <CardDescription className="text-sm text-gray-600">
                     Create and manage industry insights
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-col sm:flex-row gap-2">
-                    <Button variant="outline" className="flex-1 text-sm" asChild>
+                    <Button variant="outline" className="flex-1 text-sm border-gray-300 text-gray-900 hover:bg-gray-50 hover:border-gray-400 bg-white" asChild>
                       <Link href="/admin/blog">
                         Manage Posts
                       </Link>
                     </Button>
-                    <Button className="flex-1 text-sm" asChild>
+                    <Button className="flex-1 text-sm bg-blue-600 hover:bg-blue-700 text-white" asChild>
                       <Link href="/admin/blog/new">
                         <Plus className="h-4 w-4 mr-2" />
                         New Post
@@ -368,18 +368,18 @@ export default function AdminDashboard() {
             </div>
 
             <div>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-lg transition-shadow cursor-pointer">
                 <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center text-base md:text-lg">
-                    <Settings className="h-4 w-4 md:h-5 md:w-5 mr-2" />
+                  <CardTitle className="flex items-center text-base md:text-lg text-gray-900">
+                    <Settings className="h-4 w-4 md:h-5 md:w-5 mr-2 text-gray-600" />
                     System Settings
                   </CardTitle>
-                  <CardDescription className="text-sm">
+                  <CardDescription className="text-sm text-gray-600">
                     Configure platform settings
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button variant="outline" className="w-full text-sm" asChild>
+                  <Button variant="outline" className="w-full text-sm border-gray-300 text-gray-900 hover:bg-gray-50 hover:border-gray-400 bg-white" asChild>
                     <Link href="/admin/settings">
                       Open Settings
                     </Link>
@@ -391,10 +391,10 @@ export default function AdminDashboard() {
 
           {/* Recent Courses */}
           <div>
-            <Card>
+            <Card className="bg-white border border-gray-200 shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="text-lg md:text-xl">Recent Courses</CardTitle>
-                <Button variant="outline" size="sm" asChild>
+                <CardTitle className="text-lg md:text-xl text-gray-900">Recent Courses</CardTitle>
+                <Button variant="outline" size="sm" className="border-gray-300 text-gray-900 hover:bg-gray-50 hover:border-gray-400 bg-white" asChild>
                   <Link href="/admin/courses">View All</Link>
                 </Button>
               </CardHeader>
@@ -403,23 +403,23 @@ export default function AdminDashboard() {
                   <div className="text-center py-8">
                     <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                     <p className="text-gray-600 mb-4">No courses created yet</p>
-                    <Button asChild>
+                    <Button className="bg-blue-600 hover:bg-blue-700 text-white" asChild>
                       <Link href="/admin/courses/new">Create Your First Course</Link>
                     </Button>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     {courses.slice(0, 5).map((course) => (
-                      <div key={course.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div key={course.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
                         <div className="flex-1">
                           <h3 className="font-medium text-gray-900">{course.title}</h3>
                           <div className="flex items-center gap-2 mt-1">
-                            <Badge variant="outline" className="text-xs">
+                            <Badge variant="outline" className="text-xs border-gray-300 text-gray-700 bg-white">
                               {course.category}
                             </Badge>
                             <Badge 
                               variant={course.status === 'PUBLISHED' ? 'default' : 'secondary'}
-                              className="text-xs"
+                              className={`text-xs ${course.status === 'PUBLISHED' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700'}`}
                             >
                               {course.status}
                             </Badge>

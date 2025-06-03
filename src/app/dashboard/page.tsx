@@ -177,7 +177,7 @@ export default function StudentDashboard() {
 
           {/* Stats Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
-            <Card>
+            <Card className="bg-white border border-gray-200 shadow-sm">
               <CardContent className="p-4 md:p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                   <div className="mb-2 md:mb-0">
@@ -189,7 +189,7 @@ export default function StudentDashboard() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="bg-white border border-gray-200 shadow-sm">
               <CardContent className="p-4 md:p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                   <div className="mb-2 md:mb-0">
@@ -201,7 +201,7 @@ export default function StudentDashboard() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="bg-white border border-gray-200 shadow-sm">
               <CardContent className="p-4 md:p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                   <div className="mb-2 md:mb-0">
@@ -213,7 +213,7 @@ export default function StudentDashboard() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="bg-white border border-gray-200 shadow-sm">
               <CardContent className="p-4 md:p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                   <div className="mb-2 md:mb-0">
@@ -264,7 +264,7 @@ export default function StudentDashboard() {
                       <div
                         key={enrollment.id}
                       >
-                        <Card className="h-full hover:shadow-lg transition-shadow">
+                        <Card className="h-full hover:shadow-lg transition-shadow bg-white border border-gray-200 shadow-sm">
                           <div className="aspect-video relative overflow-hidden rounded-t-lg">
                             {enrollment.course.image ? (
                               <img
@@ -278,7 +278,7 @@ export default function StudentDashboard() {
                               </div>
                             )}
                             <div className="absolute top-2 md:top-4 right-2 md:right-4">
-                              <Badge variant={enrollment.status === 'COMPLETED' ? 'default' : 'secondary'} className="text-xs">
+                              <Badge variant={enrollment.status === 'COMPLETED' ? 'default' : 'secondary'} className={`text-xs ${enrollment.status === 'COMPLETED' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700'}`}>
                                 {enrollment.status}
                               </Badge>
                             </div>

@@ -833,7 +833,7 @@ function CertificationsSection() {
               <Button 
                 size="lg" 
                 variant="outline" 
-                className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                className="border-2 border-gray-600 text-gray-900 hover:bg-gray-100 hover:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 bg-white"
                 asChild
               >
                 <Link href="/contact">
@@ -1052,7 +1052,7 @@ function CTASection() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 max-w-3xl mx-auto">
             <Button 
               size="lg" 
-              className="w-full sm:w-auto bg-gradient-to-r from-slate-600 to-gray-600 hover:from-slate-700 hover:to-gray-700 text-white px-8 py-4 rounded-xl shadow-2xl hover:shadow-slate-500/25 transition-all duration-300 hover:scale-105 border-0 group"
+              className="w-full sm:w-auto bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white px-8 py-4 rounded-xl shadow-2xl hover:shadow-teal-500/25 transition-all duration-300 hover:scale-105 border-0 group"
               asChild
             >
               <Link href="/courses">

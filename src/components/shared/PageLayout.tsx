@@ -168,12 +168,12 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                 variant="outline"
                 size="sm"
                 onClick={() => setIsSearchOpen(true)}
-                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 border-gray-300 hover:border-gray-400 px-3 py-2 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+                className="flex items-center space-x-2 text-gray-900 hover:text-teal-600 border-gray-400 hover:border-teal-500 hover:bg-teal-50 px-3 py-2 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-white"
                 aria-label="Open search"
               >
                 <Search className="w-4 h-4" />
                 <span className="hidden xl:inline">Search</span>
-                <kbd className="hidden xl:inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 ml-2">
+                <kbd className="hidden xl:inline-flex h-5 select-none items-center gap-1 rounded border bg-gray-100 px-1.5 font-mono text-[10px] font-medium opacity-100 ml-2">
                   <span className="text-xs">⌘</span>K
                 </kbd>
               </Button>
@@ -181,7 +181,7 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
               {user ? (
                 <div className="flex items-center space-x-2">
                   <Link href="/dashboard">
-                    <Button variant="outline" size="sm" className="text-gray-700 hover:text-gray-900 border-gray-300 hover:border-gray-400 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+                    <Button variant="outline" size="sm" className="text-gray-900 hover:text-teal-600 border-gray-400 hover:border-teal-500 hover:bg-teal-50 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-white">
                       Dashboard
                     </Button>
                   </Link>
@@ -189,7 +189,7 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                     variant="outline"
                     size="sm"
                     onClick={() => signOut()}
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-300 hover:border-red-400 focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-400 hover:border-red-500 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 bg-white"
                     aria-label="Sign out"
                   >
                     <LogOut className="w-4 h-4" />
@@ -198,7 +198,7 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
               ) : (
                 <>
                   <Link href="/login">
-                    <Button variant="outline" size="sm" className="text-gray-700 hover:text-gray-900 border-gray-300 hover:border-gray-400 font-medium focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+                    <Button variant="outline" size="sm" className="text-gray-900 hover:text-teal-600 border-gray-400 hover:border-teal-500 hover:bg-teal-50 font-medium focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-white">
                       Login
                     </Button>
                   </Link>
@@ -218,7 +218,7 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                 variant="outline"
                 size="sm"
                 onClick={() => setIsSearchOpen(true)}
-                className="p-2 border-gray-300 hover:border-teal-500 hover:text-teal-600 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+                className="p-2 border-gray-400 hover:border-teal-500 hover:text-teal-600 hover:bg-teal-50 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-white text-gray-900"
                 aria-label="Open search"
               >
                 <Search className="w-5 h-5" />
@@ -309,7 +309,7 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                         <UserAvatar />
                         <span className="text-gray-700 font-medium">Welcome back!</span>
                       </div>
-                      <Button variant="outline" className="w-full text-lg py-3 h-auto border-gray-300 text-gray-700 hover:text-gray-900 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2" asChild>
+                      <Button variant="outline" className="w-full text-lg py-3 h-auto border-gray-400 text-gray-900 hover:text-teal-600 hover:bg-teal-50 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-white" asChild>
                         <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} role="menuitem">
                           <BarChart3 className="w-5 h-5 mr-2" />
                           Dashboard
@@ -317,7 +317,7 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                       </Button>
                       <Button
                         variant="outline"
-                        className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 border-red-300 hover:border-red-400 text-lg py-3 h-auto focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                        className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 border-red-400 hover:border-red-500 text-lg py-3 h-auto focus:ring-2 focus:ring-red-500 focus:ring-offset-2 bg-white"
                         onClick={() => {
                           signOut();
                           setMobileMenuOpen(false);
@@ -330,7 +330,7 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      <Button variant="outline" className="w-full text-lg py-3 h-auto border-gray-300 text-gray-700 hover:text-gray-900 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2" asChild>
+                      <Button variant="outline" className="w-full text-lg py-3 h-auto border-gray-400 text-gray-900 hover:text-teal-600 hover:bg-teal-50 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-white" asChild>
                         <Link href="/login" onClick={() => setMobileMenuOpen(false)} role="menuitem">
                           <User className="w-5 h-5 mr-2" />
                           Login
@@ -364,14 +364,14 @@ function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <h3 className="text-xl font-bold mb-4 bg-gradient-to-r from-teal-400 to-emerald-400 bg-clip-text text-transparent">Synergies4</h3>
-            <p className="text-gray-400">
+            <p className="text-gray-300">
               AI-powered learning platform for professional development
             </p>
           </div>
           
           <div>
-            <h4 className="font-semibold mb-4">Courses</h4>
-            <ul className="space-y-2 text-gray-400">
+            <h4 className="font-semibold mb-4 text-white">Courses</h4>
+            <ul className="space-y-2 text-gray-300">
               <li><Link href="/courses" className="hover:text-teal-400 transition-colors">All Courses</Link></li>
               <li><Link href="/courses" className="hover:text-teal-400 transition-colors">Agile & Scrum</Link></li>
               <li><Link href="/courses" className="hover:text-teal-400 transition-colors">Leadership</Link></li>
@@ -380,8 +380,8 @@ function Footer() {
           </div>
           
           <div>
-            <h4 className="font-semibold mb-4">Company</h4>
-            <ul className="space-y-2 text-gray-400">
+            <h4 className="font-semibold mb-4 text-white">Company</h4>
+            <ul className="space-y-2 text-gray-300">
               <li><Link href="/about-us" className="hover:text-teal-400 transition-colors">About Us</Link></li>
               <li><Link href="/contact" className="hover:text-teal-400 transition-colors">Contact</Link></li>
               <li><Link href="/coaching" className="hover:text-teal-400 transition-colors">Coaching</Link></li>
@@ -390,8 +390,8 @@ function Footer() {
           </div>
           
           <div>
-            <h4 className="font-semibold mb-4">Support</h4>
-            <ul className="space-y-2 text-gray-400">
+            <h4 className="font-semibold mb-4 text-white">Support</h4>
+            <ul className="space-y-2 text-gray-300">
               <li><Link href="/contact" className="hover:text-teal-400 transition-colors">Help Center</Link></li>
               <li><Link href="/contact" className="hover:text-teal-400 transition-colors">Contact Support</Link></li>
               <li><Link href="/synergize" className="hover:text-teal-400 transition-colors">AI Assistant</Link></li>
@@ -402,12 +402,12 @@ function Footer() {
         <Separator className="my-8 bg-gray-700" />
         
         <div className="flex flex-col md:flex-row justify-between items-center">
-          <p className="text-gray-400">
+          <p className="text-gray-300">
             © 2024 Synergies4. All rights reserved.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
-            <Link href="/contact" className="text-gray-400 hover:text-teal-400 transition-colors">Privacy Policy</Link>
-            <Link href="/contact" className="text-gray-400 hover:text-teal-400 transition-colors">Terms of Service</Link>
+            <Link href="/contact" className="text-gray-300 hover:text-teal-400 transition-colors">Privacy Policy</Link>
+            <Link href="/contact" className="text-gray-300 hover:text-teal-400 transition-colors">Terms of Service</Link>
           </div>
         </div>
       </div>
