@@ -288,38 +288,38 @@ export default function NewBlogPostPage() {
                 </CardHeader>
                 <CardContent className="space-y-4 bg-white">
                   <div>
-                    <Label htmlFor="title" className="text-sm font-medium">Title *</Label>
+                    <Label htmlFor="title" className="text-sm font-medium text-gray-900">Title *</Label>
                     <Input
                       id="title"
                       value={formData.title}
                       onChange={(e) => handleTitleChange(e.target.value)}
                       placeholder="Enter post title..."
-                      className="mt-2"
+                      className="mt-2 bg-white border-gray-300 text-gray-900"
                     />
                   </div>
 
                   <div>
-                    <Label htmlFor="slug" className="text-sm font-medium">URL Slug</Label>
+                    <Label htmlFor="slug" className="text-sm font-medium text-gray-900">URL Slug</Label>
                     <Input
                       id="slug"
                       value={formData.slug}
                       onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
                       placeholder="url-friendly-slug"
-                      className="mt-2"
+                      className="mt-2 bg-white border-gray-300 text-gray-900"
                     />
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-gray-600 mt-1">
                       URL: /industry-insight/{formData.slug || 'your-post-slug'}
                     </p>
                   </div>
 
                   <div>
-                    <Label htmlFor="excerpt" className="text-sm font-medium">Excerpt</Label>
+                    <Label htmlFor="excerpt" className="text-sm font-medium text-gray-900">Excerpt</Label>
                     <Textarea
                       id="excerpt"
                       value={formData.excerpt}
                       onChange={(e) => setFormData(prev => ({ ...prev, excerpt: e.target.value }))}
                       placeholder="Brief description of the post..."
-                      className="mt-2"
+                      className="mt-2 bg-white border-gray-300 text-gray-900"
                       rows={3}
                     />
                   </div>
@@ -342,9 +342,9 @@ export default function NewBlogPostPage() {
                     value={formData.content}
                     onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
                     placeholder="Write your blog post content here... You can use HTML tags like <h2>, <p>, <strong>, <ul>, <li>, etc."
-                    className="min-h-[300px] sm:min-h-[400px]"
+                    className="min-h-[300px] sm:min-h-[400px] bg-white border-gray-300 text-gray-900"
                   />
-                  <p className="text-xs text-gray-500 mt-2">
+                  <p className="text-xs text-gray-600 mt-2">
                     Estimated reading time: {Math.ceil(formData.content.split(' ').length / 200)} minutes
                   </p>
                 </CardContent>
@@ -360,24 +360,24 @@ export default function NewBlogPostPage() {
                 </CardHeader>
                 <CardContent className="space-y-4 bg-white">
                   <div>
-                    <Label htmlFor="meta_title" className="text-sm font-medium">Meta Title</Label>
+                    <Label htmlFor="meta_title" className="text-sm font-medium text-gray-900">Meta Title</Label>
                     <Input
                       id="meta_title"
                       value={formData.meta_title}
                       onChange={(e) => setFormData(prev => ({ ...prev, meta_title: e.target.value }))}
                       placeholder="SEO title (defaults to post title)"
-                      className="mt-2"
+                      className="mt-2 bg-white border-gray-300 text-gray-900"
                     />
                   </div>
 
                   <div>
-                    <Label htmlFor="meta_description" className="text-sm font-medium">Meta Description</Label>
+                    <Label htmlFor="meta_description" className="text-sm font-medium text-gray-900">Meta Description</Label>
                     <Textarea
                       id="meta_description"
                       value={formData.meta_description}
                       onChange={(e) => setFormData(prev => ({ ...prev, meta_description: e.target.value }))}
                       placeholder="SEO description (defaults to excerpt)"
-                      className="mt-2"
+                      className="mt-2 bg-white border-gray-300 text-gray-900"
                       rows={2}
                     />
                   </div>
@@ -400,10 +400,10 @@ export default function NewBlogPostPage() {
                     value={formData.category} 
                     onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-white border-gray-300 text-gray-900">
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white border-gray-300">
                       {categories.map((category) => (
                         <SelectItem key={category.slug} value={category.name}>
                           {category.name}
@@ -424,13 +424,13 @@ export default function NewBlogPostPage() {
                 </CardHeader>
                 <CardContent className="space-y-4 bg-white">
                   <div>
-                    <Label htmlFor="image" className="text-sm font-medium">Image URL</Label>
+                    <Label htmlFor="image" className="text-sm font-medium text-gray-900">Image URL</Label>
                     <Input
                       id="image"
                       value={formData.image}
                       onChange={(e) => setFormData(prev => ({ ...prev, image: e.target.value }))}
                       placeholder="https://example.com/image.jpg"
-                      className="mt-2"
+                      className="mt-2 bg-white border-gray-300 text-gray-900"
                     />
                   </div>
                   {formData.image && (
@@ -464,7 +464,7 @@ export default function NewBlogPostPage() {
                         onChange={(e) => setTagInput(e.target.value)}
                         onKeyPress={handleKeyPress}
                         placeholder="Add a tag..."
-                        className="flex-1"
+                        className="flex-1 bg-white border-gray-300 text-gray-900"
                       />
                       <Button onClick={addTag} size="sm" variant="outline">
                         Add
@@ -473,7 +473,7 @@ export default function NewBlogPostPage() {
                     
                     {formData.tags.length > 0 && (
                       <div className="space-y-2">
-                        <Label className="text-sm font-medium">Current Tags:</Label>
+                        <Label className="text-sm font-medium text-gray-900">Current Tags:</Label>
                         <div className="flex flex-wrap gap-2">
                           {formData.tags.map((tag, index) => (
                             <Badge key={index} variant="secondary" className="flex items-center gap-1 text-xs">
@@ -502,15 +502,15 @@ export default function NewBlogPostPage() {
                 <CardContent className="bg-white">
                   <div className="space-y-3">
                     <div>
-                      <Label className="text-sm font-medium">Status</Label>
+                      <Label className="text-sm font-medium text-gray-900">Status</Label>
                       <Select 
                         value={formData.status} 
                         onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}
                       >
-                        <SelectTrigger className="mt-2">
+                        <SelectTrigger className="mt-2 bg-white border-gray-300 text-gray-900">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-white border-gray-300">
                           <SelectItem value="draft">Draft</SelectItem>
                           <SelectItem value="published">Published</SelectItem>
                         </SelectContent>
@@ -674,7 +674,7 @@ export default function NewBlogPostPage() {
                   <Button
                     onClick={generateAISuggestions}
                     disabled={aiLoading || (!formData.title && !aiContext)}
-                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                    className="w-full bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700"
                   >
                     {aiLoading ? (
                       <>

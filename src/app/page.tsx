@@ -93,13 +93,13 @@ export default function HomePage() {
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center max-w-3xl mx-auto mb-12 sm:mb-16 px-4 sm:px-0">
             <Button 
               size="lg" 
-              className="w-full sm:w-auto text-base sm:text-lg px-8 sm:px-10 py-3 sm:py-4 bg-gray-900 text-white hover:bg-gray-800 transition-all duration-300 font-semibold rounded-xl shadow-2xl hover:shadow-gray-500/25 hover:scale-105 border-0 group h-auto" 
+              className="w-full sm:w-auto text-base sm:text-lg px-8 sm:px-10 py-3 sm:py-4 bg-gradient-to-r from-gray-800 to-gray-900 text-white hover:from-gray-900 hover:to-black transition-all duration-300 font-semibold rounded-xl shadow-2xl hover:shadow-gray-500/25 hover:scale-105 border-0 group h-auto" 
               asChild
             >
               <Link href="/courses">
-                <span className="flex items-center justify-center">
+                <span className="flex items-center justify-center text-white">
                   Explore Courses
-                  <ArrowRight className="h-4 sm:h-5 w-4 sm:w-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="h-4 sm:h-5 w-4 sm:w-5 ml-2 group-hover:translate-x-1 transition-transform text-white" />
                 </span>
               </Link>
             </Button>
@@ -110,8 +110,8 @@ export default function HomePage() {
               asChild
             >
               <Link href="/synergize">
-                <span className="flex items-center justify-center">
-                  <Brain className="h-4 sm:h-5 w-4 sm:w-5 mr-2 group-hover:scale-110 transition-transform" />
+                <span className="flex items-center justify-center text-white">
+                  <Brain className="h-4 sm:h-5 w-4 sm:w-5 mr-2 group-hover:scale-110 transition-transform text-white" />
                   Try AI Assistant
                 </span>
               </Link>
@@ -178,12 +178,12 @@ export default function HomePage() {
 // Value Propositions Section
 function ValuePropositionsSection() {
   return (
-    <section className="py-24 bg-gradient-to-br from-blue-900 via-indigo-900 to-purple-900 relative overflow-hidden">
+    <section className="py-24 bg-gradient-to-br from-slate-800 via-gray-800 to-slate-900 relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-teal-400/20 to-emerald-600/20 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-br from-cyan-400/20 to-teal-600/20 rounded-full blur-3xl animate-pulse animation-delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-br from-purple-400/10 to-blue-600/10 rounded-full blur-2xl animate-pulse animation-delay-2000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-br from-gray-400/10 to-slate-600/10 rounded-full blur-2xl animate-pulse animation-delay-2000"></div>
       </div>
 
       {/* Sophisticated Grid Pattern */}
@@ -881,17 +881,17 @@ function TestimonialsSection() {
               rating: 5
             }
           ].map((testimonial, index) => (
-            <Card key={index} className="hover:shadow-xl transition-all duration-300">
-              <CardContent className="pt-6">
+            <Card key={index} className="hover:shadow-xl transition-all duration-300 bg-white border border-gray-200 shadow-sm">
+              <CardContent className="pt-6 bg-white">
                 <div className="flex mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
                     <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
                   ))}
                 </div>
-                <p className="text-gray-600 mb-4">"{testimonial.content}"</p>
+                <p className="text-gray-900 mb-4 font-medium">"{testimonial.content}"</p>
                 <div>
-                  <p className="font-semibold">{testimonial.name}</p>
-                  <p className="text-sm text-gray-500">{testimonial.role}</p>
+                  <p className="font-semibold text-gray-900">{testimonial.name}</p>
+                  <p className="text-sm text-gray-600">{testimonial.role}</p>
                 </div>
               </CardContent>
             </Card>

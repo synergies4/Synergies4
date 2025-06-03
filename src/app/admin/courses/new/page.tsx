@@ -1065,7 +1065,7 @@ export default function CreateCourse() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="title" className="text-sm font-medium">Course Title *</Label>
+                      <Label htmlFor="title" className="text-sm font-medium text-gray-900">Course Title *</Label>
                       <Button
                         type="button"
                         variant="outline"
@@ -1085,32 +1085,32 @@ export default function CreateCourse() {
                       value={formData.title}
                       onChange={(e) => handleInputChange('title', e.target.value)}
                       placeholder="Enter course title"
-                      className="mt-2"
+                      className="mt-2 bg-white border-gray-300 text-gray-900"
                     />
                   </div>
 
                   <div>
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="course_type" className="text-sm font-medium">Course Type *</Label>
+                      <Label htmlFor="course_type" className="text-sm font-medium text-gray-900">Course Type *</Label>
                     </div>
                     <Select value={formData.course_type} onValueChange={(value) => handleInputChange('course_type', value)}>
-                      <SelectTrigger className="mt-2">
+                      <SelectTrigger className="mt-2 bg-white border-gray-300 text-gray-900">
                         <SelectValue placeholder="Select course type" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-white border-gray-300">
                         <SelectItem value="digital">Digital Course (Online)</SelectItem>
                         <SelectItem value="in_person">In-Person Course</SelectItem>
                         <SelectItem value="hybrid">Hybrid (Digital + In-Person)</SelectItem>
                       </SelectContent>
                     </Select>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-gray-600 mt-1">
                       Digital courses include modules and quizzes. In-person courses focus on scheduling and logistics.
                     </p>
                   </div>
 
                   <div>
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="category" className="text-sm font-medium">Category *</Label>
+                      <Label htmlFor="category" className="text-sm font-medium text-gray-900">Category *</Label>
                       <Button
                         type="button"
                         variant="outline"
@@ -1126,10 +1126,10 @@ export default function CreateCourse() {
                       </Button>
                     </div>
                     <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
-                      <SelectTrigger className="mt-2">
+                      <SelectTrigger className="mt-2 bg-white border-gray-300 text-gray-900">
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-white border-gray-300">
                         <SelectItem value="agile">Agile & Scrum</SelectItem>
                         <SelectItem value="leadership">Leadership</SelectItem>
                         <SelectItem value="product">Product Management</SelectItem>
@@ -1143,7 +1143,7 @@ export default function CreateCourse() {
 
                 <div>
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="description" className="text-sm font-medium">Course Description *</Label>
+                    <Label htmlFor="description" className="text-sm font-medium text-gray-900">Course Description *</Label>
                     <Button
                       type="button"
                       variant="outline"
@@ -1163,14 +1163,14 @@ export default function CreateCourse() {
                     value={formData.description}
                     onChange={(e) => handleInputChange('description', e.target.value)}
                     placeholder="Describe what students will learn in this course"
-                    className="mt-2"
+                    className="mt-2 bg-white border-gray-300 text-gray-900"
                     rows={4}
                   />
                 </div>
 
                 <div>
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="shortDesc" className="text-sm font-medium">Short Description</Label>
+                    <Label htmlFor="shortDesc" className="text-sm font-medium text-gray-900">Short Description</Label>
                     <Button
                       type="button"
                       variant="outline"
@@ -1190,14 +1190,14 @@ export default function CreateCourse() {
                     value={formData.shortDesc}
                     onChange={(e) => handleInputChange('shortDesc', e.target.value)}
                     placeholder="Brief description for course cards"
-                    className="mt-2"
+                    className="mt-2 bg-white border-gray-300 text-gray-900"
                     rows={2}
                   />
                 </div>
 
                 <div>
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="image" className="text-sm font-medium">Course Image URL</Label>
+                    <Label htmlFor="image" className="text-sm font-medium text-gray-900">Course Image URL</Label>
                     <div className="flex gap-2">
                       <Button
                         type="button"
@@ -1234,7 +1234,7 @@ export default function CreateCourse() {
                     value={formData.image}
                     onChange={(e) => handleInputChange('image', e.target.value)}
                     placeholder="Enter image URL or generate with AI"
-                    className="mt-2"
+                    className="mt-2 bg-white border-gray-300 text-gray-900"
                   />
                   {formData.image && (
                     <div className="mt-2">
@@ -1257,12 +1257,12 @@ export default function CreateCourse() {
               <div className="space-y-4 sm:space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="level" className="text-sm font-medium">Level *</Label>
+                    <Label htmlFor="level" className="text-sm font-medium text-gray-900">Level *</Label>
                     <Select value={formData.level} onValueChange={(value) => handleInputChange('level', value)}>
-                      <SelectTrigger className="mt-2">
+                      <SelectTrigger className="mt-2 bg-white border-gray-300 text-gray-900">
                         <SelectValue placeholder="Select level" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-white border-gray-300">
                         <SelectItem value="BEGINNER">Beginner</SelectItem>
                         <SelectItem value="INTERMEDIATE">Intermediate</SelectItem>
                         <SelectItem value="ADVANCED">Advanced</SelectItem>
@@ -1271,39 +1271,39 @@ export default function CreateCourse() {
                   </div>
 
                   <div>
-                    <Label htmlFor="duration" className="text-sm font-medium">Duration</Label>
+                    <Label htmlFor="duration" className="text-sm font-medium text-gray-900">Duration</Label>
                     <Input
                       id="duration"
                       value={formData.duration}
                       onChange={(e) => handleInputChange('duration', e.target.value)}
                       placeholder="e.g., 4 weeks, 20 hours"
-                      className="mt-2"
+                      className="mt-2 bg-white border-gray-300 text-gray-900"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="price" className="text-sm font-medium">Price ($)</Label>
+                    <Label htmlFor="price" className="text-sm font-medium text-gray-900">Price ($)</Label>
                     <Input
                       id="price"
                       type="number"
                       value={formData.price}
                       onChange={(e) => handleInputChange('price', e.target.value)}
                       placeholder="0.00"
-                      className="mt-2"
+                      className="mt-2 bg-white border-gray-300 text-gray-900"
                       min="0"
                       step="0.01"
                     />
                   </div>
 
                   <div>
-                    <Label htmlFor="status" className="text-sm font-medium">Status</Label>
+                    <Label htmlFor="status" className="text-sm font-medium text-gray-900">Status</Label>
                     <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value)}>
-                      <SelectTrigger className="mt-2">
+                      <SelectTrigger className="mt-2 bg-white border-gray-300 text-gray-900">
                         <SelectValue placeholder="Select status" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-white border-gray-300">
                         <SelectItem value="DRAFT">Draft</SelectItem>
                         <SelectItem value="PUBLISHED">Published</SelectItem>
                       </SelectContent>
@@ -1312,13 +1312,13 @@ export default function CreateCourse() {
                 </div>
 
                 <div>
-                  <Label htmlFor="image" className="text-sm font-medium">Course Image URL</Label>
+                  <Label htmlFor="image" className="text-sm font-medium text-gray-900">Course Image URL</Label>
                   <Input
                     id="image"
                     value={formData.image}
                     onChange={(e) => handleInputChange('image', e.target.value)}
                     placeholder="https://example.com/image.jpg"
-                    className="mt-2"
+                    className="mt-2 bg-white border-gray-300 text-gray-900"
                   />
                 </div>
 
@@ -1330,7 +1330,7 @@ export default function CreateCourse() {
                     onChange={(e) => handleInputChange('featured', e.target.checked)}
                     className="rounded border-gray-300"
                   />
-                  <Label htmlFor="featured" className="text-sm font-medium">Featured Course</Label>
+                  <Label htmlFor="featured" className="text-sm font-medium text-gray-900">Featured Course</Label>
                 </div>
 
                 {/* Conditional fields for in-person courses */}
@@ -1342,70 +1342,70 @@ export default function CreateCourse() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="max_participants" className="text-sm font-medium">Max Participants</Label>
+                        <Label htmlFor="max_participants" className="text-sm font-medium text-gray-900">Max Participants</Label>
                         <Input
                           id="max_participants"
                           type="number"
                           value={formData.max_participants}
                           onChange={(e) => handleInputChange('max_participants', e.target.value)}
                           placeholder="e.g., 20"
-                          className="mt-2"
+                          className="mt-2 bg-white border-gray-300 text-gray-900"
                           min="1"
                           max="100"
                         />
-                        <p className="text-xs text-gray-500 mt-1">Maximum number of participants for this course</p>
+                        <p className="text-xs text-gray-600 mt-1">Maximum number of participants for this course</p>
                       </div>
 
                       <div>
-                        <Label htmlFor="location" className="text-sm font-medium">Location</Label>
+                        <Label htmlFor="location" className="text-sm font-medium text-gray-900">Location</Label>
                         <Input
                           id="location"
                           value={formData.location}
                           onChange={(e) => handleInputChange('location', e.target.value)}
                           placeholder="e.g., Conference Room A, Sydney Office"
-                          className="mt-2"
+                          className="mt-2 bg-white border-gray-300 text-gray-900"
                         />
-                        <p className="text-xs text-gray-500 mt-1">Where the course will be conducted</p>
+                        <p className="text-xs text-gray-600 mt-1">Where the course will be conducted</p>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="instructor_name" className="text-sm font-medium">Instructor Name</Label>
+                        <Label htmlFor="instructor_name" className="text-sm font-medium text-gray-900">Instructor Name</Label>
                         <Input
                           id="instructor_name"
                           value={formData.instructor_name}
                           onChange={(e) => handleInputChange('instructor_name', e.target.value)}
                           placeholder="e.g., Dr. Sarah Johnson"
-                          className="mt-2"
+                          className="mt-2 bg-white border-gray-300 text-gray-900"
                         />
-                        <p className="text-xs text-gray-500 mt-1">Name of the course instructor</p>
+                        <p className="text-xs text-gray-600 mt-1">Name of the course instructor</p>
                       </div>
 
                       <div>
-                        <Label htmlFor="prerequisites" className="text-sm font-medium">Prerequisites</Label>
+                        <Label htmlFor="prerequisites" className="text-sm font-medium text-gray-900">Prerequisites</Label>
                         <Input
                           id="prerequisites"
                           value={formData.prerequisites}
                           onChange={(e) => handleInputChange('prerequisites', e.target.value)}
                           placeholder="e.g., Basic project management knowledge"
-                          className="mt-2"
+                          className="mt-2 bg-white border-gray-300 text-gray-900"
                         />
-                        <p className="text-xs text-gray-500 mt-1">Any prerequisites for participants</p>
+                        <p className="text-xs text-gray-600 mt-1">Any prerequisites for participants</p>
                       </div>
                     </div>
 
                     <div>
-                      <Label htmlFor="materials_included" className="text-sm font-medium">Materials Included</Label>
+                      <Label htmlFor="materials_included" className="text-sm font-medium text-gray-900">Materials Included</Label>
                       <Textarea
                         id="materials_included"
                         value={formData.materials_included}
                         onChange={(e) => handleInputChange('materials_included', e.target.value)}
                         placeholder="e.g., Workbook, certificate, refreshments, laptop (if needed)"
-                        className="mt-2"
+                        className="mt-2 bg-white border-gray-300 text-gray-900"
                         rows={3}
                       />
-                      <p className="text-xs text-gray-500 mt-1">List all materials and resources included with the course</p>
+                      <p className="text-xs text-gray-600 mt-1">List all materials and resources included with the course</p>
                     </div>
                   </div>
                 )}
@@ -1990,7 +1990,7 @@ export default function CreateCourse() {
         <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40">
           <Button
             onClick={() => setShowAIAssistant(true)}
-            className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-full w-12 h-12 sm:w-14 sm:h-14 p-0 group"
+            className="bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-full w-12 h-12 sm:w-14 sm:h-14 p-0 group"
             size="lg"
           >
             <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 group-hover:scale-110 transition-transform duration-200" />
