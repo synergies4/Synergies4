@@ -267,14 +267,14 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
           {mobileMenuOpen && (
             <div 
               id="mobile-menu"
-              className="lg:hidden fixed bg-white shadow-2xl z-[99999] border-2 border-red-500"
+              className="lg:hidden fixed bg-white shadow-2xl z-[99999] border-t border-gray-200"
               style={{ 
-                top: '140px',
+                top: '120px',
                 left: '0',
                 right: '0',
                 bottom: '0',
                 width: '100vw',
-                height: 'calc(100vh - 140px)',
+                height: 'calc(100vh - 120px)',
                 backgroundColor: 'white'
               }}
               role="menu"
