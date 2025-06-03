@@ -108,7 +108,17 @@ export default function GlobalSearch({
   useEffect(() => {
     if (isOpen && searchInputRef.current) {
       searchInputRef.current.focus();
+      // Prevent body scroll when search is open
+      document.body.style.overflow = 'hidden';
+    } else {
+      // Restore body scroll when search is closed
+      document.body.style.overflow = 'unset';
     }
+
+    // Cleanup function to restore scroll
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
   }, [isOpen]);
 
   // Debounced search

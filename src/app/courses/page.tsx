@@ -25,6 +25,7 @@ import {
   MessageSquare,
   Award
 } from 'lucide-react';
+import Image from 'next/image';
 
 // Course interface
 interface Course {
@@ -229,7 +230,7 @@ function CourseDirectorySection() {
         <div className="max-w-4xl mx-auto mb-16">
           <div className="group relative">
             {/* Glow Effect */}
-            <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-teal-500 rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-700"></div>
+            <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-teal-500 rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-200"></div>
             
             {/* Main Container */}
             <div className="relative bg-white/80 backdrop-blur-xl rounded-2xl border border-white/50 p-8 shadow-xl">
@@ -333,21 +334,18 @@ function CourseDirectorySection() {
             {filteredCourses.map((course, index) => (
               <div key={course.id} className={`group relative animate-fade-in-up animation-delay-${index * 100}`}>
                 {/* Glow Effect */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-teal-500 rounded-2xl blur opacity-0 group-hover:opacity-25 transition duration-1000 group-hover:duration-200"></div>
+                <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-teal-500 rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-200"></div>
                 
                 {/* Main Card */}
-                <div className="relative bg-white/80 backdrop-blur-xl rounded-2xl border border-white/50 overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 group-hover:scale-[1.02] group-hover:-translate-y-2">
+                <div className="relative bg-white/80 backdrop-blur-xl rounded-2xl border border-white/50 overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-200 group-hover:scale-[1.02] group-hover:-translate-y-2">
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-8 h-full">
                     {/* Course Image */}
                     <div className="relative overflow-hidden rounded-xl flex-shrink-0">
-                      <img 
+                      <Image
                         src={course.image || getDefaultImage(course.category)}
                         alt={course.title}
-                        className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-700"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.src = getDefaultImage(course.category);
-                        }}
+                        fill
+                        className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-200"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent group-hover:from-black/40 transition-all duration-500"></div>
                       
