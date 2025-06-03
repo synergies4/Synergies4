@@ -300,7 +300,7 @@ function FocusAreasSection() {
               <div className={`absolute -inset-1 bg-gradient-to-r ${program.color} rounded-2xl blur opacity-0 group-hover:opacity-30 transition duration-1000 group-hover:duration-200`}></div>
               
               {/* Main Card */}
-              <div className={`relative bg-gradient-to-br ${program.bgGradient} backdrop-blur-xl rounded-2xl border border-white/30 p-8 h-full hover:bg-white/10 transition-all duration-500 group-hover:scale-105 group-hover:-translate-y-3 shadow-xl hover:shadow-2xl flex flex-col`}
+              <div className={`relative bg-gradient-to-br ${program.bgGradient} backdrop-blur-xl rounded-2xl border border-white/30 p-8 h-full hover:bg-white/10 transition-all duration-500 group-hover:scale-105 group-hover:-translate-y-3 shadow-xl hover:shadow-2xl flex flex-col text-white`}
                 style={{
                   backgroundColor: 'rgba(0, 0, 0, 0.4)',
                   backdropFilter: 'blur(12px)',
@@ -325,7 +325,7 @@ function FocusAreasSection() {
                       {program.features.map((feature, idx) => (
                         <div key={idx} className="flex items-center transition-colors duration-300">
                           <CheckCircle className="h-5 w-5 text-cyan-400 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform duration-300" />
-                          <span className="font-semibold text-white">{feature}</span>
+                          <span className="font-bold text-white text-base">{feature}</span>
                         </div>
                       ))}
                     </div>

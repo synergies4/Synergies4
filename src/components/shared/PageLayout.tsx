@@ -248,23 +248,24 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
           {mobileMenuOpen && (
             <div 
               id="mobile-menu"
-              className="lg:hidden fixed inset-x-0 top-0 bottom-0 bg-white shadow-xl z-[9999]"
+              className="lg:hidden fixed inset-x-0 bg-white shadow-xl z-[9999]"
               style={{ 
                 top: '140px',
-                height: 'calc(100vh - 140px)'
+                bottom: '0px',
+                minHeight: 'calc(100vh - 140px)'
               }}
               role="menu"
               aria-label="Mobile navigation menu"
             >
-              <div className="h-full overflow-y-auto">
-                <div className="px-4 py-4 space-y-4 min-h-full flex flex-col bg-white">
+              <div className="h-full overflow-y-auto bg-white">
+                <div className="px-4 py-4 space-y-4 flex flex-col bg-white" style={{ minHeight: 'calc(100vh - 140px)' }}>
                   {/* Navigation Links */}
                   <div className="space-y-1">
                     {navigationItems.map((item) => (
                       <Link
                         key={item.label}
                         href={item.href}
-                        className="block text-gray-700 hover:text-teal-600 hover:bg-teal-50 transition-colors font-semibold py-3 px-3 text-base rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-gray-50 border border-gray-200 mb-1"
+                        className="block text-gray-800 hover:text-teal-600 hover:bg-teal-50 transition-colors font-semibold py-4 px-4 text-base rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-gray-50 border border-gray-200 mb-2"
                         onClick={() => setMobileMenuOpen(false)}
                         role="menuitem"
                       >
@@ -278,7 +279,7 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                         setIsSearchOpen(true);
                         setMobileMenuOpen(false);
                       }}
-                      className="w-full flex items-center text-gray-700 hover:text-teal-600 hover:bg-teal-50 transition-colors font-semibold py-3 px-3 text-base rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-gray-50 border border-gray-200 mb-1"
+                      className="w-full flex items-center text-gray-800 hover:text-teal-600 hover:bg-teal-50 transition-colors font-semibold py-4 px-4 text-base rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-gray-50 border border-gray-200 mb-2"
                       role="menuitem"
                     >
                       <Search className="w-5 h-5 mr-3" />
@@ -287,7 +288,7 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                   </div>
                   
                   {/* Spacer to push auth section to bottom */}
-                  <div className="flex-1 min-h-4"></div>
+                  <div className="flex-1"></div>
                   
                   {/* Action Buttons */}
                   <div className="space-y-3 pb-4">
@@ -313,7 +314,7 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                   </div>
                   
                   {/* Auth Section - Always at bottom */}
-                  <div className="border-t border-gray-200 pt-4 pb-6 mt-auto bg-gray-50 rounded-lg">
+                  <div className="border-t border-gray-200 pt-4 pb-8 bg-gray-50 rounded-lg">
                     {user ? (
                       <div className="space-y-3">
                         <div className="flex items-center space-x-3 py-2 px-3 bg-white rounded-lg border border-gray-200 shadow-sm">
