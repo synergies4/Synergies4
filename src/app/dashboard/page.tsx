@@ -307,13 +307,16 @@ export default function StudentDashboard() {
 
                               <div className="space-y-2">
                                 <div className="flex justify-between text-xs md:text-sm">
-                                  <span className="text-gray-600">Progress</span>
+                                  <span className="text-gray-600 font-medium">Progress</span>
                                   <span className="font-medium text-gray-900">{enrollment.progress_percentage}%</span>
                                 </div>
-                                <div className="w-full bg-gray-200 rounded-full h-2">
+                                <div className="w-full bg-gray-300 rounded-full h-2.5 border border-gray-200">
                                   <div 
-                                    className="bg-gradient-to-r from-blue-600 to-teal-600 h-2 rounded-full transition-all duration-300 ease-out"
-                                    style={{ width: `${enrollment.progress_percentage}%` }}
+                                    className="bg-gradient-to-r from-blue-600 to-teal-600 h-2.5 rounded-full transition-all duration-300 ease-out"
+                                    style={{ 
+                                      width: `${Math.max(enrollment.progress_percentage, 2)}%`,
+                                      minWidth: enrollment.progress_percentage > 0 ? '8px' : '0px'
+                                    }}
                                   ></div>
                                 </div>
                               </div>
@@ -358,12 +361,15 @@ export default function StudentDashboard() {
                         <div key={enrollment.id} className="space-y-2">
                           <div className="flex justify-between text-xs md:text-sm">
                             <span className="font-medium truncate pr-2 text-gray-900">{enrollment.course.title}</span>
-                            <span className="flex-shrink-0 text-gray-700">{enrollment.progress_percentage}%</span>
+                            <span className="flex-shrink-0 text-gray-700 font-medium">{enrollment.progress_percentage}%</span>
                           </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div className="w-full bg-gray-300 rounded-full h-2.5 border border-gray-200">
                             <div 
-                              className="bg-gradient-to-r from-blue-600 to-teal-600 h-2 rounded-full transition-all duration-300 ease-out"
-                              style={{ width: `${enrollment.progress_percentage}%` }}
+                              className="bg-gradient-to-r from-blue-600 to-teal-600 h-2.5 rounded-full transition-all duration-300 ease-out"
+                              style={{ 
+                                width: `${Math.max(enrollment.progress_percentage, 2)}%`,
+                                minWidth: enrollment.progress_percentage > 0 ? '8px' : '0px'
+                              }}
                             ></div>
                           </div>
                         </div>

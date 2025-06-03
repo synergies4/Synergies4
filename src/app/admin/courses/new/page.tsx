@@ -2121,17 +2121,17 @@ export default function CreateCourse() {
                   <Button
                     onClick={generateAISuggestions}
                     disabled={aiLoading || (!formData.title && aiMode !== 'title')}
-                    className="w-full bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 min-h-[48px] text-base font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+                    className="w-full bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 min-h-[48px] text-base font-medium text-white shadow-lg hover:shadow-xl transition-all duration-200"
                   >
                     {aiLoading ? (
                       <>
-                        <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-spin" />
-                        Generating Suggestions...
+                        <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-spin text-white" />
+                        <span className="text-white font-medium">Generating Suggestions...</span>
                       </>
                     ) : (
                       <>
-                        <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                        Generate AI Suggestions
+                        <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-white" />
+                        <span className="text-white font-medium">Generate AI Suggestions</span>
                       </>
                     )}
                   </Button>
