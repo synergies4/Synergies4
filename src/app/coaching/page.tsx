@@ -323,9 +323,9 @@ function FocusAreasSection() {
                     <h4 className="text-lg font-bold text-white mb-4 group-hover:text-cyan-200 transition-colors duration-300">Program Includes:</h4>
                     <div className="space-y-3">
                       {program.features.map((feature, idx) => (
-                        <div key={idx} className="flex items-center text-white/90 group-hover:text-white transition-colors duration-300">
+                        <div key={idx} className="flex items-center transition-colors duration-300">
                           <CheckCircle className="h-5 w-5 text-cyan-400 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform duration-300" />
-                          <span className="font-medium">{feature}</span>
+                          <span className="font-semibold text-white">{feature}</span>
                         </div>
                       ))}
                     </div>
