@@ -87,24 +87,6 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
       document.addEventListener('keydown', handleKeyDown);
       // Prevent body scroll when mobile menu is open
       document.body.style.overflow = 'hidden';
-      
-      // Calculate actual header height dynamically
-      const calculateHeaderHeight = () => {
-        const banner = document.querySelector('[role="banner"]') as HTMLElement;
-        const nav = document.querySelector('[role="navigation"]') as HTMLElement;
-        if (banner && nav) {
-          const totalHeight = banner.offsetHeight + nav.offsetHeight;
-          document.documentElement.style.setProperty('--header-height', `${totalHeight}px`);
-        }
-      };
-      
-      // Calculate on mount and resize
-      calculateHeaderHeight();
-      window.addEventListener('resize', calculateHeaderHeight);
-      
-      return () => {
-        window.removeEventListener('resize', calculateHeaderHeight);
-      };
     } else {
       document.body.style.overflow = 'unset';
     }
@@ -268,9 +250,8 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
               id="mobile-menu"
               className="lg:hidden fixed inset-x-0 top-0 bg-white shadow-xl z-[9999]"
               style={{ 
-                top: 'var(--header-height, 140px)',
-                height: 'calc(100vh - var(--header-height, 140px))',
-                '--header-height': '140px'
+                top: '140px',
+                height: 'calc(100vh - 140px)'
               }}
               role="menu"
               aria-label="Mobile navigation menu"
