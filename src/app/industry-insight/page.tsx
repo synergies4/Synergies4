@@ -46,6 +46,7 @@ interface BlogPost {
   featured_image?: string;
   read_time?: number;
   views?: number;
+  slug: string;
 }
 
 export default function IndustryInsight() {
@@ -281,11 +282,13 @@ function BlogPostsSection() {
                   {/* Read More Button */}
                   <Button 
                     asChild 
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 mt-auto"
+                    className="w-full bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 mt-auto"
                   >
-                    <Link href={`/blog/${createPostSlug(post.title)}`}>
-                      Read More
-                      <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    <Link href={`/industry-insight/${post.slug}`}>
+                      <span className="flex items-center justify-center text-white font-semibold">
+                        Read More
+                        <ArrowRight className="h-4 w-4 ml-2" />
+                      </span>
                     </Link>
                   </Button>
                 </div>
@@ -319,7 +322,7 @@ function NewsletterSection() {
   };
 
   return (
-    <section id="newsletter" className="py-20 bg-gradient-to-r from-blue-600 to-purple-600 text-white relative overflow-hidden">
+    <section id="newsletter" className="py-20 bg-gradient-to-r from-teal-600 to-blue-600 text-white relative overflow-hidden">
       {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-20 right-10 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>

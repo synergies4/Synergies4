@@ -516,11 +516,11 @@ function CTASection() {
         <div className="flex flex-col sm:flex-row gap-6 justify-center items-center max-w-2xl mx-auto">
           <Button 
             size="lg" 
-            className="w-full sm:w-auto text-lg px-10 py-4 bg-white text-purple-600 hover:bg-gray-100 shadow-2xl hover:shadow-white/25 transition-all duration-300 hover:scale-105 font-semibold rounded-xl border-0 group"
+            className="w-full sm:w-auto text-lg px-10 py-4 bg-white text-teal-600 hover:bg-gray-100 shadow-2xl hover:shadow-white/25 transition-all duration-300 hover:scale-105 font-semibold rounded-xl border-0 group"
             asChild
           >
             <Link href="/contact">
-              <span className="flex items-center justify-center">
+              <span className="flex items-center justify-center text-teal-600 font-semibold group-hover:text-teal-700">
                 Schedule Consultation
                 <MessageSquare className="h-5 w-5 ml-2 group-hover:scale-110 transition-transform" />
               </span>
@@ -529,11 +529,11 @@ function CTASection() {
           
           <Button 
             size="lg" 
-            className="w-full sm:w-auto text-lg px-10 py-4 bg-gradient-to-r from-white/20 to-white/10 border-2 border-white text-white hover:bg-white hover:text-purple-600 shadow-2xl hover:shadow-white/25 transition-all duration-300 hover:scale-105 font-semibold rounded-xl backdrop-blur-sm group"
+            className="w-full sm:w-auto text-lg px-10 py-4 bg-gradient-to-r from-white/20 to-white/10 border-2 border-white text-white hover:bg-white hover:text-teal-600 shadow-2xl hover:shadow-white/25 transition-all duration-300 hover:scale-105 font-semibold rounded-xl backdrop-blur-sm group"
             asChild
           >
             <Link href="/courses">
-              <span className="flex items-center justify-center">
+              <span className="flex items-center justify-center text-white font-semibold group-hover:text-teal-600">
                 <BookOpen className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
                 Explore Our Programs
               </span>
@@ -550,11 +550,11 @@ function CTASection() {
             { number: "30+", label: "Countries", icon: <Globe className="w-5 h-5" /> }
           ].map((stat, index) => (
             <div key={index} className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 hover:bg-white/10 transition-all duration-300 hover:scale-105 group">
-              <div className="flex items-center justify-center mb-3 text-purple-300 group-hover:text-white transition-colors">
+              <div className="flex items-center justify-center mb-3 text-teal-300 group-hover:text-white transition-colors">
                 {stat.icon}
               </div>
               <div className="text-2xl md:text-3xl font-bold text-white mb-1 group-hover:scale-110 transition-transform">{stat.number}</div>
-              <div className="text-sm text-purple-200/80 uppercase tracking-wide font-medium group-hover:text-white/90 transition-colors">{stat.label}</div>
+              <div className="text-sm text-teal-200/80 uppercase tracking-wide font-medium group-hover:text-white/90 transition-colors">{stat.label}</div>
             </div>
           ))}
         </div>

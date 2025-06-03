@@ -138,10 +138,10 @@ function CourseDirectorySection() {
 
   const getLevelColor = (level: string) => {
     switch (level?.toLowerCase()) {
-      case 'beginner': return 'from-emerald-500 to-green-600';
-      case 'intermediate': return 'from-blue-500 to-indigo-600';
-      case 'advanced': return 'from-purple-500 to-pink-600';
-      default: return 'from-gray-500 to-slate-600';
+      case 'beginner': return 'from-green-500 to-emerald-600';
+      case 'intermediate': return 'from-yellow-500 to-orange-600';
+      case 'advanced': return 'from-teal-500 to-blue-600';
+      default: return 'from-teal-500 to-blue-600';
     }
   };
 
@@ -160,9 +160,9 @@ function CourseDirectorySection() {
     <section id="course-directory" className="py-24 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
       {/* Enhanced Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-blue-400/20 to-purple-600/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-br from-cyan-400/20 to-blue-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-br from-purple-400/10 to-pink-600/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-blue-400/20 to-teal-600/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-br from-teal-300/15 to-cyan-300/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-br from-teal-400/10 to-blue-600/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
       </div>
 
       {/* Sophisticated Grid Pattern */}
@@ -205,7 +205,7 @@ function CourseDirectorySection() {
         <div className="max-w-4xl mx-auto mb-16">
           <div className="group relative">
             {/* Glow Effect */}
-            <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-purple-500 rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-700"></div>
+            <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-teal-500 rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-700"></div>
             
             {/* Main Container */}
             <div className="relative bg-white/80 backdrop-blur-xl rounded-2xl border border-white/50 p-8 shadow-xl">
@@ -309,7 +309,7 @@ function CourseDirectorySection() {
             {filteredCourses.map((course, index) => (
               <div key={course.id} className={`group relative animate-fade-in-up animation-delay-${index * 100}`}>
                 {/* Glow Effect */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-purple-500 rounded-2xl blur opacity-0 group-hover:opacity-25 transition duration-1000 group-hover:duration-200"></div>
+                <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-teal-500 rounded-2xl blur opacity-0 group-hover:opacity-25 transition duration-1000 group-hover:duration-200"></div>
                 
                 {/* Main Card */}
                 <div className="relative bg-white/80 backdrop-blur-xl rounded-2xl border border-white/50 overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 group-hover:scale-[1.02] group-hover:-translate-y-2">
@@ -383,16 +383,16 @@ function CourseDirectorySection() {
                       
                       {/* Course Actions - Always at bottom */}
                       <div className="flex items-center justify-between pt-6 border-t border-gray-200 mt-auto">
-                        <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        <div className="text-3xl font-bold bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent">
                           {formatPrice(course.price)}
                         </div>
                         <Button 
-                          asChild 
-                          className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 px-8 py-3 text-lg rounded-xl border-0 group"
+                          asChild
+                          className="bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 px-8 py-3 text-lg rounded-xl border-0 group"
                         >
                           <Link href={`/courses/${createCourseSlug(course.title)}`}>
-                            <span className="flex items-center justify-center">
-                              Learn More
+                            <span className="flex items-center justify-center text-white font-semibold">
+                              Enroll Now
                               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                             </span>
                           </Link>
@@ -474,22 +474,22 @@ function BrochureSection() {
               Get Your Course
             </span>
             <br />
-            <span className="bg-gradient-to-r from-cyan-300 via-blue-300 to-purple-300 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-cyan-300 via-blue-300 to-teal-300 bg-clip-text text-transparent">
               Brochure
             </span>
           </h2>
           
-          <p className="text-xl md:text-2xl text-blue-200/90 max-w-4xl mx-auto leading-relaxed font-light">
-            Download our comprehensive course catalog and discover the 
-            <span className="text-cyan-300 font-medium"> perfect learning path </span>
-            for your career goals and aspirations.
+          <p className="text-xl md:text-2xl text-gray-200/90 max-w-4xl mx-auto leading-relaxed font-light mb-12">
+            Join a community of professionals shaping the future of 
+            <span className="text-cyan-300 font-medium"> agile leadership </span>
+            and organizational excellence
           </p>
         </div>
 
         <div className="max-w-4xl mx-auto">
           <div className="group relative">
             {/* Glow Effect */}
-            <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl blur opacity-0 group-hover:opacity-30 transition duration-1000 group-hover:duration-200"></div>
+            <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-teal-500 rounded-2xl blur opacity-0 group-hover:opacity-30 transition duration-1000 group-hover:duration-200"></div>
             
             {/* Main Card */}
             <div className="relative bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl overflow-hidden">

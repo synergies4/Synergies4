@@ -127,8 +127,8 @@ function WhyChooseSection() {
               icon: <Target className="h-8 w-8" />,
               title: "Goal-Oriented Approach",
               description: "Set clear, measurable objectives and receive personalized strategies to achieve your career aspirations and professional goals.",
-              gradient: "from-purple-500 to-pink-400",
-              bgGradient: "from-purple-50 to-pink-50"
+              gradient: "from-teal-500 to-blue-400",
+              bgGradient: "from-teal-50 to-blue-50"
             },
             {
               icon: <Users className="h-8 w-8" />,
@@ -148,8 +148,8 @@ function WhyChooseSection() {
               icon: <CheckCircle className="h-8 w-8" />,
               title: "Measurable Results",
               description: "Track your progress with data-driven insights and celebrate meaningful achievements along your professional development journey.",
-              gradient: "from-indigo-500 to-purple-400",
-              bgGradient: "from-indigo-50 to-purple-50"
+              gradient: "from-blue-500 to-teal-400",
+              bgGradient: "from-blue-50 to-teal-50"
             },
             {
               icon: <Award className="h-8 w-8" />,
@@ -217,7 +217,7 @@ function WhyChooseSection() {
 // Focus Areas Section
 function FocusAreasSection() {
   return (
-    <section id="coaching-programs" className="py-24 bg-gradient-to-br from-blue-900 via-indigo-900 to-purple-900 relative overflow-hidden">
+    <section id="coaching-programs" className="py-24 bg-gradient-to-br from-blue-900 via-teal-900 to-cyan-900 relative overflow-hidden">
       {/* Enhanced Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-blue-500/20 to-cyan-600/20 rounded-full blur-3xl animate-pulse"></div>
@@ -283,6 +283,16 @@ function FocusAreasSection() {
               features: ["Mental Fitness Training", "Stress Management", "Peak Performance", "Leadership Presence"],
               color: "from-teal-400 to-cyan-600",
               bgGradient: "from-teal-900/20 to-cyan-900/20"
+            },
+            {
+              title: "Executive Leadership Transformation",
+              description: "Accelerate your journey to senior leadership with comprehensive executive coaching and strategic thinking development.",
+              features: ["1:1 Executive Coaching", "Strategic Planning", "Board Presentation Skills", "Crisis Leadership"],
+              duration: "6 months",
+              price: 8500,
+              level: "Executive",
+              color: "from-teal-500 to-blue-400",
+              bgGradient: "from-teal-50 to-blue-50"
             }
           ].map((program, index) => (
             <div key={index} className={`group relative animate-fade-in-up animation-delay-${index * 200}`}>
@@ -422,8 +432,8 @@ function TestimonialsSection() {
               content: "Positive Intelligence coaching helped me develop the mental fitness needed to lead through challenging times with clarity, resilience, and unwavering confidence.",
               rating: 5,
               image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
-              gradient: "from-purple-500 to-pink-400",
-              bgGradient: "from-purple-900/20 to-pink-900/20"
+              gradient: "from-teal-500 to-blue-400",
+              bgGradient: "from-teal-900/20 to-blue-900/20"
             }
           ].map((testimonial, index) => (
             <div key={index} className={`group relative animate-fade-in-up animation-delay-${index * 200}`}>

@@ -112,47 +112,41 @@ export default function HeroSection({
               <Button
                 onClick={primaryCTA.onClick}
                 size="lg"
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105"
+                className="bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 text-white px-8 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105"
               >
-                {primaryCTA.text}
+                <span className="text-white font-semibold">{primaryCTA.text}</span>
               </Button>
             ) : (
               <Button
                 asChild
                 size="lg"
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105"
+                className="bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 text-white px-8 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105"
               >
                 <Link href={primaryCTA.href}>
-                  {primaryCTA.text}
+                  <span className="text-white font-semibold">{primaryCTA.text}</span>
                 </Link>
               </Button>
             )
           )}
 
           {secondaryCTA && (
-            secondaryCTA.onClick ? (
-              <Button
-                onClick={secondaryCTA.onClick}
-                variant="outline"
-                size="lg"
-                className="border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105"
-              >
-                {secondaryCTA.text}
-                {secondaryCTA.icon && <span className="ml-2">{secondaryCTA.icon}</span>}
-              </Button>
-            ) : (
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105"
-              >
-                <Link href={secondaryCTA.href}>
+            <Button
+              asChild
+              variant="outline"
+              size="lg"
+              className="border-2 border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white px-8 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105 bg-white"
+            >
+              <Link href={secondaryCTA.href} className="flex items-center">
+                <span className="text-gray-900 hover:text-white font-semibold">
                   {secondaryCTA.text}
-                  {secondaryCTA.icon && <span className="ml-2">{secondaryCTA.icon}</span>}
-                </Link>
-              </Button>
-            )
+                </span>
+                {secondaryCTA.icon && (
+                  <span className="ml-2">
+                    {secondaryCTA.icon}
+                  </span>
+                )}
+              </Link>
+            </Button>
           )}
         </div>
       </div>

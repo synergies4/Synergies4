@@ -103,7 +103,7 @@ function MissionSection() {
               Sharper Minds.
             </span>
             <br />
-            <span className="bg-gradient-to-r from-purple-300 via-pink-300 to-orange-300 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-teal-300 via-blue-300 to-cyan-300 bg-clip-text text-transparent">
               Stronger Teams.
             </span>
           </h2>
