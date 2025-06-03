@@ -248,10 +248,9 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
           {mobileMenuOpen && (
             <div 
               id="mobile-menu"
-              className="lg:hidden fixed inset-x-0 top-0 bg-white shadow-xl z-[9999]"
+              className="lg:hidden fixed inset-0 bg-white shadow-xl z-[9999]"
               style={{ 
-                top: '140px',
-                height: 'calc(100vh - 140px)'
+                top: '140px'
               }}
               role="menu"
               aria-label="Mobile navigation menu"
