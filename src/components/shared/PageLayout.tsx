@@ -371,30 +371,30 @@ function Footer() {
           
           <div>
             <h4 className="font-semibold mb-4 text-white">Courses</h4>
-            <ul className="space-y-2 text-white">
-              <li><Link href="/courses" className="hover:text-teal-400 transition-colors">All Courses</Link></li>
-              <li><Link href="/courses" className="hover:text-teal-400 transition-colors">Agile & Scrum</Link></li>
-              <li><Link href="/courses" className="hover:text-teal-400 transition-colors">Leadership</Link></li>
-              <li><Link href="/courses" className="hover:text-teal-400 transition-colors">Product Management</Link></li>
+            <ul className="space-y-2">
+              <li><Link href="/courses" className="text-white hover:text-teal-400 transition-colors">All Courses</Link></li>
+              <li><Link href="/courses" className="text-white hover:text-teal-400 transition-colors">Agile & Scrum</Link></li>
+              <li><Link href="/courses" className="text-white hover:text-teal-400 transition-colors">Leadership</Link></li>
+              <li><Link href="/courses" className="text-white hover:text-teal-400 transition-colors">Product Management</Link></li>
             </ul>
           </div>
           
           <div>
             <h4 className="font-semibold mb-4 text-white">Company</h4>
-            <ul className="space-y-2 text-white">
-              <li><Link href="/about-us" className="hover:text-teal-400 transition-colors">About Us</Link></li>
-              <li><Link href="/contact" className="hover:text-teal-400 transition-colors">Contact</Link></li>
-              <li><Link href="/coaching" className="hover:text-teal-400 transition-colors">Coaching</Link></li>
-              <li><Link href="/consulting" className="hover:text-teal-400 transition-colors">Consulting</Link></li>
+            <ul className="space-y-2">
+              <li><Link href="/about-us" className="text-white hover:text-teal-400 transition-colors">About Us</Link></li>
+              <li><Link href="/contact" className="text-white hover:text-teal-400 transition-colors">Contact</Link></li>
+              <li><Link href="/coaching" className="text-white hover:text-teal-400 transition-colors">Coaching</Link></li>
+              <li><Link href="/consulting" className="text-white hover:text-teal-400 transition-colors">Consulting</Link></li>
             </ul>
           </div>
           
           <div>
             <h4 className="font-semibold mb-4 text-white">Support</h4>
-            <ul className="space-y-2 text-white">
-              <li><Link href="/contact" className="hover:text-teal-400 transition-colors">Help Center</Link></li>
-              <li><Link href="/contact" className="hover:text-teal-400 transition-colors">Contact Support</Link></li>
-              <li><Link href="/synergize" className="hover:text-teal-400 transition-colors">AI Assistant</Link></li>
+            <ul className="space-y-2">
+              <li><Link href="/contact" className="text-white hover:text-teal-400 transition-colors">Help Center</Link></li>
+              <li><Link href="/contact" className="text-white hover:text-teal-400 transition-colors">Contact Support</Link></li>
+              <li><Link href="/synergize" className="text-white hover:text-teal-400 transition-colors">AI Assistant</Link></li>
             </ul>
           </div>
         </div>
