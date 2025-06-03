@@ -241,7 +241,7 @@ function FocusAreasSection() {
         <div className="text-center mb-20">
           <div className="inline-flex items-center px-6 py-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 mb-8">
             <Compass className="w-5 h-5 text-teal-300 mr-3" />
-            <span className="text-white/90 font-medium">Coaching Focus Areas</span>
+            <span className="text-white font-semibold">Coaching Focus Areas</span>
           </div>
           
           <h2 className="text-4xl md:text-6xl font-bold mb-8 leading-tight">
@@ -254,7 +254,7 @@ function FocusAreasSection() {
             </span>
           </h2>
           
-          <p className="text-xl md:text-2xl text-blue-200/90 max-w-4xl mx-auto leading-relaxed font-light">
+          <p className="text-xl md:text-2xl text-white max-w-4xl mx-auto leading-relaxed font-light">
             Choose from our targeted coaching programs designed to address 
             <span className="text-cyan-300 font-medium"> specific professional development needs </span>
             and accelerate your career growth.
@@ -268,21 +268,21 @@ function FocusAreasSection() {
               description: "Master the art of leading AI transformation initiatives and building AI-ready teams that thrive in the digital age",
               features: ["AI Strategy Development", "Change Management", "Team Transformation", "Technology Adoption"],
               color: "from-blue-400 to-blue-600",
-              bgGradient: "from-blue-900/20 to-cyan-900/20"
+              bgGradient: "from-blue-900/40 to-cyan-900/40"
             },
             {
               title: "Agile Excellence",
               description: "Become a certified Agile leader with deep expertise in modern methodologies and team facilitation",
               features: ["Scrum Mastery", "Kanban Implementation", "Team Facilitation", "Continuous Improvement"],
               color: "from-green-400 to-green-600",
-              bgGradient: "from-green-900/20 to-emerald-900/20"
+              bgGradient: "from-green-900/40 to-emerald-900/40"
             },
             {
               title: "Positive Intelligence (PQ®)",
               description: "Develop mental fitness and emotional intelligence for peak performance and sustainable leadership",
               features: ["Mental Fitness Training", "Stress Management", "Peak Performance", "Leadership Presence"],
               color: "from-teal-400 to-cyan-600",
-              bgGradient: "from-teal-900/20 to-cyan-900/20"
+              bgGradient: "from-teal-900/40 to-cyan-900/40"
             },
             {
               title: "Executive Leadership Transformation",
@@ -292,7 +292,7 @@ function FocusAreasSection() {
               price: 8500,
               level: "Executive",
               color: "from-teal-500 to-blue-400",
-              bgGradient: "from-teal-50 to-blue-50"
+              bgGradient: "from-teal-900/40 to-blue-900/40"
             }
           ].map((program, index) => (
             <div key={index} className={`group relative animate-fade-in-up animation-delay-${index * 200}`}>
@@ -300,7 +300,13 @@ function FocusAreasSection() {
               <div className={`absolute -inset-1 bg-gradient-to-r ${program.color} rounded-2xl blur opacity-0 group-hover:opacity-30 transition duration-1000 group-hover:duration-200`}></div>
               
               {/* Main Card */}
-              <div className={`relative bg-gradient-to-br ${program.bgGradient} backdrop-blur-xl rounded-2xl border border-white/20 p-8 h-full hover:bg-white/5 transition-all duration-500 group-hover:scale-105 group-hover:-translate-y-3 shadow-xl hover:shadow-2xl flex flex-col`}>
+              <div className={`relative bg-gradient-to-br ${program.bgGradient} backdrop-blur-xl rounded-2xl border border-white/30 p-8 h-full hover:bg-white/10 transition-all duration-500 group-hover:scale-105 group-hover:-translate-y-3 shadow-xl hover:shadow-2xl flex flex-col`}
+                style={{
+                  backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                  backdropFilter: 'blur(12px)',
+                  WebkitBackdropFilter: 'blur(12px)'
+                }}
+              >
                 {/* Top Accent */}
                 <div className={`h-2 bg-gradient-to-r ${program.color} rounded-t-xl -mt-8 -mx-8 mb-6`}></div>
                 
@@ -309,17 +315,17 @@ function FocusAreasSection() {
                   <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-cyan-200 transition-colors duration-300 min-h-[3rem] flex items-center">
                     {program.title}
                   </h3>
-                  <p className="text-blue-200/80 leading-relaxed mb-6 min-h-[4.5rem] group-hover:text-white/90 transition-colors duration-300">
+                  <p className="text-white/90 leading-relaxed mb-6 min-h-[4.5rem] group-hover:text-white transition-colors duration-300 font-medium">
                     {program.description}
                   </p>
 
                   <div className="mb-8">
-                    <h4 className="text-lg font-semibold text-blue-200 mb-4 group-hover:text-white transition-colors duration-300">Program Includes:</h4>
+                    <h4 className="text-lg font-bold text-white mb-4 group-hover:text-cyan-200 transition-colors duration-300">Program Includes:</h4>
                     <div className="space-y-3">
                       {program.features.map((feature, idx) => (
-                        <div key={idx} className="flex items-center text-blue-300/80 group-hover:text-white/90 transition-colors duration-300">
+                        <div key={idx} className="flex items-center text-white/90 group-hover:text-white transition-colors duration-300">
                           <CheckCircle className="h-5 w-5 text-cyan-400 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform duration-300" />
-                          <span>{feature}</span>
+                          <span className="font-medium">{feature}</span>
                         </div>
                       ))}
                     </div>
@@ -329,11 +335,11 @@ function FocusAreasSection() {
                 {/* CTA Button */}
                 <div className="mt-auto">
                   <Button 
-                    className={`w-full bg-gradient-to-r ${program.color} hover:shadow-lg text-white shadow-md transition-all duration-300 group-hover:scale-105 border-0 rounded-xl`}
+                    className={`w-full bg-gradient-to-r ${program.color} hover:shadow-lg text-white font-semibold shadow-md transition-all duration-300 group-hover:scale-105 border-0 rounded-xl`}
                     asChild
                   >
                     <Link href="/contact">
-                      <span className="flex items-center justify-center">
+                      <span className="flex items-center justify-center font-semibold">
                         Get Started
                         <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
                       </span>
