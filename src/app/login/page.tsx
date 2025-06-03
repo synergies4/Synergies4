@@ -80,24 +80,24 @@ export default function Login() {
   // Show loading if auth is loading, or user exists but no profile yet
   if (loading || (user && !userProfile)) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center p-4">
         <div className="text-center">
-          <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-            <Sparkles className="h-8 w-8 text-teal-400 animate-spin" />
+          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <Sparkles className="h-8 w-8 text-blue-600 animate-spin" />
           </div>
-          <p className="text-white text-lg font-medium">Loading your experience...</p>
+          <p className="text-gray-700 text-lg font-medium">Loading your experience...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-32 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-1/2 -left-32 w-80 h-80 bg-teal-300/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute -bottom-40 right-1/3 w-80 h-80 bg-emerald-300/20 rounded-full blur-3xl animate-pulse delay-500"></div>
+        <div className="absolute -top-40 -right-32 w-80 h-80 bg-blue-100/30 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-1/2 -left-32 w-80 h-80 bg-teal-100/40 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute -bottom-40 right-1/3 w-80 h-80 bg-emerald-100/30 rounded-full blur-3xl animate-pulse delay-500"></div>
       </div>
 
       <div className="relative z-10 min-h-screen flex">
@@ -105,49 +105,49 @@ export default function Login() {
         <div className="hidden lg:flex lg:w-1/2 flex-col justify-center px-12 xl:px-16">
           <div className="max-w-md">
             <div className="flex items-center space-x-3 mb-8">
-              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                <Sparkles className="w-6 h-6 text-teal-400" />
+              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                <Sparkles className="w-6 h-6 text-blue-600" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-white">Synergies4</h1>
-                <p className="text-gray-100 text-sm">AI-Powered Learning Platform</p>
+                <h1 className="text-3xl font-bold text-gray-900">Synergies4</h1>
+                <p className="text-gray-600 text-sm">AI-Powered Learning Platform</p>
               </div>
             </div>
             
-            <h2 className="text-4xl font-bold text-white mb-6 leading-tight">
-              Accelerate Your <span className="text-teal-300">Agile Journey</span> with AI
+            <h2 className="text-4xl font-bold text-gray-900 mb-6 leading-tight">
+              Accelerate Your <span className="text-blue-600">Agile Journey</span> with AI
             </h2>
             
-            <p className="text-gray-100 text-lg mb-8 leading-relaxed">
+            <p className="text-gray-700 text-lg mb-8 leading-relaxed">
               Join thousands of professionals mastering Agile methodologies through personalized, AI-driven learning experiences.
             </p>
 
             {/* Feature Stats */}
             <div className="grid grid-cols-2 gap-6 mb-8">
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+              <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 border border-gray-200">
                 <div className="flex items-center space-x-2 mb-2">
-                  <Users className="w-5 h-5 text-teal-300" />
-                  <span className="text-white font-semibold">10,000+</span>
+                  <Users className="w-5 h-5 text-blue-600" />
+                  <span className="text-gray-900 font-semibold">10,000+</span>
                 </div>
-                <p className="text-gray-100 text-sm">Active Learners</p>
+                <p className="text-gray-600 text-sm">Active Learners</p>
               </div>
               
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+              <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 border border-gray-200">
                 <div className="flex items-center space-x-2 mb-2">
-                  <Award className="w-5 h-5 text-emerald-300" />
-                  <span className="text-white font-semibold">95%</span>
+                  <Award className="w-5 h-5 text-emerald-600" />
+                  <span className="text-gray-900 font-semibold">95%</span>
                 </div>
-                <p className="text-gray-100 text-sm">Success Rate</p>
+                <p className="text-gray-600 text-sm">Success Rate</p>
               </div>
             </div>
 
             {/* Trust Indicators */}
             <div className="flex items-center space-x-4">
-              <Badge className="bg-white/20 text-white border-white/30">
+              <Badge className="bg-blue-100 text-blue-700 border-blue-200">
                 <Star className="w-3 h-3 mr-1" />
                 4.9/5 Rating
               </Badge>
-              <Badge className="bg-white/20 text-white border-white/30">
+              <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200">
                 <TrendingUp className="w-3 h-3 mr-1" />
                 Industry Leading
               </Badge>
@@ -162,12 +162,12 @@ export default function Login() {
             <div className="lg:hidden text-center mb-8">
               <Link href="/" className="inline-block">
                 <div className="flex items-center justify-center space-x-3">
-                  <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                    <Sparkles className="w-6 h-6 text-teal-400" />
+                  <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                    <Sparkles className="w-6 h-6 text-blue-600" />
                   </div>
                   <div>
-                    <h1 className="text-2xl font-bold text-white">Synergies4</h1>
-                    <p className="text-gray-100 text-xs">AI-Powered Learning</p>
+                    <h1 className="text-2xl font-bold text-gray-900">Synergies4</h1>
+                    <p className="text-gray-600 text-xs">AI-Powered Learning</p>
                   </div>
                 </div>
               </Link>
@@ -227,6 +227,14 @@ export default function Login() {
                           <Eye className="h-4 w-4 text-gray-400" />
                         )}
                       </Button>
+                    </div>
+                    <div className="text-right">
+                      <Link
+                        href="/forgot-password"
+                        className="text-sm font-medium text-teal-600 hover:text-teal-700 transition-colors"
+                      >
+                        Forgot password?
+                      </Link>
                     </div>
                   </div>
 

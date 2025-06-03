@@ -73,27 +73,31 @@ export default function Signup() {
     }
 
     try {
-      const supabase = createClient();
-      const { data, error } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
-            name: formData.name,
-          }
-        }
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        }),
       });
 
-      if (error) {
-        setError(error.message);
-      } else if (data.user) {
-        setSuccess(true);
-        setTimeout(() => {
-          router.push('/login');
-        }, 2000);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create account');
       }
+
+      setSuccess(true);
+      setTimeout(() => {
+        router.push('/login');
+      }, 3000);
     } catch (error) {
-      setError('An error occurred. Please try again.');
+      console.error('Signup error:', error);
+      setError(error instanceof Error ? error.message : 'An error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -119,12 +123,12 @@ export default function Signup() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 relative overflow-hidden">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 relative overflow-hidden">
         {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-32 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute top-1/2 -left-32 w-80 h-80 bg-teal-300/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-          <div className="absolute -bottom-40 right-1/3 w-80 h-80 bg-emerald-300/20 rounded-full blur-3xl animate-pulse delay-500"></div>
+          <div className="absolute -top-40 -right-32 w-80 h-80 bg-blue-100/30 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute top-1/2 -left-32 w-80 h-80 bg-teal-100/40 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute -bottom-40 right-1/3 w-80 h-80 bg-emerald-100/30 rounded-full blur-3xl animate-pulse delay-500"></div>
         </div>
 
         <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
@@ -153,12 +157,12 @@ export default function Signup() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-32 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-1/2 -left-32 w-80 h-80 bg-teal-300/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute -bottom-40 right-1/3 w-80 h-80 bg-emerald-300/20 rounded-full blur-3xl animate-pulse delay-500"></div>
+        <div className="absolute -top-40 -right-32 w-80 h-80 bg-blue-100/30 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-1/2 -left-32 w-80 h-80 bg-teal-100/40 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute -bottom-40 right-1/3 w-80 h-80 bg-emerald-100/30 rounded-full blur-3xl animate-pulse delay-500"></div>
       </div>
 
       <div className="relative z-10 min-h-screen flex">
@@ -166,58 +170,58 @@ export default function Signup() {
         <div className="hidden lg:flex lg:w-1/2 flex-col justify-center px-12 xl:px-16">
           <div className="max-w-md">
             <div className="flex items-center space-x-3 mb-8">
-              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                <Sparkles className="w-6 h-6 text-teal-400" />
+              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                <Sparkles className="w-6 h-6 text-blue-600" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-white">Synergies4</h1>
-                <p className="text-gray-100 text-sm">AI-Powered Learning Platform</p>
+                <h1 className="text-3xl font-bold text-gray-900">Synergies4</h1>
+                <p className="text-gray-600 text-sm">AI-Powered Learning Platform</p>
               </div>
             </div>
             
-            <h2 className="text-4xl font-bold text-white mb-6 leading-tight">
-              Transform Your Career with <span className="text-teal-300">AI-Driven</span> Learning
+            <h2 className="text-4xl font-bold text-gray-900 mb-6 leading-tight">
+              Transform Your Career with <span className="text-blue-600">AI-Driven</span> Learning
             </h2>
             
-            <p className="text-gray-100 text-lg mb-8 leading-relaxed">
+            <p className="text-gray-700 text-lg mb-8 leading-relaxed">
               Join the next generation of Agile professionals. Get personalized training, expert guidance, and industry-recognized certifications.
             </p>
 
             {/* Benefits */}
             <div className="space-y-4 mb-8">
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-emerald-400/20 rounded-full flex items-center justify-center">
-                  <CheckCircle className="w-4 h-4 text-emerald-300" />
+                <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center">
+                  <CheckCircle className="w-4 h-4 text-emerald-600" />
                 </div>
-                <span className="text-gray-100">Personalized AI-powered learning paths</span>
+                <span className="text-gray-700">Personalized AI-powered learning paths</span>
               </div>
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-emerald-400/20 rounded-full flex items-center justify-center">
-                  <CheckCircle className="w-4 h-4 text-emerald-300" />
+                <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center">
+                  <CheckCircle className="w-4 h-4 text-emerald-600" />
                 </div>
-                <span className="text-gray-100">Expert mentorship and guidance</span>
+                <span className="text-gray-700">Expert mentorship and guidance</span>
               </div>
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-emerald-400/20 rounded-full flex items-center justify-center">
-                  <CheckCircle className="w-4 h-4 text-emerald-300" />
+                <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center">
+                  <CheckCircle className="w-4 h-4 text-emerald-600" />
                 </div>
-                <span className="text-gray-100">Industry-recognized certifications</span>
+                <span className="text-gray-700">Industry-recognized certifications</span>
               </div>
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-emerald-400/20 rounded-full flex items-center justify-center">
-                  <CheckCircle className="w-4 h-4 text-emerald-300" />
+                <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center">
+                  <CheckCircle className="w-4 h-4 text-emerald-600" />
                 </div>
-                <span className="text-gray-100">30-day money-back guarantee</span>
+                <span className="text-gray-700">30-day money-back guarantee</span>
               </div>
             </div>
 
             {/* Trust Indicators */}
             <div className="flex items-center space-x-4">
-              <Badge className="bg-white/20 text-white border-white/30">
+              <Badge className="bg-blue-100 text-blue-700 border-blue-200">
                 <Shield className="w-3 h-3 mr-1" />
                 Secure & Trusted
               </Badge>
-              <Badge className="bg-white/20 text-white border-white/30">
+              <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200">
                 <Brain className="w-3 h-3 mr-1" />
                 AI-Powered
               </Badge>
@@ -232,12 +236,12 @@ export default function Signup() {
             <div className="lg:hidden text-center mb-8">
               <Link href="/" className="inline-block">
                 <div className="flex items-center justify-center space-x-3">
-                  <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                    <Sparkles className="w-6 h-6 text-teal-400" />
+                  <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                    <Sparkles className="w-6 h-6 text-blue-600" />
                   </div>
                   <div>
-                    <h1 className="text-2xl font-bold text-white">Synergies4</h1>
-                    <p className="text-gray-100 text-xs">AI-Powered Learning</p>
+                    <h1 className="text-2xl font-bold text-gray-900">Synergies4</h1>
+                    <p className="text-gray-600 text-xs">AI-Powered Learning</p>
                   </div>
                 </div>
               </Link>
