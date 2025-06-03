@@ -142,63 +142,54 @@ function ServicesSection() {
               bgGradient: "from-teal-50 to-blue-50"
             }
           ].map((service, index) => (
-            <div key={index} className={`group relative animate-fade-in-up animation-delay-${index * 200}`}>
+            <div key={index} className={`group relative animate-fade-in-up animation-delay-${index * 100}`}>
               {/* Glow Effect */}
-              <div className={`absolute -inset-1 bg-gradient-to-r ${service.gradient} rounded-2xl blur opacity-0 group-hover:opacity-25 transition duration-1000 group-hover:duration-200`}></div>
+              <div className={`absolute -inset-1 bg-gradient-to-r ${service.gradient} rounded-2xl blur opacity-0 group-hover:opacity-30 transition duration-150`}></div>
               
               {/* Main Card */}
-              <div className={`relative bg-gradient-to-br ${service.bgGradient} rounded-2xl border border-white/50 p-8 h-full hover:bg-white/80 transition-all duration-500 group-hover:scale-105 group-hover:-translate-y-3 shadow-lg hover:shadow-2xl backdrop-blur-sm text-center`}>
+              <div className={`relative bg-gradient-to-br ${service.bgGradient} backdrop-blur-xl rounded-2xl border border-white/20 p-8 h-full hover:bg-white/80 transition-all duration-150 group-hover:scale-105 shadow-lg hover:shadow-2xl backdrop-blur-sm text-center`}>
                 {/* Icon Container */}
                 <div className="relative mb-6">
-                  <div className={`w-20 h-20 bg-gradient-to-br ${service.gradient} rounded-2xl flex items-center justify-center mx-auto mb-6 text-white shadow-xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}>
+                  <div className={`w-20 h-20 bg-gradient-to-br ${service.gradient} rounded-2xl flex items-center justify-center mx-auto text-white shadow-lg group-hover:shadow-xl transition-shadow duration-150`}>
                     {service.icon}
                   </div>
                   
-                  {/* Floating ring effect */}
-                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-24 border-2 border-current rounded-full opacity-0 group-hover:opacity-20 group-hover:scale-150 transition-all duration-700" style={{ color: service.gradient.includes('blue') ? '#3B82F6' : service.gradient.includes('emerald') ? '#10B981' : service.gradient.includes('teal') ? '#14B8A6' : '#F97316' }}></div>
+                  {/* Floating Elements */}
+                  <div className={`absolute top-2 right-2 w-3 h-3 bg-gradient-to-br ${service.gradient} rounded-full opacity-60 group-hover:opacity-100 transition-all duration-150`}></div>
+                  <div className={`absolute bottom-2 left-2 w-2 h-2 bg-gradient-to-br ${service.gradient} rounded-full opacity-40 group-hover:opacity-80 transition-all duration-150`}></div>
+                  
+                  {/* Accent Line */}
+                  <div className={`absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r ${service.gradient} group-hover:w-20 transition-all duration-150 rounded-full`}></div>
                 </div>
-
+                
                 {/* Content */}
-                <div className="mb-8">
-                  <h3 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-blue-700 transition-colors duration-300">
-                    {service.title}
-                  </h3>
-                  <p className="text-gray-600 leading-relaxed text-base mb-6 group-hover:text-gray-800 transition-colors duration-300">
-                    {service.description}
-                  </p>
-
-                  <div className="mb-6">
-                    <h4 className="text-sm font-semibold text-gray-700 mb-3">What's Included:</h4>
-                    <div className="space-y-2">
-                      {service.features.map((feature, idx) => (
-                        <div key={idx} className="flex items-center text-sm text-gray-600 justify-center">
-                          <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
-                          <span>{feature}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
+                <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-teal-700 transition-colors duration-150">
+                  {service.title}
+                </h3>
+                <p className="text-gray-600 leading-relaxed mb-6 group-hover:text-gray-800 transition-colors duration-150">
+                  {service.description}
+                </p>
+                
+                {/* Features List */}
+                <ul className="space-y-2 mb-6">
+                  {service.features.map((feature, idx) => (
+                    <li key={idx} className="flex items-center text-sm text-gray-700 group-hover:text-gray-900 transition-colors duration-150">
+                      <CheckCircle className="h-4 w-4 text-teal-600 mr-2 flex-shrink-0" />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+                
                 {/* CTA Button */}
                 <Button 
-                  className={`w-full bg-gradient-to-r ${service.gradient} hover:shadow-lg text-white shadow-md transition-all duration-300 group-hover:scale-105 border-0 rounded-xl`}
                   asChild
+                  className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-150 hover:scale-105 w-full"
                 >
                   <Link href="/contact">
-                    <span className="flex items-center justify-center">
-                      Learn More
-                      <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                    </span>
+                    Learn More
+                    <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
-
-                {/* Decorative elements */}
-                <div className="absolute top-4 right-4 w-8 h-8 bg-white/30 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
-                <div className="absolute bottom-4 left-4 w-6 h-6 bg-white/20 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-700" style={{ animationDelay: '200ms' }}></div>
-                
-                {/* Bottom highlight */}
-                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-current to-transparent group-hover:w-20 transition-all duration-500 rounded-full" style={{ color: service.gradient.includes('blue') ? '#3B82F6' : service.gradient.includes('emerald') ? '#10B981' : service.gradient.includes('teal') ? '#14B8A6' : '#F97316' }}></div>
               </div>
             </div>
           ))}

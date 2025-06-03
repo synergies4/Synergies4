@@ -263,31 +263,24 @@ function ValuePropositionsSection() {
               style={{ animationDelay: `${index * 150}ms` }}
             >
               {/* Glow Effect */}
-              <div className={`absolute -inset-1 bg-gradient-to-r ${item.gradient} rounded-2xl blur opacity-0 group-hover:opacity-75 transition duration-200`}></div>
+              <div className={`absolute -inset-1 bg-gradient-to-r ${item.gradient} rounded-2xl blur opacity-0 group-hover:opacity-75 transition duration-150`}></div>
               
               {/* Main Card */}
-              <div className={`relative ${item.gradient} border border-white/15 transition-all duration-200 group-hover:scale-105 shadow-lg hover:shadow-2xl rounded-2xl p-8 text-center backdrop-blur-sm bg-white/15`}>
+              <div className={`relative ${item.gradient} border border-white/15 transition-all duration-150 group-hover:scale-105 shadow-lg hover:shadow-2xl rounded-2xl p-8 text-center backdrop-blur-sm bg-white/15`}>
                 {/* Icon Container */}
                 <div className="relative mb-6">
-                  <div className={`w-20 h-20 bg-gradient-to-br ${item.gradient} rounded-2xl flex items-center justify-center mx-auto mb-6 text-white shadow-2xl group-hover:scale-110 transition-all duration-200`}>
+                  <div className={`w-20 h-20 bg-gradient-to-br ${item.gradient} rounded-2xl flex items-center justify-center mx-auto mb-6 text-white shadow-2xl group-hover:scale-110 transition-all duration-150`}>
                     {item.icon}
                   </div>
-                  
-                  <div className={`absolute inset-0 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 group-hover:scale-150 transition-all duration-250`} style={{ background: item.glowColor }}></div>
                 </div>
-
+                
                 {/* Content */}
-                <div>
-                  <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-cyan-200 transition-colors duration-150">
-                    {item.title}
-                  </h3>
-                  <p className="text-gray-100/80 leading-relaxed text-base group-hover:text-white/90 transition-colors duration-150">
-                    {item.description}
-                  </p>
-                </div>
-
-                {/* Bottom accent */}
-                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-white to-transparent group-hover:w-16 transition-all duration-200 rounded-full"></div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-teal-700 transition-colors duration-150">
+                  {item.title}
+                </h3>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  {item.description}
+                </p>
               </div>
             </div>
           ))}

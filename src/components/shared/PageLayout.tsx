@@ -87,6 +87,24 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
       document.addEventListener('keydown', handleKeyDown);
       // Prevent body scroll when mobile menu is open
       document.body.style.overflow = 'hidden';
+      
+      // Calculate actual header height dynamically
+      const calculateHeaderHeight = () => {
+        const banner = document.querySelector('[role="banner"]');
+        const nav = document.querySelector('[role="navigation"]');
+        if (banner && nav) {
+          const totalHeight = banner.offsetHeight + nav.offsetHeight;
+          document.documentElement.style.setProperty('--header-height', `${totalHeight}px`);
+        }
+      };
+      
+      // Calculate on mount and resize
+      calculateHeaderHeight();
+      window.addEventListener('resize', calculateHeaderHeight);
+      
+      return () => {
+        window.removeEventListener('resize', calculateHeaderHeight);
+      };
     } else {
       document.body.style.overflow = 'unset';
     }
@@ -248,10 +266,11 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
           {mobileMenuOpen && (
             <div 
               id="mobile-menu"
-              className="lg:hidden fixed left-0 right-0 bg-white shadow-xl z-[9999]"
+              className="lg:hidden fixed inset-x-0 top-0 bg-white shadow-xl z-[9999]"
               style={{ 
-                top: '140px',
-                height: 'calc(100vh - 140px)'
+                top: 'var(--header-height, 140px)',
+                height: 'calc(100vh - var(--header-height, 140px))',
+                '--header-height': '140px'
               }}
               role="menu"
               aria-label="Mobile navigation menu"
@@ -293,7 +312,7 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                   <div className="space-y-3 pb-4">
                     <Button 
                       asChild 
-                      className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 text-base py-3 h-12 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+                      className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-150 text-base py-3 h-12 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
                     >
                       <Link href="/synergize" onClick={() => setMobileMenuOpen(false)} role="menuitem">
                         <Brain className="w-5 h-5 mr-2" />
@@ -303,7 +322,7 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                     
                     <Button 
                       asChild 
-                      className="w-full bg-gradient-to-r from-slate-600 to-gray-600 hover:from-slate-700 hover:to-gray-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 text-base py-3 h-12 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                      className="w-full bg-gradient-to-r from-slate-600 to-gray-600 hover:from-slate-700 hover:to-gray-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-150 text-base py-3 h-12 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
                     >
                       <Link href="/contact" onClick={() => setMobileMenuOpen(false)} role="menuitem">
                         <MessageSquare className="w-5 h-5 mr-2" />
@@ -347,7 +366,7 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                             Login
                           </Link>
                         </Button>
-                        <Button className="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold text-base py-3 h-12 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 shadow-md hover:shadow-lg transition-all duration-200" asChild>
+                        <Button className="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold text-base py-3 h-12 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 shadow-md hover:shadow-lg transition-all duration-150" asChild>
                           <Link href="/signup" onClick={() => setMobileMenuOpen(false)} role="menuitem">
                             <UserPlus className="w-5 h-5 mr-2" />
                             Sign Up

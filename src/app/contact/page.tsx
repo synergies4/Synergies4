@@ -397,40 +397,29 @@ export default function Contact() {
                     bgGradient: "from-purple-50 to-pink-50"
                   }
                 ].map((item, index) => (
-                  <div key={index} className="group relative">
+                  <div key={index} className={`group relative animate-fade-in-up animation-delay-${index * 100}`}>
                     {/* Glow Effect */}
-                    <div className={`absolute -inset-1 bg-gradient-to-r ${item.gradient} rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-700`}></div>
+                    <div className={`absolute -inset-1 bg-gradient-to-r ${item.gradient} rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-150`}></div>
                     
-                    {/* Contact Card */}
-                    <div className={`relative bg-gradient-to-br ${item.bgGradient} rounded-2xl border border-white/50 p-6 hover:bg-white/80 transition-all duration-500 group-hover:scale-105 group-hover:-translate-y-1 shadow-lg hover:shadow-2xl backdrop-blur-sm`}>
-                      <div className="flex items-start space-x-4">
-                        <div className={`w-12 h-12 bg-gradient-to-br ${item.gradient} rounded-xl flex items-center justify-center flex-shrink-0 text-white shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
-                          {item.icon}
+                    {/* Main Card */}
+                    <div className={`relative bg-gradient-to-br ${item.bgGradient} rounded-2xl border border-white/50 p-6 hover:bg-white/80 transition-all duration-150 group-hover:scale-105 shadow-lg hover:shadow-2xl backdrop-blur-sm`}>
+                      {/* Icon Container */}
+                      <div className="relative mb-6">
+                        <div className={`w-16 h-16 bg-gradient-to-br ${item.gradient} rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:shadow-xl transition-shadow duration-150`}>
+                          <item.icon className="h-8 w-8" />
                         </div>
-                        <div className="flex-1">
-                          <h3 className="font-bold text-gray-900 mb-1 text-lg group-hover:text-blue-700 transition-colors">{item.title}</h3>
-                          <p className="text-gray-600 mb-3 group-hover:text-gray-800 transition-colors">{item.description}</p>
-                          {item.href === "#" ? (
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              className={`text-teal-600 border-teal-600 hover:bg-teal-50 transition-all duration-300 hover:scale-105`}
-                            >
-                              {item.contact}
-                            </Button>
-                          ) : (
-                            <a 
-                              href={item.href} 
-                              className={`font-semibold transition-colors duration-300 hover:underline ${item.gradient.includes('blue') ? 'text-blue-600 hover:text-blue-700' : item.gradient.includes('green') ? 'text-green-600 hover:text-green-700' : 'text-teal-600 hover:text-teal-700'}`}
-                            >
-                              {item.contact}
-                            </a>
-                          )}
-                        </div>
+                        
+                        {/* Accent Line */}
+                        <div className={`absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r ${item.gradient} group-hover:w-16 transition-all duration-150 rounded-full`}></div>
                       </div>
                       
-                      {/* Decorative element */}
-                      <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-current to-transparent group-hover:w-16 transition-all duration-500 rounded-full" style={{ color: item.gradient.includes('blue') ? '#3B82F6' : item.gradient.includes('green') ? '#10B981' : '#14B8A6' }}></div>
+                      {/* Content */}
+                      <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-teal-700 transition-colors duration-150">
+                        {item.title}
+                      </h3>
+                      <p className="text-gray-600 text-sm leading-relaxed">
+                        {item.description}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -553,7 +542,7 @@ export default function Contact() {
                 bgGradient: "from-purple-900/20 to-pink-900/20"
               }
             ].map((office, index) => (
-              <div key={index} className={`group relative animate-fade-in-up animation-delay-${index * 200}`}>
+              <div key={index} className={`group relative animate-fade-in-up animation-delay-${index * 100}`}>
                 {/* Glow Effect */}
                 <div className={`absolute -inset-1 bg-gradient-to-r ${office.gradient} rounded-2xl blur opacity-0 group-hover:opacity-30 transition duration-1000 group-hover:duration-200`}></div>
                 

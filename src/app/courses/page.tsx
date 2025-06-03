@@ -23,7 +23,8 @@ import {
   Filter,
   CheckCircle,
   MessageSquare,
-  Award
+  Award,
+  PlayCircle
 } from 'lucide-react';
 import Image from 'next/image';
 
@@ -230,7 +231,7 @@ function CourseDirectorySection() {
         <div className="max-w-4xl mx-auto mb-16">
           <div className="group relative">
             {/* Glow Effect */}
-            <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-teal-500 rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-200"></div>
+            <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-teal-500 rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-150"></div>
             
             {/* Main Container */}
             <div className="relative bg-white/80 backdrop-blur-xl rounded-2xl border border-white/50 p-8 shadow-xl">
@@ -334,91 +335,38 @@ function CourseDirectorySection() {
             {filteredCourses.map((course, index) => (
               <div key={course.id} className={`group relative animate-fade-in-up animation-delay-${index * 100}`}>
                 {/* Glow Effect */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-teal-500 rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-200"></div>
+                <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-teal-500 rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-150"></div>
                 
                 {/* Main Card */}
-                <div className="relative bg-white/80 backdrop-blur-xl rounded-2xl border border-white/50 overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-200 group-hover:scale-[1.02] group-hover:-translate-y-2">
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-8 h-full">
-                    {/* Course Image */}
-                    <div className="relative overflow-hidden rounded-xl flex-shrink-0">
-                      <Image
-                        src={course.image || getDefaultImage(course.category)}
-                        alt={course.title}
-                        fill
-                        className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-200"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent group-hover:from-black/40 transition-all duration-500"></div>
-                      
-                      {/* Level Badge */}
-                      <div className="absolute top-4 left-4">
-                        <div className={`px-3 py-1 bg-gradient-to-r ${getLevelColor(course.level)} rounded-full text-white text-sm font-semibold shadow-lg backdrop-blur-sm`}>
-                          {course.level}
-                        </div>
-                      </div>
-                      
-                      {/* Category Badge */}
-                      <div className="absolute top-4 right-4">
-                        <Badge className="bg-white/90 text-gray-900 border font-medium backdrop-blur-sm">
-                          {course.category}
-                        </Badge>
-                      </div>
-                      
-                      {course.featured && (
-                        <div className="absolute bottom-4 left-4">
-                          <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0 font-medium shadow-lg">
-                            <Star className="w-3 h-3 mr-1 fill-current" />
-                            Featured
-                          </Badge>
-                        </div>
-                      )}
-
-                      {/* Floating Icon */}
-                      <div className="absolute bottom-4 right-4 w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
-                        <BookOpen className="w-6 h-6" />
-                      </div>
+                <div className="relative bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-2xl transition-all duration-150 group-hover:scale-[1.01] overflow-hidden">
+                  <div className="relative h-64">
+                    <Image
+                      src={course.image || getDefaultImage(course.category)}
+                      alt={course.title}
+                      fill
+                      className="object-cover rounded-t-lg"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent group-hover:from-black/40 transition-all duration-150"></div>
+                    <div className="absolute bottom-4 left-4 right-4">
+                      <Badge variant="secondary" className="bg-white/90 text-gray-800 mb-2">
+                        {course.category}
+                      </Badge>
+                      <h3 className="text-white font-bold text-lg mb-2 group-hover:text-cyan-200 transition-colors duration-150">
+                        {course.title}
+                      </h3>
                     </div>
                     
-                    {/* Course Content */}
-                    <div className="lg:col-span-2 flex flex-col justify-between">
-                      <div className="flex-1">
-                        <CardHeader className="p-0 mb-6">
-                          <CardTitle className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-700 to-blue-800 bg-clip-text text-transparent mb-3 group-hover:from-blue-600 group-hover:to-teal-600 transition-all duration-300 min-h-[3rem] flex items-center leading-tight">
-                            {course.title}
-                          </CardTitle>
-                          <div className="flex flex-wrap gap-3 mb-4">
-                            {course.duration && (
-                              <Badge variant="outline" className="text-sm border-blue-300 text-blue-700 bg-blue-50">
-                                <Clock className="w-4 h-4 mr-1" />
-                                {course.duration}
-                              </Badge>
-                            )}
-                            <Badge variant="outline" className="text-sm border-teal-300 text-teal-700 bg-teal-50">
-                              <Target className="w-4 h-4 mr-1" />
-                              {course.level}
-                            </Badge>
-                          </div>
-                          <CardDescription className="text-lg leading-relaxed text-gray-600 min-h-[4.5rem] group-hover:text-gray-800 transition-colors duration-300">
-                            {getFormattedDescription(course)}
-                          </CardDescription>
-                        </CardHeader>
-                      </div>
-                      
-                      {/* Course Actions - Always at bottom */}
-                      <div className="flex items-center justify-between pt-6 border-t border-gray-200 mt-auto">
-                        <div className="text-3xl font-bold bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent">
-                          {formatPrice(course.price)}
-                        </div>
-                        <Button 
-                          asChild
-                          className="bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 px-8 py-3 text-lg rounded-xl border-0 group"
-                        >
-                          <Link href={`/courses/${createCourseSlug(course.title)}`}>
-                            <span className="flex items-center justify-center text-white font-semibold">
-                              Enroll Now
-                              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                            </span>
-                          </Link>
-                        </Button>
+                    {/* Course level indicator */}
+                    <div className="absolute top-4 right-4">
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getLevelColor(course.level)}`}>
+                        {course.level}
+                      </span>
+                    </div>
+                    
+                    {/* Play button overlay */}
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                      <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-150">
+                        <PlayCircle className="h-8 w-8 text-white" />
                       </div>
                     </div>
                   </div>
