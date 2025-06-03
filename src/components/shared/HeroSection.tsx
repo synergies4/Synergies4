@@ -44,7 +44,7 @@ export default function HeroSection({
         return 'bg-gray-50 relative overflow-hidden';
       case 'gradient':
       default:
-        return 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden';
+        return 'bg-gradient-to-br from-blue-50 via-slate-50 to-teal-50 relative overflow-hidden';
     }
   };
 
@@ -62,9 +62,9 @@ export default function HeroSection({
       {/* Floating Background Elements for gradient variant */}
       {backgroundVariant === 'gradient' && (
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-lg blur-xl" />
-          <div className="absolute top-32 right-20 w-24 h-24 bg-gradient-to-br from-purple-400/25 to-pink-400/25 rounded-full blur-lg" />
-          <div className="absolute bottom-20 left-1/4 w-40 h-40 bg-gradient-to-br from-indigo-400/15 to-blue-400/15 rounded-2xl blur-2xl" />
+          <div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-teal-400/20 rounded-lg blur-xl" />
+          <div className="absolute top-32 right-20 w-24 h-24 bg-gradient-to-br from-teal-400/25 to-cyan-400/25 rounded-full blur-lg" />
+          <div className="absolute bottom-20 left-1/4 w-40 h-40 bg-gradient-to-br from-slate-400/15 to-blue-400/15 rounded-2xl blur-2xl" />
           <div className="absolute top-1/2 right-10 w-28 h-28 bg-gradient-to-br from-cyan-400/20 to-blue-400/20 rounded-lg blur-xl" />
           
           {/* Mobile-optimized particles */}
@@ -72,7 +72,7 @@ export default function HeroSection({
             {Array.from({ length: 8 }).map((_, i) => (
               <div
                 key={`particle-${i}`}
-                className="absolute w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-40"
+                className="absolute w-2 h-2 bg-gradient-to-r from-blue-400 to-teal-400 rounded-full opacity-40"
                 style={{
                   left: `${(i * 12) % 100}%`,
                   top: `${(i * 15) % 100}%`,
@@ -95,7 +95,7 @@ export default function HeroSection({
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
             {title}{' '}
             {highlightText && (
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent">
                 {highlightText}
               </span>
             )}

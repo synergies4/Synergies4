@@ -72,12 +72,12 @@ export default function AboutUs() {
 // Mission Section
 function MissionSection() {
   return (
-    <section className="py-24 bg-gradient-to-br from-blue-900 via-indigo-900 to-purple-900 relative overflow-hidden">
+    <section className="py-24 bg-gradient-to-br from-slate-800 via-gray-800 to-slate-900 relative overflow-hidden">
       {/* Enhanced Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-blue-500/20 to-teal-600/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/3 left-1/3 w-80 h-80 bg-gradient-to-br from-cyan-500/15 to-blue-600/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-2/3 left-1/4 w-64 h-64 bg-gradient-to-br from-emerald-500/10 to-teal-600/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-teal-500/20 to-blue-600/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/3 left-1/3 w-80 h-80 bg-gradient-to-br from-cyan-500/15 to-teal-600/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-2/3 left-1/4 w-64 h-64 bg-gradient-to-br from-blue-500/10 to-cyan-600/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
       </div>
 
       {/* Sophisticated Grid Pattern */}
@@ -222,7 +222,7 @@ function StatisticsSection() {
           {[
             { number: 10000, suffix: "+", label: "Professionals Trained", gradient: "from-blue-400 to-cyan-500" },
             { number: 95, suffix: "%", label: "Success Rate", gradient: "from-emerald-400 to-green-500" },
-            { number: 500, suffix: "+", label: "Organizations Served", gradient: "from-purple-400 to-pink-500" },
+            { number: 500, suffix: "+", label: "Organizations Served", gradient: "from-teal-400 to-blue-500" },
             { number: 50, suffix: "+", label: "Countries Reached", gradient: "from-orange-400 to-red-500" }
           ].map((stat, index) => (
             <StatCard key={index} stat={stat} index={index} />
@@ -267,9 +267,9 @@ function SpecialSection() {
     <section className="py-24 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
       {/* Enhanced Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-blue-400/20 to-purple-600/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-blue-400/20 to-teal-600/20 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-br from-cyan-400/20 to-blue-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-br from-purple-400/10 to-pink-600/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-br from-teal-400/10 to-cyan-600/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
       </div>
 
       {/* Sophisticated Grid Pattern */}
@@ -321,8 +321,8 @@ function SpecialSection() {
               icon: <Users className="h-10 w-10" />,
               title: "Human-Centered Design",
               description: "Technology serves people, not the other way around. We prioritize human connection and growth.",
-              gradient: "from-purple-500 to-pink-400",
-              bgGradient: "from-purple-50 to-pink-50"
+              gradient: "from-teal-500 to-blue-400",
+              bgGradient: "from-teal-50 to-blue-50"
             },
             {
               icon: <Target className="h-10 w-10" />,
@@ -342,8 +342,8 @@ function SpecialSection() {
               icon: <CheckCircle className="h-10 w-10" />,
               title: "Proven Methodologies",
               description: "Our approaches are backed by research, tested in practice, and refined through experience.",
-              gradient: "from-indigo-500 to-purple-400",
-              bgGradient: "from-indigo-50 to-purple-50"
+              gradient: "from-blue-500 to-cyan-400",
+              bgGradient: "from-blue-50 to-cyan-50"
             },
             {
               icon: <Award className="h-10 w-10" />,
@@ -492,8 +492,8 @@ function TestimonialsSection() {
               content: "The combination of Agile methodologies with AI insights has revolutionized how we approach product development. We're delivering value faster than ever before.",
               rating: 5,
               image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-              gradient: "from-purple-500 to-pink-400",
-              bgGradient: "from-purple-900/20 to-pink-900/20"
+              gradient: "from-emerald-500 to-teal-400",
+              bgGradient: "from-emerald-900/20 to-teal-900/20"
             },
             {
               name: "Emily Rodriguez",
@@ -502,8 +502,8 @@ function TestimonialsSection() {
               content: "The positive intelligence training has been life-changing. I'm not just a better leader—I'm a better person. My team has noticed the difference immediately.",
               rating: 5,
               image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
-              gradient: "from-emerald-500 to-teal-400",
-              bgGradient: "from-emerald-900/20 to-teal-900/20"
+              gradient: "from-teal-500 to-blue-400",
+              bgGradient: "from-teal-900/20 to-blue-900/20"
             }
           ].map((testimonial, index) => (
             <div key={index} className={`group relative animate-fade-in-up animation-delay-${index * 200}`}>
