@@ -248,9 +248,13 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
           {mobileMenuOpen && (
             <div 
               id="mobile-menu"
-              className="lg:hidden fixed left-0 right-0 bottom-0 bg-white shadow-xl z-[9999]"
+              className="lg:hidden fixed w-full bg-white shadow-xl z-[9999] border-t border-gray-200"
               style={{ 
-                top: '140px'
+                top: '140px',
+                left: '0',
+                right: '0',
+                minHeight: 'calc(100vh - 140px)',
+                maxHeight: 'calc(100vh - 140px)'
               }}
               role="menu"
               aria-label="Mobile navigation menu"
