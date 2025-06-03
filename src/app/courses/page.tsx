@@ -110,6 +110,30 @@ function CourseDirectorySection() {
     return `$${price.toLocaleString()}`;
   };
 
+  const getFormattedDescription = (course: Course) => {
+    const description = course.short_desc || course.description;
+    if (!description || description.trim() === '') {
+      // Fallback description based on category
+      const fallbackDescriptions = {
+        'Executive': 'Develop strategic leadership skills and executive presence for senior-level responsibilities.',
+        'Agile': 'Master Agile methodologies and frameworks to drive team productivity and project success.',
+        'Product': 'Learn product management fundamentals and strategies for successful product development.',
+        'PQ Skills': 'Build positive intelligence and emotional resilience for peak performance and leadership.',
+        'Leadership': 'Enhance your leadership capabilities and learn to inspire and motivate teams effectively.',
+        'Business': 'Develop essential business skills and strategic thinking for professional growth.',
+        'Technology': 'Gain cutting-edge technology skills and digital literacy for the modern workplace.',
+        'default': 'Comprehensive professional development course designed to advance your career and skills.'
+      };
+      return fallbackDescriptions[course.category as keyof typeof fallbackDescriptions] || fallbackDescriptions.default;
+    }
+    
+    // Truncate to consistent length (150 characters)
+    if (description.length > 150) {
+      return description.substring(0, 147) + '...';
+    }
+    return description;
+  };
+
   const getDefaultImage = (category: string) => {
     const categoryColors = {
       'Executive': '1e3a8a',
@@ -376,7 +400,7 @@ function CourseDirectorySection() {
                             </Badge>
                           </div>
                           <CardDescription className="text-lg leading-relaxed text-gray-600 min-h-[4.5rem] group-hover:text-gray-800 transition-colors duration-300">
-                            {course.short_desc || course.description}
+                            {getFormattedDescription(course)}
                           </CardDescription>
                         </CardHeader>
                       </div>

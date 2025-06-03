@@ -24,7 +24,8 @@ import {
   BarChart3,
   BookOpen,
   Settings,
-  FileText
+  FileText,
+  UserPlus
 } from 'lucide-react';
 import GlobalSearch from '@/components/shared/GlobalSearch';
 
@@ -247,106 +248,115 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
           {mobileMenuOpen && (
             <div 
               id="mobile-menu"
-              className="lg:hidden border-t bg-white/95 backdrop-blur-md max-h-[80vh] overflow-y-auto mobile-menu"
+              className="lg:hidden fixed inset-x-0 top-[calc(100%-4px)] bg-white/98 backdrop-blur-md border-t border-gray-200 shadow-xl z-40"
+              style={{ 
+                height: 'calc(100vh - 140px)', 
+                top: '140px' 
+              }}
               role="menu"
               aria-label="Mobile navigation menu"
             >
-              <div className="px-4 py-4 space-y-4">
-                {/* Navigation Links */}
-                {navigationItems.map((item) => (
-                  <Link
-                    key={item.label}
-                    href={item.href}
-                    className="block text-gray-600 hover:text-teal-600 transition-colors font-medium py-3 text-lg border-b border-gray-100 last:border-0 mobile-menu-item focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 rounded-md"
-                    onClick={() => setMobileMenuOpen(false)}
-                    role="menuitem"
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-                
-                {/* Mobile Search - Additional Option */}
-                <button
-                  onClick={() => {
-                    setIsSearchOpen(true);
-                    setMobileMenuOpen(false);
-                  }}
-                  className="w-full flex items-center text-gray-600 hover:text-teal-600 transition-colors font-medium py-3 text-lg border-b border-gray-100 mobile-menu-item focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 rounded-md"
-                  role="menuitem"
-                >
-                  <Search className="w-5 h-5 mr-3" />
-                  Search
-                </button>
-                
-                {/* Action Buttons */}
-                <div className="pt-4 space-y-3">
-                  <Button 
-                    asChild 
-                    className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 text-lg py-3 h-auto focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
-                  >
-                    <Link href="/synergize" onClick={() => setMobileMenuOpen(false)} role="menuitem">
-                      <Brain className="w-5 h-5 mr-2" />
-                      Synergize AI
-                    </Link>
-                  </Button>
-                  
-                  <Button 
-                    asChild 
-                    className="w-full bg-gradient-to-r from-slate-600 to-gray-600 hover:from-slate-700 hover:to-gray-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 text-lg py-3 h-auto focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-                  >
-                    <Link href="/contact" onClick={() => setMobileMenuOpen(false)} role="menuitem">
-                      <MessageSquare className="w-5 h-5 mr-2" />
-                      Contact Us
-                    </Link>
-                  </Button>
-                </div>
-                
-                {/* Auth Section */}
-                <div className="pt-4 border-t space-y-3">
-                  {user ? (
-                    <div className="space-y-3">
-                      <div className="flex items-center space-x-3 py-2">
-                        <UserAvatar />
-                        <span className="text-gray-700 font-medium">Welcome back!</span>
-                      </div>
-                      <Button variant="outline" className="w-full text-lg py-3 h-auto border-gray-400 text-gray-900 hover:text-teal-600 hover:bg-teal-50 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-white" asChild>
-                        <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} role="menuitem">
-                          <BarChart3 className="w-5 h-5 mr-2" />
-                          Dashboard
-                        </Link>
-                      </Button>
-                      <Button
-                        variant="outline"
-                        className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 border-red-400 hover:border-red-500 text-lg py-3 h-auto focus:ring-2 focus:ring-red-500 focus:ring-offset-2 bg-white"
-                        onClick={() => {
-                          signOut();
-                          setMobileMenuOpen(false);
-                        }}
+              <div className="h-full overflow-y-auto overscroll-contain">
+                <div className="px-4 py-4 space-y-4 min-h-full flex flex-col">
+                  {/* Navigation Links */}
+                  <div className="space-y-1">
+                    {navigationItems.map((item) => (
+                      <Link
+                        key={item.label}
+                        href={item.href}
+                        className="block text-gray-700 hover:text-teal-600 hover:bg-teal-50 transition-colors font-medium py-3 px-3 text-base rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+                        onClick={() => setMobileMenuOpen(false)}
                         role="menuitem"
                       >
-                        <LogOut className="w-5 h-5 mr-2" />
-                        Sign Out
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      <Button variant="outline" className="w-full text-lg py-3 h-auto border-gray-400 text-gray-900 hover:text-teal-600 hover:bg-teal-50 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-white" asChild>
-                        <Link href="/login" onClick={() => setMobileMenuOpen(false)} role="menuitem">
-                          <User className="w-5 h-5 mr-2" />
-                          Login
-                        </Link>
-                      </Button>
-                      <Button className="w-full bg-teal-600 hover:bg-teal-700 text-white text-lg py-3 h-auto focus:ring-2 focus:ring-teal-500 focus:ring-offset-2" asChild>
-                        <Link href="/signup" onClick={() => setMobileMenuOpen(false)} role="menuitem">
-                          Sign Up
-                        </Link>
-                      </Button>
-                    </div>
-                  )}
+                        {item.label}
+                      </Link>
+                    ))}
+                    
+                    {/* Mobile Search - Additional Option */}
+                    <button
+                      onClick={() => {
+                        setIsSearchOpen(true);
+                        setMobileMenuOpen(false);
+                      }}
+                      className="w-full flex items-center text-gray-700 hover:text-teal-600 hover:bg-teal-50 transition-colors font-medium py-3 px-3 text-base rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+                      role="menuitem"
+                    >
+                      <Search className="w-5 h-5 mr-3" />
+                      Search
+                    </button>
+                  </div>
+                  
+                  {/* Spacer to push auth section to bottom */}
+                  <div className="flex-1 min-h-4"></div>
+                  
+                  {/* Action Buttons */}
+                  <div className="space-y-3 pb-4">
+                    <Button 
+                      asChild 
+                      className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 text-base py-3 h-12 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+                    >
+                      <Link href="/synergize" onClick={() => setMobileMenuOpen(false)} role="menuitem">
+                        <Brain className="w-5 h-5 mr-2" />
+                        Synergize AI
+                      </Link>
+                    </Button>
+                    
+                    <Button 
+                      asChild 
+                      className="w-full bg-gradient-to-r from-slate-600 to-gray-600 hover:from-slate-700 hover:to-gray-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 text-base py-3 h-12 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                    >
+                      <Link href="/contact" onClick={() => setMobileMenuOpen(false)} role="menuitem">
+                        <MessageSquare className="w-5 h-5 mr-2" />
+                        Contact Us
+                      </Link>
+                    </Button>
+                  </div>
+                  
+                  {/* Auth Section - Always at bottom */}
+                  <div className="border-t border-gray-200 pt-4 pb-6 mt-auto">
+                    {user ? (
+                      <div className="space-y-3">
+                        <div className="flex items-center space-x-3 py-2 px-3 bg-gray-50 rounded-lg">
+                          <UserAvatar />
+                          <span className="text-gray-700 font-medium text-sm">Welcome back!</span>
+                        </div>
+                        <Button variant="outline" className="w-full text-base py-3 h-12 border-gray-300 text-gray-900 hover:text-teal-600 hover:bg-teal-50 hover:border-teal-300 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-white" asChild>
+                          <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} role="menuitem">
+                            <BarChart3 className="w-5 h-5 mr-2" />
+                            Dashboard
+                          </Link>
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 border-red-300 hover:border-red-400 text-base py-3 h-12 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 bg-white"
+                          onClick={() => {
+                            signOut();
+                            setMobileMenuOpen(false);
+                          }}
+                          role="menuitem"
+                        >
+                          <LogOut className="w-5 h-5 mr-2" />
+                          Sign Out
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        <Button variant="outline" className="w-full text-base py-3 h-12 border-gray-300 text-gray-900 hover:text-teal-600 hover:bg-teal-50 hover:border-teal-300 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-white" asChild>
+                          <Link href="/login" onClick={() => setMobileMenuOpen(false)} role="menuitem">
+                            <User className="w-5 h-5 mr-2" />
+                            Login
+                          </Link>
+                        </Button>
+                        <Button className="w-full bg-teal-600 hover:bg-teal-700 text-white text-base py-3 h-12 font-medium focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 shadow-md hover:shadow-lg transition-all duration-200" asChild>
+                          <Link href="/signup" onClick={() => setMobileMenuOpen(false)} role="menuitem">
+                            <UserPlus className="w-5 h-5 mr-2" />
+                            Sign Up
+                          </Link>
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 </div>
-                
-                {/* Add some bottom padding to ensure last item is visible */}
-                <div className="pb-4"></div>
               </div>
             </div>
           )}
