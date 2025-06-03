@@ -269,12 +269,12 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
               id="mobile-menu"
               className="lg:hidden fixed bg-white shadow-2xl z-[99999] border-t border-gray-200"
               style={{ 
-                top: '120px',
+                top: '100px',
                 left: '0',
                 right: '0',
                 bottom: '0',
                 width: '100vw',
-                height: 'calc(100vh - 120px)',
+                height: 'calc(100vh - 100px)',
                 backgroundColor: 'white'
               }}
               role="menu"
