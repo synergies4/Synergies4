@@ -248,17 +248,16 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
           {mobileMenuOpen && (
             <div 
               id="mobile-menu"
-              className="lg:hidden fixed inset-x-0 bg-white shadow-xl z-[9999]"
+              className="lg:hidden fixed left-0 right-0 bg-white shadow-xl z-[9999]"
               style={{ 
                 top: '140px',
-                bottom: '0px',
-                minHeight: 'calc(100vh - 140px)'
+                height: 'calc(100vh - 140px)'
               }}
               role="menu"
               aria-label="Mobile navigation menu"
             >
               <div className="h-full overflow-y-auto bg-white">
-                <div className="px-4 py-4 space-y-4 flex flex-col bg-white" style={{ minHeight: 'calc(100vh - 140px)' }}>
+                <div className="h-full px-4 py-4 space-y-4 flex flex-col bg-white">
                   {/* Navigation Links */}
                   <div className="space-y-1">
                     {navigationItems.map((item) => (
@@ -314,7 +313,7 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                   </div>
                   
                   {/* Auth Section - Always at bottom */}
-                  <div className="border-t border-gray-200 pt-4 pb-8 bg-gray-50 rounded-lg">
+                  <div className="border-t border-gray-200 pt-4 pb-4 bg-gray-50 rounded-lg">
                     {user ? (
                       <div className="space-y-3">
                         <div className="flex items-center space-x-3 py-2 px-3 bg-white rounded-lg border border-gray-200 shadow-sm">
