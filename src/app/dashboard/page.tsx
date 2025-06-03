@@ -341,9 +341,9 @@ export default function StudentDashboard() {
                 <h2 className="text-xl md:text-2xl font-bold text-gray-900">Learning Progress</h2>
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-                  <Card>
+                  <Card className="bg-white border border-gray-200 shadow-sm">
                     <CardHeader className="pb-3 md:pb-6">
-                      <CardTitle className="flex items-center gap-2 text-base md:text-lg">
+                      <CardTitle className="flex items-center gap-2 text-base md:text-lg text-gray-900">
                         <TrendingUp className="h-4 w-4 md:h-5 md:w-5" />
                         Course Progress
                       </CardTitle>
@@ -352,8 +352,8 @@ export default function StudentDashboard() {
                       {enrollments.map((enrollment) => (
                         <div key={enrollment.id} className="space-y-2">
                           <div className="flex justify-between text-xs md:text-sm">
-                            <span className="font-medium truncate pr-2">{enrollment.course.title}</span>
-                            <span className="flex-shrink-0">{enrollment.progress_percentage}%</span>
+                            <span className="font-medium truncate pr-2 text-gray-900">{enrollment.course.title}</span>
+                            <span className="flex-shrink-0 text-gray-700">{enrollment.progress_percentage}%</span>
                           </div>
                           <Progress value={enrollment.progress_percentage} className="h-2" />
                         </div>
@@ -361,9 +361,9 @@ export default function StudentDashboard() {
                     </CardContent>
                   </Card>
 
-                  <Card>
+                  <Card className="bg-white border border-gray-200 shadow-sm">
                     <CardHeader className="pb-3 md:pb-6">
-                      <CardTitle className="flex items-center gap-2 text-base md:text-lg">
+                      <CardTitle className="flex items-center gap-2 text-base md:text-lg text-gray-900">
                         <Target className="h-4 w-4 md:h-5 md:w-5" />
                         Quiz Performance
                       </CardTitle>
@@ -407,7 +407,7 @@ export default function StudentDashboard() {
                   {enrollments
                     .filter(enrollment => enrollment.certificate_issued)
                     .map((enrollment) => (
-                      <Card key={enrollment.id} className="hover:shadow-lg transition-shadow">
+                      <Card key={enrollment.id} className="hover:shadow-lg transition-shadow bg-white border border-gray-200 shadow-sm">
                         <CardContent className="p-4 md:p-6">
                           <div className="flex items-center gap-3 md:gap-4 mb-3 md:mb-4">
                             <div className="w-10 h-10 md:w-12 md:h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
@@ -422,7 +422,7 @@ export default function StudentDashboard() {
                               </p>
                             </div>
                           </div>
-                          <Button variant="outline" size="sm" className="w-full text-xs md:text-sm">
+                          <Button variant="outline" size="sm" className="w-full text-xs md:text-sm border-gray-300 text-gray-900 hover:bg-gray-50 hover:border-gray-400 bg-white">
                             Download Certificate
                           </Button>
                         </CardContent>
@@ -430,7 +430,7 @@ export default function StudentDashboard() {
                     ))}
                   
                   {enrollments.filter(enrollment => enrollment.certificate_issued).length === 0 && (
-                    <Card className="col-span-full">
+                    <Card className="col-span-full bg-white border border-gray-200 shadow-sm">
                       <CardContent className="p-8 md:p-12 text-center">
                         <Award className="h-10 w-10 md:h-12 md:w-12 text-gray-400 mx-auto mb-4" />
                         <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-2">

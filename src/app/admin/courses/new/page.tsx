@@ -1057,8 +1057,8 @@ export default function CreateCourse() {
         </div>
 
         {/* Form Steps */}
-        <Card className="mb-6">
-          <CardContent className="p-4 sm:p-6">
+        <Card className="mb-6 bg-white border border-gray-200 shadow-sm">
+          <CardContent className="p-4 sm:p-6 bg-white">
             {/* Step 1: Basic Information */}
             {currentStep === 1 && (
               <div className="space-y-4 sm:space-y-6">
@@ -1439,8 +1439,8 @@ export default function CreateCourse() {
 
                 <div className="space-y-4">
                   {formData.modules.map((module, index) => (
-                    <Card key={module.id}>
-                      <CardHeader className="pb-3">
+                    <Card key={module.id} className="bg-white border border-gray-200 shadow-sm">
+                      <CardHeader className="pb-3 bg-white">
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                           <CardTitle className="text-base">Module {index + 1}</CardTitle>
                           <div className="flex gap-2">
@@ -2002,7 +2002,7 @@ export default function CreateCourse() {
       {/* AI Assistant Modal */}
       {showAIAssistant && (
         <div className="fixed inset-0 bg-gray-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <Card className="w-full max-w-4xl max-h-[90vh] overflow-hidden">
+          <Card className="w-full max-w-4xl max-h-[90vh] overflow-hidden bg-white border border-gray-200 shadow-xl">
             <CardHeader className="bg-gradient-to-r from-teal-600 to-blue-600 text-white">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
@@ -2027,7 +2027,7 @@ export default function CreateCourse() {
 
             {/* Mobile Content - Scrollable */}
             <div className="flex-1 overflow-y-auto overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
-              <CardContent className="p-4">
+              <CardContent className="p-4 bg-white">
                 <div className="space-y-4">
                   {/* AI Mode Selection - Mobile */}
                   <div>
@@ -2049,7 +2049,7 @@ export default function CreateCourse() {
                   </div>
 
                   {/* Mode Description */}
-                  <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-3 rounded-lg border border-blue-200">
+                  <div className="bg-gradient-to-r from-blue-50 to-teal-50 p-3 rounded-lg border border-blue-200">
                     <h4 className="font-medium mb-2 text-blue-800 text-sm">
                       {aiModeDescriptions[aiMode]?.title}
                     </h4>
@@ -2115,7 +2115,7 @@ export default function CreateCourse() {
                   <Button
                     onClick={generateAISuggestions}
                     disabled={aiLoading || (!formData.title && aiMode !== 'title')}
-                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 min-h-[48px] text-base font-medium"
+                    className="w-full bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 min-h-[48px] text-base font-medium"
                   >
                     {aiLoading ? (
                       <>
@@ -2262,9 +2262,9 @@ export default function CreateCourse() {
 
           {/* Desktop: Centered modal with proper scrolling */}
           <div className="hidden sm:block w-full max-w-4xl h-[90vh] flex flex-col">
-            <Card className="flex flex-col h-full overflow-hidden">
+            <Card className="flex flex-col h-full overflow-hidden bg-white border border-gray-200 shadow-xl">
               {/* Desktop Header - Fixed */}
-              <CardHeader className="bg-gradient-to-r from-purple-600 to-blue-600 text-white flex-shrink-0">
+              <CardHeader className="bg-gradient-to-r from-teal-600 to-blue-600 text-white flex-shrink-0">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     <div className="bg-white/20 p-2 rounded-lg">
@@ -2272,7 +2272,7 @@ export default function CreateCourse() {
                     </div>
                     <div>
                       <CardTitle className="text-xl">AI Course Assistant</CardTitle>
-                      <CardDescription className="text-purple-100">
+                      <CardDescription className="text-teal-100">
                         Get AI-powered suggestions for your course content
                       </CardDescription>
                     </div>
@@ -2290,7 +2290,7 @@ export default function CreateCourse() {
 
               {/* Desktop Content - Scrollable */}
               <div className="flex-1 overflow-y-auto overscroll-contain">
-                <CardContent className="p-6">
+                <CardContent className="p-6 bg-white">
                   <div className="space-y-6">
                     {/* AI Mode Selection - Desktop */}
                     <div>
@@ -2312,7 +2312,7 @@ export default function CreateCourse() {
                     </div>
 
                     {/* Mode Description */}
-                    <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg border border-blue-200">
+                    <div className="bg-gradient-to-r from-blue-50 to-teal-50 p-4 rounded-lg border border-blue-200">
                       <h4 className="font-medium mb-2 text-blue-800">
                         {aiModeDescriptions[aiMode]?.title}
                       </h4>
@@ -2378,7 +2378,7 @@ export default function CreateCourse() {
                     <Button
                       onClick={generateAISuggestions}
                       disabled={aiLoading || (!formData.title && aiMode !== 'title')}
-                      className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 min-h-[48px] text-base font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+                      className="w-full bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 min-h-[48px] text-base font-medium shadow-lg hover:shadow-xl transition-all duration-200"
                     >
                       {aiLoading ? (
                         <>

@@ -251,7 +251,7 @@ export default function NewBlogPostPage() {
                 </div>
               </div>
               <div className="flex space-x-2 sm:space-x-3">
-                <Button variant="outline" size="sm" asChild className="flex-1 sm:flex-none">
+                <Button variant="outline" size="sm" asChild className="flex-1 sm:flex-none border-gray-300 text-gray-900 hover:bg-gray-50 hover:border-gray-400 bg-white">
                   <Link href="/admin/blog">
                     <ArrowLeft className="w-4 h-4 mr-2" />
                     <span className="hidden sm:inline">Back to Blog</span>
@@ -279,14 +279,14 @@ export default function NewBlogPostPage() {
             {/* Main Content - Mobile First, Desktop 2/3 width */}
             <div className="lg:col-span-2 space-y-6">
               {/* Basic Info */}
-              <Card>
-                <CardHeader className="pb-4">
+              <Card className="bg-white border border-gray-200 shadow-sm">
+                <CardHeader className="pb-4 bg-white">
                   <CardTitle className="text-lg">Basic Information</CardTitle>
                   <CardDescription className="text-sm">
                     Enter the main details for your blog post
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-4 bg-white">
                   <div>
                     <Label htmlFor="title" className="text-sm font-medium">Title *</Label>
                     <Input
@@ -327,8 +327,8 @@ export default function NewBlogPostPage() {
               </Card>
 
               {/* Content */}
-              <Card>
-                <CardHeader className="pb-4">
+              <Card className="bg-white border border-gray-200 shadow-sm">
+                <CardHeader className="pb-4 bg-white">
                   <CardTitle className="text-lg flex items-center">
                     <FileText className="w-5 h-5 mr-2" />
                     Content *
@@ -337,7 +337,7 @@ export default function NewBlogPostPage() {
                     Write your blog post content. You can use HTML tags for formatting.
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="bg-white">
                   <Textarea
                     value={formData.content}
                     onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
@@ -351,14 +351,14 @@ export default function NewBlogPostPage() {
               </Card>
 
               {/* SEO - Mobile: Show after content, Desktop: Show after content */}
-              <Card>
-                <CardHeader className="pb-4">
+              <Card className="bg-white border border-gray-200 shadow-sm">
+                <CardHeader className="pb-4 bg-white">
                   <CardTitle className="text-lg">SEO Settings</CardTitle>
                   <CardDescription className="text-sm">
                     Optimize your post for search engines
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-4 bg-white">
                   <div>
                     <Label htmlFor="meta_title" className="text-sm font-medium">Meta Title</Label>
                     <Input
@@ -388,14 +388,14 @@ export default function NewBlogPostPage() {
             {/* Sidebar - Mobile: Stack below content, Desktop: 1/3 width */}
             <div className="space-y-6">
               {/* Category */}
-              <Card>
-                <CardHeader className="pb-4">
+              <Card className="bg-white border border-gray-200 shadow-sm">
+                <CardHeader className="pb-4 bg-white">
                   <CardTitle className="text-lg flex items-center">
                     <Tag className="w-5 h-5 mr-2" />
                     Category *
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="bg-white">
                   <Select 
                     value={formData.category} 
                     onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
@@ -415,14 +415,14 @@ export default function NewBlogPostPage() {
               </Card>
 
               {/* Featured Image */}
-              <Card>
-                <CardHeader className="pb-4">
+              <Card className="bg-white border border-gray-200 shadow-sm">
+                <CardHeader className="pb-4 bg-white">
                   <CardTitle className="text-lg flex items-center">
                     <ImageIcon className="w-5 h-5 mr-2" />
                     Featured Image
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-4 bg-white">
                   <div>
                     <Label htmlFor="image" className="text-sm font-medium">Image URL</Label>
                     <Input
@@ -449,14 +449,14 @@ export default function NewBlogPostPage() {
               </Card>
 
               {/* Tags */}
-              <Card>
-                <CardHeader className="pb-4">
+              <Card className="bg-white border border-gray-200 shadow-sm">
+                <CardHeader className="pb-4 bg-white">
                   <CardTitle className="text-lg flex items-center">
                     <Tag className="w-5 h-5 mr-2" />
                     Tags
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="bg-white">
                   <div className="space-y-4">
                     <div className="flex gap-2">
                       <Input
@@ -492,14 +492,14 @@ export default function NewBlogPostPage() {
               </Card>
 
               {/* Publish Actions - Mobile: Show at bottom, Desktop: Show in sidebar */}
-              <Card>
-                <CardHeader className="pb-4">
+              <Card className="bg-white border border-gray-200 shadow-sm">
+                <CardHeader className="pb-4 bg-white">
                   <CardTitle className="text-lg">Publish</CardTitle>
                   <CardDescription className="text-sm">
                     Ready to publish your post?
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="bg-white">
                   <div className="space-y-3">
                     <div>
                       <Label className="text-sm font-medium">Status</Label>
@@ -559,7 +559,7 @@ export default function NewBlogPostPage() {
         <div className="fixed bottom-6 right-6 z-50">
           <Button
             onClick={() => setShowAIAssistant(true)}
-            className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-full w-14 h-14"
+            className="bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-full w-14 h-14"
             size="lg"
           >
             <Sparkles className="w-6 h-6" />
@@ -569,7 +569,7 @@ export default function NewBlogPostPage() {
         {/* AI Assistant Modal */}
         {showAIAssistant && (
           <div className="fixed inset-0 bg-gray-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <Card className="w-full max-w-4xl max-h-[90vh] overflow-hidden">
+            <Card className="w-full max-w-4xl max-h-[90vh] overflow-hidden bg-white border border-gray-200 shadow-xl">
               <CardHeader className="bg-gradient-to-r from-teal-600 to-blue-600 text-white">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
@@ -591,7 +591,7 @@ export default function NewBlogPostPage() {
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+              <CardContent className="p-6 overflow-y-auto max-h-[calc(90vh-120px)] bg-white">
                 <div className="space-y-6">
                   {/* AI Mode Selection */}
                   <div>

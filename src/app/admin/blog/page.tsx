@@ -256,8 +256,8 @@ export default function AdminBlogPage() {
           </div>
 
           {/* Filters */}
-          <Card className="mb-6">
-            <CardContent className="pt-6">
+          <Card className="mb-6 bg-white border border-gray-200 shadow-sm">
+            <CardContent className="pt-6 bg-white">
               <div className="flex flex-col md:flex-row gap-4">
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -289,8 +289,8 @@ export default function AdminBlogPage() {
           {loading ? (
             <div className="grid gap-4">
               {[...Array(5)].map((_, i) => (
-                <Card key={i} className="animate-pulse">
-                  <CardContent className="pt-6">
+                <Card key={i} className="animate-pulse bg-white border border-gray-200 shadow-sm">
+                  <CardContent className="pt-6 bg-white">
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
                         <div className="bg-gray-200 h-6 rounded mb-2 w-3/4"></div>
@@ -307,8 +307,8 @@ export default function AdminBlogPage() {
               ))}
             </div>
           ) : posts.length === 0 ? (
-            <Card>
-              <CardContent className="pt-6 text-center py-12">
+            <Card className="bg-white border border-gray-200 shadow-sm">
+              <CardContent className="pt-6 text-center py-12 bg-white">
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">No blog posts found</h3>
                 <p className="text-gray-600 mb-6">Get started by creating your first blog post.</p>
                 <Button asChild>
@@ -325,8 +325,8 @@ export default function AdminBlogPage() {
                 <div
                   key={post.id}
                 >
-                  <Card className="hover:shadow-md transition-shadow">
-                    <CardContent className="pt-6">
+                  <Card className="hover:shadow-md transition-shadow bg-white border border-gray-200 shadow-sm">
+                    <CardContent className="pt-6 bg-white">
                       <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-2">

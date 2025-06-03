@@ -36,26 +36,26 @@ export default function HomePage() {
   return (
     <PageLayout>
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-900 via-indigo-900 to-purple-900 min-h-screen flex items-center overflow-hidden">
+      <section className="relative bg-gradient-to-br from-slate-100 via-blue-50 to-cyan-50 min-h-screen flex items-center overflow-hidden">
         {/* Enhanced Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
           {/* Animated Orbs */}
           <div className="absolute top-1/4 right-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-gradient-to-br from-teal-600/20 to-emerald-600/20 rounded-full blur-3xl animate-pulse"></div>
           <div className="absolute bottom-1/3 left-1/3 w-48 sm:w-80 h-48 sm:h-80 bg-gradient-to-br from-cyan-500/15 to-teal-600/15 rounded-full blur-3xl animate-pulse animation-delay-1000"></div>
-          <div className="absolute top-2/3 left-1/4 w-32 sm:w-64 h-32 sm:h-64 bg-gradient-to-br from-purple-500/10 to-blue-600/10 rounded-full blur-2xl animate-pulse animation-delay-2000"></div>
+          <div className="absolute top-2/3 left-1/4 w-32 sm:w-64 h-32 sm:h-64 bg-gradient-to-br from-blue-500/10 to-cyan-600/10 rounded-full blur-2xl animate-pulse animation-delay-2000"></div>
           
           {/* Geometric Shapes - Mobile Optimized */}
-          <div className="absolute top-20 left-4 sm:left-20 w-16 sm:w-32 h-16 sm:h-32 border border-white/10 rounded-full animate-pulse"></div>
+          <div className="absolute top-20 left-4 sm:left-20 w-16 sm:w-32 h-16 sm:h-32 border border-teal-200/30 rounded-full animate-pulse"></div>
           <div className="absolute bottom-20 right-4 sm:right-20 w-12 sm:w-24 h-12 sm:h-24 border border-cyan-400/20 rounded-lg rotate-45 animate-pulse" style={{ animationDelay: '1.5s' }}></div>
           <div className="absolute top-1/2 right-4 sm:right-10 w-8 sm:w-16 h-8 sm:h-16 border border-teal-400/20 rounded-full animate-pulse" style={{ animationDelay: '3s' }}></div>
         </div>
 
         {/* Sophisticated Grid Pattern */}
-        <div className="absolute inset-0 opacity-[0.03]">
+        <div className="absolute inset-0 opacity-[0.05]">
           <div className="absolute inset-0" style={{
             backgroundImage: `
-              linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px),
+              linear-gradient(rgba(20, 184, 166, 0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(20, 184, 166, 0.1) 1px, transparent 1px),
               radial-gradient(circle at 25% 25%, rgba(20, 184, 166, 0.1) 2px, transparent 2px),
               radial-gradient(circle at 75% 75%, rgba(16, 185, 129, 0.1) 1px, transparent 1px)
             `,
@@ -65,17 +65,17 @@ export default function HomePage() {
 
         <div className="container mx-auto px-4 text-center relative z-10 py-12 sm:py-20">
           {/* Enhanced Badge with Animation - Mobile Optimized */}
-          <div className="inline-flex items-center px-4 sm:px-6 py-2 sm:py-3 bg-white/10 backdrop-blur-md rounded-full border border-white/20 mb-8 sm:mb-12 group hover:bg-white/15 transition-all duration-500 hover:scale-105">
+          <div className="inline-flex items-center px-4 sm:px-6 py-2 sm:py-3 bg-white/80 backdrop-blur-md rounded-full border border-teal-200/50 mb-8 sm:mb-12 group hover:bg-white/90 transition-all duration-500 hover:scale-105">
             <div className="w-2 h-2 bg-gradient-to-r from-teal-400 to-emerald-400 rounded-full mr-2 sm:mr-3 animate-pulse"></div>
-            <Zap className="w-3 sm:w-4 h-3 sm:h-4 mr-1 sm:mr-2 text-teal-300 group-hover:text-teal-200 transition-colors" />
-            <span className="text-white/90 font-medium group-hover:text-white transition-colors text-sm sm:text-base">AI-Powered Learning Platform</span>
+            <Zap className="w-3 sm:w-4 h-3 sm:h-4 mr-1 sm:mr-2 text-teal-600 group-hover:text-teal-700 transition-colors" />
+            <span className="text-gray-700 font-medium group-hover:text-gray-800 transition-colors text-sm sm:text-base">AI-Powered Learning Platform</span>
             <div className="w-2 h-2 bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-full ml-2 sm:ml-3 animate-pulse" style={{ animationDelay: '1s' }}></div>
           </div>
 
           {/* Enhanced Hero Title with Better Typography - Mobile Optimized */}
-          <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white mb-6 sm:mb-8 leading-tight tracking-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-gray-900 mb-6 sm:mb-8 leading-tight tracking-tight">
             <span className="block mb-2 sm:mb-4">Build Skills That</span>
-            <span className="block bg-gradient-to-r from-teal-400 via-cyan-300 to-emerald-400 bg-clip-text text-transparent animate-gradient relative">
+            <span className="block bg-gradient-to-r from-teal-600 via-cyan-600 to-emerald-600 bg-clip-text text-transparent animate-gradient relative">
               Set You Apart
               {/* Subtle underline effect */}
               <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-16 sm:w-32 h-1 bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent rounded-full"></div>
@@ -83,9 +83,9 @@ export default function HomePage() {
           </h1>
           
           {/* Enhanced Subtitle - Mobile Optimized */}
-          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-200 mb-12 sm:mb-16 max-w-4xl mx-auto leading-relaxed font-light px-4 sm:px-0">
+          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-700 mb-12 sm:mb-16 max-w-4xl mx-auto leading-relaxed font-light px-4 sm:px-0">
             Learn practical frameworks in 
-            <span className="text-white font-medium bg-gradient-to-r from-teal-400 to-cyan-400 bg-clip-text text-transparent"> Agile, leadership, and mental fitness </span>
+            <span className="text-gray-900 font-medium bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent"> Agile, leadership, and mental fitness </span>
             that teams and leaders actually use
           </p>
           
@@ -93,7 +93,7 @@ export default function HomePage() {
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center max-w-3xl mx-auto mb-12 sm:mb-16 px-4 sm:px-0">
             <Button 
               size="lg" 
-              className="w-full sm:w-auto text-base sm:text-lg px-8 sm:px-10 py-3 sm:py-4 bg-white text-black hover:bg-gray-100 transition-all duration-300 font-semibold rounded-xl shadow-2xl hover:shadow-white/25 hover:scale-105 border-0 group h-auto" 
+              className="w-full sm:w-auto text-base sm:text-lg px-8 sm:px-10 py-3 sm:py-4 bg-gray-900 text-white hover:bg-gray-800 transition-all duration-300 font-semibold rounded-xl shadow-2xl hover:shadow-gray-500/25 hover:scale-105 border-0 group h-auto" 
               asChild
             >
               <Link href="/courses">
@@ -126,12 +126,12 @@ export default function HomePage() {
               { number: "4.9", label: "Rating", icon: <Star className="w-4 sm:w-5 h-4 sm:h-5" /> },
               { number: "50+", label: "Courses", icon: <BookOpen className="w-4 sm:w-5 h-4 sm:h-5" /> }
             ].map((stat, index) => (
-              <div key={index} className="bg-white/5 backdrop-blur-sm rounded-xl sm:rounded-2xl border border-white/10 p-4 sm:p-6 hover:bg-white/10 transition-all duration-300 hover:scale-105 group">
-                <div className="flex items-center justify-center mb-2 sm:mb-3 text-teal-400 group-hover:text-cyan-400 transition-colors">
+              <div key={index} className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl border border-gray-200/50 p-4 sm:p-6 hover:bg-white/90 transition-all duration-300 hover:scale-105 group">
+                <div className="flex items-center justify-center mb-2 sm:mb-3 text-teal-600 group-hover:text-cyan-600 transition-colors">
                   {stat.icon}
                 </div>
-                <div className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-1 group-hover:scale-110 transition-transform">{stat.number}</div>
-                <div className="text-xs sm:text-sm text-gray-400 uppercase tracking-wide font-medium">{stat.label}</div>
+                <div className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-1 group-hover:scale-110 transition-transform">{stat.number}</div>
+                <div className="text-xs sm:text-sm text-gray-600 uppercase tracking-wide font-medium">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -139,10 +139,10 @@ export default function HomePage() {
 
         {/* Enhanced Scroll Indicator with Centered Text - Fixed Positioning */}
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2">
-          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center relative group hover:border-white/50 transition-colors animate-bounce">
-            <div className="w-1 h-3 bg-gradient-to-b from-white/60 to-transparent rounded-full mt-2 animate-pulse group-hover:from-cyan-400/80 transition-colors"></div>
+          <div className="w-6 h-10 border-2 border-gray-600/30 rounded-full flex justify-center relative group hover:border-gray-600/50 transition-colors animate-bounce">
+            <div className="w-1 h-3 bg-gradient-to-b from-gray-600/60 to-transparent rounded-full mt-2 animate-pulse group-hover:from-cyan-600/80 transition-colors"></div>
           </div>
-          <div className="text-white/60 text-sm font-medium animate-pulse">
+          <div className="text-gray-600/60 text-sm font-medium animate-pulse">
             Scroll to explore
           </div>
         </div>
