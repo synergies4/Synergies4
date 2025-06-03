@@ -74,16 +74,46 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
   const { user, signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // Close mobile menu on escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && mobileMenuOpen) {
+        setMobileMenuOpen(false);
+      }
+    };
+    
+    if (mobileMenuOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+      // Prevent body scroll when mobile menu is open
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'unset';
+    };
+  }, [mobileMenuOpen]);
+
+  const navigationItems = [
+    { label: 'About Us', href: '/about-us' },
+    { label: 'Courses', href: '/courses' },
+    { label: 'Coaching', href: '/coaching' },
+    { label: 'Consulting', href: '/consulting' },
+    { label: 'Industry Insight', href: '/industry-insight' },
+  ];
+
   return (
     <>
       {/* Countdown Banner - Fixed Mobile Layout */}
-      <div className="bg-gradient-to-r from-teal-600 to-emerald-600 text-white py-3 px-4">
+      <div className="bg-gradient-to-r from-teal-600 to-emerald-600 text-white py-3 px-4" role="banner">
         <div className="container mx-auto">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-center">
             <p className="text-sm sm:text-base font-medium">
               🚀 Expand your potential through learning. Offering earlybirds a discount of $295.00.
             </p>
-            <div className="flex gap-1 sm:gap-2 text-xs sm:text-sm">
+            <div className="flex gap-1 sm:gap-2 text-xs sm:text-sm" aria-label="Countdown timer">
               {['00 Days', '00 Hours', '00 Minutes', '00 Seconds'].map((time, index) => (
                 <Badge key={index} variant="secondary" className="bg-white/20 text-white border-white/30 px-2 py-1 text-xs">
                   {time}
@@ -95,12 +125,12 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
       </div>
 
       {/* Navigation */}
-      <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b shadow-sm">
+      <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b shadow-sm" role="navigation" aria-label="Main navigation">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <div className="flex-shrink-0">
-              <Link href="/" className="flex items-center">
+              <Link href="/" className="flex items-center" aria-label="Synergies4 home">
                 <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent hover:from-teal-700 hover:to-emerald-700 transition-all duration-300">
                   Synergies4
                 </span>
@@ -109,20 +139,13 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
             
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center justify-center flex-1 space-x-6 mx-8">
-              {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item) => (
+              {navigationItems.map((item) => (
                 <Link 
-                  key={item}
-                  href={
-                    item === 'About Us' ? '/about-us' :
-                    item === 'Courses' ? '/courses' :
-                    item === 'Coaching' ? '/coaching' : 
-                    item === 'Consulting' ? '/consulting' : 
-                    item === 'Industry Insight' ? '/industry-insight' :
-                    `/${item.toLowerCase().replace(' ', '-')}`
-                  } 
-                  className="text-gray-600 hover:text-teal-600 transition-colors font-medium whitespace-nowrap text-sm"
+                  key={item.label}
+                  href={item.href} 
+                  className="text-gray-600 hover:text-teal-600 transition-colors font-medium whitespace-nowrap text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 rounded-md px-2 py-1"
                 >
-                  {item}
+                  {item.label}
                 </Link>
               ))}
             </div>
@@ -131,7 +154,8 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
             <div className="hidden lg:flex items-center space-x-3 flex-shrink-0">
               <Link href="/synergize" className="group">
                 <Button 
-                  className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-sm px-4 py-2"
+                  className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-sm px-4 py-2 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+                  aria-label="Access Synergize AI assistant"
                 >
                   <Brain className="w-4 h-4 mr-2" />
                   Synergize AI
@@ -144,7 +168,8 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                 variant="outline"
                 size="sm"
                 onClick={() => setIsSearchOpen(true)}
-                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 border-gray-300 hover:border-gray-400 px-3 py-2"
+                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 border-gray-300 hover:border-gray-400 px-3 py-2 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+                aria-label="Open search"
               >
                 <Search className="w-4 h-4" />
                 <span className="hidden xl:inline">Search</span>
@@ -156,7 +181,7 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
               {user ? (
                 <div className="flex items-center space-x-2">
                   <Link href="/dashboard">
-                    <Button variant="outline" size="sm" className="text-gray-700 hover:text-gray-900 border-gray-300 hover:border-gray-400">
+                    <Button variant="outline" size="sm" className="text-gray-700 hover:text-gray-900 border-gray-300 hover:border-gray-400 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
                       Dashboard
                     </Button>
                   </Link>
@@ -164,7 +189,8 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                     variant="outline"
                     size="sm"
                     onClick={() => signOut()}
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-300 hover:border-red-400"
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-300 hover:border-red-400 focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                    aria-label="Sign out"
                   >
                     <LogOut className="w-4 h-4" />
                   </Button>
@@ -172,12 +198,12 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
               ) : (
                 <>
                   <Link href="/login">
-                    <Button variant="outline" size="sm" className="text-gray-700 hover:text-gray-900 border-gray-300 hover:border-gray-400 font-medium">
+                    <Button variant="outline" size="sm" className="text-gray-700 hover:text-gray-900 border-gray-300 hover:border-gray-400 font-medium focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
                       Login
                     </Button>
                   </Link>
                   <Link href="/signup">
-                    <Button size="sm" className="bg-teal-600 hover:bg-teal-700 text-white font-medium">
+                    <Button size="sm" className="bg-teal-600 hover:bg-teal-700 text-white font-medium focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
                       Sign Up
                     </Button>
                   </Link>
@@ -192,7 +218,8 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                 variant="outline"
                 size="sm"
                 onClick={() => setIsSearchOpen(true)}
-                className="p-2 border-gray-300 hover:border-teal-500 hover:text-teal-600"
+                className="p-2 border-gray-300 hover:border-teal-500 hover:text-teal-600 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+                aria-label="Open search"
               >
                 <Search className="w-5 h-5" />
               </Button>
@@ -202,7 +229,10 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                 variant="ghost"
                 size="sm"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2"
+                className="p-2 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+                aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+                aria-expanded={mobileMenuOpen}
+                aria-controls="mobile-menu"
               >
                 {mobileMenuOpen ? (
                   <X className="h-6 w-6" />
@@ -215,24 +245,23 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
 
           {/* Mobile Menu */}
           {mobileMenuOpen && (
-            <div className="lg:hidden border-t bg-white/95 backdrop-blur-md max-h-[80vh] overflow-y-auto">
+            <div 
+              id="mobile-menu"
+              className="lg:hidden border-t bg-white/95 backdrop-blur-md max-h-[80vh] overflow-y-auto mobile-menu"
+              role="menu"
+              aria-label="Mobile navigation menu"
+            >
               <div className="px-4 py-4 space-y-4">
                 {/* Navigation Links */}
-                {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item) => (
+                {navigationItems.map((item) => (
                   <Link
-                    key={item}
-                    href={
-                      item === 'About Us' ? '/about-us' :
-                      item === 'Courses' ? '/courses' :
-                      item === 'Coaching' ? '/coaching' : 
-                      item === 'Consulting' ? '/consulting' : 
-                      item === 'Industry Insight' ? '/industry-insight' :
-                      `/${item.toLowerCase().replace(' ', '-')}`
-                    }
-                    className="block text-gray-600 hover:text-teal-600 transition-colors font-medium py-3 text-lg border-b border-gray-100 last:border-0"
+                    key={item.label}
+                    href={item.href}
+                    className="block text-gray-600 hover:text-teal-600 transition-colors font-medium py-3 text-lg border-b border-gray-100 last:border-0 mobile-menu-item focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 rounded-md"
                     onClick={() => setMobileMenuOpen(false)}
+                    role="menuitem"
                   >
-                    {item}
+                    {item.label}
                   </Link>
                 ))}
                 
@@ -242,7 +271,8 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                     setIsSearchOpen(true);
                     setMobileMenuOpen(false);
                   }}
-                  className="w-full flex items-center text-gray-600 hover:text-teal-600 transition-colors font-medium py-3 text-lg border-b border-gray-100"
+                  className="w-full flex items-center text-gray-600 hover:text-teal-600 transition-colors font-medium py-3 text-lg border-b border-gray-100 mobile-menu-item focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 rounded-md"
+                  role="menuitem"
                 >
                   <Search className="w-5 h-5 mr-3" />
                   Search
@@ -252,9 +282,9 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                 <div className="pt-4 space-y-3">
                   <Button 
                     asChild 
-                    className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 text-lg py-3 h-auto"
+                    className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 text-lg py-3 h-auto focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
                   >
-                    <Link href="/synergize" onClick={() => setMobileMenuOpen(false)}>
+                    <Link href="/synergize" onClick={() => setMobileMenuOpen(false)} role="menuitem">
                       <Brain className="w-5 h-5 mr-2" />
                       Synergize AI
                     </Link>
@@ -262,9 +292,9 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                   
                   <Button 
                     asChild 
-                    className="w-full bg-gradient-to-r from-slate-600 to-gray-600 hover:from-slate-700 hover:to-gray-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 text-lg py-3 h-auto"
+                    className="w-full bg-gradient-to-r from-slate-600 to-gray-600 hover:from-slate-700 hover:to-gray-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 text-lg py-3 h-auto focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
                   >
-                    <Link href="/contact" onClick={() => setMobileMenuOpen(false)}>
+                    <Link href="/contact" onClick={() => setMobileMenuOpen(false)} role="menuitem">
                       <MessageSquare className="w-5 h-5 mr-2" />
                       Contact Us
                     </Link>
@@ -279,19 +309,20 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                         <UserAvatar />
                         <span className="text-gray-700 font-medium">Welcome back!</span>
                       </div>
-                      <Button variant="outline" className="w-full text-lg py-3 h-auto border-gray-300 text-gray-700 hover:text-gray-900" asChild>
-                        <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
+                      <Button variant="outline" className="w-full text-lg py-3 h-auto border-gray-300 text-gray-700 hover:text-gray-900 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2" asChild>
+                        <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} role="menuitem">
                           <BarChart3 className="w-5 h-5 mr-2" />
                           Dashboard
                         </Link>
                       </Button>
                       <Button
                         variant="outline"
-                        className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 border-red-300 hover:border-red-400 text-lg py-3 h-auto"
+                        className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 border-red-300 hover:border-red-400 text-lg py-3 h-auto focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                         onClick={() => {
                           signOut();
                           setMobileMenuOpen(false);
                         }}
+                        role="menuitem"
                       >
                         <LogOut className="w-5 h-5 mr-2" />
                         Sign Out
@@ -299,14 +330,14 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      <Button variant="outline" className="w-full text-lg py-3 h-auto border-gray-300 text-gray-700 hover:text-gray-900" asChild>
-                        <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                      <Button variant="outline" className="w-full text-lg py-3 h-auto border-gray-300 text-gray-700 hover:text-gray-900 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2" asChild>
+                        <Link href="/login" onClick={() => setMobileMenuOpen(false)} role="menuitem">
                           <User className="w-5 h-5 mr-2" />
                           Login
                         </Link>
                       </Button>
-                      <Button className="w-full bg-teal-600 hover:bg-teal-700 text-white text-lg py-3 h-auto" asChild>
-                        <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
+                      <Button className="w-full bg-teal-600 hover:bg-teal-700 text-white text-lg py-3 h-auto focus:ring-2 focus:ring-teal-500 focus:ring-offset-2" asChild>
+                        <Link href="/signup" onClick={() => setMobileMenuOpen(false)} role="menuitem">
                           Sign Up
                         </Link>
                       </Button>
@@ -460,9 +491,25 @@ export default function PageLayout({ children, showStats = false }: PageLayoutPr
   }, []);
 
   return (
-    <main className="min-h-screen">
-      <Navigation isSearchOpen={isSearchOpen} setIsSearchOpen={setIsSearchOpen} />
-      {children}
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+      {/* Skip Links for Accessibility */}
+      <div className="sr-only">
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
+        <a href="#navigation" className="skip-link">
+          Skip to navigation
+        </a>
+      </div>
+      
+      <div id="navigation">
+        <Navigation isSearchOpen={isSearchOpen} setIsSearchOpen={setIsSearchOpen} />
+      </div>
+      
+      <main id="main-content" role="main" className="min-h-screen">
+        {children}
+      </main>
+      
       {showStats && <StatsSection />}
       <Footer />
       
@@ -478,6 +525,6 @@ export default function PageLayout({ children, showStats = false }: PageLayoutPr
         placeholder="Search courses, articles, pages..."
         showFilters={true}
       />
-    </main>
+    </div>
   );
 } 
