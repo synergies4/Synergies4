@@ -506,7 +506,7 @@ export default function UserManagement() {
             <CardContent>
               <div className="space-y-4">
                 {filteredUsers.map((userData) => (
-                  <div key={userData.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                  <div key={userData.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors bg-white">
                     <div className="flex items-center space-x-4">
                       <Avatar>
                         <AvatarFallback className="bg-blue-100 text-blue-600">
@@ -540,10 +540,10 @@ export default function UserManagement() {
                         value={userData.role}
                         onValueChange={(value) => handleRoleChange(userData.id, value)}
                       >
-                        <SelectTrigger className="w-32">
+                        <SelectTrigger className="w-32 bg-white border-gray-300 text-gray-900">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-white border-gray-300">
                           <SelectItem value="USER">Student</SelectItem>
                           <SelectItem value="INSTRUCTOR">Instructor</SelectItem>
                           <SelectItem value="ADMIN">Admin</SelectItem>
@@ -552,23 +552,23 @@ export default function UserManagement() {
                       
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
-                          <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
+                          <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700 bg-white border-gray-300 hover:bg-red-50">
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </AlertDialogTrigger>
-                        <AlertDialogContent>
+                        <AlertDialogContent className="bg-white">
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Delete User</AlertDialogTitle>
-                            <AlertDialogDescription>
+                            <AlertDialogTitle className="text-gray-900">Delete User</AlertDialogTitle>
+                            <AlertDialogDescription className="text-gray-600">
                               Are you sure you want to delete {userData.name || userData.email}? 
                               This action cannot be undone and will remove all their data.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogCancel className="bg-white text-gray-900 border-gray-300 hover:bg-gray-50">Cancel</AlertDialogCancel>
                             <AlertDialogAction
                               onClick={() => handleDeleteUser(userData.id)}
-                              className="bg-red-600 hover:bg-red-700"
+                              className="bg-red-600 hover:bg-red-700 text-white"
                             >
                               Delete User
                             </AlertDialogAction>

@@ -2002,8 +2002,8 @@ export default function CreateCourse() {
       {/* AI Assistant Modal */}
       {showAIAssistant && (
         <div className="fixed inset-0 bg-gray-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <Card className="w-full max-w-4xl max-h-[90vh] overflow-hidden bg-white border border-gray-200 shadow-xl">
-            <CardHeader className="bg-gradient-to-r from-teal-600 to-blue-600 text-white">
+          <Card className="w-full max-w-4xl max-h-[90vh] overflow-hidden bg-white border border-gray-200 shadow-xl flex flex-col">
+            <CardHeader className="bg-gradient-to-r from-teal-600 to-blue-600 text-white flex-shrink-0">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <div className="bg-white/20 p-2 rounded-lg">
@@ -2027,7 +2027,7 @@ export default function CreateCourse() {
               </div>
             </CardHeader>
 
-            {/* Content - Responsive */}
+            {/* Content - Responsive and Scrollable */}
             <div className="flex-1 overflow-y-auto overscroll-contain">
               <CardContent className="p-4 sm:p-6 bg-white">
                 <div className="space-y-4 sm:space-y-6">

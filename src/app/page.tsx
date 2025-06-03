@@ -97,7 +97,7 @@ export default function HomePage() {
               asChild
             >
               <Link href="/courses">
-                <span className="flex items-center justify-center text-white">
+                <span className="flex items-center justify-center text-white font-semibold">
                   Explore Courses
                   <ArrowRight className="h-4 sm:h-5 w-4 sm:w-5 ml-2 group-hover:translate-x-1 transition-transform text-white" />
                 </span>
@@ -572,12 +572,12 @@ function FeaturedCoursesSection() {
                     {/* CTA Button */}
                     <Button 
                       asChild 
-                      className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-105 rounded-xl border-0"
+                      className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-105 rounded-xl border-0"
                     >
                       <Link href={`/courses/${createCourseSlug(course.title)}`}>
-                        <span className="flex items-center justify-center">
+                        <span className="flex items-center justify-center text-white font-semibold">
                           Start Learning
-                          <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                          <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform text-white" />
                         </span>
                       </Link>
                     </Button>
@@ -797,11 +797,11 @@ function CertificationsSection() {
                 {/* CTA Button - Always at bottom */}
                 <div className="mt-auto">
                   <Button 
-                    className={`w-full bg-gradient-to-r ${getProgressColor(cert.level)} hover:shadow-lg text-white shadow-md transition-all duration-300 group-hover:scale-105`}
+                    className={`w-full bg-gradient-to-r ${getProgressColor(cert.level)} hover:shadow-lg text-white font-semibold shadow-md transition-all duration-300 group-hover:scale-105`}
                   >
-                    <span className="flex items-center justify-center">
+                    <span className="flex items-center justify-center text-white font-semibold">
                       Start Certification
-                      <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                      <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform text-white" />
                     </span>
                   </Button>
                 </div>
@@ -1056,9 +1056,9 @@ function CTASection() {
               asChild
             >
               <Link href="/courses">
-                <span className="flex items-center justify-center">
+                <span className="flex items-center justify-center text-white font-semibold">
                   Start Learning Today
-                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform text-white" />
                 </span>
               </Link>
             </Button>
@@ -1069,7 +1069,7 @@ function CTASection() {
               asChild
             >
               <Link href="/contact">
-                <span className="flex items-center justify-center">
+                <span className="flex items-center justify-center text-white font-semibold group-hover:text-teal-600">
                   <MessageSquare className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
                   Talk to an Expert
                 </span>
