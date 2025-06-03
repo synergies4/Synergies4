@@ -248,7 +248,7 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
           {mobileMenuOpen && (
             <div 
               id="mobile-menu"
-              className="lg:hidden fixed inset-0 bg-white shadow-xl z-[9999]"
+              className="lg:hidden fixed left-0 right-0 bottom-0 bg-white shadow-xl z-[9999]"
               style={{ 
                 top: '140px'
               }}
