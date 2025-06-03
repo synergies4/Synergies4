@@ -301,9 +301,9 @@ function ValuePropositionsSection() {
               asChild
             >
               <Link href="/courses">
-                <span className="flex items-center justify-center">
+                <span className="flex items-center justify-center text-white font-semibold">
                   Explore Our Courses
-                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform text-white" />
                 </span>
               </Link>
             </Button>

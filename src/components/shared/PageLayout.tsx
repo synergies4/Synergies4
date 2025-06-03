@@ -364,14 +364,14 @@ function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <h3 className="text-xl font-bold mb-4 bg-gradient-to-r from-teal-400 to-emerald-400 bg-clip-text text-transparent">Synergies4</h3>
-            <p className="text-gray-300">
+            <p className="text-gray-200">
               AI-powered learning platform for professional development
             </p>
           </div>
           
           <div>
             <h4 className="font-semibold mb-4 text-white">Courses</h4>
-            <ul className="space-y-2 text-gray-300">
+            <ul className="space-y-2 text-gray-200">
               <li><Link href="/courses" className="hover:text-teal-400 transition-colors">All Courses</Link></li>
               <li><Link href="/courses" className="hover:text-teal-400 transition-colors">Agile & Scrum</Link></li>
               <li><Link href="/courses" className="hover:text-teal-400 transition-colors">Leadership</Link></li>
@@ -381,7 +381,7 @@ function Footer() {
           
           <div>
             <h4 className="font-semibold mb-4 text-white">Company</h4>
-            <ul className="space-y-2 text-gray-300">
+            <ul className="space-y-2 text-gray-200">
               <li><Link href="/about-us" className="hover:text-teal-400 transition-colors">About Us</Link></li>
               <li><Link href="/contact" className="hover:text-teal-400 transition-colors">Contact</Link></li>
               <li><Link href="/coaching" className="hover:text-teal-400 transition-colors">Coaching</Link></li>
@@ -391,7 +391,7 @@ function Footer() {
           
           <div>
             <h4 className="font-semibold mb-4 text-white">Support</h4>
-            <ul className="space-y-2 text-gray-300">
+            <ul className="space-y-2 text-gray-200">
               <li><Link href="/contact" className="hover:text-teal-400 transition-colors">Help Center</Link></li>
               <li><Link href="/contact" className="hover:text-teal-400 transition-colors">Contact Support</Link></li>
               <li><Link href="/synergize" className="hover:text-teal-400 transition-colors">AI Assistant</Link></li>
@@ -402,12 +402,12 @@ function Footer() {
         <Separator className="my-8 bg-gray-700" />
         
         <div className="flex flex-col md:flex-row justify-between items-center">
-          <p className="text-gray-300">
+          <p className="text-gray-200">
             © 2024 Synergies4. All rights reserved.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
-            <Link href="/contact" className="text-gray-300 hover:text-teal-400 transition-colors">Privacy Policy</Link>
-            <Link href="/contact" className="text-gray-300 hover:text-teal-400 transition-colors">Terms of Service</Link>
+            <Link href="/contact" className="text-gray-200 hover:text-teal-400 transition-colors">Privacy Policy</Link>
+            <Link href="/contact" className="text-gray-200 hover:text-teal-400 transition-colors">Terms of Service</Link>
           </div>
         </div>
       </div>
