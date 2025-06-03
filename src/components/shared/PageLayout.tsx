@@ -248,26 +248,23 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
           {mobileMenuOpen && (
             <div 
               id="mobile-menu"
-              className="lg:hidden fixed inset-x-0 bg-white border-t border-gray-200 shadow-xl z-[9999]"
+              className="lg:hidden fixed inset-x-0 bg-white/98 backdrop-blur-md border-t border-gray-200 shadow-xl z-[9999]"
               style={{ 
                 height: 'calc(100vh - 140px)', 
-                top: '140px',
-                backgroundColor: 'rgba(255, 255, 255, 0.98)',
-                backdropFilter: 'blur(12px)',
-                WebkitBackdropFilter: 'blur(12px)'
+                top: '140px'
               }}
               role="menu"
               aria-label="Mobile navigation menu"
             >
-              <div className="h-full overflow-y-auto overscroll-contain bg-white/95">
-                <div className="px-4 py-4 space-y-4 min-h-full flex flex-col bg-white/90">
+              <div className="h-full overflow-y-auto overscroll-contain">
+                <div className="px-4 py-4 space-y-4 min-h-full flex flex-col">
                   {/* Navigation Links */}
                   <div className="space-y-1">
                     {navigationItems.map((item) => (
                       <Link
                         key={item.label}
                         href={item.href}
-                        className="block text-gray-700 hover:text-teal-600 hover:bg-teal-50 transition-colors font-medium py-3 px-3 text-base rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-white/80 border border-gray-100 mb-1"
+                        className="block text-gray-700 hover:text-teal-600 hover:bg-teal-50 transition-colors font-medium py-3 px-3 text-base rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-white/50 border border-gray-100 mb-1"
                         onClick={() => setMobileMenuOpen(false)}
                         role="menuitem"
                       >
@@ -281,7 +278,7 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                         setIsSearchOpen(true);
                         setMobileMenuOpen(false);
                       }}
-                      className="w-full flex items-center text-gray-700 hover:text-teal-600 hover:bg-teal-50 transition-colors font-medium py-3 px-3 text-base rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-white/80 border border-gray-100 mb-1"
+                      className="w-full flex items-center text-gray-700 hover:text-teal-600 hover:bg-teal-50 transition-colors font-medium py-3 px-3 text-base rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-white/50 border border-gray-100 mb-1"
                       role="menuitem"
                     >
                       <Search className="w-5 h-5 mr-3" />
@@ -316,10 +313,10 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                   </div>
                   
                   {/* Auth Section - Always at bottom */}
-                  <div className="border-t border-gray-200 pt-4 pb-6 mt-auto bg-gray-50/80 rounded-lg">
+                  <div className="border-t border-gray-200 pt-4 pb-6 mt-auto bg-gray-50/50 rounded-lg">
                     {user ? (
                       <div className="space-y-3">
-                        <div className="flex items-center space-x-3 py-2 px-3 bg-white/90 rounded-lg border">
+                        <div className="flex items-center space-x-3 py-2 px-3 bg-white/60 rounded-lg border border-gray-200">
                           <UserAvatar />
                           <span className="text-gray-700 font-medium text-sm">Welcome back!</span>
                         </div>
