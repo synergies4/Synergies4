@@ -2006,10 +2006,12 @@ export default function CreateCourse() {
             <CardHeader className="bg-gradient-to-r from-teal-600 to-blue-600 text-white">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <Brain className="w-6 h-6" />
+                  <div className="bg-white/20 p-2 rounded-lg">
+                    <Brain className="w-6 h-6" />
+                  </div>
                   <div>
-                    <CardTitle>AI Course Assistant</CardTitle>
-                    <CardDescription className="text-teal-100">
+                    <CardTitle className="text-lg sm:text-xl">AI Course Assistant</CardTitle>
+                    <CardDescription className="text-teal-100 text-sm">
                       Get AI-powered suggestions for your course content
                     </CardDescription>
                   </div>
@@ -2018,93 +2020,97 @@ export default function CreateCourse() {
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowAIAssistant(false)}
-                  className="text-white hover:bg-white/20"
+                  className="text-white hover:bg-white/20 p-2"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-4 h-4 sm:w-5 sm:h-5" />
                 </Button>
               </div>
             </CardHeader>
 
-            {/* Mobile Content - Scrollable */}
-            <div className="flex-1 overflow-y-auto overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
-              <CardContent className="p-4 bg-white">
-                <div className="space-y-4">
-                  {/* AI Mode Selection - Mobile */}
+            {/* Content - Responsive */}
+            <div className="flex-1 overflow-y-auto overscroll-contain">
+              <CardContent className="p-4 sm:p-6 bg-white">
+                <div className="space-y-4 sm:space-y-6">
+                  {/* AI Mode Selection - Responsive */}
                   <div>
                     <Label className="text-sm font-medium mb-3 block">What would you like help with?</Label>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
                       {aiModeOptions.map(({ mode, icon: Icon, label }) => (
                         <Button
                           key={mode}
                           variant={aiMode === mode ? 'default' : 'outline'}
                           size="sm"
                           onClick={() => handleAiModeChange(mode)}
-                          className="flex flex-col items-center p-3 h-auto"
+                          className={`flex flex-col items-center p-3 sm:p-4 h-auto ${
+                            aiMode === mode 
+                              ? 'bg-teal-600 text-white border-teal-600 hover:bg-teal-700' 
+                              : 'bg-white text-gray-900 border-gray-300 hover:bg-gray-50'
+                          }`}
                         >
-                          <Icon className="w-4 h-4 mb-1" />
-                          <span className="text-xs text-center">{label}</span>
+                          <Icon className="w-4 h-4 sm:w-5 sm:h-5 mb-1 sm:mb-2" />
+                          <span className="text-xs text-center leading-tight">{label}</span>
                         </Button>
                       ))}
                     </div>
                   </div>
 
                   {/* Mode Description */}
-                  <div className="bg-gradient-to-r from-blue-50 to-teal-50 p-3 rounded-lg border border-blue-200">
-                    <h4 className="font-medium mb-2 text-blue-800 text-sm">
+                  <div className="bg-gradient-to-r from-blue-50 to-teal-50 p-3 sm:p-4 rounded-lg border border-blue-200">
+                    <h4 className="font-medium mb-2 text-blue-800 text-sm sm:text-base">
                       {aiModeDescriptions[aiMode]?.title}
                     </h4>
-                    <p className="text-xs text-blue-700 leading-relaxed">
+                    <p className="text-xs sm:text-sm text-blue-700 leading-relaxed">
                       {aiModeDescriptions[aiMode]?.description}
                     </p>
                   </div>
 
                   {/* Context Input */}
                   <div>
-                    <Label htmlFor="aiContext-mobile" className="text-sm font-medium block mb-2">
+                    <Label htmlFor="aiContext" className="text-sm font-medium block mb-2">
                       Additional Context <span className="text-gray-500 text-xs">(Optional)</span>
                     </Label>
                     <Textarea
-                      id="aiContext-mobile"
+                      id="aiContext"
                       value={aiContext}
                       onChange={(e) => setAiContext(e.target.value)}
-                      placeholder="Provide any additional context about your course..."
-                      className="resize-none"
+                      placeholder="Provide any additional context about your course, target audience, specific requirements, etc."
+                      className="resize-none bg-white border-gray-300 text-gray-900"
                       rows={3}
                     />
                   </div>
 
                   {/* Course Info */}
-                  <div className="bg-gray-50 p-3 rounded-lg border">
-                    <h4 className="font-medium mb-3 text-sm flex items-center">
+                  <div className="bg-gray-50 p-3 sm:p-4 rounded-lg border">
+                    <h4 className="font-medium mb-3 flex items-center text-sm sm:text-base">
                       <BookOpen className="w-4 h-4 mr-2" />
                       Current Course Info
                     </h4>
-                    <div className="space-y-2 text-xs">
-                      <div className="flex justify-between">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 text-xs sm:text-sm">
+                      <div>
                         <span className="text-gray-600 font-medium">Title:</span> 
-                        <span className="text-right max-w-[60%] truncate">{formData.title || 'Not set'}</span>
+                        <div className="mt-1 text-gray-900">{formData.title || 'Not set'}</div>
                       </div>
-                      <div className="flex justify-between">
+                      <div>
                         <span className="text-gray-600 font-medium">Category:</span> 
-                        <span>{formData.category || 'Not set'}</span>
+                        <div className="mt-1 text-gray-900">{formData.category || 'Not set'}</div>
                       </div>
-                      <div className="flex justify-between">
+                      <div>
                         <span className="text-gray-600 font-medium">Level:</span> 
-                        <span>{formData.level || 'Not set'}</span>
+                        <div className="mt-1 text-gray-900">{formData.level || 'Not set'}</div>
                       </div>
-                      <div className="flex justify-between">
+                      <div>
                         <span className="text-gray-600 font-medium">Modules:</span> 
-                        <span>{formData.modules.length}</span>
+                        <div className="mt-1 text-gray-900">{formData.modules.length}</div>
                       </div>
                     </div>
                   </div>
 
                   {/* Warning Message */}
                   {!formData.title && aiMode !== 'title' && (
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 sm:p-4">
                       <div className="flex items-start space-x-2">
                         <HelpCircle className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
-                        <p className="text-xs text-yellow-800">
+                        <p className="text-xs sm:text-sm text-yellow-800">
                           Please enter a course title first to get AI suggestions.
                         </p>
                       </div>
@@ -2115,29 +2121,29 @@ export default function CreateCourse() {
                   <Button
                     onClick={generateAISuggestions}
                     disabled={aiLoading || (!formData.title && aiMode !== 'title')}
-                    className="w-full bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 min-h-[48px] text-base font-medium"
+                    className="w-full bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 min-h-[48px] text-base font-medium shadow-lg hover:shadow-xl transition-all duration-200"
                   >
                     {aiLoading ? (
                       <>
-                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                        Generating...
+                        <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-spin" />
+                        Generating Suggestions...
                       </>
                     ) : (
                       <>
-                        <Sparkles className="w-5 h-5 mr-2" />
-                        Generate
+                        <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                        Generate AI Suggestions
                       </>
                     )}
                   </Button>
 
                   {/* Error Display */}
                   {aiError && (
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4">
                       <div className="flex items-start space-x-2">
                         <X className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
                         <div className="flex-1">
-                          <p className="text-xs text-red-800 font-medium">Error</p>
-                          <p className="text-xs text-red-700">{aiError}</p>
+                          <p className="text-xs sm:text-sm text-red-800 font-medium">Error</p>
+                          <p className="text-xs sm:text-sm text-red-700">{aiError}</p>
                         </div>
                         <Button
                           variant="ghost"
@@ -2155,7 +2161,7 @@ export default function CreateCourse() {
                   {aiSuggestions && (
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
-                        <h4 className="font-medium text-sm flex items-center">
+                        <h4 className="font-medium text-sm sm:text-base flex items-center">
                           <Brain className="w-4 h-4 mr-2 text-purple-600" />
                           AI Suggestions
                         </h4>
@@ -2163,27 +2169,27 @@ export default function CreateCourse() {
                           variant="outline"
                           size="sm"
                           onClick={() => copyToClipboard(aiSuggestions)}
-                          className="min-h-[36px] text-xs"
+                          className="text-xs bg-white border-gray-300 text-gray-900 hover:bg-gray-50"
                         >
-                          <Copy className="w-3 h-3 mr-1" />
+                          <Copy className="w-3 h-3 mr-1 sm:mr-2" />
                           Copy
                         </Button>
                       </div>
                       
                       <div className="bg-white border rounded-lg overflow-hidden shadow-sm">
-                        <div className="max-h-48 overflow-y-auto p-3" style={{ WebkitOverflowScrolling: 'touch' }}>
-                          <pre className="whitespace-pre-wrap text-xs leading-relaxed">{aiSuggestions}</pre>
+                        <div className="max-h-48 sm:max-h-60 overflow-y-auto p-3 sm:p-4 overscroll-contain">
+                          <pre className="whitespace-pre-wrap text-xs sm:text-sm leading-relaxed text-gray-900">{aiSuggestions}</pre>
                         </div>
                       </div>
                       
                       {/* Action Buttons */}
                       <div className="space-y-2">
                         {aiMode === 'description' && (
-                          <div className="space-y-2">
+                          <div className="space-y-2 sm:space-y-0 sm:flex sm:gap-2">
                             <Button
                               onClick={() => applyAISuggestion('description')}
                               size="sm"
-                              className="w-full min-h-[44px]"
+                              className="w-full sm:flex-1"
                             >
                               Apply to Description
                             </Button>
@@ -2191,7 +2197,7 @@ export default function CreateCourse() {
                               onClick={() => applyAISuggestion('shortDesc')}
                               variant="outline"
                               size="sm"
-                              className="w-full min-h-[44px]"
+                              className="w-full sm:flex-1 bg-white border-gray-300 text-gray-900 hover:bg-gray-50"
                             >
                               Apply to Short Description
                             </Button>
@@ -2202,7 +2208,7 @@ export default function CreateCourse() {
                           <Button
                             onClick={() => applyAISuggestion('title')}
                             size="sm"
-                            className="w-full min-h-[44px]"
+                            className="w-full"
                           >
                             Apply First Title
                           </Button>
@@ -2212,7 +2218,7 @@ export default function CreateCourse() {
                           <Button
                             onClick={() => applyAISuggestion('modules')}
                             size="sm"
-                            className="w-full min-h-[44px]"
+                            className="w-full"
                           >
                             Apply Module Structure
                           </Button>
@@ -2222,7 +2228,7 @@ export default function CreateCourse() {
                           <Button
                             onClick={() => applyAISuggestion('quiz')}
                             size="sm"
-                            className="w-full min-h-[44px]"
+                            className="w-full"
                           >
                             Apply Quiz Questions
                           </Button>
@@ -2232,7 +2238,7 @@ export default function CreateCourse() {
                           <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
                             <div className="flex items-start space-x-2">
                               <Lightbulb className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
-                              <p className="text-xs text-amber-800">
+                              <p className="text-xs sm:text-sm text-amber-800">
                                 Copy the suggestions above and use them as reference for your course content.
                               </p>
                             </div>
@@ -2242,283 +2248,30 @@ export default function CreateCourse() {
                     </div>
                   )}
 
-                  {/* Add some padding at bottom for scroll */}
-                  <div className="pb-4"></div>
+                  {/* Add padding at bottom for better scrolling */}
+                  <div className="pb-4 sm:pb-6"></div>
                 </div>
               </CardContent>
             </div>
 
-            {/* Mobile Footer */}
+            {/* Footer */}
             <div className="border-t p-4 bg-white flex-shrink-0">
               <Button
                 onClick={() => setShowAIAssistant(false)}
                 variant="outline"
-                className="w-full min-h-[44px]"
+                className="w-full min-h-[44px] bg-white border-gray-300 text-gray-900 hover:bg-gray-50"
               >
                 Close Assistant
               </Button>
             </div>
           </Card>
 
-          {/* Desktop: Centered modal with proper scrolling */}
-          <div className="hidden sm:block w-full max-w-4xl h-[90vh] flex flex-col">
-            <Card className="flex flex-col h-full overflow-hidden bg-white border border-gray-200 shadow-xl">
-              {/* Desktop Header - Fixed */}
-              <CardHeader className="bg-gradient-to-r from-teal-600 to-blue-600 text-white flex-shrink-0">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="bg-white/20 p-2 rounded-lg">
-                      <Brain className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-xl">AI Course Assistant</CardTitle>
-                      <CardDescription className="text-teal-100">
-                        Get AI-powered suggestions for your course content
-                      </CardDescription>
-                    </div>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowAIAssistant(false)}
-                    className="text-white hover:bg-white/20 p-2"
-                  >
-                    <X className="w-5 h-5" />
-                  </Button>
-                </div>
-              </CardHeader>
-
-              {/* Desktop Content - Scrollable */}
-              <div className="flex-1 overflow-y-auto overscroll-contain">
-                <CardContent className="p-6 bg-white">
-                  <div className="space-y-6">
-                    {/* AI Mode Selection - Desktop */}
-                    <div>
-                      <Label className="text-sm font-medium mb-3 block">What would you like help with?</Label>
-                      <div className="grid grid-cols-4 gap-3">
-                        {aiModeOptions.map(({ mode, icon: Icon, label }) => (
-                          <Button
-                            key={mode}
-                            variant={aiMode === mode ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => handleAiModeChange(mode)}
-                            className="flex flex-col items-center p-4 h-auto"
-                          >
-                            <Icon className="w-5 h-5 mb-2" />
-                            <span className="text-xs text-center">{label}</span>
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Mode Description */}
-                    <div className="bg-gradient-to-r from-blue-50 to-teal-50 p-4 rounded-lg border border-blue-200">
-                      <h4 className="font-medium mb-2 text-blue-800">
-                        {aiModeDescriptions[aiMode]?.title}
-                      </h4>
-                      <p className="text-sm text-blue-700 leading-relaxed">
-                        {aiModeDescriptions[aiMode]?.description}
-                      </p>
-                    </div>
-
-                    {/* Context Input */}
-                    <div>
-                      <Label htmlFor="aiContext-desktop" className="text-sm font-medium block mb-2">
-                        Additional Context <span className="text-gray-500 text-xs">(Optional)</span>
-                      </Label>
-                      <Textarea
-                        id="aiContext-desktop"
-                        value={aiContext}
-                        onChange={(e) => setAiContext(e.target.value)}
-                        placeholder="Provide any additional context about your course, target audience, specific requirements, etc."
-                        className="resize-none"
-                        rows={3}
-                      />
-                    </div>
-
-                    {/* Course Info */}
-                    <div className="bg-gray-50 p-4 rounded-lg border">
-                      <h4 className="font-medium mb-3 flex items-center">
-                        <BookOpen className="w-4 h-4 mr-2" />
-                        Current Course Info
-                      </h4>
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <span className="text-gray-600 font-medium">Title:</span> 
-                          <div className="mt-1">{formData.title || 'Not set'}</div>
-                        </div>
-                        <div>
-                          <span className="text-gray-600 font-medium">Category:</span> 
-                          <div className="mt-1">{formData.category || 'Not set'}</div>
-                        </div>
-                        <div>
-                          <span className="text-gray-600 font-medium">Level:</span> 
-                          <div className="mt-1">{formData.level || 'Not set'}</div>
-                        </div>
-                        <div>
-                          <span className="text-gray-600 font-medium">Modules:</span> 
-                          <div className="mt-1">{formData.modules.length}</div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Warning Message */}
-                    {!formData.title && aiMode !== 'title' && (
-                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                        <div className="flex items-start space-x-2">
-                          <HelpCircle className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
-                          <p className="text-sm text-yellow-800">
-                            Please enter a course title first to get AI suggestions.
-                          </p>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Generate Button */}
-                    <Button
-                      onClick={generateAISuggestions}
-                      disabled={aiLoading || (!formData.title && aiMode !== 'title')}
-                      className="w-full bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 min-h-[48px] text-base font-medium shadow-lg hover:shadow-xl transition-all duration-200"
-                    >
-                      {aiLoading ? (
-                        <>
-                          <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                          Generating Suggestions...
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles className="w-5 h-5 mr-2" />
-                          Generate AI Suggestions
-                        </>
-                      )}
-                    </Button>
-
-                    {/* Error Display */}
-                    {aiError && (
-                      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                        <div className="flex items-start space-x-2">
-                          <X className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
-                          <div className="flex-1">
-                            <p className="text-sm text-red-800 font-medium">Error</p>
-                            <p className="text-sm text-red-700">{aiError}</p>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setAiError('')}
-                            className="text-red-600 hover:text-red-700 p-1 h-auto"
-                          >
-                            <X className="w-3 h-3" />
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* AI Suggestions */}
-                    {aiSuggestions && (
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <h4 className="font-medium flex items-center">
-                            <Brain className="w-4 h-4 mr-2 text-purple-600" />
-                            AI Suggestions
-                          </h4>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => copyToClipboard(aiSuggestions)}
-                            className="text-xs"
-                          >
-                            <Copy className="w-3 h-3 mr-2" />
-                            Copy
-                          </Button>
-                        </div>
-                        
-                        <div className="bg-white border rounded-lg overflow-hidden shadow-sm">
-                          <div className="max-h-60 overflow-y-auto p-4 overscroll-contain">
-                            <pre className="whitespace-pre-wrap text-sm leading-relaxed">{aiSuggestions}</pre>
-                          </div>
-                        </div>
-                        
-                        {/* Action Buttons */}
-                        <div className="space-y-2">
-                          {aiMode === 'description' && (
-                            <div className="flex gap-2">
-                              <Button
-                                onClick={() => applyAISuggestion('description')}
-                                size="sm"
-                                className="flex-1"
-                              >
-                                Apply to Description
-                              </Button>
-                              <Button
-                                onClick={() => applyAISuggestion('shortDesc')}
-                                variant="outline"
-                                size="sm"
-                                className="flex-1"
-                              >
-                                Apply to Short Description
-                              </Button>
-                            </div>
-                          )}
-
-                          {aiMode === 'title' && (
-                            <Button
-                              onClick={() => applyAISuggestion('title')}
-                              size="sm"
-                              className="w-full"
-                            >
-                              Apply First Title
-                            </Button>
-                          )}
-
-                          {aiMode === 'modules' && (
-                            <Button
-                              onClick={() => applyAISuggestion('modules')}
-                              size="sm"
-                              className="w-full"
-                            >
-                              Apply Module Structure
-                            </Button>
-                          )}
-
-                          {aiMode === 'quiz' && (
-                            <Button
-                              onClick={() => applyAISuggestion('quiz')}
-                              size="sm"
-                              className="w-full"
-                            >
-                              Apply Quiz Questions
-                            </Button>
-                          )}
-
-                          {(aiMode === 'content' || aiMode === 'pricing' || aiMode === 'marketing' || aiMode === 'imageIdeas') && (
-                            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-                              <div className="flex items-start space-x-2">
-                                <Lightbulb className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
-                                <p className="text-sm text-amber-800">
-                                  Copy the suggestions above and use them as reference for your course content.
-                                </p>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Add padding at bottom for better scrolling */}
-                    <div className="pb-6"></div>
-                  </div>
-                </CardContent>
-              </div>
-            </Card>
-          </div>
-
           {/* Loading Overlay */}
           {aiLoading && (
             <div className="absolute inset-0 bg-gray-800/20 flex items-center justify-center z-10">
               <div className="text-white text-center">
                 <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
-                <p className="text-sm">Generating image...</p>
+                <p className="text-sm">Generating suggestions...</p>
               </div>
             </div>
           )}

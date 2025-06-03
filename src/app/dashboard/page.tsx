@@ -308,9 +308,14 @@ export default function StudentDashboard() {
                               <div className="space-y-2">
                                 <div className="flex justify-between text-xs md:text-sm">
                                   <span className="text-gray-600">Progress</span>
-                                  <span className="font-medium">{enrollment.progress_percentage}%</span>
+                                  <span className="font-medium text-gray-900">{enrollment.progress_percentage}%</span>
                                 </div>
-                                <Progress value={enrollment.progress_percentage} className="h-2" />
+                                <div className="w-full bg-gray-200 rounded-full h-2">
+                                  <div 
+                                    className="bg-gradient-to-r from-blue-600 to-teal-600 h-2 rounded-full transition-all duration-300 ease-out"
+                                    style={{ width: `${enrollment.progress_percentage}%` }}
+                                  ></div>
+                                </div>
                               </div>
 
                               <div className="flex gap-2">
@@ -355,7 +360,12 @@ export default function StudentDashboard() {
                             <span className="font-medium truncate pr-2 text-gray-900">{enrollment.course.title}</span>
                             <span className="flex-shrink-0 text-gray-700">{enrollment.progress_percentage}%</span>
                           </div>
-                          <Progress value={enrollment.progress_percentage} className="h-2" />
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div 
+                              className="bg-gradient-to-r from-blue-600 to-teal-600 h-2 rounded-full transition-all duration-300 ease-out"
+                              style={{ width: `${enrollment.progress_percentage}%` }}
+                            ></div>
+                          </div>
                         </div>
                       ))}
                     </CardContent>
