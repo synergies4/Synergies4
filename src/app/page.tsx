@@ -36,13 +36,13 @@ export default function HomePage() {
   return (
     <PageLayout>
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-slate-700 via-gray-700 to-slate-600 min-h-screen flex items-center overflow-hidden">
+      <section className="relative bg-gradient-to-br from-blue-900 via-indigo-900 to-purple-900 min-h-screen flex items-center overflow-hidden">
         {/* Enhanced Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
           {/* Animated Orbs */}
           <div className="absolute top-1/4 right-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-gradient-to-br from-teal-600/20 to-emerald-600/20 rounded-full blur-3xl animate-pulse"></div>
           <div className="absolute bottom-1/3 left-1/3 w-48 sm:w-80 h-48 sm:h-80 bg-gradient-to-br from-cyan-500/15 to-teal-600/15 rounded-full blur-3xl animate-pulse animation-delay-1000"></div>
-          <div className="absolute top-2/3 left-1/4 w-32 sm:w-64 h-32 sm:h-64 bg-gradient-to-br from-slate-500/10 to-gray-600/10 rounded-full blur-2xl animate-pulse animation-delay-2000"></div>
+          <div className="absolute top-2/3 left-1/4 w-32 sm:w-64 h-32 sm:h-64 bg-gradient-to-br from-purple-500/10 to-blue-600/10 rounded-full blur-2xl animate-pulse animation-delay-2000"></div>
           
           {/* Geometric Shapes - Mobile Optimized */}
           <div className="absolute top-20 left-4 sm:left-20 w-16 sm:w-32 h-16 sm:h-32 border border-white/10 rounded-full animate-pulse"></div>
@@ -83,7 +83,7 @@ export default function HomePage() {
           </h1>
           
           {/* Enhanced Subtitle - Mobile Optimized */}
-          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 mb-12 sm:mb-16 max-w-4xl mx-auto leading-relaxed font-light px-4 sm:px-0">
+          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-200 mb-12 sm:mb-16 max-w-4xl mx-auto leading-relaxed font-light px-4 sm:px-0">
             Learn practical frameworks in 
             <span className="text-white font-medium bg-gradient-to-r from-teal-400 to-cyan-400 bg-clip-text text-transparent"> Agile, leadership, and mental fitness </span>
             that teams and leaders actually use
@@ -178,12 +178,12 @@ export default function HomePage() {
 // Value Propositions Section
 function ValuePropositionsSection() {
   return (
-    <section className="py-24 bg-gradient-to-br from-slate-700 via-gray-700 to-slate-600 relative overflow-hidden">
+    <section className="py-24 bg-gradient-to-br from-blue-900 via-indigo-900 to-purple-900 relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-teal-400/20 to-emerald-600/20 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-br from-cyan-400/20 to-teal-600/20 rounded-full blur-3xl animate-pulse animation-delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-br from-slate-400/10 to-gray-600/10 rounded-full blur-2xl animate-pulse animation-delay-2000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-br from-purple-400/10 to-blue-600/10 rounded-full blur-2xl animate-pulse animation-delay-2000"></div>
       </div>
 
       {/* Sophisticated Grid Pattern */}

@@ -217,7 +217,7 @@ function WhyChooseSection() {
 // Focus Areas Section
 function FocusAreasSection() {
   return (
-    <section id="coaching-programs" className="py-24 bg-gradient-to-br from-slate-800 via-gray-800 to-slate-700 relative overflow-hidden">
+    <section id="coaching-programs" className="py-24 bg-gradient-to-br from-blue-900 via-indigo-900 to-purple-900 relative overflow-hidden">
       {/* Enhanced Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-blue-500/20 to-cyan-600/20 rounded-full blur-3xl animate-pulse"></div>
@@ -349,7 +349,7 @@ function FocusAreasSection() {
 // Testimonials Section
 function TestimonialsSection() {
   return (
-    <section className="py-24 bg-gradient-to-br from-gray-800 via-slate-700 to-gray-800 relative overflow-hidden">
+    <section className="py-24 bg-gradient-to-br from-slate-900 via-gray-900 to-slate-900 relative overflow-hidden">
       {/* Enhanced Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-yellow-500/20 to-orange-600/20 rounded-full blur-3xl animate-pulse"></div>
