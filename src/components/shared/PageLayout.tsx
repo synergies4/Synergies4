@@ -74,8 +74,9 @@ interface NavigationProps {
 function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
   const { user, signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [headerHeight, setHeaderHeight] = useState(140);
 
-  // Close mobile menu on escape key
+  // Close mobile menu on escape key and calculate dynamic header height
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && mobileMenuOpen) {
@@ -87,6 +88,24 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
       document.addEventListener('keydown', handleKeyDown);
       // Prevent body scroll when mobile menu is open
       document.body.style.overflow = 'hidden';
+      
+      // Calculate actual header height dynamically
+      const calculateHeaderHeight = () => {
+        const banner = document.querySelector('[role="banner"]') as HTMLElement;
+        const nav = document.querySelector('[role="navigation"]') as HTMLElement;
+        if (banner && nav) {
+          const totalHeight = banner.offsetHeight + nav.offsetHeight;
+          setHeaderHeight(totalHeight);
+        }
+      };
+      
+      // Calculate immediately and on resize
+      calculateHeaderHeight();
+      window.addEventListener('resize', calculateHeaderHeight);
+      
+      return () => {
+        window.removeEventListener('resize', calculateHeaderHeight);
+      };
     } else {
       document.body.style.overflow = 'unset';
     }
@@ -250,11 +269,11 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
               id="mobile-menu"
               className="lg:hidden fixed w-full bg-white shadow-xl z-[9999] border-t border-gray-200"
               style={{ 
-                top: '140px',
+                top: `${headerHeight}px`,
                 left: '0',
                 right: '0',
-                minHeight: 'calc(100vh - 140px)',
-                maxHeight: 'calc(100vh - 140px)'
+                minHeight: `calc(100vh - ${headerHeight}px)`,
+                maxHeight: `calc(100vh - ${headerHeight}px)`
               }}
               role="menu"
               aria-label="Mobile navigation menu"
