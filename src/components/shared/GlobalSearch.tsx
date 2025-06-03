@@ -222,7 +222,7 @@ export default function GlobalSearch({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 bg-gray-900/80 backdrop-blur-sm">
       <div className="flex items-start justify-center min-h-screen pt-[5vh] sm:pt-[10vh] px-2 sm:px-4">
         <Card className="w-full max-w-3xl bg-white shadow-2xl border-0 rounded-2xl overflow-hidden">
           <CardContent className="p-0">

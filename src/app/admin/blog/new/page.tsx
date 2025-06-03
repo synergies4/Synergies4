@@ -568,15 +568,15 @@ export default function NewBlogPostPage() {
 
         {/* AI Assistant Modal */}
         {showAIAssistant && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="fixed inset-0 bg-gray-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <Card className="w-full max-w-4xl max-h-[90vh] overflow-hidden">
-              <CardHeader className="bg-gradient-to-r from-purple-600 to-blue-600 text-white">
+              <CardHeader className="bg-gradient-to-r from-teal-600 to-blue-600 text-white">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     <Brain className="w-6 h-6" />
                     <div>
                       <CardTitle>AI Blog Assistant</CardTitle>
-                      <CardDescription className="text-purple-100">
+                      <CardDescription className="text-teal-100">
                         Get AI-powered suggestions for your blog content
                       </CardDescription>
                     </div>

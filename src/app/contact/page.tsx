@@ -158,7 +158,7 @@ export default function Contact() {
                   <MessageSquare className="w-4 h-4 text-blue-600 mr-2" />
                   <span className="text-blue-700 font-medium text-sm">Contact Form</span>
                 </div>
-                <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+                <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-gray-700 via-blue-800 to-teal-800 bg-clip-text text-transparent">
                   Send us a Message
                 </h2>
                 <p className="text-lg text-gray-700 leading-relaxed">
@@ -357,7 +357,7 @@ export default function Contact() {
                   <Phone className="w-4 h-4 text-teal-600 mr-2" />
                   <span className="text-teal-700 font-medium text-sm">Contact Info</span>
                 </div>
-                <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-gray-900 via-teal-800 to-blue-800 bg-clip-text text-transparent">
+                <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-gray-700 via-teal-800 to-blue-800 bg-clip-text text-transparent">
                   Get in Touch
                 </h2>
                 <p className="text-lg text-gray-700 leading-relaxed">
@@ -476,11 +476,11 @@ export default function Contact() {
       </section>
 
       {/* Global Offices Section */}
-      <section id="locations" className="py-24 bg-gradient-to-br from-gray-900 via-slate-800 to-gray-900 relative overflow-hidden">
+      <section id="locations" className="py-24 bg-gradient-to-br from-gray-800 via-slate-700 to-gray-800 relative overflow-hidden">
         {/* Enhanced Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-blue-500/20 to-cyan-600/20 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-1/3 left-1/3 w-80 h-80 bg-gradient-to-br from-purple-500/15 to-pink-600/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute bottom-1/3 left-1/3 w-80 h-80 bg-gradient-to-br from-teal-500/15 to-emerald-600/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
           <div className="absolute top-2/3 left-1/4 w-64 h-64 bg-gradient-to-br from-emerald-500/10 to-teal-600/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
         </div>
 

@@ -2001,270 +2001,264 @@ export default function CreateCourse() {
 
       {/* AI Assistant Modal */}
       {showAIAssistant && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-hidden">
-          {/* Mobile: Full screen modal */}
-          <div className="block sm:hidden w-full h-full">
-            <Card className="h-full w-full flex flex-col overflow-hidden rounded-lg">
-              {/* Mobile Header - Fixed */}
-              <CardHeader className="bg-gradient-to-r from-purple-600 to-blue-600 text-white flex-shrink-0">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="bg-white/20 p-2 rounded-lg">
-                      <Brain className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-lg">AI Course Assistant</CardTitle>
-                      <CardDescription className="text-purple-100 text-sm">
-                        Get AI-powered suggestions
-                      </CardDescription>
-                    </div>
+        <div className="fixed inset-0 bg-gray-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-4xl max-h-[90vh] overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-teal-600 to-blue-600 text-white">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <Brain className="w-6 h-6" />
+                  <div>
+                    <CardTitle>AI Course Assistant</CardTitle>
+                    <CardDescription className="text-teal-100">
+                      Get AI-powered suggestions for your course content
+                    </CardDescription>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowAIAssistant(false)}
-                    className="text-white hover:bg-white/20 p-2 min-h-[44px] min-w-[44px]"
-                  >
-                    <X className="w-5 h-5" />
-                  </Button>
                 </div>
-              </CardHeader>
-
-              {/* Mobile Content - Scrollable */}
-              <div className="flex-1 overflow-y-auto overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
-                <CardContent className="p-4">
-                  <div className="space-y-4">
-                    {/* AI Mode Selection - Mobile */}
-                    <div>
-                      <Label className="text-sm font-medium mb-3 block">What would you like help with?</Label>
-                      <div className="grid grid-cols-2 gap-2">
-                        {aiModeOptions.map(({ mode, icon: Icon, label }) => (
-                          <Button
-                            key={mode}
-                            variant={aiMode === mode ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => handleAiModeChange(mode)}
-                            className="flex flex-col items-center p-3 h-auto"
-                          >
-                            <Icon className="w-4 h-4 mb-1" />
-                            <span className="text-xs text-center">{label}</span>
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Mode Description */}
-                    <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-3 rounded-lg border border-blue-200">
-                      <h4 className="font-medium mb-2 text-blue-800 text-sm">
-                        {aiModeDescriptions[aiMode]?.title}
-                      </h4>
-                      <p className="text-xs text-blue-700 leading-relaxed">
-                        {aiModeDescriptions[aiMode]?.description}
-                      </p>
-                    </div>
-
-                    {/* Context Input */}
-                    <div>
-                      <Label htmlFor="aiContext-mobile" className="text-sm font-medium block mb-2">
-                        Additional Context <span className="text-gray-500 text-xs">(Optional)</span>
-                      </Label>
-                      <Textarea
-                        id="aiContext-mobile"
-                        value={aiContext}
-                        onChange={(e) => setAiContext(e.target.value)}
-                        placeholder="Provide any additional context about your course..."
-                        className="resize-none"
-                        rows={3}
-                      />
-                    </div>
-
-                    {/* Course Info */}
-                    <div className="bg-gray-50 p-3 rounded-lg border">
-                      <h4 className="font-medium mb-3 text-sm flex items-center">
-                        <BookOpen className="w-4 h-4 mr-2" />
-                        Current Course Info
-                      </h4>
-                      <div className="space-y-2 text-xs">
-                        <div className="flex justify-between">
-                          <span className="text-gray-600 font-medium">Title:</span> 
-                          <span className="text-right max-w-[60%] truncate">{formData.title || 'Not set'}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600 font-medium">Category:</span> 
-                          <span>{formData.category || 'Not set'}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600 font-medium">Level:</span> 
-                          <span>{formData.level || 'Not set'}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600 font-medium">Modules:</span> 
-                          <span>{formData.modules.length}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Warning Message */}
-                    {!formData.title && aiMode !== 'title' && (
-                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                        <div className="flex items-start space-x-2">
-                          <HelpCircle className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
-                          <p className="text-xs text-yellow-800">
-                            Please enter a course title first to get AI suggestions.
-                          </p>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Generate Button */}
-                    <Button
-                      onClick={generateAISuggestions}
-                      disabled={aiLoading || (!formData.title && aiMode !== 'title')}
-                      className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 min-h-[48px] text-base font-medium"
-                    >
-                      {aiLoading ? (
-                        <>
-                          <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                          Generating...
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles className="w-5 h-5 mr-2" />
-                          Generate
-                        </>
-                      )}
-                    </Button>
-
-                    {/* Error Display */}
-                    {aiError && (
-                      <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                        <div className="flex items-start space-x-2">
-                          <X className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
-                          <div className="flex-1">
-                            <p className="text-xs text-red-800 font-medium">Error</p>
-                            <p className="text-xs text-red-700">{aiError}</p>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setAiError('')}
-                            className="text-red-600 hover:text-red-700 p-1 h-auto"
-                          >
-                            <X className="w-3 h-3" />
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* AI Suggestions */}
-                    {aiSuggestions && (
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <h4 className="font-medium text-sm flex items-center">
-                            <Brain className="w-4 h-4 mr-2 text-purple-600" />
-                            AI Suggestions
-                          </h4>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => copyToClipboard(aiSuggestions)}
-                            className="min-h-[36px] text-xs"
-                          >
-                            <Copy className="w-3 h-3 mr-1" />
-                            Copy
-                          </Button>
-                        </div>
-                        
-                        <div className="bg-white border rounded-lg overflow-hidden shadow-sm">
-                          <div className="max-h-48 overflow-y-auto p-3" style={{ WebkitOverflowScrolling: 'touch' }}>
-                            <pre className="whitespace-pre-wrap text-xs leading-relaxed">{aiSuggestions}</pre>
-                          </div>
-                        </div>
-                        
-                        {/* Action Buttons */}
-                        <div className="space-y-2">
-                          {aiMode === 'description' && (
-                            <div className="space-y-2">
-                              <Button
-                                onClick={() => applyAISuggestion('description')}
-                                size="sm"
-                                className="w-full min-h-[44px]"
-                              >
-                                Apply to Description
-                              </Button>
-                              <Button
-                                onClick={() => applyAISuggestion('shortDesc')}
-                                variant="outline"
-                                size="sm"
-                                className="w-full min-h-[44px]"
-                              >
-                                Apply to Short Description
-                              </Button>
-                            </div>
-                          )}
-
-                          {aiMode === 'title' && (
-                            <Button
-                              onClick={() => applyAISuggestion('title')}
-                              size="sm"
-                              className="w-full min-h-[44px]"
-                            >
-                              Apply First Title
-                            </Button>
-                          )}
-
-                          {aiMode === 'modules' && (
-                            <Button
-                              onClick={() => applyAISuggestion('modules')}
-                              size="sm"
-                              className="w-full min-h-[44px]"
-                            >
-                              Apply Module Structure
-                            </Button>
-                          )}
-
-                          {aiMode === 'quiz' && (
-                            <Button
-                              onClick={() => applyAISuggestion('quiz')}
-                              size="sm"
-                              className="w-full min-h-[44px]"
-                            >
-                              Apply Quiz Questions
-                            </Button>
-                          )}
-
-                          {(aiMode === 'content' || aiMode === 'pricing' || aiMode === 'marketing' || aiMode === 'imageIdeas') && (
-                            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-                              <div className="flex items-start space-x-2">
-                                <Lightbulb className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
-                                <p className="text-xs text-amber-800">
-                                  Copy the suggestions above and use them as reference for your course content.
-                                </p>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Add some padding at bottom for scroll */}
-                    <div className="pb-4"></div>
-                  </div>
-                </CardContent>
-              </div>
-
-              {/* Mobile Footer */}
-              <div className="border-t p-4 bg-white flex-shrink-0">
                 <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={() => setShowAIAssistant(false)}
-                  variant="outline"
-                  className="w-full min-h-[44px]"
+                  className="text-white hover:bg-white/20"
                 >
-                  Close Assistant
+                  <X className="w-4 h-4" />
                 </Button>
               </div>
-            </Card>
-          </div>
+            </CardHeader>
+
+            {/* Mobile Content - Scrollable */}
+            <div className="flex-1 overflow-y-auto overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
+              <CardContent className="p-4">
+                <div className="space-y-4">
+                  {/* AI Mode Selection - Mobile */}
+                  <div>
+                    <Label className="text-sm font-medium mb-3 block">What would you like help with?</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {aiModeOptions.map(({ mode, icon: Icon, label }) => (
+                        <Button
+                          key={mode}
+                          variant={aiMode === mode ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => handleAiModeChange(mode)}
+                          className="flex flex-col items-center p-3 h-auto"
+                        >
+                          <Icon className="w-4 h-4 mb-1" />
+                          <span className="text-xs text-center">{label}</span>
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Mode Description */}
+                  <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-3 rounded-lg border border-blue-200">
+                    <h4 className="font-medium mb-2 text-blue-800 text-sm">
+                      {aiModeDescriptions[aiMode]?.title}
+                    </h4>
+                    <p className="text-xs text-blue-700 leading-relaxed">
+                      {aiModeDescriptions[aiMode]?.description}
+                    </p>
+                  </div>
+
+                  {/* Context Input */}
+                  <div>
+                    <Label htmlFor="aiContext-mobile" className="text-sm font-medium block mb-2">
+                      Additional Context <span className="text-gray-500 text-xs">(Optional)</span>
+                    </Label>
+                    <Textarea
+                      id="aiContext-mobile"
+                      value={aiContext}
+                      onChange={(e) => setAiContext(e.target.value)}
+                      placeholder="Provide any additional context about your course..."
+                      className="resize-none"
+                      rows={3}
+                    />
+                  </div>
+
+                  {/* Course Info */}
+                  <div className="bg-gray-50 p-3 rounded-lg border">
+                    <h4 className="font-medium mb-3 text-sm flex items-center">
+                      <BookOpen className="w-4 h-4 mr-2" />
+                      Current Course Info
+                    </h4>
+                    <div className="space-y-2 text-xs">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 font-medium">Title:</span> 
+                        <span className="text-right max-w-[60%] truncate">{formData.title || 'Not set'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 font-medium">Category:</span> 
+                        <span>{formData.category || 'Not set'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 font-medium">Level:</span> 
+                        <span>{formData.level || 'Not set'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 font-medium">Modules:</span> 
+                        <span>{formData.modules.length}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Warning Message */}
+                  {!formData.title && aiMode !== 'title' && (
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                      <div className="flex items-start space-x-2">
+                        <HelpCircle className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+                        <p className="text-xs text-yellow-800">
+                          Please enter a course title first to get AI suggestions.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Generate Button */}
+                  <Button
+                    onClick={generateAISuggestions}
+                    disabled={aiLoading || (!formData.title && aiMode !== 'title')}
+                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 min-h-[48px] text-base font-medium"
+                  >
+                    {aiLoading ? (
+                      <>
+                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-5 h-5 mr-2" />
+                        Generate
+                      </>
+                    )}
+                  </Button>
+
+                  {/* Error Display */}
+                  {aiError && (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                      <div className="flex items-start space-x-2">
+                        <X className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
+                        <div className="flex-1">
+                          <p className="text-xs text-red-800 font-medium">Error</p>
+                          <p className="text-xs text-red-700">{aiError}</p>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setAiError('')}
+                          className="text-red-600 hover:text-red-700 p-1 h-auto"
+                        >
+                          <X className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* AI Suggestions */}
+                  {aiSuggestions && (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-medium text-sm flex items-center">
+                          <Brain className="w-4 h-4 mr-2 text-purple-600" />
+                          AI Suggestions
+                        </h4>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => copyToClipboard(aiSuggestions)}
+                          className="min-h-[36px] text-xs"
+                        >
+                          <Copy className="w-3 h-3 mr-1" />
+                          Copy
+                        </Button>
+                      </div>
+                      
+                      <div className="bg-white border rounded-lg overflow-hidden shadow-sm">
+                        <div className="max-h-48 overflow-y-auto p-3" style={{ WebkitOverflowScrolling: 'touch' }}>
+                          <pre className="whitespace-pre-wrap text-xs leading-relaxed">{aiSuggestions}</pre>
+                        </div>
+                      </div>
+                      
+                      {/* Action Buttons */}
+                      <div className="space-y-2">
+                        {aiMode === 'description' && (
+                          <div className="space-y-2">
+                            <Button
+                              onClick={() => applyAISuggestion('description')}
+                              size="sm"
+                              className="w-full min-h-[44px]"
+                            >
+                              Apply to Description
+                            </Button>
+                            <Button
+                              onClick={() => applyAISuggestion('shortDesc')}
+                              variant="outline"
+                              size="sm"
+                              className="w-full min-h-[44px]"
+                            >
+                              Apply to Short Description
+                            </Button>
+                          </div>
+                        )}
+
+                        {aiMode === 'title' && (
+                          <Button
+                            onClick={() => applyAISuggestion('title')}
+                            size="sm"
+                            className="w-full min-h-[44px]"
+                          >
+                            Apply First Title
+                          </Button>
+                        )}
+
+                        {aiMode === 'modules' && (
+                          <Button
+                            onClick={() => applyAISuggestion('modules')}
+                            size="sm"
+                            className="w-full min-h-[44px]"
+                          >
+                            Apply Module Structure
+                          </Button>
+                        )}
+
+                        {aiMode === 'quiz' && (
+                          <Button
+                            onClick={() => applyAISuggestion('quiz')}
+                            size="sm"
+                            className="w-full min-h-[44px]"
+                          >
+                            Apply Quiz Questions
+                          </Button>
+                        )}
+
+                        {(aiMode === 'content' || aiMode === 'pricing' || aiMode === 'marketing' || aiMode === 'imageIdeas') && (
+                          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                            <div className="flex items-start space-x-2">
+                              <Lightbulb className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                              <p className="text-xs text-amber-800">
+                                Copy the suggestions above and use them as reference for your course content.
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Add some padding at bottom for scroll */}
+                  <div className="pb-4"></div>
+                </div>
+              </CardContent>
+            </div>
+
+            {/* Mobile Footer */}
+            <div className="border-t p-4 bg-white flex-shrink-0">
+              <Button
+                onClick={() => setShowAIAssistant(false)}
+                variant="outline"
+                className="w-full min-h-[44px]"
+              >
+                Close Assistant
+              </Button>
+            </div>
+          </Card>
 
           {/* Desktop: Centered modal with proper scrolling */}
           <div className="hidden sm:block w-full max-w-4xl h-[90vh] flex flex-col">
@@ -2521,11 +2515,10 @@ export default function CreateCourse() {
 
           {/* Loading Overlay */}
           {aiLoading && (
-            <div className="absolute inset-0 bg-black/20 flex items-center justify-center z-10">
-              <div className="bg-white rounded-lg p-6 shadow-xl flex flex-col items-center space-y-3">
-                <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
-                <p className="text-sm font-medium">Generating AI suggestions...</p>
-                <p className="text-xs text-gray-500 text-center">This may take a few seconds</p>
+            <div className="absolute inset-0 bg-gray-800/20 flex items-center justify-center z-10">
+              <div className="text-white text-center">
+                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
+                <p className="text-sm">Generating image...</p>
               </div>
             </div>
           )}

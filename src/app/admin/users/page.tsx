@@ -83,9 +83,9 @@ export default function UserManagement() {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (profilesError) {
-        console.warn('Error fetching user profiles:', profilesError.message);
-        // Show sample data when database is not available
+      if (profilesError || !profiles || profiles.length === 0) {
+        console.warn('No user profiles found or error occurred:', profilesError?.message);
+        // Show sample data when database is not available or empty
         const sampleUsers: UserData[] = [
           {
             id: 'sample-1',
@@ -113,6 +113,24 @@ export default function UserManagement() {
             created_at: new Date(Date.now() - 172800000).toISOString(),
             last_sign_in_at: new Date(Date.now() - 7200000).toISOString(),
             enrollments_count: 0
+          },
+          {
+            id: 'sample-4',
+            email: 'student1@example.com',
+            name: 'Jane Smith',
+            role: 'USER',
+            created_at: new Date(Date.now() - 259200000).toISOString(),
+            last_sign_in_at: new Date(Date.now() - 10800000).toISOString(),
+            enrollments_count: 3
+          },
+          {
+            id: 'sample-5',
+            email: 'student2@example.com',
+            name: 'Bob Johnson',
+            role: 'USER',
+            created_at: new Date(Date.now() - 345600000).toISOString(),
+            last_sign_in_at: new Date(Date.now() - 14400000).toISOString(),
+            enrollments_count: 1
           }
         ];
         setUsers(sampleUsers);
@@ -192,6 +210,24 @@ export default function UserManagement() {
           created_at: new Date(Date.now() - 172800000).toISOString(),
           last_sign_in_at: new Date(Date.now() - 7200000).toISOString(),
           enrollments_count: 0
+        },
+        {
+          id: 'sample-4',
+          email: 'student1@example.com',
+          name: 'Jane Smith',
+          role: 'USER',
+          created_at: new Date(Date.now() - 259200000).toISOString(),
+          last_sign_in_at: new Date(Date.now() - 10800000).toISOString(),
+          enrollments_count: 3
+        },
+        {
+          id: 'sample-5',
+          email: 'student2@example.com',
+          name: 'Bob Johnson',
+          role: 'USER',
+          created_at: new Date(Date.now() - 345600000).toISOString(),
+          last_sign_in_at: new Date(Date.now() - 14400000).toISOString(),
+          enrollments_count: 1
         }
       ];
       setUsers(sampleUsers);

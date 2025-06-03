@@ -36,7 +36,7 @@ export default function HomePage() {
   return (
     <PageLayout>
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 min-h-screen flex items-center overflow-hidden">
+      <section className="relative bg-gradient-to-br from-slate-700 via-gray-700 to-slate-600 min-h-screen flex items-center overflow-hidden">
         {/* Enhanced Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
           {/* Animated Orbs */}
@@ -178,7 +178,7 @@ export default function HomePage() {
 // Value Propositions Section
 function ValuePropositionsSection() {
   return (
-    <section className="py-24 bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 relative overflow-hidden">
+    <section className="py-24 bg-gradient-to-br from-slate-700 via-gray-700 to-slate-600 relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-teal-400/20 to-emerald-600/20 rounded-full blur-3xl animate-pulse"></div>
@@ -425,7 +425,7 @@ function FeaturedCoursesSection() {
   const displayCourses = courses.length > 0 ? courses : fallbackCourses;
 
   return (
-    <section className="py-24 bg-gradient-to-br from-slate-950 via-gray-900 to-slate-900 relative overflow-hidden">
+    <section className="py-24 bg-gradient-to-br from-slate-800 via-gray-800 to-slate-700 relative overflow-hidden">
       {/* Dynamic Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-teal-500/10 to-emerald-600/10 rounded-full blur-3xl animate-pulse"></div>

@@ -72,10 +72,10 @@ export default function AboutUs() {
 // Mission Section
 function MissionSection() {
   return (
-    <section className="py-24 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+    <section className="py-24 bg-gradient-to-br from-slate-700 via-blue-800 to-slate-800 relative overflow-hidden">
       {/* Enhanced Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-blue-500/20 to-purple-600/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-blue-500/20 to-teal-600/20 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-1/3 left-1/3 w-80 h-80 bg-gradient-to-br from-cyan-500/15 to-blue-600/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
         <div className="absolute top-2/3 left-1/4 w-64 h-64 bg-gradient-to-br from-emerald-500/10 to-teal-600/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
       </div>
@@ -85,7 +85,7 @@ function MissionSection() {
         <div className="absolute inset-0" style={{
           backgroundImage: `
             radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.3) 2px, transparent 2px),
-            radial-gradient(circle at 75% 75%, rgba(168, 85, 247, 0.3) 2px, transparent 2px),
+            radial-gradient(circle at 75% 75%, rgba(20, 184, 166, 0.3) 2px, transparent 2px),
             radial-gradient(circle at 50% 50%, rgba(34, 197, 94, 0.2) 1px, transparent 1px)
           `,
           backgroundSize: '60px 60px, 80px 80px, 40px 40px'
@@ -177,10 +177,10 @@ function MissionSection() {
 // Statistics Section
 function StatisticsSection() {
   return (
-    <section className="py-24 bg-gradient-to-br from-indigo-950 via-slate-900 to-gray-900 relative overflow-hidden">
+    <section className="py-24 bg-gradient-to-br from-slate-800 via-gray-800 to-slate-700 relative overflow-hidden">
       {/* Dynamic Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-blue-500/10 to-purple-600/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-blue-500/10 to-teal-600/10 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-1/3 left-1/3 w-80 h-80 bg-gradient-to-br from-cyan-500/10 to-blue-600/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
         <div className="absolute top-2/3 left-1/4 w-64 h-64 bg-gradient-to-br from-emerald-500/10 to-teal-600/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
       </div>
@@ -189,7 +189,7 @@ function StatisticsSection() {
       <div className="absolute inset-0 opacity-5">
         <div className="absolute inset-0" style={{
           backgroundImage: `conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(59, 130, 246, 0.3) 60deg, transparent 120deg),
-                           conic-gradient(from 180deg at 25% 75%, transparent 0deg, rgba(168, 85, 247, 0.3) 60deg, transparent 120deg)`,
+                           conic-gradient(from 180deg at 25% 75%, transparent 0deg, rgba(20, 184, 166, 0.3) 60deg, transparent 120deg)`,
           backgroundSize: '120px 120px, 80px 80px'
         }} />
       </div>
@@ -292,7 +292,7 @@ function SpecialSection() {
           </div>
           
           <h2 className="text-4xl md:text-6xl font-bold mb-8 leading-tight">
-            <span className="bg-gradient-to-r from-gray-900 via-blue-800 to-teal-800 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-gray-700 via-blue-800 to-teal-800 bg-clip-text text-transparent">
               Beyond Traditional
             </span>
             <br />
@@ -429,12 +429,12 @@ function AboutDetailsSection() {
 // Testimonials Section
 function TestimonialsSection() {
   return (
-    <section className="py-24 bg-gradient-to-br from-gray-900 via-slate-800 to-gray-900 relative overflow-hidden">
+    <section className="py-24 bg-gradient-to-br from-gray-800 via-slate-700 to-gray-800 relative overflow-hidden">
       {/* Enhanced Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-yellow-500/20 to-orange-600/20 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-1/3 left-1/3 w-80 h-80 bg-gradient-to-br from-blue-500/15 to-cyan-600/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-2/3 left-1/4 w-64 h-64 bg-gradient-to-br from-purple-500/10 to-pink-600/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-2/3 left-1/4 w-64 h-64 bg-gradient-to-br from-teal-500/10 to-emerald-600/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
       </div>
 
       {/* Geometric Pattern */}

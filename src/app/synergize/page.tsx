@@ -400,7 +400,7 @@ const SlidePresentation = ({
 
       {/* Fullscreen Exit Hint */}
       {isFullscreen && (
-        <div className="absolute top-2 sm:top-4 right-2 sm:right-4 bg-black bg-opacity-50 text-white px-2 sm:px-3 py-1 rounded text-xs sm:text-sm">
+        <div className="absolute top-2 sm:top-4 right-2 sm:right-4 bg-gray-900/80 text-white px-2 sm:px-3 py-1 rounded text-xs sm:text-sm">
           Press ESC to exit fullscreen
         </div>
       )}
