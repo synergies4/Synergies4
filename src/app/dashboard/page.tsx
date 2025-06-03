@@ -148,6 +148,20 @@ export default function StudentDashboard() {
       .replace(/(^-|-$)/g, '');
   };
 
+  // Helper function to get badge styles based on difficulty level
+  const getLevelBadgeStyle = (level: string) => {
+    switch (level?.toUpperCase()) {
+      case 'BEGINNER':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'INTERMEDIATE':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'ADVANCED':
+        return 'bg-red-100 text-red-800 border-red-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
   if (authLoading || loading) {
     return (
       <PageLayout>
@@ -297,7 +311,9 @@ export default function StudentDashboard() {
 
                               <div className="flex items-center gap-2 md:gap-4 text-xs md:text-sm text-gray-500">
                                 <div className="flex items-center gap-1">
-                                  <Badge variant="outline" className="text-xs">{enrollment.course.level}</Badge>
+                                  <Badge variant="outline" className={`text-xs ${getLevelBadgeStyle(enrollment.course.level)}`}>
+                                    {enrollment.course.level}
+                                  </Badge>
                                 </div>
                                 <div className="flex items-center gap-1">
                                   <Clock className="h-3 w-3 md:h-4 md:w-4" />
