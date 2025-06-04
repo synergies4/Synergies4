@@ -104,19 +104,58 @@ export default function Signup() {
   };
 
   const handleGoogleSignUp = async () => {
+    console.log('🚀 handleGoogleSignUp called');
+    
     try {
+      console.log('Starting Google sign-up...');
       const supabase = createClient();
-      const { error } = await supabase.auth.signInWithOAuth({
+      console.log('✅ Supabase client created');
+      
+      // Log the current origin
+      console.log('Current origin:', window.location.origin);
+      
+      // Log environment variables (without sensitive data)
+      console.log('Supabase URL from env:', process.env.NEXT_PUBLIC_SUPABASE_URL);
+      
+      const redirectTo = `${window.location.origin}/dashboard`;
+      console.log('Redirect URL will be:', redirectTo);
+      
+      console.log('🔄 Calling supabase.auth.signInWithOAuth...');
+      
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/dashboard`
+          redirectTo: redirectTo,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          }
         }
       });
       
+      console.log('📊 OAuth response data:', data);
+      console.log('📊 OAuth response error:', error);
+      
       if (error) {
-        setError(error.message);
+        console.error('❌ Google OAuth error:', error);
+        console.error('Error details:', {
+          message: error.message,
+          status: error.status,
+          statusCode: error.statusCode
+        });
+        setError(`Google sign-up failed: ${error.message}`);
+      } else {
+        console.log('✅ Google OAuth initiated successfully');
+        console.log('Response data:', data);
       }
     } catch (error) {
+      console.error('💥 Catch block - Google sign-up error:', error);
+      console.error('Error type:', typeof error);
+      console.error('Error constructor:', error.constructor.name);
+      if (error instanceof Error) {
+        console.error('Error message:', error.message);
+        console.error('Error stack:', error.stack);
+      }
       setError('An error occurred with Google sign up.');
     }
   };

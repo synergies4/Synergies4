@@ -347,23 +347,23 @@ function SpecialSection() {
           ].map((item, index) => (
             <div key={index} className={`group relative animate-fade-in-up animation-delay-${index * 100}`}>
               {/* Glow Effect */}
-              <div className={`absolute -inset-1 bg-gradient-to-r ${item.gradient} rounded-2xl blur opacity-0 group-hover:opacity-25 transition-opacity`}></div>
+              <div className={`absolute -inset-1 bg-gradient-to-r ${item.gradient} rounded-2xl blur opacity-0 group-hover:opacity-25 transition-opacity-smooth`}></div>
               
               {/* Main Card */}
-              <div className={`relative bg-gradient-to-br ${item.bgGradient} rounded-2xl border border-white/50 p-8 h-full hover:bg-white/80 transition-all group-hover:scale-105 shadow-lg hover:shadow-2xl backdrop-blur-sm`}>
+              <div className={`relative bg-gradient-to-br ${item.bgGradient} rounded-2xl border border-white/50 p-8 h-full hover:bg-white/80 card-hover-optimized shadow-lg hover:shadow-2xl backdrop-blur-sm`}>
                 {/* Icon Container */}
                 <div className="relative mb-6">
-                  <div className={`w-20 h-20 bg-gradient-to-br ${item.gradient} rounded-2xl flex items-center justify-center mx-auto mb-6 text-white shadow-xl transition-transform group-hover:scale-110`}>
+                  <div className={`w-20 h-20 bg-gradient-to-br ${item.gradient} rounded-2xl flex items-center justify-center mx-auto mb-6 text-white shadow-xl transition-transform-smooth group-hover:scale-110`}>
                     {item.icon}
                   </div>
                 </div>
 
                 {/* Content */}
                 <div className="text-center">
-                  <h3 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-blue-700 transition-colors">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-blue-700 transition-colors-smooth">
                     {item.title}
                   </h3>
-                  <p className="text-gray-600 leading-relaxed text-base group-hover:text-gray-800 transition-colors">
+                  <p className="text-gray-600 leading-relaxed text-base group-hover:text-gray-800 transition-colors-smooth">
                     {item.description}
                   </p>
                 </div>
