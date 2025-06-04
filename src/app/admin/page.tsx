@@ -351,7 +351,7 @@ export default function AdminDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-col sm:flex-row gap-2">
-                    <Button variant="outline" className="flex-1 text-sm border-gray-300 text-gray-900 hover:bg-gray-50 hover:border-gray-400 bg-white" asChild>
+                    <Button variant="outline" className="flex-1 text-sm border-gray-300 text-gray-900 hover:bg-gray-50 hover:border-gray-400 hover:text-gray-900 bg-white" asChild>
                       <Link href="/admin/blog">
                         Manage Posts
                       </Link>

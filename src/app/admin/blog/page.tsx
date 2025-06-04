@@ -17,8 +17,7 @@ import {
   Calendar,
   Clock,
   User,
-  MoreHorizontal,
-  ArrowUpDown
+  MoreHorizontal
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { UserAvatar } from '@/components/UserAvatar';
@@ -55,7 +54,6 @@ export default function AdminBlogPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (userProfile?.role === 'ADMIN') {
@@ -147,99 +145,6 @@ export default function AdminBlogPage() {
   return (
     <PageLayout>
       <div className="min-h-screen bg-gray-50">
-        {/* Navigation */}
-        <div className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b shadow-sm">
-          <div className="container mx-auto px-4">
-            <div className="flex items-center justify-between h-16">
-              <div>
-                <Link href="/" className="flex items-center">
-                  <span 
-                    className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover:from-blue-700 hover:to-purple-700 transition-all duration-300"
-                  >
-                    Synergies4
-                  </span>
-                </Link>
-              </div>
-              
-              {/* Desktop Navigation */}
-              <div className="hidden md:flex items-center space-x-8">
-                {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item, index) => (
-                  <div key={item}>
-                    <Link 
-                      href={
-                        item === 'About Us' ? '/about-us' :
-                        item === 'Courses' ? '/courses' :
-                        item === 'Coaching' ? '/coaching' : 
-                        item === 'Consulting' ? '/consulting' : 
-                        item === 'Industry Insight' ? '/industry-insight' :
-                        `/${item.toLowerCase().replace(' ', '-')}`
-                      } 
-                      className="text-gray-600 hover:text-blue-600 transition-colors font-medium"
-                    >
-                      {item}
-                    </Link>
-                  </div>
-                ))}
-              </div>
-              
-              {/* Desktop Auth */}
-              <div 
-                className="hidden md:flex items-center space-x-3"
-              >
-                <UserAvatar />
-              </div>
-
-              {/* Mobile Menu Button */}
-              <div className="md:hidden">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="p-2"
-                >
-                  {mobileMenuOpen ? (
-                    <ArrowUpDown className="h-6 w-6" />
-                  ) : (
-                    <ArrowUpDown className="h-6 w-6" />
-                  )}
-                </Button>
-              </div>
-            </div>
-
-            {/* Mobile Menu */}
-            {mobileMenuOpen && (
-              <div className="md:hidden border-t bg-white/95 backdrop-blur-md overflow-hidden">
-                <div className="px-4 py-4 space-y-4">
-                  {['About Us', 'Courses', 'Coaching', 'Consulting', 'Industry Insight'].map((item) => (
-                    <Link
-                      key={item}
-                      href={
-                        item === 'About Us' ? '/about-us' :
-                        item === 'Courses' ? '/courses' :
-                        item === 'Coaching' ? '/coaching' : 
-                        item === 'Consulting' ? '/consulting' : 
-                        item === 'Industry Insight' ? '/industry-insight' :
-                        `/${item.toLowerCase().replace(' ', '-')}`
-                      }
-                      className="block text-gray-600 hover:text-blue-600 transition-colors font-medium py-2 text-lg"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      {item}
-                    </Link>
-                  ))}
-                  
-                  {/* Mobile Auth */}
-                  <div className="pt-4 border-t space-y-3">
-                    <div className="flex items-center space-x-2">
-                      <UserAvatar />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
         <div className="container mx-auto px-4 py-8">
           {/* Header */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
@@ -247,7 +152,7 @@ export default function AdminBlogPage() {
               <h1 className="text-3xl font-bold text-gray-900 mb-2">Blog Management</h1>
               <p className="text-gray-600">Manage your industry insights and blog posts</p>
             </div>
-            <Button asChild>
+            <Button asChild className="bg-teal-600 hover:bg-teal-700 text-white">
               <Link href="/admin/blog/new">
                 <Plus className="mr-2 h-4 w-4" />
                 Create New Post
@@ -265,17 +170,17 @@ export default function AdminBlogPage() {
                     placeholder="Search posts..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 bg-white text-gray-900 border-gray-300 placeholder:text-gray-500"
                   />
                 </div>
                 <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <SelectTrigger className="w-48">
+                  <SelectTrigger className="w-48 bg-white text-gray-900 border-gray-300">
                     <SelectValue placeholder="All Categories" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Categories</SelectItem>
+                  <SelectContent className="bg-white border border-gray-200">
+                    <SelectItem value="all" className="text-gray-900">All Categories</SelectItem>
                     {categories.map((category) => (
-                      <SelectItem key={category.slug} value={category.name}>
+                      <SelectItem key={category.slug} value={category.name} className="text-gray-900">
                         {category.name}
                       </SelectItem>
                     ))}
@@ -311,7 +216,7 @@ export default function AdminBlogPage() {
               <CardContent className="pt-6 text-center py-12 bg-white">
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">No blog posts found</h3>
                 <p className="text-gray-600 mb-6">Get started by creating your first blog post.</p>
-                <Button asChild>
+                <Button asChild className="bg-teal-600 hover:bg-teal-700 text-white">
                   <Link href="/admin/blog/new">
                     <Plus className="mr-2 h-4 w-4" />
                     Create New Post
@@ -330,7 +235,7 @@ export default function AdminBlogPage() {
                       <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-2">
-                            <Badge variant="outline">
+                            <Badge variant="outline" className="bg-gray-100 text-gray-900 border-gray-300">
                               {post.category}
                             </Badge>
                           </div>
