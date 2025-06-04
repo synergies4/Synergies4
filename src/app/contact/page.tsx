@@ -186,10 +186,10 @@ export default function Contact() {
               ) : (
                 <div className="group relative">
                   {/* Glow Effect */}
-                  <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-purple-500 rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-700"></div>
+                  <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-purple-500 rounded-2xl blur opacity-0 group-hover:opacity-20 transition-opacity-smooth"></div>
                   
                   {/* Form Card */}
-                  <div className="relative bg-white/80 backdrop-blur-xl rounded-2xl border border-white/50 p-8 shadow-xl hover:shadow-2xl transition-all duration-500">
+                  <div className="relative glass-effect-light rounded-2xl border border-white/50 p-8 shadow-xl hover:shadow-2xl card-hover-optimized">
                     <form onSubmit={handleSubmit} className="space-y-6">
                       {/* Name Fields */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -203,7 +203,7 @@ export default function Contact() {
                             value={formData.firstName}
                             onChange={handleInputChange}
                             required
-                            className="transition-all duration-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-300 bg-white/90"
+                            className="transition-colors-smooth focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-300 bg-white/90"
                             placeholder="John"
                           />
                         </div>
@@ -217,7 +217,7 @@ export default function Contact() {
                             value={formData.lastName}
                             onChange={handleInputChange}
                             required
-                            className="transition-all duration-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-300 bg-white/90"
+                            className="transition-colors-smooth focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-300 bg-white/90"
                             placeholder="Doe"
                           />
                         </div>
@@ -236,7 +236,7 @@ export default function Contact() {
                             value={formData.email}
                             onChange={handleInputChange}
                             required
-                            className="transition-all duration-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-300 bg-white/90"
+                            className="transition-colors-smooth focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-300 bg-white/90"
                             placeholder="john@company.com"
                           />
                         </div>
@@ -250,7 +250,7 @@ export default function Contact() {
                             type="tel"
                             value={formData.phone}
                             onChange={handleInputChange}
-                            className="transition-all duration-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-300 bg-white/90"
+                            className="transition-colors-smooth focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-300 bg-white/90"
                             placeholder="+1 (555) 123-4567"
                           />
                         </div>
@@ -267,7 +267,7 @@ export default function Contact() {
                             name="company"
                             value={formData.company}
                             onChange={handleInputChange}
-                            className="transition-all duration-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-300 bg-white/90"
+                            className="transition-colors-smooth focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-300 bg-white/90"
                             placeholder="Your Company"
                           />
                         </div>
@@ -276,10 +276,10 @@ export default function Contact() {
                             Inquiry Type *
                           </Label>
                           <Select value={formData.inquiryType} onValueChange={handleSelectChange}>
-                            <SelectTrigger className="transition-all duration-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-300 bg-white/90">
+                            <SelectTrigger className="transition-colors-smooth focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-300 bg-white/90">
                               <SelectValue placeholder="Select inquiry type" />
                             </SelectTrigger>
-                            <SelectContent className="bg-white/95 backdrop-blur-xl border border-gray-200">
+                            <SelectContent className="glass-effect-light border border-gray-200">
                               <SelectItem value="general">General Inquiry</SelectItem>
                               <SelectItem value="courses">Course Information</SelectItem>
                               <SelectItem value="coaching">Coaching Services</SelectItem>
@@ -302,7 +302,7 @@ export default function Contact() {
                           value={formData.subject}
                           onChange={handleInputChange}
                           required
-                          className="transition-all duration-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-300 bg-white/90"
+                          className="transition-colors-smooth focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-300 bg-white/90"
                           placeholder="How can we help you?"
                         />
                       </div>
@@ -319,7 +319,7 @@ export default function Contact() {
                           onChange={handleInputChange}
                           required
                           rows={6}
-                          className="transition-all duration-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-300 bg-white/90 resize-none"
+                          className="transition-colors-smooth focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-300 bg-white/90 resize-none"
                           placeholder="Tell us more about your needs..."
                         />
                       </div>
@@ -329,7 +329,7 @@ export default function Contact() {
                         <Button
                           type="submit"
                           disabled={isSubmitting}
-                          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-4 text-lg font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl border-0 rounded-xl group"
+                          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-4 text-lg font-semibold transition-colors-smooth hover:scale-105 hover:shadow-xl border-0 rounded-xl group"
                         >
                           {isSubmitting ? (
                             <>
@@ -338,7 +338,7 @@ export default function Contact() {
                             </>
                           ) : (
                             <>
-                              <Send className="mr-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                              <Send className="mr-2 h-5 w-5 group-hover:translate-x-1 transition-transform-smooth" />
                               Send Message
                             </>
                           )}
@@ -399,22 +399,19 @@ export default function Contact() {
                 ].map((item, index) => (
                   <div key={index} className={`group relative animate-fade-in-up animation-delay-${index * 100}`}>
                     {/* Glow Effect */}
-                    <div className={`absolute -inset-1 bg-gradient-to-r ${item.gradient} rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-150`}></div>
+                    <div className={`absolute -inset-1 bg-gradient-to-r ${item.gradient} rounded-2xl blur opacity-0 group-hover:opacity-20 transition-opacity-smooth`}></div>
                     
                     {/* Main Card */}
-                    <div className={`relative bg-gradient-to-br ${item.bgGradient} rounded-2xl border border-white/50 p-6 hover:bg-white/80 transition-all duration-150 group-hover:scale-105 shadow-lg hover:shadow-2xl backdrop-blur-sm`}>
+                    <div className={`relative bg-gradient-to-br ${item.bgGradient} rounded-2xl border border-white/50 p-6 hover:bg-white/80 card-hover-optimized shadow-lg hover:shadow-2xl`}>
                       {/* Icon Container */}
                       <div className="relative mb-6">
-                        <div className={`w-16 h-16 bg-gradient-to-br ${item.gradient} rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:shadow-xl transition-shadow duration-150`}>
+                        <div className={`w-16 h-16 bg-gradient-to-br ${item.gradient} rounded-2xl flex items-center justify-center text-white shadow-lg transition-shadow-smooth`}>
                           {item.icon}
                         </div>
-                        
-                        {/* Accent Line */}
-                        <div className={`absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r ${item.gradient} group-hover:w-16 transition-all duration-150 rounded-full`}></div>
                       </div>
                       
                       {/* Content */}
-                      <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-teal-700 transition-colors duration-150">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-teal-700 transition-colors-smooth">
                         {item.title}
                       </h3>
                       <p className="text-gray-600 text-sm leading-relaxed">
@@ -427,16 +424,16 @@ export default function Contact() {
                 {/* Business Hours */}
                 <div className="group relative">
                   {/* Glow Effect */}
-                  <div className="absolute -inset-1 bg-gradient-to-r from-orange-400 to-yellow-500 rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-700"></div>
+                  <div className="absolute -inset-1 bg-gradient-to-r from-orange-400 to-yellow-500 rounded-2xl blur opacity-0 group-hover:opacity-20 transition-opacity-smooth"></div>
                   
                   {/* Hours Card */}
-                  <div className="relative bg-gradient-to-br from-orange-50 to-yellow-50 rounded-2xl border border-white/50 p-6 hover:bg-white/80 transition-all duration-500 group-hover:scale-105 group-hover:-translate-y-1 shadow-lg hover:shadow-2xl backdrop-blur-sm">
+                  <div className="relative bg-gradient-to-br from-orange-50 to-yellow-50 rounded-2xl border border-white/50 p-6 hover:bg-white/80 card-hover-optimized shadow-lg hover:shadow-2xl">
                     <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-yellow-500 rounded-xl flex items-center justify-center flex-shrink-0 text-white shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+                      <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-yellow-500 rounded-xl flex items-center justify-center flex-shrink-0 text-white shadow-lg transition-transform-smooth group-hover:scale-110">
                         <Clock className="h-6 w-6" />
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-bold text-gray-900 mb-3 text-lg group-hover:text-orange-700 transition-colors">Business Hours</h3>
+                        <h3 className="font-bold text-gray-900 mb-3 text-lg group-hover:text-orange-700 transition-colors-smooth">Business Hours</h3>
                         <div className="space-y-2 text-sm text-gray-700">
                           <div className="flex justify-between items-center py-1 px-3 bg-white/50 rounded-lg">
                             <span className="font-medium">Monday - Friday</span>
@@ -453,9 +450,6 @@ export default function Contact() {
                         </div>
                       </div>
                     </div>
-                    
-                    {/* Decorative element */}
-                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-orange-500 to-transparent group-hover:w-16 transition-all duration-500 rounded-full"></div>
                   </div>
                 </div>
               </div>
@@ -544,26 +538,23 @@ export default function Contact() {
             ].map((office, index) => (
               <div key={index} className={`group relative animate-fade-in-up animation-delay-${index * 100}`}>
                 {/* Glow Effect */}
-                <div className={`absolute -inset-1 bg-gradient-to-r ${office.gradient} rounded-2xl blur opacity-0 group-hover:opacity-30 transition duration-1000 group-hover:duration-200`}></div>
+                <div className={`absolute -inset-1 bg-gradient-to-r ${office.gradient} rounded-2xl blur opacity-0 group-hover:opacity-30 transition-opacity-smooth`}></div>
                 
                 {/* Office Card */}
-                <div className={`relative bg-gradient-to-br ${office.bgGradient} backdrop-blur-xl rounded-2xl border border-white/20 p-8 h-full hover:bg-white/5 transition-all duration-500 group-hover:scale-105 group-hover:-translate-y-3 shadow-xl hover:shadow-2xl text-center`}>
+                <div className={`relative glass-effect-dark rounded-2xl border border-white/20 p-8 h-full hover:bg-white/5 card-hover-optimized shadow-xl hover:shadow-2xl text-center`}>
                   {/* Icon */}
                   <div className="relative mb-6">
-                    <div className={`w-20 h-20 bg-gradient-to-br ${office.gradient} rounded-2xl flex items-center justify-center mx-auto text-white shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}>
+                    <div className={`w-20 h-20 bg-gradient-to-br ${office.gradient} rounded-2xl flex items-center justify-center mx-auto text-white shadow-2xl transition-transform-smooth group-hover:scale-110`}>
                       {office.icon}
                     </div>
-                    
-                    {/* Floating ring effect */}
-                    <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-24 border-2 border-current rounded-full opacity-0 group-hover:opacity-20 group-hover:scale-150 transition-all duration-700" style={{ color: office.gradient.includes('blue') ? '#3B82F6' : office.gradient.includes('emerald') ? '#10B981' : '#8B5CF6' }}></div>
                   </div>
 
                   {/* Content */}
                   <div>
-                    <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-cyan-200 transition-colors duration-300">{office.city}</h3>
-                    <p className="text-gray-300 mb-6 text-lg group-hover:text-gray-200 transition-colors duration-300">{office.role}</p>
+                    <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-cyan-200 transition-colors-smooth">{office.city}</h3>
+                    <p className="text-gray-300 mb-6 text-lg group-hover:text-gray-200 transition-colors-smooth">{office.role}</p>
                     
-                    <div className="space-y-2 text-gray-400 group-hover:text-gray-300 transition-colors duration-300">
+                    <div className="space-y-2 text-gray-400 group-hover:text-gray-300 transition-colors-smooth">
                       <div className="flex items-center justify-center text-sm">
                         <MapPin className="h-4 w-4 mr-2 text-cyan-400" />
                         <span>{office.address}</span>
@@ -572,13 +563,6 @@ export default function Contact() {
                       <p className="text-sm font-medium">{office.country}</p>
                     </div>
                   </div>
-
-                  {/* Decorative elements */}
-                  <div className="absolute top-4 right-4 w-6 h-6 bg-white/10 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
-                  <div className="absolute bottom-4 left-4 w-4 h-4 bg-white/10 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-700" style={{ animationDelay: '200ms' }}></div>
-                  
-                  {/* Bottom accent */}
-                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent group-hover:w-20 transition-all duration-500 rounded-full"></div>
                 </div>
               </div>
             ))}

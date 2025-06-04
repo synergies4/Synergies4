@@ -140,29 +140,26 @@ function MissionSection() {
           ].map((item, index) => (
             <div key={index} className="group relative">
               {/* Glow Effect */}
-              <div className={`absolute -inset-1 bg-gradient-to-r ${item.gradient} rounded-2xl blur opacity-0 group-hover:opacity-75 transition-opacity`}></div>
+              <div className={`absolute -inset-1 bg-gradient-to-r ${item.gradient} rounded-2xl blur opacity-0 group-hover:opacity-25 transition-opacity`}></div>
               
               {/* Main Card */}
-              <div className="relative bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 p-8 h-full hover:bg-white/15 transition-all group-hover:scale-105 group-hover:-translate-y-2">
+              <div className="relative glass-effect-dark rounded-2xl border border-white/20 p-8 h-full hover:bg-white/15 card-hover-optimized">
                 {/* Icon Container */}
                 <div className="relative mb-6">
-                  <div className={`w-20 h-20 bg-gradient-to-br ${item.gradient} rounded-2xl flex items-center justify-center mx-auto mb-6 text-white shadow-2xl transition-transform group-hover:scale-110`}>
+                  <div className={`w-20 h-20 bg-gradient-to-br ${item.gradient} rounded-2xl flex items-center justify-center mx-auto mb-6 text-white shadow-2xl transition-transform-smooth group-hover:scale-110`}>
                     {item.icon}
                   </div>
                 </div>
 
                 {/* Content */}
                 <div className="text-center">
-                  <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-cyan-200 transition-colors">
+                  <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-cyan-200 transition-colors-smooth">
                     {item.title}
                   </h3>
-                  <p className="text-blue-100/80 leading-relaxed text-base group-hover:text-white/90 transition-colors">
+                  <p className="text-blue-100/80 leading-relaxed text-base group-hover:text-white/90 transition-colors-smooth">
                     {item.description}
                   </p>
                 </div>
-
-                {/* Hover indicator */}
-                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-white to-transparent group-hover:w-16 transition-all rounded-full"></div>
               </div>
             </div>
           ))}
@@ -243,17 +240,14 @@ function StatCard({ stat, index }: { stat: any, index: number }) {
   return (
     <div className="group text-center relative">
       {/* Background glow */}
-      <div className={`absolute inset-0 bg-gradient-to-r ${stat.gradient} rounded-2xl blur opacity-0 group-hover:opacity-20 transition-opacity`}></div>
+      <div className={`absolute inset-0 bg-gradient-to-r ${stat.gradient} rounded-2xl blur opacity-0 group-hover:opacity-20 transition-opacity-smooth`}></div>
       
       {/* Main content */}
-      <div className="relative bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 hover:bg-white/10 transition-all group-hover:scale-110 group-hover:-translate-y-2">
-        <div className={`text-4xl md:text-5xl font-bold mb-2 bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent transition-transform group-hover:scale-110`}>
+      <div className="relative bg-white/5 rounded-2xl border border-white/10 p-6 hover:bg-white/10 card-hover-optimized">
+        <div className={`text-4xl md:text-5xl font-bold mb-2 bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent transition-transform-smooth group-hover:scale-110`}>
           {count.toLocaleString()}{stat.suffix}
         </div>
-        <div className="text-blue-200/80 text-sm md:text-base group-hover:text-white transition-colors">{stat.label}</div>
-        
-        {/* Floating indicator */}
-        <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-transparent via-white to-transparent group-hover:w-12 transition-all"></div>
+        <div className="text-blue-200/80 text-sm md:text-base group-hover:text-white transition-colors-smooth">{stat.label}</div>
       </div>
     </div>
   );
@@ -496,12 +490,12 @@ function TestimonialsSection() {
           ].map((testimonial, index) => (
             <div key={index} className={`group relative animate-fade-in-up animation-delay-${index * 200}`}>
               {/* Glow Effect */}
-              <div className={`absolute -inset-1 bg-gradient-to-r ${testimonial.gradient} rounded-2xl blur opacity-0 group-hover:opacity-30 transition-opacity`}></div>
+              <div className={`absolute -inset-1 bg-gradient-to-r ${testimonial.gradient} rounded-2xl blur opacity-0 group-hover:opacity-30 transition-opacity-smooth`}></div>
               
               {/* Main Card */}
-              <div className={`relative bg-gradient-to-br ${testimonial.bgGradient} backdrop-blur-xl rounded-2xl border border-white/20 p-8 h-full hover:bg-white/5 transition-all group-hover:scale-105 shadow-xl hover:shadow-2xl`}>
+              <div className={`relative glass-effect-dark rounded-2xl border border-white/20 p-8 h-full hover:bg-white/5 card-hover-optimized shadow-xl hover:shadow-2xl`}>
                 {/* Quote Icon */}
-                <div className="absolute top-6 right-6 text-white/20 group-hover:text-white/40 transition-colors">
+                <div className="absolute top-6 right-6 text-white/20 group-hover:text-white/40 transition-colors-smooth">
                   <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
                   </svg>
@@ -510,28 +504,26 @@ function TestimonialsSection() {
                 {/* Stars */}
                 <div className="flex mb-6">
                   {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-current mr-1 transition-transform group-hover:scale-110" />
+                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-current mr-1 transition-transform-smooth group-hover:scale-110" />
                   ))}
                 </div>
 
                 {/* Content */}
-                <p className="text-gray-200 mb-8 italic leading-relaxed text-lg group-hover:text-white transition-colors font-light">"{testimonial.content}"</p>
+                <p className="text-gray-200 mb-8 italic leading-relaxed text-lg group-hover:text-white transition-colors-smooth font-light">"{testimonial.content}"</p>
                 
                 {/* Author */}
                 <div className="flex items-center">
-                  <div className="relative">
-                    <Avatar className="h-16 w-16 mr-4 ring-2 ring-white/20 group-hover:ring-white/40 transition-all">
-                      <AvatarImage src={testimonial.image} alt={testimonial.name} />
-                      <AvatarFallback className="bg-gradient-to-br from-gray-600 to-gray-800 text-white">
-                        {testimonial.name.split(' ').map(n => n[0]).join('')}
-                      </AvatarFallback>
-                    </Avatar>
-                  </div>
+                  <Avatar className="h-16 w-16 mr-4 ring-2 ring-white/20 group-hover:ring-white/40 transition-all">
+                    <AvatarImage src={testimonial.image} alt={testimonial.name} />
+                    <AvatarFallback className="bg-gradient-to-br from-gray-600 to-gray-800 text-white">
+                      {testimonial.name.split(' ').map(n => n[0]).join('')}
+                    </AvatarFallback>
+                  </Avatar>
                   
                   <div>
-                    <p className="font-bold text-white text-lg group-hover:text-yellow-200 transition-colors">{testimonial.name}</p>
-                    <p className="text-gray-300 text-base group-hover:text-gray-200 transition-colors">{testimonial.role}</p>
-                    <p className="text-gray-400 text-sm group-hover:text-gray-300 transition-colors">{testimonial.company}</p>
+                    <p className="font-bold text-white text-lg group-hover:text-yellow-200 transition-colors-smooth">{testimonial.name}</p>
+                    <p className="text-gray-300 text-base group-hover:text-gray-200 transition-colors-smooth">{testimonial.role}</p>
+                    <p className="text-gray-400 text-sm group-hover:text-gray-300 transition-colors-smooth">{testimonial.company}</p>
                   </div>
                 </div>
               </div>

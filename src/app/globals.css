@@ -241,6 +241,68 @@ p, li, span {
   animation-delay: 2000ms;
 }
 
+/* Optimized Transitions - Replace transition-all */
+.transition-transform-smooth {
+  transition: transform 150ms ease-out;
+}
+
+.transition-colors-smooth {
+  transition: color 150ms ease-out, background-color 150ms ease-out;
+}
+
+.transition-opacity-smooth {
+  transition: opacity 150ms ease-out;
+}
+
+.transition-shadow-smooth {
+  transition: box-shadow 150ms ease-out;
+}
+
+/* Optimized Card Animation */
+.card-hover-optimized {
+  transition: transform 150ms ease-out, box-shadow 150ms ease-out;
+}
+
+.card-hover-optimized:hover {
+  transform: scale(1.05);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Replace backdrop-blur with simpler effects */
+.glass-effect-light {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.glass-effect-dark {
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* Optimized Glow Effects */
+.glow-blue {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+.glow-teal {
+  box-shadow: 0 0 20px rgba(20, 184, 166, 0.3);
+}
+
+.glow-emerald {
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+}
+
+/* Performance-optimized hover states */
+.hover-lift {
+  transition: transform 150ms ease-out;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+}
+
 /* Fade in animations */
 @keyframes fade-in-up {
   from {
