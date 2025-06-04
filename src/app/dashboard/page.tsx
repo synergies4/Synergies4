@@ -246,9 +246,9 @@ export default function StudentDashboard() {
           <div>
             <Tabs defaultValue="courses" className="space-y-4 md:space-y-6">
               <TabsList className="grid w-full grid-cols-3 h-auto bg-white border border-gray-200">
-                <TabsTrigger value="courses" className="text-xs md:text-sm py-2 md:py-3 text-gray-900 data-[state=active]:bg-blue-600 data-[state=active]:text-white">My Courses</TabsTrigger>
-                <TabsTrigger value="progress" className="text-xs md:text-sm py-2 md:py-3 text-gray-900 data-[state=active]:bg-blue-600 data-[state=active]:text-white">Progress</TabsTrigger>
-                <TabsTrigger value="certificates" className="text-xs md:text-sm py-2 md:py-3 text-gray-900 data-[state=active]:bg-blue-600 data-[state=active]:text-white">Certificates</TabsTrigger>
+                <TabsTrigger value="courses" className="text-xs md:text-sm py-2 md:py-3 text-gray-900 data-[state=active]:bg-teal-600 data-[state=active]:text-white">My Courses</TabsTrigger>
+                <TabsTrigger value="progress" className="text-xs md:text-sm py-2 md:py-3 text-gray-900 data-[state=active]:bg-teal-600 data-[state=active]:text-white">Progress</TabsTrigger>
+                <TabsTrigger value="certificates" className="text-xs md:text-sm py-2 md:py-3 text-gray-900 data-[state=active]:bg-teal-600 data-[state=active]:text-white">Certificates</TabsTrigger>
               </TabsList>
 
               <TabsContent value="courses" className="space-y-4 md:space-y-6">
