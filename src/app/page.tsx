@@ -513,7 +513,7 @@ function FeaturedCoursesSection() {
                 <div className="absolute -inset-1 bg-gradient-to-r from-teal-500 via-emerald-500 to-cyan-500 rounded-2xl blur opacity-0 group-hover:opacity-75 transition-opacity"></div>
                 
                 {/* Main Card */}
-                <div className="relative bg-white/10 rounded-2xl border border-white/20 overflow-hidden shadow-lg hover:shadow-xl transition-all group-hover:scale-105 flex flex-col h-full">
+                <div className="relative bg-white/10 rounded-2xl border border-white/20 overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-105 flex flex-col h-full">
                   {/* Course Image with Enhanced Overlay */}
                   <div className="relative h-48 overflow-hidden flex-shrink-0">
                     <img 
@@ -745,7 +745,7 @@ function CertificationsSection() {
                   </Badge>
                 </div>
                 
-                <CardTitle className="text-xl font-bold transition-colors group-hover:text-teal-600 mb-2 min-h-[3rem] flex items-center">
+                <CardTitle className="text-xl font-bold text-gray-900 transition-colors group-hover:text-teal-600 mb-2 min-h-[3rem] flex items-center">
                   {cert.title}
                 </CardTitle>
                 <CardDescription className="text-gray-600 leading-relaxed min-h-[4.5rem]">

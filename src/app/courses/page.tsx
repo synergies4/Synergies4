@@ -363,7 +363,7 @@ function CourseDirectorySection() {
                 <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-teal-500 rounded-2xl blur opacity-0 group-hover:opacity-25 transition-opacity"></div>
                 
                 {/* Main Card */}
-                <div className="relative bg-white/90 rounded-2xl border border-white/50 shadow-lg hover:shadow-2xl transition-all group-hover:scale-105 overflow-hidden flex flex-col h-full">
+                <div className="relative bg-white/90 rounded-2xl border border-white/50 shadow-lg hover:shadow-2xl transition-all duration-300 group-hover:scale-105 overflow-hidden flex flex-col h-full">
                   {/* Course Image */}
                   <div className="relative h-48 overflow-hidden flex-shrink-0">
                     <Image
