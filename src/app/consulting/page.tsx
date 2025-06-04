@@ -264,10 +264,10 @@ function WhyChooseSection() {
 
                 {/* Content */}
                 <div>
-                  <h3 className="text-xl font-bold text-gray-100 mb-4 group-hover:text-gray-900 transition-colors-smooth">
+                  <h3 className="text-xl font-bold text-gray-800 mb-4 group-hover:text-gray-900 transition-colors-smooth">
                     {item.title}
                   </h3>
-                  <p className="text-gray-200 leading-relaxed text-base group-hover:text-gray-700 transition-colors-smooth">
+                  <p className="text-gray-700 leading-relaxed text-base group-hover:text-gray-800 transition-colors-smooth">
                     {item.description}
                   </p>
                 </div>
