@@ -150,7 +150,9 @@ export default function Signup() {
     } catch (error) {
       console.error('💥 Catch block - Google sign-up error:', error);
       console.error('Error type:', typeof error);
-      console.error('Error constructor:', error.constructor.name);
+      if (error && typeof error === 'object' && 'constructor' in error) {
+        console.error('Error constructor:', (error as any).constructor.name);
+      }
       if (error instanceof Error) {
         console.error('Error message:', error.message);
         console.error('Error stack:', error.stack);
