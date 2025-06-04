@@ -2086,7 +2086,9 @@ export default function SynergizeAgile() {
           <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-teal-50 to-emerald-50">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-gray-900 mb-2">Synergies4</h2>
+                <Link href="/" className="hover:opacity-80 transition-opacity">
+                  <h2 className="text-lg font-semibold text-gray-900 mb-2 hover:text-teal-600 transition-colors">Synergies4</h2>
+                </Link>
                 <h3 className="text-base font-medium text-gray-700">AI Assistant</h3>
               </div>
               <Button
@@ -2296,17 +2298,6 @@ export default function SynergizeAgile() {
                 <Menu className="h-5 w-5" />
               </Button>
               
-              {/* Synergies Logo - Link to Home */}
-              <Link 
-                href="/" 
-                className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
-                title="Back to Home"
-              >
-                <span className="text-lg font-bold text-gray-900">Synergies4</span>
-              </Link>
-              
-              <div className="w-px h-6 bg-gray-300 hidden sm:block"></div>
-              
               <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${currentRole.color} flex items-center justify-center text-white`}>
                 {currentRole.icon}
               </div>
@@ -2332,7 +2323,8 @@ export default function SynergizeAgile() {
           style={{
             WebkitOverflowScrolling: 'touch',
             scrollBehavior: 'smooth',
-            touchAction: 'pan-y'
+            touchAction: 'pan-y',
+            paddingBottom: isMobile ? '120px' : '20px' // Extra padding on mobile for input area
           }}
         >
           {messages.length === 0 && (
@@ -2421,11 +2413,18 @@ export default function SynergizeAgile() {
 
         {/* Mobile Scroll Indicator */}
         {isMobile && showScrollIndicator && (
-          <div className="absolute bottom-24 right-4 z-50">
+          <div className="absolute bottom-32 right-4 z-50">
             <button
               type="button" 
               className="bg-teal-600 text-white p-3 rounded-full shadow-lg animate-bounce cursor-pointer hover:bg-teal-700 transition-colors touch-manipulation"
-              onClick={() => scrollToBottom()}
+              onClick={() => {
+                if (chatContainerRef.current) {
+                  chatContainerRef.current.scrollTo({
+                    top: chatContainerRef.current.scrollHeight,
+                    behavior: 'smooth'
+                  });
+                }
+              }}
               style={{ minHeight: '48px', minWidth: '48px' }}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2846,27 +2845,27 @@ Format as a realistic conversation with clear speaker labels and include decisio
       </section>
 
       {/* AI Assistant Interface */}
-      <section id="agile-assistant" className="py-20 bg-white">
+      <section id="agile-assistant" className="py-12 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             {/* Header */}
-            <div className="text-center mb-8">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
                 AI Assistant
               </h2>
-              <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
                 Get instant answers to your Agile questions with personalized, role-specific guidance
               </p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Role Selection */}
               <Card className="bg-gradient-to-br from-teal-50 to-emerald-50 border-0 shadow-lg">
-                <CardHeader>
-                  <CardTitle className="text-center">Select Your Agile Role</CardTitle>
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-center text-lg">Select Your Agile Role</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {/* Mobile: Use native select */}
                     <div className="block md:hidden relative">
                       <select
@@ -2926,11 +2925,11 @@ Format as a realistic conversation with clear speaker labels and include decisio
 
               {/* Mode Selection */}
               <Card className="bg-gradient-to-br from-emerald-50 to-teal-50 border-0 shadow-lg">
-                <CardHeader>
-                  <CardTitle className="text-center">Choose Interaction Mode</CardTitle>
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-center text-lg">Choose Interaction Mode</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {/* Mobile: Use native select */}
                     <div className="block md:hidden relative">
                       <select
@@ -2990,11 +2989,11 @@ Format as a realistic conversation with clear speaker labels and include decisio
 
               {/* AI Provider Selection */}
               <Card className="bg-gradient-to-br from-slate-50 to-gray-100 border-0 shadow-lg">
-                <CardHeader>
-                  <CardTitle className="text-center">Select AI Provider</CardTitle>
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-center text-lg">Select AI Provider</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {/* Mobile: Use native select */}
                     <div className="block md:hidden relative">
                       <select
@@ -3055,8 +3054,8 @@ Format as a realistic conversation with clear speaker labels and include decisio
             </div>
 
             {/* Chat Interface */}
-            <div className="mt-8">
-              <Card className="h-[600px] flex flex-col border-0 shadow-xl overflow-hidden relative">
+            <div className="mt-6">
+              <Card className="h-[500px] flex flex-col border-0 shadow-xl overflow-hidden relative">
                 <CardHeader className={`bg-gradient-to-r ${currentRole.color} text-white rounded-t-lg flex-shrink-0`}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
