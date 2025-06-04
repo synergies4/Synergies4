@@ -93,7 +93,7 @@ export default function HomePage() {
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center max-w-3xl mx-auto mb-12 sm:mb-16 px-4 sm:px-0">
             <Button 
               size="lg" 
-              className="w-full sm:w-auto text-base sm:text-lg px-8 sm:px-10 py-3 sm:py-4 bg-gradient-to-r from-gray-800 to-gray-900 text-white hover:from-gray-900 hover:to-black transition-all duration-300 font-semibold rounded-xl shadow-2xl hover:shadow-gray-500/25 hover:scale-105 border-0 group h-auto" 
+              className="w-full sm:w-auto text-base sm:text-lg px-8 sm:px-10 py-3 sm:py-4 bg-gradient-to-r from-gray-800 to-gray-900 text-white hover:from-gray-900 hover:to-black transition-all font-semibold rounded-xl shadow-2xl hover:shadow-gray-500/25 hover:scale-105 border-0 group h-auto" 
               asChild
             >
               <Link href="/courses">
@@ -106,7 +106,7 @@ export default function HomePage() {
 
             <Button 
               size="lg" 
-              className="w-full sm:w-auto text-base sm:text-lg px-8 sm:px-10 py-3 sm:py-4 bg-gradient-to-r from-teal-600 to-emerald-600 text-white hover:from-teal-700 hover:to-emerald-700 transition-all duration-300 font-semibold rounded-xl shadow-2xl hover:shadow-teal-500/25 hover:scale-105 border-0 group h-auto" 
+              className="w-full sm:w-auto text-base sm:text-lg px-8 sm:px-10 py-3 sm:py-4 bg-gradient-to-r from-teal-600 to-emerald-600 text-white hover:from-teal-700 hover:to-emerald-700 transition-all font-semibold rounded-xl shadow-2xl hover:shadow-teal-500/25 hover:scale-105 border-0 group h-auto" 
               asChild
             >
               <Link href="/synergize">
@@ -262,14 +262,11 @@ function ValuePropositionsSection() {
               className="group relative animate-fade-in-up h-full"
               style={{ animationDelay: `${index * 150}ms` }}
             >
-              {/* Glow Effect */}
-              <div className={`absolute -inset-1 bg-gradient-to-r ${item.gradient} rounded-2xl blur opacity-0 group-hover:opacity-75 transition-opacity`}></div>
-              
               {/* Main Card */}
-              <div className={`relative bg-gradient-to-br ${item.gradient} border border-white/15 rounded-2xl p-8 text-center backdrop-blur-sm bg-white/15 h-full flex flex-col transition-all group-hover:scale-105 shadow-lg hover:shadow-2xl`}>
+              <div className={`relative bg-gradient-to-br ${item.gradient} border border-white/15 rounded-2xl p-8 text-center h-full flex flex-col transition-all group-hover:scale-105 shadow-lg hover:shadow-xl`}>
                 {/* Icon Container */}
                 <div className="relative mb-6">
-                  <div className={`w-20 h-20 bg-gradient-to-br ${item.gradient} rounded-2xl flex items-center justify-center mx-auto mb-6 text-white shadow-2xl transition-transform group-hover:scale-110`}>
+                  <div className={`w-20 h-20 bg-gradient-to-br ${item.gradient} rounded-2xl flex items-center justify-center mx-auto mb-6 text-white shadow-lg transition-transform group-hover:scale-110`}>
                     {item.icon}
                   </div>
                 </div>
@@ -291,7 +288,7 @@ function ValuePropositionsSection() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 max-w-3xl mx-auto">
             <Button 
               size="lg" 
-              className="w-full sm:w-auto bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white px-8 py-4 rounded-xl shadow-2xl hover:shadow-teal-500/25 transition-all duration-300 hover:scale-105 border-0 group"
+              className="w-full sm:w-auto bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white px-8 py-4 rounded-xl shadow-2xl hover:shadow-teal-500/25 transition-all hover:scale-105 border-0 group"
               asChild
             >
               <Link href="/courses">
@@ -304,7 +301,7 @@ function ValuePropositionsSection() {
             
             <Button 
               size="lg" 
-              className="w-full sm:w-auto bg-white text-teal-600 hover:bg-gray-100 px-8 py-4 rounded-xl shadow-2xl hover:shadow-white/25 transition-all duration-300 hover:scale-105 border-0 font-semibold group"
+              className="w-full sm:w-auto bg-white text-teal-600 hover:bg-gray-100 px-8 py-4 rounded-xl shadow-2xl hover:shadow-white/25 transition-all hover:scale-105 border-0 font-semibold group"
               asChild
             >
               <Link href="/synergize">
@@ -490,7 +487,7 @@ function FeaturedCoursesSection() {
                 <div className="absolute -inset-1 bg-gradient-to-r from-teal-500 via-emerald-500 to-cyan-500 rounded-2xl blur opacity-0 group-hover:opacity-75 transition-opacity"></div>
                 
                 {/* Main Card */}
-                <div className="relative bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden shadow-2xl hover:bg-white/15 transition-all group-hover:scale-105 group-hover:-translate-y-3 flex flex-col h-full">
+                <div className="relative bg-white/10 rounded-2xl border border-white/20 overflow-hidden shadow-lg hover:shadow-xl transition-all group-hover:scale-105 flex flex-col h-full">
                   {/* Course Image with Enhanced Overlay */}
                   <div className="relative h-48 overflow-hidden flex-shrink-0">
                     <img 
@@ -500,28 +497,28 @@ function FeaturedCoursesSection() {
                     />
                     
                     {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent group-hover:from-black/40 transition-all"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
                     
                     {/* Level Badge */}
                     <div className="absolute top-4 left-4">
-                      <div className={`px-3 py-1 bg-gradient-to-r ${getLevelColor(course.level)} rounded-full text-white text-sm font-semibold shadow-lg backdrop-blur-sm`}>
+                      <div className={`px-3 py-1 bg-gradient-to-r ${getLevelColor(course.level)} rounded-full text-white text-sm font-semibold shadow-lg`}>
                         {course.level}
                       </div>
                     </div>
                     
                     {/* Duration Badge */}
-                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-semibold text-gray-800 shadow-lg">
+                    <div className="absolute top-4 right-4 bg-white/90 rounded-full px-3 py-1 text-sm font-semibold text-gray-800 shadow-lg">
                       {course.duration || '6 weeks'}
                     </div>
 
                     {/* Floating Icon */}
-                    <div className="absolute bottom-4 right-4 w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white group-hover:scale-110 group-hover:rotate-12 transition-all">
+                    <div className="absolute bottom-4 right-4 w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-white transition-transform group-hover:scale-110">
                       <BookOpen className="w-6 h-6" />
                     </div>
                   </div>
 
                   {/* Card Content */}
-                  <div className="flex flex-col flex-1 p-6">
+                  <div className="flex flex-col flex-1 p-6 bg-white/5">
                     {/* Title */}
                     <h3 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-200 transition-colors line-clamp-2 min-h-[3.5rem] flex items-start">
                       {course.title}
@@ -566,7 +563,7 @@ function FeaturedCoursesSection() {
                     {/* CTA Button */}
                     <Button 
                       asChild 
-                      className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-105 rounded-xl border-0"
+                      className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all group-hover:scale-105 rounded-xl border-0"
                     >
                       <Link href={`/courses/${createCourseSlug(course.title)}`}>
                         <span className="flex items-center justify-center text-white font-semibold">
@@ -587,7 +584,7 @@ function FeaturedCoursesSection() {
           <div className="inline-flex items-center space-x-4">
             <Button 
               size="lg" 
-              className="bg-gradient-to-r from-cyan-500 to-teal-600 hover:from-cyan-600 hover:to-teal-700 text-white px-8 py-4 rounded-xl shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 hover:scale-105 border-0"
+              className="bg-gradient-to-r from-cyan-500 to-teal-600 hover:from-cyan-600 hover:to-teal-700 text-white px-8 py-4 rounded-xl shadow-2xl hover:shadow-cyan-500/25 transition-all hover:scale-105 border-0"
               asChild
             >
               <Link href="/courses">
@@ -708,7 +705,7 @@ function CertificationsSection() {
               features: ["360° Feedback", "Leadership Coaching", "Team Simulations", "Executive Mentoring"]
             }
           ].map((cert, index) => (
-            <Card key={index} className="group transition-all hover:shadow-2xl hover:-translate-y-2 bg-white/90 backdrop-blur-sm border-0 shadow-lg overflow-hidden rounded-xl flex flex-col h-full">
+            <Card key={index} className="group transition-all hover:shadow-2xl hover:-translate-y-2 bg-white/90 border-0 shadow-lg overflow-hidden rounded-xl flex flex-col h-full">
               {/* Header with Icon */}
               <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 p-6 border-b flex-shrink-0">
                 <div className="flex items-start justify-between mb-4">
@@ -750,7 +747,7 @@ function CertificationsSection() {
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div 
-                      className={`bg-gradient-to-r ${getProgressColor(cert.level)} h-2 rounded-full transition-all duration-1000 ease-out`}
+                      className={`bg-gradient-to-r ${getProgressColor(cert.level)} h-2 rounded-full transition-all`}
                       style={{ width: `${cert.completion}%` }}
                     ></div>
                   </div>
@@ -791,7 +788,7 @@ function CertificationsSection() {
                 {/* CTA Button - Always at bottom */}
                 <div className="mt-auto">
                   <Button 
-                    className={`w-full bg-gradient-to-r ${getProgressColor(cert.level)} hover:shadow-lg text-white font-semibold shadow-md transition-all duration-300 group-hover:scale-105`}
+                    className={`w-full bg-gradient-to-r ${getProgressColor(cert.level)} hover:shadow-lg text-white font-semibold shadow-md transition-all group-hover:scale-105`}
                   >
                     <span className="flex items-center justify-center text-white font-semibold">
                       Start Certification
@@ -816,7 +813,7 @@ function CertificationsSection() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
                 size="lg" 
-                className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all hover:scale-105"
                 asChild
               >
                 <Link href="/courses">
@@ -827,7 +824,7 @@ function CertificationsSection() {
               <Button 
                 size="lg" 
                 variant="outline" 
-                className="border-2 border-gray-600 text-gray-900 hover:bg-gray-100 hover:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 bg-white"
+                className="border-2 border-gray-600 text-gray-900 hover:bg-gray-100 hover:border-gray-700 shadow-lg hover:shadow-xl transition-all hover:scale-105 bg-white"
                 asChild
               >
                 <Link href="/contact">
@@ -1046,7 +1043,7 @@ function CTASection() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 max-w-3xl mx-auto">
             <Button 
               size="lg" 
-              className="w-full sm:w-auto bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white px-8 py-4 rounded-xl shadow-2xl hover:shadow-teal-500/25 transition-all duration-300 hover:scale-105 border-0 group"
+              className="w-full sm:w-auto bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white px-8 py-4 rounded-xl shadow-2xl hover:shadow-teal-500/25 transition-all hover:scale-105 border-0 group"
               asChild
             >
               <Link href="/courses">
@@ -1059,7 +1056,7 @@ function CTASection() {
             
             <Button 
               size="lg" 
-              className="w-full sm:w-auto bg-gradient-to-r from-white/20 to-white/10 border-2 border-white text-white hover:bg-white hover:text-teal-600 shadow-2xl hover:shadow-white/25 transition-all duration-300 hover:scale-105 font-semibold rounded-xl backdrop-blur-sm group" 
+              className="w-full sm:w-auto bg-gradient-to-r from-white/20 to-white/10 border-2 border-white text-white hover:bg-white hover:text-teal-600 shadow-2xl hover:shadow-white/25 transition-all hover:scale-105 font-semibold rounded-xl group" 
               asChild
             >
               <Link href="/contact">
