@@ -140,8 +140,7 @@ export default function Signup() {
         console.error('❌ Google OAuth error:', error);
         console.error('Error details:', {
           message: error.message,
-          status: error.status,
-          statusCode: error.statusCode
+          status: error.status
         });
         setError(`Google sign-up failed: ${error.message}`);
       } else {

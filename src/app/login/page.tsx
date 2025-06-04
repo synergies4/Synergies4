@@ -96,8 +96,7 @@ export default function Login() {
         console.error('❌ Google OAuth error:', error);
         console.error('Error details:', {
           message: error.message,
-          status: error.status,
-          statusCode: error.statusCode
+          status: error.status
         });
         setError(`Google sign-in failed: ${error.message}`);
       } else {
