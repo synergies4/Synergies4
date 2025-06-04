@@ -269,19 +269,19 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
               id="mobile-menu"
               className="lg:hidden fixed bg-white shadow-2xl z-[99999] border-t border-gray-200"
               style={{ 
-                top: '100px',
+                top: '95px',
                 left: '0',
                 right: '0',
                 bottom: '0',
                 width: '100vw',
-                height: 'calc(100vh - 100px)',
+                height: 'calc(100vh - 95px)',
                 backgroundColor: 'white'
               }}
               role="menu"
               aria-label="Mobile navigation menu"
             >
-              <div className="h-full overflow-y-auto bg-white">
-                <div className="h-full px-4 py-4 space-y-4 flex flex-col bg-white">
+              <div className="h-full overflow-y-auto overscroll-contain bg-white">
+                <div className="px-4 py-4 space-y-4 min-h-full flex flex-col bg-white">
                   {/* Navigation Links */}
                   <div className="space-y-1">
                     {navigationItems.map((item) => (
