@@ -280,12 +280,12 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
               <div className="h-full overflow-y-scroll bg-white" style={{ WebkitOverflowScrolling: 'touch' }}>
                 <div className="p-4 space-y-4">
                   {/* Navigation Links */}
-                  <div className="space-y-1">
+                  <div className="space-y-3">
                     {navigationItems.map((item) => (
                       <Link
                         key={item.label}
                         href={item.href}
-                        className="block text-gray-800 hover:text-teal-600 hover:bg-teal-50 transition-colors font-semibold py-4 px-4 text-base rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-gray-50 border border-gray-200 mb-2"
+                        className="block text-gray-800 hover:text-teal-600 hover:bg-teal-50 transition-colors font-semibold py-4 px-4 text-base rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-gray-50 border border-gray-200"
                         onClick={() => setMobileMenuOpen(false)}
                         role="menuitem"
                       >
@@ -299,7 +299,7 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                         setIsSearchOpen(true);
                         setMobileMenuOpen(false);
                       }}
-                      className="w-full flex items-center text-gray-800 hover:text-teal-600 hover:bg-teal-50 transition-colors font-semibold py-4 px-4 text-base rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-gray-50 border border-gray-200 mb-2"
+                      className="w-full flex items-center text-gray-800 hover:text-teal-600 hover:bg-teal-50 transition-colors font-semibold py-4 px-4 text-base rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-gray-50 border border-gray-200"
                       role="menuitem"
                     >
                       <Search className="w-5 h-5 mr-3" />
