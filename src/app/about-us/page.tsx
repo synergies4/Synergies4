@@ -140,31 +140,29 @@ function MissionSection() {
           ].map((item, index) => (
             <div key={index} className="group relative">
               {/* Glow Effect */}
-              <div className={`absolute -inset-1 bg-gradient-to-r ${item.gradient} rounded-2xl blur opacity-0 group-hover:opacity-75 transition duration-1000 group-hover:duration-200`}></div>
+              <div className={`absolute -inset-1 bg-gradient-to-r ${item.gradient} rounded-2xl blur opacity-0 group-hover:opacity-75 transition-opacity`}></div>
               
               {/* Main Card */}
-              <div className="relative bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 p-8 h-full hover:bg-white/15 transition-all duration-500 group-hover:scale-105 group-hover:-translate-y-2">
+              <div className="relative bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 p-8 h-full hover:bg-white/15 transition-all group-hover:scale-105 group-hover:-translate-y-2">
                 {/* Icon Container */}
                 <div className="relative mb-6">
-                  <div className={`w-20 h-20 bg-gradient-to-br ${item.gradient} rounded-2xl flex items-center justify-center mx-auto mb-6 text-white shadow-2xl group-hover:scale-110 group-hover:rotate-3 transition-all duration-500`}>
+                  <div className={`w-20 h-20 bg-gradient-to-br ${item.gradient} rounded-2xl flex items-center justify-center mx-auto mb-6 text-white shadow-2xl transition-transform group-hover:scale-110`}>
                     {item.icon}
                   </div>
-                  {/* Floating particles effect */}
-                  <div className={`absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-24 bg-${item.glowColor} rounded-full blur-xl opacity-0 group-hover:opacity-100 group-hover:scale-150 transition-all duration-700`}></div>
                 </div>
 
                 {/* Content */}
                 <div className="text-center">
-                  <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-cyan-200 transition-colors duration-300">
+                  <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-cyan-200 transition-colors">
                     {item.title}
                   </h3>
-                  <p className="text-blue-100/80 leading-relaxed text-base group-hover:text-white/90 transition-colors duration-300">
+                  <p className="text-blue-100/80 leading-relaxed text-base group-hover:text-white/90 transition-colors">
                     {item.description}
                   </p>
                 </div>
 
                 {/* Hover indicator */}
-                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-white to-transparent group-hover:w-16 transition-all duration-500 rounded-full"></div>
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-white to-transparent group-hover:w-16 transition-all rounded-full"></div>
               </div>
             </div>
           ))}
@@ -245,17 +243,17 @@ function StatCard({ stat, index }: { stat: any, index: number }) {
   return (
     <div className="group text-center relative">
       {/* Background glow */}
-      <div className={`absolute inset-0 bg-gradient-to-r ${stat.gradient} rounded-2xl blur opacity-0 group-hover:opacity-20 transition-all duration-700`}></div>
+      <div className={`absolute inset-0 bg-gradient-to-r ${stat.gradient} rounded-2xl blur opacity-0 group-hover:opacity-20 transition-opacity`}></div>
       
       {/* Main content */}
-      <div className="relative bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 hover:bg-white/10 transition-all duration-500 group-hover:scale-110 group-hover:-translate-y-2">
-        <div className={`text-4xl md:text-5xl font-bold mb-2 bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent group-hover:scale-110 transition-transform duration-300`}>
+      <div className="relative bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 hover:bg-white/10 transition-all group-hover:scale-110 group-hover:-translate-y-2">
+        <div className={`text-4xl md:text-5xl font-bold mb-2 bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent transition-transform group-hover:scale-110`}>
           {count.toLocaleString()}{stat.suffix}
         </div>
-        <div className="text-blue-200/80 text-sm md:text-base group-hover:text-white transition-colors duration-300">{stat.label}</div>
+        <div className="text-blue-200/80 text-sm md:text-base group-hover:text-white transition-colors">{stat.label}</div>
         
         {/* Floating indicator */}
-        <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-transparent via-white to-transparent group-hover:w-12 transition-all duration-500"></div>
+        <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-transparent via-white to-transparent group-hover:w-12 transition-all"></div>
       </div>
     </div>
   );
@@ -498,12 +496,12 @@ function TestimonialsSection() {
           ].map((testimonial, index) => (
             <div key={index} className={`group relative animate-fade-in-up animation-delay-${index * 200}`}>
               {/* Glow Effect */}
-              <div className={`absolute -inset-1 bg-gradient-to-r ${testimonial.gradient} rounded-2xl blur opacity-0 group-hover:opacity-30 transition duration-1000 group-hover:duration-200`}></div>
+              <div className={`absolute -inset-1 bg-gradient-to-r ${testimonial.gradient} rounded-2xl blur opacity-0 group-hover:opacity-30 transition-opacity`}></div>
               
               {/* Main Card */}
-              <div className={`relative bg-gradient-to-br ${testimonial.bgGradient} backdrop-blur-xl rounded-2xl border border-white/20 p-8 h-full hover:bg-white/5 transition-all duration-500 group-hover:scale-105 group-hover:-translate-y-3 shadow-xl hover:shadow-2xl`}>
+              <div className={`relative bg-gradient-to-br ${testimonial.bgGradient} backdrop-blur-xl rounded-2xl border border-white/20 p-8 h-full hover:bg-white/5 transition-all group-hover:scale-105 shadow-xl hover:shadow-2xl`}>
                 {/* Quote Icon */}
-                <div className="absolute top-6 right-6 text-white/20 group-hover:text-white/40 transition-colors duration-300">
+                <div className="absolute top-6 right-6 text-white/20 group-hover:text-white/40 transition-colors">
                   <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
                   </svg>
@@ -512,39 +510,30 @@ function TestimonialsSection() {
                 {/* Stars */}
                 <div className="flex mb-6">
                   {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-current mr-1 group-hover:scale-110 transition-transform duration-300" style={{ animationDelay: `${i * 100}ms` }} />
+                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-current mr-1 transition-transform group-hover:scale-110" />
                   ))}
                 </div>
 
                 {/* Content */}
-                <p className="text-gray-200 mb-8 italic leading-relaxed text-lg group-hover:text-white transition-colors duration-300 font-light">"{testimonial.content}"</p>
+                <p className="text-gray-200 mb-8 italic leading-relaxed text-lg group-hover:text-white transition-colors font-light">"{testimonial.content}"</p>
                 
                 {/* Author */}
                 <div className="flex items-center">
                   <div className="relative">
-                    <Avatar className="h-16 w-16 mr-4 ring-2 ring-white/20 group-hover:ring-white/40 transition-all duration-300">
+                    <Avatar className="h-16 w-16 mr-4 ring-2 ring-white/20 group-hover:ring-white/40 transition-all">
                       <AvatarImage src={testimonial.image} alt={testimonial.name} />
                       <AvatarFallback className="bg-gradient-to-br from-gray-600 to-gray-800 text-white">
                         {testimonial.name.split(' ').map(n => n[0]).join('')}
                       </AvatarFallback>
                     </Avatar>
-                    {/* Glow effect for avatar */}
-                    <div className={`absolute inset-0 bg-gradient-to-r ${testimonial.gradient} rounded-full blur opacity-0 group-hover:opacity-30 transition-all duration-500`}></div>
                   </div>
                   
                   <div>
-                    <p className="font-bold text-white text-lg group-hover:text-yellow-200 transition-colors duration-300">{testimonial.name}</p>
-                    <p className="text-gray-300 text-base group-hover:text-gray-200 transition-colors duration-300">{testimonial.role}</p>
-                    <p className="text-gray-400 text-sm group-hover:text-gray-300 transition-colors duration-300">{testimonial.company}</p>
+                    <p className="font-bold text-white text-lg group-hover:text-yellow-200 transition-colors">{testimonial.name}</p>
+                    <p className="text-gray-300 text-base group-hover:text-gray-200 transition-colors">{testimonial.role}</p>
+                    <p className="text-gray-400 text-sm group-hover:text-gray-300 transition-colors">{testimonial.company}</p>
                   </div>
                 </div>
-
-                {/* Decorative elements */}
-                <div className="absolute bottom-4 right-4 w-6 h-6 bg-white/10 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
-                <div className="absolute top-1/2 left-0 w-1 h-12 bg-gradient-to-b from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
-                
-                {/* Bottom accent */}
-                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-yellow-400 to-transparent group-hover:w-24 transition-all duration-500 rounded-full"></div>
               </div>
             </div>
           ))}
