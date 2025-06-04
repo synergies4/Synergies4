@@ -252,10 +252,10 @@ function CourseDirectorySection() {
                   <select
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="w-full h-12 px-4 text-lg border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/90 font-medium"
+                    className="w-full h-12 px-4 text-lg border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/90 font-medium text-gray-900"
                   >
                     {categories.map(category => (
-                      <option key={category} value={category}>
+                      <option key={category} value={category} className="text-gray-900">
                         {category === 'All' ? 'All Categories' : category}
                       </option>
                     ))}
@@ -331,43 +331,94 @@ function CourseDirectorySection() {
         )}
 
         {!loading && !error && filteredCourses.length > 0 && (
-          <div className="space-y-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
             {filteredCourses.map((course, index) => (
               <div key={course.id} className={`group relative animate-fade-in-up animation-delay-${index * 100}`}>
                 {/* Glow Effect */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-teal-500 rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-150"></div>
+                <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-teal-500 rounded-2xl blur opacity-0 group-hover:opacity-25 transition-opacity"></div>
                 
                 {/* Main Card */}
-                <div className="relative bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-2xl transition-all duration-150 group-hover:scale-[1.01] overflow-hidden">
-                  <div className="relative h-64">
+                <div className="relative bg-white/90 rounded-2xl border border-white/50 shadow-lg hover:shadow-2xl transition-all group-hover:scale-105 overflow-hidden flex flex-col h-full">
+                  {/* Course Image */}
+                  <div className="relative h-48 overflow-hidden flex-shrink-0">
                     <Image
                       src={course.image || getDefaultImage(course.category)}
                       alt={course.title}
                       fill
-                      className="object-cover rounded-t-lg"
+                      className="object-cover group-hover:scale-110 transition-transform"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent group-hover:from-black/40 transition-all duration-150"></div>
-                    <div className="absolute bottom-4 left-4 right-4">
-                      <Badge variant="secondary" className="bg-white/90 text-gray-800 mb-2">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                    
+                    {/* Level Badge */}
+                    <div className="absolute top-4 right-4">
+                      <Badge className={`bg-gradient-to-r ${getLevelColor(course.level)} text-white border-0 font-semibold`}>
+                        {course.level}
+                      </Badge>
+                    </div>
+                    
+                    {/* Category Badge */}
+                    <div className="absolute top-4 left-4">
+                      <Badge variant="secondary" className="bg-white/90 text-gray-800 font-medium">
                         {course.category}
                       </Badge>
-                      <h3 className="text-white font-bold text-lg mb-2 group-hover:text-cyan-200 transition-colors duration-150">
-                        {course.title}
-                      </h3>
                     </div>
+                  </div>
+
+                  {/* Card Content */}
+                  <div className="flex flex-col flex-1 p-6">
+                    {/* Title */}
+                    <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors line-clamp-2 min-h-[3.5rem] flex items-start">
+                      {course.title}
+                    </h3>
                     
-                    {/* Course level indicator */}
-                    <div className="absolute top-4 right-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getLevelColor(course.level)}`}>
-                        {course.level}
-                      </span>
-                    </div>
-                    
-                    {/* Play button overlay */}
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-                      <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-150">
-                        <PlayCircle className="h-8 w-8 text-white" />
+                    {/* Description */}
+                    <p className="text-gray-600 text-sm leading-relaxed mb-4 flex-1 group-hover:text-gray-700 transition-colors">
+                      {getFormattedDescription(course)}
+                    </p>
+
+                    {/* Course Meta */}
+                    <div className="flex items-center justify-between mb-4 text-sm">
+                      <div className="flex items-center space-x-1">
+                        <div className="flex">
+                          {[...Array(5)].map((_, i) => (
+                            <Star 
+                              key={i} 
+                              className={`h-4 w-4 ${i < 4 ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} 
+                            />
+                          ))}
+                        </div>
+                        <span className="text-gray-600 font-medium ml-1">4.8</span>
                       </div>
+                      <div className="flex items-center text-gray-500">
+                        <Users className="h-4 w-4 mr-1" />
+                        <span>1,200+</span>
+                      </div>
+                    </div>
+
+                    {/* Duration */}
+                    {course.duration && (
+                      <div className="flex items-center text-gray-500 text-sm mb-4">
+                        <Clock className="h-4 w-4 mr-2" />
+                        <span>{course.duration}</span>
+                      </div>
+                    )}
+
+                    {/* Price and CTA */}
+                    <div className="flex items-center justify-between mt-auto">
+                      <div className="text-2xl font-bold text-blue-600">
+                        {formatPrice(course.price)}
+                      </div>
+                      <Button 
+                        asChild 
+                        className="bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all group-hover:scale-105 rounded-xl border-0"
+                      >
+                        <Link href={`/courses/${createCourseSlug(course.title)}`}>
+                          <span className="flex items-center">
+                            Start Learning
+                            <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                          </span>
+                        </Link>
+                      </Button>
                     </div>
                   </div>
                 </div>
