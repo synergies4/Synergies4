@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -1376,6 +1376,8 @@ export default function SynergizeAgile() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<any>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  // Mobile scroll indicator state
+  const [showScrollIndicator, setShowScrollIndicator] = useState(false);
 
   // Check for mobile device and speech recognition support
   useEffect(() => {
@@ -1438,8 +1440,21 @@ export default function SynergizeAgile() {
   };
 
   const scrollToBottom = () => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    // Only scroll within the chat container, not the entire page
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTo({
+        top: chatContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    } else if (messagesEndRef.current) {
+      // Fallback for main interface - only scroll the container, not the page
+      const scrollContainer = messagesEndRef.current.closest('.overflow-y-auto');
+      if (scrollContainer) {
+        scrollContainer.scrollTo({
+          top: scrollContainer.scrollHeight,
+          behavior: 'smooth'
+        });
+      }
     }
   };
 
@@ -1516,15 +1531,75 @@ export default function SynergizeAgile() {
       }
     };
 
+    // Mobile scroll optimization - prevent page scroll when in chat view
+    const handleTouchMove = (e: TouchEvent) => {
+      if (isFullChatView && isMobile) {
+        const target = e.target as HTMLElement;
+        // Allow scrolling within chat container or sidebar
+        if (!target.closest('[data-chat-container]') && !target.closest('[data-sidebar-container]')) {
+          e.preventDefault();
+        }
+      }
+      // Prevent page scroll when sidebar is open on mobile
+      if (sidebarOpen && isMobile) {
+        const target = e.target as HTMLElement;
+        // Only allow scrolling within the sidebar
+        if (!target.closest('[data-sidebar-container]')) {
+          e.preventDefault();
+        }
+      }
+    };
+
     // Add event listeners for mobile touch events
     document.addEventListener('touchstart', preventScroll, { passive: false });
     document.addEventListener('touchmove', preventScroll, { passive: false });
     
+    // Add mobile-specific scroll prevention
+    if ((isFullChatView && isMobile) || (sidebarOpen && isMobile)) {
+      document.addEventListener('touchmove', handleTouchMove, { passive: false });
+      // Prevent iOS Safari bounce scrolling on the body
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+      document.body.style.height = '100%';
+    }
+    
     return () => {
       document.removeEventListener('touchstart', preventScroll);
       document.removeEventListener('touchmove', preventScroll);
+      document.removeEventListener('touchmove', handleTouchMove);
+      
+      // Restore body scroll when not in full chat view
+      if (!isFullChatView || !isMobile) {
+        document.body.style.overflow = '';
+        document.body.style.position = '';
+        document.body.style.width = '';
+        document.body.style.height = '';
+      }
     };
-  }, []);
+  }, [isFullChatView, isMobile, sidebarOpen]);
+
+  // Check if there are more messages below (mobile scroll indicator)
+  useEffect(() => {
+    if (!isMobile || !chatContainerRef.current) return;
+
+    const handleScroll = () => {
+      const container = chatContainerRef.current;
+      if (!container) return;
+      
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
+      setShowScrollIndicator(!isNearBottom && messages.length > 2);
+    };
+
+    const container = chatContainerRef.current;
+    container.addEventListener('scroll', handleScroll);
+    handleScroll(); // Check initial state
+
+    return () => {
+      container?.removeEventListener('scroll', handleScroll);
+    };
+  }, [isMobile, messages.length]);
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim() && files.length === 0) return;
@@ -1675,7 +1750,7 @@ export default function SynergizeAgile() {
   };
 
   // Type-safe handler for provider selection with scroll prevention
-  const handleProviderChange = (value: string) => {
+  const handleProviderChange = useCallback((value: string) => {
     if (value === 'anthropic' || value === 'openai' || value === 'google') {
       // Prevent any scrolling during provider change
       const currentScrollPosition = window.pageYOffset;
@@ -1685,25 +1760,30 @@ export default function SynergizeAgile() {
         window.scrollTo(0, currentScrollPosition);
       }, 0);
     }
-  };
+  }, []);
 
   // Role change handler with scroll prevention
-  const handleRoleChange = (value: string) => {
+  const handleRoleChange = useCallback((value: string) => {
     const currentScrollPosition = window.pageYOffset;
     setSelectedRole(value);
     setTimeout(() => {
       window.scrollTo(0, currentScrollPosition);
     }, 0);
-  };
+  }, []);
 
   // Mode change handler with scroll prevention
-  const handleModeChange = (value: string) => {
+  const handleModeChange = useCallback((value: string) => {
     const currentScrollPosition = window.pageYOffset;
     setSelectedMode(value);
     setTimeout(() => {
       window.scrollTo(0, currentScrollPosition);
     }, 0);
-  };
+  }, []);
+
+  // Stable input change handler to prevent focus loss
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInputMessage(e.target.value);
+  }, []);
 
   const currentRole = AGILE_ROLES[selectedRole as keyof typeof AGILE_ROLES];
   const currentMode = INTERACTION_MODES[selectedMode as keyof typeof INTERACTION_MODES];
@@ -1900,7 +1980,7 @@ export default function SynergizeAgile() {
   const FullChatView = () => (
     <div className="h-screen flex bg-gray-50">
       {/* Sidebar */}
-      <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 fixed lg:relative z-30 w-80 h-full bg-white border-r border-gray-200 shadow-lg transition-transform duration-300`}>
+      <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 fixed lg:relative z-30 w-80 h-full bg-white border-r border-gray-200 shadow-lg transition-transform duration-300`} data-sidebar-container="true">
         <div className="flex flex-col h-full">
           {/* Sidebar Header */}
           <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-teal-50 to-emerald-50">
@@ -1919,7 +1999,14 @@ export default function SynergizeAgile() {
           </div>
 
           {/* Controls */}
-          <div className="flex-1 p-6 space-y-6 overflow-y-auto">
+          <div 
+            className="flex-1 p-6 space-y-6 overflow-y-auto overscroll-contain touch-pan-y"
+            style={{
+              WebkitOverflowScrolling: 'touch',
+              scrollBehavior: 'smooth',
+              touchAction: 'pan-y'
+            }}
+          >
             {/* Role Selection */}
             <div>
               <Label className="text-sm font-medium text-gray-700 mb-3 block">Your Role</Label>
@@ -2092,7 +2179,7 @@ export default function SynergizeAgile() {
       )}
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col min-h-0">
+      <div className="flex-1 flex flex-col min-h-0 relative">
         {/* Chat Header */}
         <div className="bg-white border-b border-gray-200 p-4">
           <div className="flex items-center justify-between">
@@ -2105,6 +2192,21 @@ export default function SynergizeAgile() {
               >
                 <Menu className="h-5 w-5" />
               </Button>
+              
+              {/* Synergies Logo - Link to Home */}
+              <Link 
+                href="/" 
+                className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
+                title="Back to Home"
+              >
+                <div className="w-8 h-8 bg-gradient-to-r from-teal-600 to-emerald-600 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">S4</span>
+                </div>
+                <span className="hidden sm:block text-lg font-bold text-gray-900">Synergies4</span>
+              </Link>
+              
+              <div className="w-px h-6 bg-gray-300"></div>
+              
               <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${currentRole.color} flex items-center justify-center text-white`}>
                 {currentRole.icon}
               </div>
@@ -2122,7 +2224,16 @@ export default function SynergizeAgile() {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6" ref={chatContainerRef}>
+        <div 
+          className="flex-1 overflow-y-auto p-6 space-y-6 overscroll-contain touch-pan-y" 
+          ref={chatContainerRef}
+          data-chat-container="true"
+          style={{
+            WebkitOverflowScrolling: 'touch',
+            scrollBehavior: 'smooth',
+            touchAction: 'pan-y'
+          }}
+        >
           {messages.length === 0 && (
             <div className="text-center py-12">
               <div className={`w-16 h-16 rounded-full bg-gradient-to-r ${currentRole.color} flex items-center justify-center mx-auto mb-4`}>
@@ -2134,6 +2245,11 @@ export default function SynergizeAgile() {
               <p className="text-gray-600 max-w-md mx-auto">
                 I'm here to help you with {currentMode.description.toLowerCase()}. How can I assist you today?
               </p>
+              {isMobile && (
+                <div className="mt-4 text-xs text-gray-500 bg-gray-100 rounded-lg p-3 mx-auto max-w-xs">
+                  💡 Swipe up and down in this area to scroll through messages
+                </div>
+              )}
             </div>
           )}
 
@@ -2199,6 +2315,20 @@ export default function SynergizeAgile() {
           )}
           <div ref={messagesEndRef} />
         </div>
+
+        {/* Mobile Scroll Indicator */}
+        {isMobile && showScrollIndicator && (
+          <div className="absolute bottom-20 right-4 z-10">
+            <div 
+              className="bg-teal-600 text-white p-2 rounded-full shadow-lg animate-bounce cursor-pointer"
+              onClick={() => scrollToBottom()}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+              </svg>
+            </div>
+          </div>
+        )}
 
         {/* Input Area */}
         <div className="bg-white border-t border-gray-200 p-4">
@@ -2434,17 +2564,27 @@ Format as a realistic conversation with clear speaker labels and include decisio
 
             <div className="flex-1 relative">
               <Textarea
+                key="main-chat-input"
                 value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                placeholder={`Ask your ${currentRole.name} assistant anything...`}
-                className="min-h-[50px] max-h-[150px] resize-none pr-12 text-gray-900 bg-white border-gray-300 placeholder:text-gray-500"
+                onChange={handleInputChange}
+                placeholder={isMobile ? "Ask your AI assistant..." : `Ask your ${currentRole.name} assistant anything about Agile...`}
+                className={`min-h-[44px] max-h-[120px] resize-none pr-12 text-gray-900 bg-white border-gray-300 placeholder:text-gray-500 ${isMobile ? 'text-base' : ''}`}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     handleSendMessage();
                   }
                 }}
+                rows={isMobile ? 2 : 1}
               />
+              
+              {/* Voice feedback indicator */}
+              {isListening && (
+                <div className="absolute top-2 right-14 flex items-center space-x-1 text-red-600">
+                  <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
+                  <span className="text-xs">Listening...</span>
+                </div>
+              )}
             </div>
 
             <Button
@@ -2821,7 +2961,15 @@ Format as a realistic conversation with clear speaker labels and include decisio
 
               <CardContent className="flex-1 flex flex-col p-0 min-h-0 overflow-hidden">
                 {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 min-h-0">
+                <div 
+                  className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 min-h-0 overscroll-contain touch-pan-y"
+                  data-chat-container="true"
+                  style={{
+                    WebkitOverflowScrolling: 'touch',
+                    scrollBehavior: 'smooth',
+                    touchAction: 'pan-y'
+                  }}
+                >
                   {messages.length === 0 && (
                     <div className="flex items-center justify-center h-full">
                       <div className="text-center">
@@ -3010,9 +3158,10 @@ Format as a realistic conversation with clear speaker labels and include decisio
                         
                         <div className="flex-1 relative">
                           <Textarea
+                            key="main-interface-chat-input"
                             value={inputMessage}
-                            onChange={(e) => setInputMessage(e.target.value)}
-                            placeholder={`Ask your ${currentRole.name} assistant anything about Agile...`}
+                            onChange={handleInputChange}
+                            placeholder={isMobile ? "Ask your AI assistant..." : `Ask your ${currentRole.name} assistant anything about Agile...`}
                             className={`min-h-[44px] max-h-[120px] resize-none pr-12 text-gray-900 bg-white border-gray-300 placeholder:text-gray-500 ${isMobile ? 'text-base' : ''}`}
                             onKeyDown={(e) => {
                               if (e.key === 'Enter' && !e.shiftKey) {

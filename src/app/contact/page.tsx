@@ -121,7 +121,7 @@ export default function Contact() {
           href: "#contact-form"
         }}
         secondaryCTA={{
-          text: "View Our Locations",
+          text: "Get in Touch",
           href: "#locations",
           icon: <ArrowRight className="w-4 h-4" />
         }}
@@ -463,7 +463,7 @@ export default function Contact() {
         </div>
       </section>
 
-      {/* Global Offices Section */}
+      {/* Get in Touch Section */}
       <section id="locations" className="py-24 bg-gradient-to-br from-slate-900 via-gray-900 to-slate-900 relative overflow-hidden">
         {/* Enhanced Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
@@ -485,92 +485,42 @@ export default function Contact() {
         </div>
 
         <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center mb-20">
+          <div className="text-center max-w-2xl mx-auto">
             <div className="inline-flex items-center px-6 py-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 mb-8">
-              <Globe className="w-5 h-5 text-blue-300 mr-3" />
-              <span className="text-white/90 font-medium">Global Presence</span>
+              <MessageSquare className="w-5 h-5 text-blue-300 mr-3" />
+              <span className="text-white/90 font-medium">Ready to Connect?</span>
             </div>
             
             <h2 className="text-4xl md:text-6xl font-bold mb-8 leading-tight">
               <span className="bg-gradient-to-r from-white via-blue-200 to-cyan-300 bg-clip-text text-transparent">
-                We're Here to
+                Let's Start the
               </span>
               <br />
               <span className="bg-gradient-to-r from-purple-300 via-pink-300 to-orange-300 bg-clip-text text-transparent">
-                Serve You
+                Conversation
               </span>
             </h2>
             
-            <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed font-light">
-              With offices around the world, we're 
-              <span className="text-cyan-300 font-medium"> always close by </span>
-              to provide personalized support and service.
+            <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed font-light mb-12">
+              Ready to transform your organization with AI-powered learning? 
+              <span className="text-cyan-300 font-medium"> We're here to help you every step of the way.</span>
             </p>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                city: "San Francisco",
-                role: "Headquarters",
-                address: "123 Innovation Drive",
-                location: "San Francisco, CA 94105",
-                country: "United States",
-                icon: <Building className="h-8 w-8" />,
-                gradient: "from-blue-500 to-cyan-400",
-                bgGradient: "from-blue-900/20 to-cyan-900/20"
-              },
-              {
-                city: "New York",
-                role: "East Coast Hub",
-                address: "456 Business Ave",
-                location: "New York, NY 10001",
-                country: "United States",
-                icon: <Users className="h-8 w-8" />,
-                gradient: "from-emerald-500 to-teal-400",
-                bgGradient: "from-emerald-900/20 to-teal-900/20"
-              },
-              {
-                city: "London",
-                role: "European Office",
-                address: "789 Tech Street",
-                location: "London EC2A 4DP",
-                country: "United Kingdom",
-                icon: <Globe className="h-8 w-8" />,
-                gradient: "from-purple-500 to-pink-400",
-                bgGradient: "from-purple-900/20 to-pink-900/20"
-              }
-            ].map((office, index) => (
-              <div key={index} className={`group relative animate-fade-in-up animation-delay-${index * 100}`}>
-                {/* Glow Effect */}
-                <div className={`absolute -inset-1 bg-gradient-to-r ${office.gradient} rounded-2xl blur opacity-0 group-hover:opacity-30 transition-opacity-smooth`}></div>
-                
-                {/* Office Card */}
-                <div className={`relative glass-effect-dark rounded-2xl border border-white/20 p-8 h-full hover:bg-white/5 card-hover-optimized shadow-xl hover:shadow-2xl text-center`}>
-                  {/* Icon */}
-                  <div className="relative mb-6">
-                    <div className={`w-20 h-20 bg-gradient-to-br ${office.gradient} rounded-2xl flex items-center justify-center mx-auto text-white shadow-2xl transition-transform-smooth group-hover:scale-110`}>
-                      {office.icon}
-                    </div>
-                  </div>
-
-                  {/* Content */}
-                  <div>
-                    <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-cyan-200 transition-colors-smooth">{office.city}</h3>
-                    <p className="text-gray-300 mb-6 text-lg group-hover:text-gray-200 transition-colors-smooth">{office.role}</p>
-                    
-                    <div className="space-y-2 text-gray-400 group-hover:text-gray-300 transition-colors-smooth">
-                      <div className="flex items-center justify-center text-sm">
-                        <MapPin className="h-4 w-4 mr-2 text-cyan-400" />
-                        <span>{office.address}</span>
-                      </div>
-                      <p className="text-sm">{office.location}</p>
-                      <p className="text-sm font-medium">{office.country}</p>
-                    </div>
-                  </div>
-                </div>
+            <Button 
+              onClick={() => {
+                document.getElementById('contact-form')?.scrollIntoView({ 
+                  behavior: 'smooth' 
+                });
+              }}
+              className="group relative px-8 py-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-lg font-semibold rounded-2xl border-0 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105"
+            >
+              <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-purple-400 rounded-2xl blur opacity-0 group-hover:opacity-30 transition-opacity duration-300"></div>
+              <div className="relative flex items-center space-x-3">
+                <MessageSquare className="h-6 w-6 group-hover:scale-110 transition-transform duration-300" />
+                <span>Get in Touch</span>
+                <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
               </div>
-            ))}
+            </Button>
           </div>
         </div>
       </section>
