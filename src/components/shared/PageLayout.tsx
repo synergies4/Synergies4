@@ -249,15 +249,15 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                 variant="ghost"
                 size="sm"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+                className="p-2 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 text-gray-700 hover:text-teal-600"
                 aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
                 aria-expanded={mobileMenuOpen}
                 aria-controls="mobile-menu"
               >
                 {mobileMenuOpen ? (
-                  <X className="h-6 w-6" />
+                  <X className="h-6 w-6 text-gray-700" />
                 ) : (
-                  <Menu className="h-6 w-6" />
+                  <Menu className="h-6 w-6 text-gray-700" />
                 )}
               </Button>
             </div>

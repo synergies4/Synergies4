@@ -55,7 +55,7 @@ interface QuizAttempt {
 }
 
 export default function StudentDashboard() {
-  const { user, userProfile, loading: authLoading } = useAuth();
+  const { user, userProfile, loading: authLoading, isLoggingOut } = useAuth();
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [quizAttempts, setQuizAttempts] = useState<QuizAttempt[]>([]);
   const [loading, setLoading] = useState(true);
@@ -69,11 +69,11 @@ export default function StudentDashboard() {
   useEffect(() => {
     if (!authLoading && user) {
       fetchDashboardData();
-    } else if (!authLoading && !user) {
-      // Redirect to login
+    } else if (!authLoading && !user && !isLoggingOut) {
+      // Only redirect to login if not in the process of logging out
       window.location.href = '/login?redirect=/dashboard';
     }
-  }, [user, authLoading]);
+  }, [user, authLoading, isLoggingOut]);
 
   const fetchDashboardData = async () => {
     try {
@@ -162,13 +162,15 @@ export default function StudentDashboard() {
     }
   };
 
-  if (authLoading || loading) {
+  if (authLoading || loading || isLoggingOut) {
     return (
       <PageLayout>
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading your dashboard...</p>
+            <p className="text-gray-600">
+              {isLoggingOut ? 'Logging out...' : 'Loading your dashboard...'}
+            </p>
           </div>
         </div>
       </PageLayout>

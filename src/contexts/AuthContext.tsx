@@ -17,6 +17,7 @@ interface AuthContextType {
   user: User | null;
   userProfile: UserProfile | null;
   loading: boolean;
+  isLoggingOut: boolean;
   signOut: () => Promise<void>;
 }
 
@@ -24,6 +25,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   userProfile: null,
   loading: true,
+  isLoggingOut: false,
   signOut: async () => {},
 });
 
@@ -138,6 +140,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
@@ -220,24 +223,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     console.log('Starting sign out process...');
     
-    // Clear local state immediately
-    setUser(null);
-    setUserProfile(null);
-    console.log('Local state cleared');
+    // Set logging out state
+    setIsLoggingOut(true);
     
-    // Sign out from Supabase in the background (don't await)
-    const supabase = createClient();
-    supabase.auth.signOut().then(() => {
+    try {
+      // Sign out from Supabase
+      const supabase = createClient();
+      await supabase.auth.signOut();
       console.log('Supabase sign out successful');
-    }).catch((error) => {
+      
+      // Clear local state
+      setUser(null);
+      setUserProfile(null);
+      console.log('Local state cleared');
+      
+      // Redirect to home page
+      window.location.href = '/';
+      
+    } catch (error) {
       console.log('Supabase sign out error:', error);
-    });
+      // Even if there's an error, clear local state and redirect
+      setUser(null);
+      setUserProfile(null);
+      window.location.href = '/';
+    } finally {
+      setIsLoggingOut(false);
+    }
     
     console.log('Sign out complete');
   };
 
   return (
-    <AuthContext.Provider value={{ user, userProfile, loading, signOut }}>
+    <AuthContext.Provider value={{ user, userProfile, loading, isLoggingOut, signOut }}>
       {children}
     </AuthContext.Provider>
   );
