@@ -721,8 +721,8 @@ const PresentationGenerator = ({
                 id="topic"
                 value={presentationTopic}
                 onChange={(e) => setPresentationTopic(e.target.value)}
-                placeholder="e.g., Sprint Planning Best Practices"
-                className="min-h-[48px] text-base text-gray-900 bg-white border-gray-300 placeholder:text-gray-500 focus:border-teal-500 focus:ring-teal-500"
+                placeholder="Sprint Planning Best Practices"
+                className="h-12 text-base text-gray-900 bg-white border-gray-300 placeholder:text-gray-400 focus:border-teal-500 focus:ring-teal-500 px-4"
               />
             </div>
             
@@ -734,8 +734,8 @@ const PresentationGenerator = ({
                 id="audience"
                 value={audience}
                 onChange={(e) => setAudience(e.target.value)}
-                placeholder="e.g., Development teams"
-                className="min-h-[48px] text-base text-gray-900 bg-white border-gray-300 placeholder:text-gray-500 focus:border-teal-500 focus:ring-teal-500"
+                placeholder="Development teams"
+                className="h-12 text-base text-gray-900 bg-white border-gray-300 placeholder:text-gray-400 focus:border-teal-500 focus:ring-teal-500 px-4"
               />
             </div>
           </div>
@@ -807,7 +807,7 @@ const PresentationGenerator = ({
       </div>
 
       {/* Mobile Scroll Indicator */}
-      <div className="block sm:hidden text-center py-2">
+      <div className="block sm:hidden text-center py-3">
         <div className="inline-flex items-center space-x-2 text-gray-500 text-xs">
           <svg className="w-4 h-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7-7-7" />
@@ -819,12 +819,26 @@ const PresentationGenerator = ({
         </div>
       </div>
 
-      {/* Generate Button - More Prominent */}
-      <div className="sticky bottom-0 bg-gradient-to-t from-white via-white to-transparent pt-4 pb-4 sm:pb-0 sm:bg-none sm:static">
+      {/* Field Validation Message - Separate Section */}
+      {(!presentationTopic || !audience) && (
+        <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg mb-4">
+          <div className="flex items-center space-x-3">
+            <svg className="w-5 h-5 text-orange-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+            <span className="text-sm font-medium text-orange-800">
+              Please fill in both required fields above to continue
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Generate Button - Improved Layout */}
+      <div className="pt-2 pb-6 sm:pb-0">
         <Button 
           onClick={generatePresentation}
           disabled={!presentationTopic || !audience || isLoading}
-          className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-base font-semibold min-h-[52px] shadow-lg transform transition-all duration-200 hover:scale-[1.02] disabled:scale-100 disabled:shadow-none"
+          className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-base font-semibold h-14 shadow-lg transform transition-all duration-200 hover:scale-[1.02] disabled:scale-100 disabled:shadow-none"
         >
           {isLoading ? (
             <>
@@ -839,20 +853,17 @@ const PresentationGenerator = ({
           )}
         </Button>
         
-        {/* Progress indicator for required fields */}
-        <div className="mt-2 text-center">
-          <div className="text-xs text-gray-500">
-            {!presentationTopic || !audience ? (
-              <span className="text-orange-600 font-medium">
-                ⚠️ Please fill in both required fields above
-              </span>
-            ) : (
-              <span className="text-green-600 font-medium">
-                ✓ Ready to generate presentation
-              </span>
-            )}
+        {/* Success indicator */}
+        {presentationTopic && audience && (
+          <div className="mt-3 text-center">
+            <div className="inline-flex items-center space-x-2 text-green-600 text-sm">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              <span className="font-medium">Ready to generate presentation</span>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Existing content continues below... */}
