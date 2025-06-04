@@ -78,6 +78,8 @@ body {
 /* Enhanced Smooth Scrolling */
 * {
   scroll-behavior: smooth;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
 }
 
 html {
@@ -484,4 +486,36 @@ button:disabled, [aria-disabled="true"] {
   .p-3-mobile {
     padding: 0.75rem;
   }
+}
+
+/* Optimized hover animations with GPU acceleration */
+.group:hover .group-hover\:scale-105,
+.group:hover .group-hover\:scale-110,
+.group:hover .group-hover\:-translate-y-2,
+.group:hover .group-hover\:-translate-y-3,
+.group:hover .group-hover\:translate-x-1,
+.hover\:scale-105:hover,
+.hover\:scale-110:hover,
+.hover\:-translate-y-2:hover,
+.hover\:-translate-y-3:hover {
+  will-change: transform;
+}
+
+.group:hover .group-hover\:text-cyan-200,
+.group:hover .group-hover\:text-teal-600,
+.group:hover .group-hover\:text-white,
+.group:hover .group-hover\:text-cyan-600,
+.transition-colors {
+  will-change: color;
+}
+
+.transition-opacity,
+.group:hover .group-hover\:opacity-75 {
+  will-change: opacity;
+}
+
+/* Smooth transform defaults */
+* {
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
 }

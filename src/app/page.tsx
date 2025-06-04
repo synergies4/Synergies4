@@ -126,11 +126,11 @@ export default function HomePage() {
               { number: "4.9", label: "Rating", icon: <Star className="w-4 sm:w-5 h-4 sm:h-5" /> },
               { number: "50+", label: "Courses", icon: <BookOpen className="w-4 sm:w-5 h-4 sm:h-5" /> }
             ].map((stat, index) => (
-              <div key={index} className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl border border-gray-200/50 p-4 sm:p-6 hover:bg-white/90 transition-all duration-300 hover:scale-105 group">
-                <div className="flex items-center justify-center mb-2 sm:mb-3 text-teal-600 group-hover:text-cyan-600 transition-colors">
+              <div key={index} className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl border border-gray-200/50 p-4 sm:p-6 transition-all duration-500 hover:bg-white/90 hover:scale-105 group">
+                <div className="flex items-center justify-center mb-2 sm:mb-3 text-teal-600 transition-colors duration-500 group-hover:text-cyan-600">
                   {stat.icon}
                 </div>
-                <div className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-1 group-hover:scale-110 transition-transform">{stat.number}</div>
+                <div className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-1 transition-transform duration-500 group-hover:scale-110">{stat.number}</div>
                 <div className="text-xs sm:text-sm text-gray-600 uppercase tracking-wide font-medium">{stat.label}</div>
               </div>
             ))}
@@ -263,19 +263,19 @@ function ValuePropositionsSection() {
               style={{ animationDelay: `${index * 150}ms` }}
             >
               {/* Glow Effect */}
-              <div className={`absolute -inset-1 bg-gradient-to-r ${item.gradient} rounded-2xl blur opacity-0 group-hover:opacity-75 transition duration-500`}></div>
+              <div className={`absolute -inset-1 bg-gradient-to-r ${item.gradient} rounded-2xl blur opacity-0 group-hover:opacity-75 transition-opacity duration-500`}></div>
               
               {/* Main Card */}
-              <div className={`relative bg-gradient-to-br ${item.gradient} border border-white/15 transition-all duration-500 group-hover:scale-105 shadow-lg hover:shadow-2xl rounded-2xl p-8 text-center backdrop-blur-sm bg-white/15 h-full flex flex-col`}>
+              <div className={`relative bg-gradient-to-br ${item.gradient} border border-white/15 rounded-2xl p-8 text-center backdrop-blur-sm bg-white/15 h-full flex flex-col transition-all duration-500 group-hover:scale-105 shadow-lg hover:shadow-2xl`}>
                 {/* Icon Container */}
                 <div className="relative mb-6">
-                  <div className={`w-20 h-20 bg-gradient-to-br ${item.gradient} rounded-2xl flex items-center justify-center mx-auto mb-6 text-white shadow-2xl group-hover:scale-110 transition-all duration-500`}>
+                  <div className={`w-20 h-20 bg-gradient-to-br ${item.gradient} rounded-2xl flex items-center justify-center mx-auto mb-6 text-white shadow-2xl transition-transform duration-500 group-hover:scale-110`}>
                     {item.icon}
                   </div>
                 </div>
                 
                 {/* Content */}
-                <h3 className="text-xl font-bold text-white mb-4 group-hover:text-cyan-200 transition-colors duration-500">
+                <h3 className="text-xl font-bold text-white mb-4 transition-colors duration-500 group-hover:text-cyan-200">
                   {item.title}
                 </h3>
                 <p className="text-white/90 text-sm leading-relaxed flex-1">
@@ -708,11 +708,11 @@ function CertificationsSection() {
               features: ["360° Feedback", "Leadership Coaching", "Team Simulations", "Executive Mentoring"]
             }
           ].map((cert, index) => (
-            <Card key={index} className="group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white/90 backdrop-blur-sm border-0 shadow-lg overflow-hidden rounded-xl flex flex-col h-full">
+            <Card key={index} className="group transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 bg-white/90 backdrop-blur-sm border-0 shadow-lg overflow-hidden rounded-xl flex flex-col h-full">
               {/* Header with Icon */}
               <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 p-6 border-b flex-shrink-0">
                 <div className="flex items-start justify-between mb-4">
-                  <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${getProgressColor(cert.level)} flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                  <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${getProgressColor(cert.level)} flex items-center justify-center text-white shadow-lg transition-transform duration-500 group-hover:scale-110`}>
                     {getIcon(cert.title)}
                   </div>
                   <Badge className={`${getLevelColor(cert.level)} border font-medium`}>
@@ -720,7 +720,7 @@ function CertificationsSection() {
                   </Badge>
                 </div>
                 
-                <CardTitle className="text-xl font-bold group-hover:text-teal-600 transition-colors mb-2 min-h-[3rem] flex items-center">
+                <CardTitle className="text-xl font-bold transition-colors duration-500 group-hover:text-teal-600 mb-2 min-h-[3rem] flex items-center">
                   {cert.title}
                 </CardTitle>
                 <CardDescription className="text-gray-600 leading-relaxed min-h-[4.5rem]">
@@ -875,11 +875,11 @@ function TestimonialsSection() {
               rating: 5
             }
           ].map((testimonial, index) => (
-            <Card key={index} className="hover:shadow-xl transition-all duration-300 bg-white border border-gray-200 shadow-sm">
+            <Card key={index} className="transition-all duration-500 hover:shadow-xl bg-white border border-gray-200 shadow-sm group">
               <CardContent className="pt-6 bg-white">
                 <div className="flex mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-current transition-transform duration-500 group-hover:scale-110" />
                   ))}
                 </div>
                 <p className="text-gray-900 mb-4 font-medium">"{testimonial.content}"</p>
@@ -1080,12 +1080,12 @@ function CTASection() {
             { number: "4.9", label: "Average Rating", icon: <Star className="w-5 h-5" /> },
             { number: "50+", label: "Expert Courses", icon: <BookOpen className="w-5 h-5" /> }
           ].map((stat, index) => (
-            <div key={index} className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 hover:bg-white/10 transition-all duration-300 hover:scale-105 group">
-              <div className="flex items-center justify-center mb-3 text-teal-300 group-hover:text-white transition-colors">
+            <div key={index} className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 transition-all duration-500 hover:bg-white/10 hover:scale-105 group">
+              <div className="flex items-center justify-center mb-3 text-teal-300 transition-colors duration-500 group-hover:text-white">
                 {stat.icon}
               </div>
-              <div className="text-2xl md:text-3xl font-bold text-white mb-1 group-hover:scale-110 transition-transform">{stat.number}</div>
-              <div className="text-sm text-teal-200/80 uppercase tracking-wide font-medium group-hover:text-white/90 transition-colors">{stat.label}</div>
+              <div className="text-2xl md:text-3xl font-bold text-white mb-1 transition-transform duration-500 group-hover:scale-110">{stat.number}</div>
+              <div className="text-sm text-teal-200/80 uppercase tracking-wide font-medium transition-colors duration-500 group-hover:text-white/90">{stat.label}</div>
             </div>
           ))}
         </div>
