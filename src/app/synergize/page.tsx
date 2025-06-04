@@ -1709,6 +1709,193 @@ export default function SynergizeAgile() {
   const currentMode = INTERACTION_MODES[selectedMode as keyof typeof INTERACTION_MODES];
   const currentProvider = AI_PROVIDERS[selectedProvider];
 
+  // Presentation Display Component for Chat Messages
+  const PresentationDisplay = ({ messageContent }: { messageContent: string }) => {
+    const [parsedPresentation, setParsedPresentation] = useState<any>(null);
+    const [currentSlide, setCurrentSlide] = useState(0);
+    const [showFullPresentation, setShowFullPresentation] = useState(false);
+
+    useEffect(() => {
+      try {
+        // Try multiple approaches to extract JSON
+        let presentationData = null;
+        
+        // Method 1: Look for complete JSON object with proper braces
+        const jsonMatch = messageContent.match(/\{(?:[^{}]|{[^{}]*})*\}/);
+        if (jsonMatch) {
+          try {
+            presentationData = JSON.parse(jsonMatch[0]);
+          } catch (e) {
+            console.log('Method 1 failed, trying method 2');
+          }
+        }
+        
+        // Method 2: Look for JSON between code blocks
+        if (!presentationData) {
+          const codeBlockMatch = messageContent.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+          if (codeBlockMatch) {
+            try {
+              presentationData = JSON.parse(codeBlockMatch[1]);
+            } catch (e) {
+              console.log('Method 2 failed, trying method 3');
+            }
+          }
+        }
+        
+        // Method 3: Extract everything between first { and last }
+        if (!presentationData) {
+          const firstBrace = messageContent.indexOf('{');
+          const lastBrace = messageContent.lastIndexOf('}');
+          if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+            try {
+              const jsonStr = messageContent.substring(firstBrace, lastBrace + 1);
+              presentationData = JSON.parse(jsonStr);
+            } catch (e) {
+              console.log('Method 3 failed');
+            }
+          }
+        }
+        
+        if (presentationData && presentationData.slides && Array.isArray(presentationData.slides)) {
+          setParsedPresentation(presentationData);
+        }
+      } catch (error) {
+        console.error('Failed to parse presentation:', error);
+      }
+    }, [messageContent]);
+
+    if (!parsedPresentation) {
+      return (
+        <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
+          <p className="text-sm text-orange-700">
+            Presentation generated but couldn't be parsed. Please try again.
+          </p>
+        </div>
+      );
+    }
+
+    const slides = parsedPresentation.slides || [];
+    const currentSlideData = slides[currentSlide];
+
+    if (showFullPresentation) {
+      return (
+        <SlidePresentation
+          slides={slides}
+          onClose={() => setShowFullPresentation(false)}
+          presentationTitle={parsedPresentation.title}
+          onExportPDF={() => {
+            // Export PDF functionality here
+            console.log('Export PDF functionality would go here');
+          }}
+        />
+      );
+    }
+
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h4 className="font-semibold text-gray-900">
+            {parsedPresentation.title}
+          </h4>
+          <Badge variant="outline" className="text-xs">
+            {slides.length} slides
+          </Badge>
+        </div>
+
+        {/* Slide Preview */}
+        {currentSlideData && (
+          <div className="bg-gray-50 border rounded-lg p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h5 className="font-medium text-gray-900">
+                Slide {currentSlideData.slideNumber}: {currentSlideData.title}
+              </h5>
+              <Badge variant="outline" className="text-xs">
+                {currentSlideData.layout}
+              </Badge>
+            </div>
+            
+            <div className="space-y-2">
+              {currentSlideData.content?.slice(0, 3).map((item: string, idx: number) => (
+                <div key={idx} className="flex items-start">
+                  <span className="w-2 h-2 bg-teal-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                  <span className="text-sm text-gray-700">{item}</span>
+                </div>
+              ))}
+              {currentSlideData.content?.length > 3 && (
+                <p className="text-xs text-gray-500 ml-5">
+                  ...and {currentSlideData.content.length - 3} more points
+                </p>
+              )}
+            </div>
+
+            {/* Navigation */}
+            <div className="flex items-center justify-between mt-4">
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentSlide(Math.max(0, currentSlide - 1))}
+                  disabled={currentSlide === 0}
+                  className="text-xs"
+                >
+                  <ArrowRight className="h-3 w-3 rotate-180 mr-1" />
+                  Prev
+                </Button>
+                <span className="text-xs text-gray-500">
+                  {currentSlide + 1} of {slides.length}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentSlide(Math.min(slides.length - 1, currentSlide + 1))}
+                  disabled={currentSlide === slides.length - 1}
+                  className="text-xs"
+                >
+                  Next
+                  <ArrowRight className="h-3 w-3 ml-1" />
+                </Button>
+              </div>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowFullPresentation(true)}
+                className="text-xs"
+              >
+                <Presentation className="h-3 w-3 mr-1" />
+                View Full
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Quick Actions */}
+        <div className="flex space-x-2">
+          <Button
+            size="sm"
+            onClick={() => setShowFullPresentation(true)}
+            className="bg-teal-600 hover:bg-teal-700 text-white text-xs"
+          >
+            <Presentation className="h-3 w-3 mr-1" />
+            Present Slides
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              const jsonStr = JSON.stringify(parsedPresentation, null, 2);
+              navigator.clipboard.writeText(jsonStr);
+            }}
+            className="text-xs"
+          >
+            <Copy className="h-3 w-3 mr-1" />
+            Copy JSON
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
   // Full Chat View Component
   const FullChatView = () => (
     <div className="h-screen flex bg-gray-50">
@@ -1737,12 +1924,12 @@ export default function SynergizeAgile() {
             <div>
               <Label className="text-sm font-medium text-gray-700 mb-3 block">Your Role</Label>
               <Select value={selectedRole} onValueChange={handleRoleChange}>
-                <SelectTrigger className="w-full">
+                <SelectTrigger className="w-full bg-white border-gray-300 text-gray-900">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white border border-gray-300 shadow-lg">
                   {Object.entries(AGILE_ROLES).map(([key, role]) => (
-                    <SelectItem key={key} value={key}>
+                    <SelectItem key={key} value={key} className="text-gray-900 hover:bg-gray-50">
                       <div className="flex items-center">
                         <span className="mr-2">{role.icon}</span>
                         {role.name}
@@ -1758,12 +1945,12 @@ export default function SynergizeAgile() {
             <div>
               <Label className="text-sm font-medium text-gray-700 mb-3 block">Interaction Mode</Label>
               <Select value={selectedMode} onValueChange={handleModeChange}>
-                <SelectTrigger className="w-full">
+                <SelectTrigger className="w-full bg-white border-gray-300 text-gray-900">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white border border-gray-300 shadow-lg">
                   {Object.entries(INTERACTION_MODES).map(([key, mode]) => (
-                    <SelectItem key={key} value={key}>
+                    <SelectItem key={key} value={key} className="text-gray-900 hover:bg-gray-50">
                       <div className="flex items-center">
                         <span className="mr-2">{mode.icon}</span>
                         {mode.name}
@@ -1778,12 +1965,12 @@ export default function SynergizeAgile() {
             <div>
               <Label className="text-sm font-medium text-gray-700 mb-3 block">AI Provider</Label>
               <Select value={selectedProvider} onValueChange={handleProviderChange}>
-                <SelectTrigger className="w-full">
+                <SelectTrigger className="w-full bg-white border-gray-300 text-gray-900">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white border border-gray-300 shadow-lg">
                   {Object.entries(AI_PROVIDERS).map(([key, provider]) => (
-                    <SelectItem key={key} value={key}>
+                    <SelectItem key={key} value={key} className="text-gray-900 hover:bg-gray-50">
                       <div className="flex items-center">
                         <span className="mr-2">{provider.icon}</span>
                         {provider.name}
@@ -1795,49 +1982,6 @@ export default function SynergizeAgile() {
               </Select>
             </div>
 
-            {/* Specialized Mode Interface */}
-            {selectedMode !== 'chat' && (
-              <div className="border-t pt-6">
-                <h3 className="text-sm font-medium text-gray-700 mb-3">Mode Tools</h3>
-                {selectedMode === 'presentation' && (
-                  <PresentationGenerator
-                    currentRole={currentRole}
-                    inputMessage={inputMessage}
-                    setInputMessage={setInputMessage}
-                    handleSendMessage={handleSendMessage}
-                    isLoading={isLoading}
-                    messages={messages}
-                    copyMessage={copyMessage}
-                    selectedProvider={selectedProvider}
-                  />
-                )}
-                {selectedMode === 'scenario' && (
-                  <ScenarioSimulator
-                    currentRole={currentRole}
-                    inputMessage={inputMessage}
-                    setInputMessage={setInputMessage}
-                    handleSendMessage={handleSendMessage}
-                    isLoading={isLoading}
-                    messages={messages}
-                    copyMessage={copyMessage}
-                    selectedProvider={selectedProvider}
-                  />
-                )}
-                {selectedMode === 'advisor' && (
-                  <RoleBasedAdvisor
-                    currentRole={currentRole}
-                    inputMessage={inputMessage}
-                    setInputMessage={setInputMessage}
-                    handleSendMessage={handleSendMessage}
-                    isLoading={isLoading}
-                    messages={messages}
-                    copyMessage={copyMessage}
-                    selectedProvider={selectedProvider}
-                  />
-                )}
-              </div>
-            )}
-
             {/* Quick Actions */}
             <div className="border-t pt-6">
               <h3 className="text-sm font-medium text-gray-700 mb-3">Quick Actions</h3>
@@ -1846,7 +1990,7 @@ export default function SynergizeAgile() {
                   variant="outline"
                   size="sm"
                   onClick={clearChat}
-                  className="w-full justify-start"
+                  className="w-full justify-start bg-white border-gray-300 text-gray-900 hover:bg-gray-50"
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
                   Clear Chat
@@ -1855,7 +1999,7 @@ export default function SynergizeAgile() {
                   variant="outline"
                   size="sm"
                   onClick={() => setIsFullChatView(false)}
-                  className="w-full justify-start"
+                  className="w-full justify-start bg-white border-gray-300 text-gray-900 hover:bg-gray-50"
                 >
                   <ArrowRight className="h-4 w-4 mr-2 rotate-180" />
                   Back to Setup
@@ -1930,9 +2074,19 @@ export default function SynergizeAgile() {
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
-                      {message.content}
-                    </p>
+                    {/* Check if message contains presentation JSON */}
+                    {message.type === 'ai' && (message.content.includes('"slides"') || message.content.includes('"title"')) ? (
+                      <div className="space-y-4">
+                        <p className="text-sm text-green-600 font-medium">
+                          ✅ Presentation generated successfully!
+                        </p>
+                        <PresentationDisplay messageContent={message.content} />
+                      </div>
+                    ) : (
+                      <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+                        {message.content}
+                      </p>
+                    )}
                     <div className="flex items-center justify-between mt-3">
                       <span className={`text-xs ${message.type === 'user' ? 'text-teal-100' : 'text-gray-500'}`}>
                         {message.timestamp.toLocaleTimeString()}
@@ -1978,7 +2132,7 @@ export default function SynergizeAgile() {
           {files.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-4">
               {files.map((file, index) => (
-                <div key={index} className="flex items-center bg-gray-100 rounded-lg p-2 border">
+                <div key={index} className="flex items-center bg-gray-100 rounded-lg p-2 border border-gray-300">
                   <FileText className="h-4 w-4 text-gray-500 mr-2" />
                   <span className="text-sm text-gray-700 truncate max-w-[150px]">
                     {file.name}
@@ -1996,12 +2150,130 @@ export default function SynergizeAgile() {
             </div>
           )}
 
+          {/* Specialized Mode Input - Only show for non-chat modes */}
+          {selectedMode !== 'chat' && (
+            <div className="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <h3 className="text-sm font-medium text-gray-700 mb-3">
+                {selectedMode === 'presentation' && 'Presentation Generator'}
+                {selectedMode === 'scenario' && 'Scenario Simulator'}
+                {selectedMode === 'advisor' && 'Role-Based Advisor'}
+              </h3>
+              
+              {selectedMode === 'presentation' && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-sm font-medium text-gray-700">Topic</Label>
+                      <Input
+                        placeholder="Enter presentation topic"
+                        className="mt-1 bg-white border-gray-300 text-gray-900"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            const topic = (e.target as HTMLInputElement).value;
+                            setInputMessage(`Create a presentation about: ${topic}`);
+                            handleSendMessage();
+                          }
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-sm font-medium text-gray-700">Audience</Label>
+                      <Input
+                        placeholder="Target audience"
+                        className="mt-1 bg-white border-gray-300 text-gray-900"
+                      />
+                    </div>
+                  </div>
+                  <Button
+                    onClick={() => {
+                      setInputMessage('Generate a presentation with the details provided above');
+                      handleSendMessage();
+                    }}
+                    disabled={isLoading}
+                    className="bg-teal-600 hover:bg-teal-700 text-white"
+                  >
+                    <Presentation className="h-4 w-4 mr-2" />
+                    Generate Presentation
+                  </Button>
+                </div>
+              )}
+              
+              {selectedMode === 'scenario' && (
+                <div className="space-y-4">
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700">Scenario Context</Label>
+                    <Textarea
+                      placeholder="Describe the scenario you want to simulate..."
+                      className="mt-1 bg-white border-gray-300 text-gray-900"
+                      rows={3}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && e.ctrlKey) {
+                          const context = (e.target as HTMLTextAreaElement).value;
+                          setInputMessage(`Simulate this scenario: ${context}`);
+                          handleSendMessage();
+                        }
+                      }}
+                    />
+                  </div>
+                  <Button
+                    onClick={() => {
+                      const textarea = document.querySelector('textarea') as HTMLTextAreaElement;
+                      if (textarea?.value) {
+                        setInputMessage(`Simulate this scenario: ${textarea.value}`);
+                        handleSendMessage();
+                      }
+                    }}
+                    disabled={isLoading}
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                  >
+                    <PlayCircle className="h-4 w-4 mr-2" />
+                    Start Scenario
+                  </Button>
+                </div>
+              )}
+              
+              {selectedMode === 'advisor' && (
+                <div className="space-y-4">
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700">Challenge or Question</Label>
+                    <Textarea
+                      placeholder="Describe your challenge or ask a question..."
+                      className="mt-1 bg-white border-gray-300 text-gray-900"
+                      rows={3}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && e.ctrlKey) {
+                          const question = (e.target as HTMLTextAreaElement).value;
+                          setInputMessage(question);
+                          handleSendMessage();
+                        }
+                      }}
+                    />
+                  </div>
+                  <Button
+                    onClick={() => {
+                      const textarea = document.querySelector('textarea') as HTMLTextAreaElement;
+                      if (textarea?.value) {
+                        setInputMessage(textarea.value);
+                        handleSendMessage();
+                      }
+                    }}
+                    disabled={isLoading}
+                    className="bg-orange-600 hover:bg-orange-700 text-white"
+                  >
+                    <Brain className="h-4 w-4 mr-2" />
+                    Get Advice
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="flex items-end space-x-3">
             <Button
               variant="outline"
               size="sm"
               onClick={() => fileInputRef.current?.click()}
-              className="flex-shrink-0"
+              className="flex-shrink-0 bg-white border-gray-300 text-gray-900 hover:bg-gray-50"
             >
               <Upload className="h-4 w-4" />
             </Button>
@@ -2011,7 +2283,7 @@ export default function SynergizeAgile() {
                 variant="outline"
                 size="sm"
                 onClick={isListening ? stopVoiceInput : startVoiceInput}
-                className={`flex-shrink-0 ${isListening ? 'bg-red-50 border-red-300 text-red-600' : ''}`}
+                className={`flex-shrink-0 ${isListening ? 'bg-red-50 border-red-300 text-red-600' : 'bg-white border-gray-300 text-gray-900 hover:bg-gray-50'}`}
               >
                 {isListening ? <MicOff className="h-4 w-4 animate-pulse" /> : <Mic className="h-4 w-4" />}
               </Button>
@@ -2022,7 +2294,7 @@ export default function SynergizeAgile() {
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 placeholder={`Ask your ${currentRole.name} assistant anything...`}
-                className="min-h-[50px] max-h-[150px] resize-none pr-12 text-gray-900 bg-gray-50 border-gray-300"
+                className="min-h-[50px] max-h-[150px] resize-none pr-12 text-gray-900 bg-white border-gray-300 placeholder:text-gray-500"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
@@ -2435,17 +2707,27 @@ export default function SynergizeAgile() {
                             : 'bg-white border shadow-sm'
                         }`}
                       >
-                        <div className="flex items-start space-x-2">
+                        <div className="flex items-start space-x-3">
                           {message.type === 'ai' && (
                             <div className={`w-6 h-6 rounded-full bg-gradient-to-r ${currentRole.color} flex items-center justify-center flex-shrink-0 mt-1`}>
                               <Bot className="h-3 w-3 text-white" />
                             </div>
                           )}
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm leading-relaxed whitespace-pre-wrap break-words overflow-wrap-anywhere">
-                              {message.content}
-                            </p>
-                            <div className="flex items-center justify-between mt-2">
+                            {/* Check if message contains presentation JSON */}
+                            {message.type === 'ai' && (message.content.includes('"slides"') || message.content.includes('"title"')) ? (
+                              <div className="space-y-4">
+                                <p className="text-sm text-green-600 font-medium">
+                                  ✅ Presentation generated successfully!
+                                </p>
+                                <PresentationDisplay messageContent={message.content} />
+                              </div>
+                            ) : (
+                              <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+                                {message.content}
+                              </p>
+                            )}
+                            <div className="flex items-center justify-between mt-3">
                               <div className="flex items-center space-x-2">
                                 <span className={`text-xs ${message.type === 'user' ? 'text-teal-100' : 'text-gray-500'}`}>
                                   {message.timestamp.toLocaleTimeString()}
