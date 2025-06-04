@@ -1358,74 +1358,77 @@ const RoleBasedAdvisor = ({
   );
 };
 
-// COMPLETELY ISOLATED INPUT COMPONENT - DEFINED OUTSIDE MAIN COMPONENT
-const IsolatedChatInput = React.memo(React.forwardRef<
+// COMPLETELY SELF-CONTAINED INPUT COMPONENT - MANAGES ITS OWN STATE
+const SelfContainedChatInput = React.memo(React.forwardRef<
   HTMLTextAreaElement,
   {
-    value: string;
-    onChange: (value: string) => void;
-    onSubmit: () => void;
+    initialValue?: string;
+    onSubmit: (value: string) => void;
     placeholder: string;
     disabled: boolean;
-    className: string;
+    className?: string;
   }
->(({ value, onChange, onSubmit, placeholder, disabled, className }, ref) => {
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    e.stopPropagation();
-    onChange(e.target.value);
-  }, [onChange]);
+>(({ initialValue = '', onSubmit, placeholder, disabled, className }, ref) => {
+  // Internal state - completely isolated from parent
+  const [internalValue, setInternalValue] = React.useState(initialValue);
+  
+  // Only update internal value when initialValue changes from parent (like clearing after send)
+  React.useEffect(() => {
+    if (initialValue !== internalValue && initialValue === '') {
+      setInternalValue('');
+    }
+  }, [initialValue]);
 
-  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleChange = React.useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    e.stopPropagation();
+    setInternalValue(e.target.value);
+  }, []);
+
+  const handleKeyDown = React.useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       e.stopPropagation();
-      onSubmit();
+      if (internalValue.trim()) {
+        onSubmit(internalValue.trim());
+        setInternalValue(''); // Clear internal state after submit
+      }
     }
-  }, [onSubmit]);
+  }, [internalValue, onSubmit]);
+
+  const handleSubmit = React.useCallback(() => {
+    if (internalValue.trim()) {
+      onSubmit(internalValue.trim());
+      setInternalValue(''); // Clear internal state after submit
+    }
+  }, [internalValue, onSubmit]);
+
+  // Expose submit function to parent via ref
+  React.useImperativeHandle(ref, () => ({
+    focus: () => {},
+    blur: () => {},
+    submit: handleSubmit,
+    clear: () => setInternalValue(''),
+    getValue: () => internalValue
+  } as any), [handleSubmit, internalValue]);
 
   return (
     <textarea
-      ref={ref}
-      value={value}
+      value={internalValue}
       onChange={handleChange}
       onKeyDown={handleKeyDown}
       placeholder={placeholder}
       disabled={disabled}
-      className={className}
+      className="w-full resize-none outline-none border border-gray-300 rounded-md p-3 text-sm leading-5 bg-white text-gray-900 min-h-[50px] max-h-[150px] font-sans transition-colors focus:border-green-500 focus:ring-2 focus:ring-green-500/20"
       autoComplete="off"
       spellCheck="false"
       autoCorrect="off"
       autoCapitalize="off"
-      data-isolated-input="true"
-      style={{
-        width: '100%',
-        resize: 'none',
-        outline: 'none',
-        border: '1px solid #d1d5db',
-        borderRadius: '0.375rem',
-        padding: '0.75rem',
-        fontSize: '0.875rem',
-        lineHeight: '1.25rem',
-        backgroundColor: 'white',
-        color: '#111827',
-        minHeight: '50px',
-        maxHeight: '150px',
-        fontFamily: 'inherit',
-        transition: 'border-color 0.15s ease-in-out',
-      }}
-      onFocus={(e) => {
-        e.target.style.borderColor = '#10b981';
-        e.target.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.1)';
-      }}
-      onBlur={(e) => {
-        e.target.style.borderColor = '#d1d5db';
-        e.target.style.boxShadow = 'none';
-      }}
+      data-self-contained-input="true"
     />
   );
 }));
 
-IsolatedChatInput.displayName = 'IsolatedChatInput';
+SelfContainedChatInput.displayName = 'SelfContainedChatInput';
 
 export default function SynergizeAgile() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -1676,8 +1679,9 @@ export default function SynergizeAgile() {
     }
   }, [isMobile, messages.length, chatContainerRef.current]);
 
-  const handleSendMessage = async () => {
-    if (!inputMessage.trim() && files.length === 0) return;
+  const handleSendMessage = async (messageContent?: string) => {
+    const messageToSend = messageContent || inputMessage;
+    if (!messageToSend.trim() && files.length === 0) return;
 
     // Check if we've reached the response limit
     if (responseCount >= maxResponses) {
@@ -1692,7 +1696,7 @@ export default function SynergizeAgile() {
     const userMessage: Message = {
       id: Date.now().toString(),
       type: 'user',
-      content: inputMessage,
+      content: messageToSend,
       timestamp: new Date(),
       mode: selectedMode,
       role: selectedRole,
@@ -1700,7 +1704,7 @@ export default function SynergizeAgile() {
     };
 
     setMessages(prev => [...prev, userMessage]);
-    setInputMessage('');
+    // Don't clear inputMessage here - the self-contained input handles its own clearing
     setIsLoading(true);
 
     try {
@@ -1738,7 +1742,7 @@ export default function SynergizeAgile() {
         body: JSON.stringify({
           messages: [
             { role: 'system', content: systemPrompt },
-            { role: 'user', content: inputMessage }
+            { role: 'user', content: messageToSend }
           ],
           provider: selectedProvider,
           attachments: files.map(file => ({
@@ -2770,9 +2774,8 @@ Format as a realistic conversation with clear speaker labels and include decisio
             )}
 
             <div className="flex-1 relative">
-              <IsolatedChatInput
-                value={inputMessage}
-                onChange={handleInputChange}
+              <SelfContainedChatInput
+                initialValue={inputMessage}
                 onSubmit={handleSendMessage}
                 placeholder={stablePlaceholder}
                 disabled={stableDisabled}
@@ -3374,9 +3377,8 @@ Format as a realistic conversation with clear speaker labels and include decisio
                           )}
                           
                           <div className="flex-1 relative">
-                            <IsolatedChatInput
-                              value={inputMessage}
-                              onChange={handleInputChange}
+                            <SelfContainedChatInput
+                              initialValue={inputMessage}
                               onSubmit={handleSendMessage}
                               placeholder={stableMainPlaceholder}
                               disabled={stableDisabled}
