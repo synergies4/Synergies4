@@ -355,36 +355,36 @@ function SpecialSection() {
           ].map((item, index) => (
             <div key={index} className={`group relative animate-fade-in-up animation-delay-${index * 100}`}>
               {/* Glow Effect */}
-              <div className={`absolute -inset-1 bg-gradient-to-r ${item.gradient} rounded-2xl blur opacity-0 group-hover:opacity-25 transition duration-1000 group-hover:duration-200`}></div>
+              <div className={`absolute -inset-1 bg-gradient-to-r ${item.gradient} rounded-2xl blur opacity-0 group-hover:opacity-25 transition-opacity`}></div>
               
               {/* Main Card */}
-              <div className={`relative bg-gradient-to-br ${item.bgGradient} rounded-2xl border border-white/50 p-8 h-full hover:bg-white/80 transition-all duration-500 group-hover:scale-105 group-hover:-translate-y-3 shadow-lg hover:shadow-2xl backdrop-blur-sm`}>
+              <div className={`relative bg-gradient-to-br ${item.bgGradient} rounded-2xl border border-white/50 p-8 h-full hover:bg-white/80 transition-all group-hover:scale-105 group-hover:-translate-y-3 shadow-lg hover:shadow-2xl backdrop-blur-sm`}>
                 {/* Icon Container */}
                 <div className="relative mb-6">
-                  <div className={`w-20 h-20 bg-gradient-to-br ${item.gradient} rounded-2xl flex items-center justify-center mx-auto mb-6 text-white shadow-xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}>
+                  <div className={`w-20 h-20 bg-gradient-to-br ${item.gradient} rounded-2xl flex items-center justify-center mx-auto mb-6 text-white shadow-xl transition-transform group-hover:scale-110 group-hover:rotate-6`}>
                     {item.icon}
                   </div>
                   
                   {/* Floating ring effect */}
-                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-24 border-2 border-current rounded-full opacity-0 group-hover:opacity-20 group-hover:scale-150 transition-all duration-700" style={{ color: item.gradient.includes('blue') ? '#3B82F6' : item.gradient.includes('teal') ? '#14B8A6' : '#10B981' }}></div>
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-24 border-2 border-current rounded-full opacity-0 group-hover:opacity-20 group-hover:scale-150 transition-all" style={{ color: item.gradient.includes('blue') ? '#3B82F6' : item.gradient.includes('teal') ? '#14B8A6' : '#10B981' }}></div>
                 </div>
 
                 {/* Content */}
                 <div className="text-center">
-                  <h3 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-blue-700 transition-colors duration-300">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-blue-700 transition-colors">
                     {item.title}
                   </h3>
-                  <p className="text-gray-600 leading-relaxed text-base group-hover:text-gray-800 transition-colors duration-300">
+                  <p className="text-gray-600 leading-relaxed text-base group-hover:text-gray-800 transition-colors">
                     {item.description}
                   </p>
                 </div>
 
                 {/* Decorative elements */}
-                <div className="absolute top-4 right-4 w-8 h-8 bg-white/30 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
-                <div className="absolute bottom-4 left-4 w-6 h-6 bg-white/20 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-700" style={{ animationDelay: '200ms' }}></div>
+                <div className="absolute top-4 right-4 w-8 h-8 bg-white/30 rounded-full opacity-0 group-hover:opacity-100 transition-all"></div>
+                <div className="absolute bottom-4 left-4 w-6 h-6 bg-white/20 rounded-full opacity-0 group-hover:opacity-100 transition-all"></div>
                 
                 {/* Bottom highlight */}
-                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-current to-transparent group-hover:w-20 transition-all duration-500 rounded-full" style={{ color: item.gradient.includes('blue') ? '#3B82F6' : item.gradient.includes('teal') ? '#14B8A6' : '#10B981' }}></div>
+                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-current to-transparent group-hover:w-20 transition-all rounded-full" style={{ color: item.gradient.includes('blue') ? '#3B82F6' : item.gradient.includes('teal') ? '#14B8A6' : '#10B981' }}></div>
               </div>
             </div>
           ))}
