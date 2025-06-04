@@ -267,21 +267,18 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
           {mobileMenuOpen && (
             <div 
               id="mobile-menu"
-              className="lg:hidden fixed bg-white shadow-2xl z-[99999] border-t border-gray-200"
+              className="lg:hidden absolute left-0 right-0 bg-white shadow-2xl z-[99999] border-t border-gray-200"
               style={{ 
-                top: '95px',
-                left: '0',
-                right: '0',
-                bottom: '0',
+                top: '100%',
                 width: '100vw',
-                height: 'calc(100vh - 95px)',
-                backgroundColor: 'white'
+                height: '70vh',
+                maxHeight: '70vh'
               }}
               role="menu"
               aria-label="Mobile navigation menu"
             >
-              <div className="h-full overflow-y-auto overscroll-contain bg-white">
-                <div className="px-4 py-4 space-y-4 min-h-full flex flex-col bg-white">
+              <div className="h-full overflow-y-scroll bg-white" style={{ WebkitOverflowScrolling: 'touch' }}>
+                <div className="p-4 space-y-4">
                   {/* Navigation Links */}
                   <div className="space-y-1">
                     {navigationItems.map((item) => (
@@ -310,11 +307,8 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                     </button>
                   </div>
                   
-                  {/* Spacer to push auth section to bottom */}
-                  <div className="flex-1"></div>
-                  
                   {/* Action Buttons */}
-                  <div className="space-y-3 pb-4">
+                  <div className="space-y-3 py-4">
                     <Button 
                       asChild 
                       className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-150 text-base py-3 h-12 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
@@ -336,7 +330,7 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                     </Button>
                   </div>
                   
-                  {/* Auth Section - Always at bottom */}
+                  {/* Auth Section */}
                   <div className="border-t border-gray-200 pt-4 pb-4 bg-gray-50 rounded-lg">
                     {user ? (
                       <div className="space-y-3">
@@ -379,6 +373,14 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                         </Button>
                       </div>
                     )}
+                  </div>
+                  
+                  {/* Extra padding to test scroll */}
+                  <div className="py-8">
+                    <p className="text-gray-500 text-center text-sm">Scroll test area</p>
+                  </div>
+                  <div className="py-8">
+                    <p className="text-gray-500 text-center text-sm">More content to test scrolling</p>
                   </div>
                 </div>
               </div>
