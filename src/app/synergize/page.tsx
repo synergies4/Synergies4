@@ -1372,10 +1372,12 @@ const IsolatedChatInput = React.memo(React.forwardRef<
 >(({ value, onChange, onSubmit, placeholder, disabled, className }, ref) => {
   const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     e.stopPropagation();
+    console.log('IsolatedChatInput: handleChange called with value:', e.target.value);
     onChange(e.target.value);
   }, [onChange]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    console.log('IsolatedChatInput: handleKeyDown called with key:', e.key);
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       e.stopPropagation();
@@ -1383,12 +1385,24 @@ const IsolatedChatInput = React.memo(React.forwardRef<
     }
   }, [onSubmit]);
 
+  const handleFocus = useCallback(() => {
+    console.log('IsolatedChatInput: Focus gained');
+  }, []);
+
+  const handleBlur = useCallback(() => {
+    console.log('IsolatedChatInput: Focus lost');
+  }, []);
+
+  console.log('IsolatedChatInput: Rendering with value:', value);
+
   return (
-    <Textarea
+    <textarea
       ref={ref}
       value={value}
       onChange={handleChange}
       onKeyDown={handleKeyDown}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
       placeholder={placeholder}
       disabled={disabled}
       className={className}
@@ -1397,15 +1411,79 @@ const IsolatedChatInput = React.memo(React.forwardRef<
       autoCorrect="off"
       autoCapitalize="off"
       data-isolated-input="true"
+      style={{
+        resize: 'none',
+        outline: 'none',
+        border: '1px solid #d1d5db',
+        borderRadius: '0.375rem',
+        padding: '0.75rem',
+        fontSize: '0.875rem',
+        lineHeight: '1.25rem',
+        backgroundColor: 'white',
+        color: '#111827',
+        minHeight: '50px',
+        maxHeight: '150px'
+      }}
     />
   );
 }));
 
 IsolatedChatInput.displayName = 'IsolatedChatInput';
 
+// MINIMAL TEST INPUT - COMPLETELY SELF-CONTAINED
+const MinimalTestInput = React.memo(() => {
+  const [localValue, setLocalValue] = useState('');
+  
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    console.log('MinimalTestInput: Change detected, new value:', e.target.value);
+    setLocalValue(e.target.value);
+  };
+
+  const handleFocus = () => {
+    console.log('MinimalTestInput: Focus gained');
+  };
+
+  const handleBlur = () => {
+    console.log('MinimalTestInput: Focus lost');
+  };
+
+  console.log('MinimalTestInput: Rendering with localValue:', localValue);
+
+  return (
+    <div style={{ margin: '10px 0', padding: '10px', border: '2px solid red' }}>
+      <div style={{ marginBottom: '5px', fontSize: '12px', color: 'red' }}>
+        TEST INPUT - If this works, the issue is with the main input
+      </div>
+      <textarea
+        value={localValue}
+        onChange={handleChange}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        placeholder="Test typing here..."
+        style={{
+          width: '100%',
+          minHeight: '40px',
+          padding: '8px',
+          border: '2px solid red',
+          borderRadius: '4px',
+          resize: 'none'
+        }}
+      />
+      <div style={{ fontSize: '12px', color: 'red' }}>
+        Current value: "{localValue}"
+      </div>
+    </div>
+  );
+});
+
+MinimalTestInput.displayName = 'MinimalTestInput';
+
 export default function SynergizeAgile() {
+  console.log('SynergizeAgile: Component rendering/re-rendering');
+  
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
+  console.log('SynergizeAgile: inputMessage state:', inputMessage);
   const [selectedRole, setSelectedRole] = useState<string>('scrum-master');
   const [selectedMode, setSelectedMode] = useState<string>('chat');
   const [selectedProvider, setSelectedProvider] = useState<keyof typeof AI_PROVIDERS>('anthropic');
@@ -1859,6 +1937,7 @@ export default function SynergizeAgile() {
 
   // Stable input change handler to prevent focus loss
   const handleInputChange = useCallback((value: string) => {
+    console.log('SynergizeAgile: handleInputChange called with value:', value);
     setInputMessage(value);
   }, []);
 
@@ -2513,6 +2592,9 @@ export default function SynergizeAgile() {
 
         {/* Input Area */}
         <div className={`bg-white border-t border-gray-200 p-4 ${isMobile ? 'fixed bottom-0 left-0 right-0 z-50 shadow-lg' : ''}`}>
+          {/* TEST INPUT - REMOVE AFTER DEBUGGING */}
+          <MinimalTestInput />
+          
           {files.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-4">
               {files.map((file, index) => (
