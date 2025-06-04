@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -1816,6 +1816,11 @@ export default function SynergizeAgile() {
     setInputMessage(e.target.value);
   }, []);
 
+  // Prevent re-renders that cause focus loss
+  const stableRoleData = useMemo(() => currentRole, [selectedRole]);
+  const stableModeData = useMemo(() => currentMode, [selectedMode]);
+  const stableProviderData = useMemo(() => currentProvider, [selectedProvider]);
+
   const currentRole = AGILE_ROLES[selectedRole as keyof typeof AGILE_ROLES];
   const currentMode = INTERACTION_MODES[selectedMode as keyof typeof INTERACTION_MODES];
   const currentProvider = AI_PROVIDERS[selectedProvider];
@@ -2670,10 +2675,10 @@ Format as a realistic conversation with clear speaker labels and include decisio
 
             <div className="flex-1 relative">
               <Textarea
-                key="full-chat-input"
+                key="full-chat-input-stable"
                 value={inputMessage}
                 onChange={handleInputChange}
-                placeholder={responseCount >= maxResponses ? "Session limit reached - Get in touch for unlimited access!" : (isMobile ? "Ask your AI assistant..." : `Ask your ${currentRole.name} assistant anything...`)}
+                placeholder={responseCount >= maxResponses ? "Session limit reached - Get in touch for unlimited access!" : (isMobile ? "Ask your AI assistant..." : "Ask your assistant anything...")}
                 className={`min-h-[50px] max-h-[150px] resize-none pr-12 text-gray-900 bg-white border-gray-300 placeholder:text-gray-500 ${responseCount >= maxResponses ? 'opacity-50 cursor-not-allowed' : ''}`}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
@@ -2682,6 +2687,8 @@ Format as a realistic conversation with clear speaker labels and include decisio
                   }
                 }}
                 disabled={responseCount >= maxResponses}
+                autoComplete="off"
+                spellCheck="false"
               />
             </div>
 
@@ -3282,7 +3289,7 @@ Format as a realistic conversation with clear speaker labels and include decisio
                               key="main-interface-chat-input"
                               value={inputMessage}
                               onChange={handleInputChange}
-                              placeholder={responseCount >= maxResponses ? "Session limit reached - Get in touch for unlimited access!" : (isMobile ? "Ask your AI assistant..." : `Ask your ${currentRole.name} assistant anything about Agile...`)}
+                              placeholder={responseCount >= maxResponses ? "Session limit reached - Get in touch for unlimited access!" : (isMobile ? "Ask your AI assistant..." : "Ask your assistant anything about Agile...")}
                               className={`min-h-[44px] max-h-[120px] resize-none pr-12 text-gray-900 bg-white border-gray-300 placeholder:text-gray-500 ${isMobile ? 'text-base' : ''} ${responseCount >= maxResponses ? 'opacity-50 cursor-not-allowed' : ''}`}
                               onKeyDown={(e) => {
                                 if (e.key === 'Enter' && !e.shiftKey) {
