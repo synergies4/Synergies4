@@ -250,12 +250,12 @@ function IndustryLeadersSection() {
               <Button 
                 size="lg" 
                 variant="outline"
-                className="border-2 border-gray-300 hover:border-teal-500 hover:bg-teal-50 px-8 py-4 rounded-xl transition-all hover:scale-105"
+                className="border-2 border-gray-300 text-white bg-gray-800 hover:border-teal-500 hover:bg-teal-600 hover:text-white px-8 py-4 rounded-xl transition-all hover:scale-105"
                 asChild
               >
                 <Link href="/coaching">
-                  <span className="flex items-center justify-center">
-                    <Users className="mr-2 h-5 w-5" />
+                  <span className="flex items-center justify-center text-white">
+                    <Users className="mr-2 h-5 w-5 text-white" />
                     Get Coaching
                   </span>
                 </Link>
