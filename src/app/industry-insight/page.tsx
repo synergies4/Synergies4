@@ -237,13 +237,13 @@ function BlogPostsSection() {
         {!loading && !error && filteredPosts.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredPosts.map((post, index) => (
-              <Card key={post.id} className="hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 bg-white/90 backdrop-blur-sm border-0 shadow-lg overflow-hidden rounded-xl group h-full flex flex-col">
+              <Card key={post.id} className="card-hover-optimized bg-white/90 border-0 shadow-lg overflow-hidden rounded-xl group h-full flex flex-col">
                 {/* Post Image */}
                 <div className="relative overflow-hidden h-48">
                   <img 
                     src={post.featured_image || getDefaultImage(post.category)}
                     alt={post.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.src = getDefaultImage(post.category);

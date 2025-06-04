@@ -65,10 +65,10 @@ export default function HomePage() {
 
         <div className="container mx-auto px-4 text-center relative z-10 py-12 sm:py-20">
           {/* Enhanced Badge with Animation - Mobile Optimized */}
-          <div className="inline-flex items-center px-4 sm:px-6 py-2 sm:py-3 bg-white/80 backdrop-blur-md rounded-full border border-teal-200/50 mb-8 sm:mb-12 group hover:bg-white/90 transition-all duration-500 hover:scale-105">
+          <div className="inline-flex items-center px-4 sm:px-6 py-2 sm:py-3 bg-white/80 backdrop-blur-md rounded-full border border-teal-200/50 mb-8 sm:mb-12 group hover:bg-white/90 card-hover-optimized">
             <div className="w-2 h-2 bg-gradient-to-r from-teal-400 to-emerald-400 rounded-full mr-2 sm:mr-3 animate-pulse"></div>
-            <Zap className="w-3 sm:w-4 h-3 sm:h-4 mr-1 sm:mr-2 text-teal-600 group-hover:text-teal-700 transition-colors" />
-            <span className="text-gray-700 font-medium group-hover:text-gray-800 transition-colors text-sm sm:text-base">AI-Powered Learning Platform</span>
+            <Zap className="w-3 sm:w-4 h-3 sm:h-4 mr-1 sm:mr-2 text-teal-600 group-hover:text-teal-700 transition-colors-smooth" />
+            <span className="text-gray-700 font-medium group-hover:text-gray-800 transition-colors-smooth text-sm sm:text-base">AI-Powered Learning Platform</span>
             <div className="w-2 h-2 bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-full ml-2 sm:ml-3 animate-pulse" style={{ animationDelay: '1s' }}></div>
           </div>
 
@@ -462,7 +462,7 @@ function FeaturedCoursesSection() {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="bg-white/10 backdrop-blur-xl rounded-2xl shadow-lg overflow-hidden animate-pulse border border-white/20">
+              <div key={i} className="glass-effect-light rounded-2xl shadow-lg overflow-hidden animate-pulse border border-white/20">
                 <div className="h-48 bg-gradient-to-br from-gray-400/20 to-gray-600/20"></div>
                 <div className="p-6">
                   <div className="h-4 bg-white/20 rounded mb-3"></div>

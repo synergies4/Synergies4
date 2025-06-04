@@ -147,49 +147,21 @@ function ServicesSection() {
               <div className={`absolute -inset-1 bg-gradient-to-r ${service.gradient} rounded-2xl blur opacity-0 group-hover:opacity-30 transition duration-150`}></div>
               
               {/* Main Card */}
-              <div className={`relative bg-gradient-to-br ${service.bgGradient} backdrop-blur-xl rounded-2xl border border-white/20 p-8 h-full hover:bg-white/80 transition-all duration-150 group-hover:scale-105 shadow-lg hover:shadow-2xl backdrop-blur-sm text-center`}>
+              <div className={`relative glass-effect-light rounded-2xl border border-white/20 p-8 h-full hover:bg-white/80 card-hover-optimized shadow-lg hover:shadow-2xl text-center`}>
                 {/* Icon Container */}
                 <div className="relative mb-6">
-                  <div className={`w-20 h-20 bg-gradient-to-br ${service.gradient} rounded-2xl flex items-center justify-center mx-auto text-white shadow-lg group-hover:shadow-xl transition-shadow duration-150`}>
+                  <div className={`w-20 h-20 bg-gradient-to-br ${service.gradient} rounded-2xl flex items-center justify-center mx-auto text-white shadow-lg transition-shadow-smooth`}>
                     {service.icon}
                   </div>
-                  
-                  {/* Floating Elements */}
-                  <div className={`absolute top-2 right-2 w-3 h-3 bg-gradient-to-br ${service.gradient} rounded-full opacity-60 group-hover:opacity-100 transition-all duration-150`}></div>
-                  <div className={`absolute bottom-2 left-2 w-2 h-2 bg-gradient-to-br ${service.gradient} rounded-full opacity-40 group-hover:opacity-80 transition-all duration-150`}></div>
-                  
-                  {/* Accent Line */}
-                  <div className={`absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r ${service.gradient} group-hover:w-20 transition-all duration-150 rounded-full`}></div>
                 </div>
                 
                 {/* Content */}
-                <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-teal-700 transition-colors duration-150">
+                <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-teal-700 transition-colors-smooth">
                   {service.title}
                 </h3>
-                <p className="text-gray-600 leading-relaxed mb-6 group-hover:text-gray-800 transition-colors duration-150">
+                <p className="text-gray-600 leading-relaxed text-base group-hover:text-gray-800 transition-colors-smooth">
                   {service.description}
                 </p>
-                
-                {/* Features List */}
-                <ul className="space-y-2 mb-6">
-                  {service.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-center text-sm text-gray-700 group-hover:text-gray-900 transition-colors duration-150">
-                      <CheckCircle className="h-4 w-4 text-teal-600 mr-2 flex-shrink-0" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-                
-                {/* CTA Button */}
-                <Button 
-                  asChild
-                  className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-150 hover:scale-105 w-full"
-                >
-                  <Link href="/contact">
-                    Learn More
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
               </div>
             </div>
           ))}
@@ -282,33 +254,23 @@ function WhyChooseSection() {
               <div className={`absolute -inset-1 bg-gradient-to-r ${item.gradient} rounded-2xl blur opacity-0 group-hover:opacity-30 transition duration-1000 group-hover:duration-200`}></div>
               
               {/* Main Card */}
-              <div className={`relative bg-gradient-to-br ${item.bgGradient} backdrop-blur-xl rounded-2xl border border-white/20 p-8 h-full hover:bg-white/5 transition-all duration-500 group-hover:scale-105 group-hover:-translate-y-3 shadow-xl hover:shadow-2xl text-center`}>
+              <div className={`relative glass-effect-light rounded-2xl border border-white/20 p-8 h-full hover:bg-white/80 card-hover-optimized shadow-lg hover:shadow-2xl text-center`}>
                 {/* Icon Container */}
                 <div className="relative mb-6">
-                  <div className={`w-20 h-20 bg-gradient-to-br ${item.gradient} rounded-2xl flex items-center justify-center mx-auto mb-6 text-white shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}>
+                  <div className={`w-20 h-20 bg-gradient-to-br ${item.gradient} rounded-2xl flex items-center justify-center mx-auto mb-6 text-white shadow-2xl transition-transform-smooth group-hover:scale-110`}>
                     {item.icon}
                   </div>
-                  
-                  {/* Floating ring effect */}
-                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-24 border-2 border-current rounded-full opacity-0 group-hover:opacity-20 group-hover:scale-150 transition-all duration-700" style={{ color: item.gradient.includes('blue') ? '#3B82F6' : item.gradient.includes('emerald') ? '#10B981' : item.gradient.includes('teal') ? '#14B8A6' : '#F97316' }}></div>
                 </div>
 
                 {/* Content */}
                 <div>
-                  <h3 className="text-xl font-bold text-white mb-4 group-hover:text-cyan-200 transition-colors duration-300">
+                  <h3 className="text-xl font-bold text-white mb-4 group-hover:text-cyan-200 transition-colors-smooth">
                     {item.title}
                   </h3>
-                  <p className="text-blue-200/80 leading-relaxed text-base group-hover:text-white/90 transition-colors duration-300">
+                  <p className="text-blue-200/80 leading-relaxed text-base group-hover:text-white/90 transition-colors-smooth">
                     {item.description}
                   </p>
                 </div>
-
-                {/* Decorative elements */}
-                <div className="absolute top-4 right-4 w-8 h-8 bg-white/10 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
-                <div className="absolute bottom-4 left-4 w-6 h-6 bg-white/10 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-700" style={{ animationDelay: '200ms' }}></div>
-                
-                {/* Bottom highlight */}
-                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-current to-transparent group-hover:w-20 transition-all duration-500 rounded-full" style={{ color: item.gradient.includes('blue') ? '#3B82F6' : item.gradient.includes('emerald') ? '#10B981' : item.gradient.includes('teal') ? '#14B8A6' : '#F97316' }}></div>
               </div>
             </div>
           ))}
@@ -395,7 +357,7 @@ function CaseStudiesSection() {
               <div className={`absolute -inset-1 bg-gradient-to-r ${study.gradient} rounded-2xl blur opacity-0 group-hover:opacity-30 transition duration-1000 group-hover:duration-200`}></div>
               
               {/* Main Card */}
-              <div className={`relative bg-gradient-to-br ${study.bgGradient} backdrop-blur-xl rounded-2xl border border-white/20 p-8 h-full hover:bg-white/5 transition-all duration-500 group-hover:scale-105 group-hover:-translate-y-3 shadow-xl hover:shadow-2xl`}>
+              <div className={`relative glass-effect-light rounded-2xl border border-white/20 p-8 h-full hover:bg-white/80 card-hover-optimized shadow-lg hover:shadow-2xl text-center`}>
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
                   <Badge variant="outline" className="text-sm bg-white/10 border-white/30 text-white">
@@ -409,28 +371,28 @@ function CaseStudiesSection() {
                 </div>
 
                 {/* Company */}
-                <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-cyan-200 transition-colors duration-300">
+                <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-cyan-200 transition-colors-smooth">
                   {study.company}
                 </h3>
 
                 {/* Challenge & Solution */}
                 <div className="space-y-4 mb-6">
                   <div>
-                    <h4 className="text-lg font-semibold text-blue-200 mb-2 group-hover:text-white transition-colors duration-300">Challenge:</h4>
-                    <p className="text-gray-300 leading-relaxed group-hover:text-white/90 transition-colors duration-300">{study.challenge}</p>
+                    <h4 className="text-lg font-semibold text-blue-200 mb-2 group-hover:text-white transition-colors-smooth">Challenge:</h4>
+                    <p className="text-gray-300 leading-relaxed group-hover:text-white/90 transition-colors-smooth">{study.challenge}</p>
                   </div>
                   <div>
-                    <h4 className="text-lg font-semibold text-blue-200 mb-2 group-hover:text-white transition-colors duration-300">Solution:</h4>
-                    <p className="text-gray-300 leading-relaxed group-hover:text-white/90 transition-colors duration-300">{study.solution}</p>
+                    <h4 className="text-lg font-semibold text-blue-200 mb-2 group-hover:text-white transition-colors-smooth">Solution:</h4>
+                    <p className="text-gray-300 leading-relaxed group-hover:text-white/90 transition-colors-smooth">{study.solution}</p>
                   </div>
                 </div>
 
                 {/* Results */}
                 <div className="mb-6">
-                  <h4 className="text-lg font-semibold text-yellow-300 mb-4 group-hover:text-yellow-200 transition-colors duration-300">Key Results:</h4>
+                  <h4 className="text-lg font-semibold text-yellow-300 mb-4 group-hover:text-yellow-200 transition-colors-smooth">Key Results:</h4>
                   <div className="grid grid-cols-1 gap-3">
                     {study.results.map((result, idx) => (
-                      <div key={idx} className="flex items-center text-gray-300 group-hover:text-white/90 transition-colors duration-300">
+                      <div key={idx} className="flex items-center text-gray-300 group-hover:text-white/90 transition-colors-smooth">
                         <CheckCircle className="h-5 w-5 text-green-400 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform duration-300" />
                         <span className="font-medium">{result}</span>
                       </div>
@@ -439,17 +401,10 @@ function CaseStudiesSection() {
                 </div>
 
                 {/* Testimonial */}
-                <blockquote className="text-gray-200 italic leading-relaxed mb-4 group-hover:text-white transition-colors duration-300 font-light text-lg border-l-4 border-yellow-400 pl-4">
+                <blockquote className="text-gray-200 italic leading-relaxed mb-4 group-hover:text-white transition-colors-smooth font-light text-lg border-l-4 border-yellow-400 pl-4">
                   "{study.testimonial}"
                 </blockquote>
-                <p className="text-yellow-300 font-semibold group-hover:text-yellow-200 transition-colors duration-300">— {study.author}</p>
-
-                {/* Decorative elements */}
-                <div className="absolute top-6 right-6 w-8 h-8 bg-white/10 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
-                <div className="absolute bottom-6 left-6 w-6 h-6 bg-white/10 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-700" style={{ animationDelay: '200ms' }}></div>
-                
-                {/* Bottom accent */}
-                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-yellow-400 to-transparent group-hover:w-24 transition-all duration-500 rounded-full"></div>
+                <p className="text-yellow-300 font-semibold group-hover:text-yellow-200 transition-colors-smooth">— {study.author}</p>
               </div>
             </div>
           ))}

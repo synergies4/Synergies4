@@ -234,7 +234,7 @@ function CourseDirectorySection() {
             <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-teal-500 rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-150"></div>
             
             {/* Main Container */}
-            <div className="relative bg-white/80 backdrop-blur-xl rounded-2xl border border-white/50 p-8 shadow-xl">
+            <div className="relative glass-effect-light rounded-2xl border border-white/50 p-8 shadow-xl">
               <div className="flex flex-col md:flex-row gap-6 mb-6">
                 {/* Search */}
                 <div className="flex-1 relative">
@@ -513,7 +513,7 @@ function BrochureSection() {
             <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-teal-500 rounded-2xl blur opacity-0 group-hover:opacity-30 transition duration-1000 group-hover:duration-200"></div>
             
             {/* Main Card */}
-            <div className="relative bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl overflow-hidden">
+            <div className="relative glass-effect-dark rounded-2xl border border-white/20 shadow-2xl overflow-hidden">
               <div className="p-8 md:p-12">
                 {isSubmitted ? (
                   <div className="text-center py-12 animate-fade-in-up">
