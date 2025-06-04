@@ -133,7 +133,7 @@ export default function HomePage() {
           </div>
 
           {/* Enhanced Stats with Cards - Fixed Spacing */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 max-w-4xl mx-auto mb-16 sm:mb-24 px-4 sm:px-0">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 max-w-4xl mx-auto mb-24 sm:mb-24 px-4 sm:px-0">
             {[
               { number: "10K+", label: "Learners", icon: <Users className="w-4 sm:w-5 h-4 sm:h-5" /> },
               { number: "95%", label: "Success Rate", icon: <TrendingUp className="w-4 sm:w-5 h-4 sm:h-5" /> },
@@ -152,7 +152,7 @@ export default function HomePage() {
         </div>
 
         {/* Enhanced Scroll Indicator with Down Arrow - Fixed Positioning */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2">
+        <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2">
           <div className="p-3 rounded-full border-2 border-gray-600/30 hover:border-gray-600/50 transition-colors animate-bounce group cursor-pointer">
             <ArrowDown className="w-6 h-6 text-gray-600/60 group-hover:text-cyan-600/80 transition-colors" />
           </div>
