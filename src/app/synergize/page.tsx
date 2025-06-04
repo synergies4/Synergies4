@@ -1923,63 +1923,136 @@ export default function SynergizeAgile() {
             {/* Role Selection */}
             <div>
               <Label className="text-sm font-medium text-gray-700 mb-3 block">Your Role</Label>
-              <Select value={selectedRole} onValueChange={handleRoleChange}>
-                <SelectTrigger className="w-full bg-white border-gray-300 text-gray-900 focus:border-teal-500 focus:ring-teal-500">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-teal-600 border border-teal-500 shadow-lg">
+              
+              {/* Mobile: Use native select */}
+              <div className="block md:hidden relative">
+                <select
+                  value={selectedRole}
+                  onChange={(e) => handleRoleChange(e.target.value)}
+                  className="w-full min-h-[44px] text-base px-4 py-3 bg-teal-600 border border-teal-500 text-white rounded-lg focus:ring-2 focus:ring-teal-400 focus:border-teal-400 appearance-none pr-10"
+                >
                   {Object.entries(AGILE_ROLES).map(([key, role]) => (
-                    <SelectItem key={key} value={key} className="text-white hover:bg-teal-700 focus:bg-teal-700 data-[highlighted]:bg-teal-700">
-                      <div className="flex items-center">
-                        <span className="mr-2 text-white">{role.icon}</span>
-                        <span className="text-white">{role.name}</span>
-                      </div>
-                    </SelectItem>
+                    <option key={key} value={key} className="bg-teal-600 text-white">
+                      {role.name}
+                    </option>
                   ))}
-                </SelectContent>
-              </Select>
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
+                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+
+              {/* Desktop: Use Radix UI Select */}
+              <div className="hidden md:block">
+                <Select value={selectedRole} onValueChange={handleRoleChange}>
+                  <SelectTrigger className="w-full bg-teal-600 border-teal-500 text-white focus:border-teal-400 focus:ring-teal-400 hover:bg-teal-700 [&>svg]:text-white">
+                    <SelectValue className="text-white" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-teal-600 border border-teal-500 shadow-lg z-50">
+                    {Object.entries(AGILE_ROLES).map(([key, role]) => (
+                      <SelectItem key={key} value={key} className="text-white hover:bg-teal-700 focus:bg-teal-700 data-[highlighted]:bg-teal-700 data-[state=checked]:bg-teal-800">
+                        <div className="flex items-center">
+                          <span className="mr-2 text-white">{role.icon}</span>
+                          <span className="text-white">{role.name}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
               <p className="text-xs text-gray-500 mt-2">{currentRole.description}</p>
             </div>
 
             {/* Mode Selection */}
             <div>
               <Label className="text-sm font-medium text-gray-700 mb-3 block">Interaction Mode</Label>
-              <Select value={selectedMode} onValueChange={handleModeChange}>
-                <SelectTrigger className="w-full bg-white border-gray-300 text-gray-900 focus:border-emerald-500 focus:ring-emerald-500">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-emerald-600 border border-emerald-500 shadow-lg">
+              
+              {/* Mobile: Use native select */}
+              <div className="block md:hidden relative">
+                <select
+                  value={selectedMode}
+                  onChange={(e) => handleModeChange(e.target.value)}
+                  className="w-full min-h-[44px] text-base px-4 py-3 bg-emerald-600 border border-emerald-500 text-white rounded-lg focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 appearance-none pr-10"
+                >
                   {Object.entries(INTERACTION_MODES).map(([key, mode]) => (
-                    <SelectItem key={key} value={key} className="text-white hover:bg-emerald-700 focus:bg-emerald-700 data-[highlighted]:bg-emerald-700">
-                      <div className="flex items-center">
-                        <span className="mr-2 text-white">{mode.icon}</span>
-                        <span className="text-white">{mode.name}</span>
-                      </div>
-                    </SelectItem>
+                    <option key={key} value={key} className="bg-emerald-600 text-white">
+                      {mode.name}
+                    </option>
                   ))}
-                </SelectContent>
-              </Select>
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
+                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+
+              {/* Desktop: Use Radix UI Select */}
+              <div className="hidden md:block">
+                <Select value={selectedMode} onValueChange={handleModeChange}>
+                  <SelectTrigger className="w-full bg-emerald-600 border-emerald-500 text-white focus:border-emerald-400 focus:ring-emerald-400 hover:bg-emerald-700 [&>svg]:text-white">
+                    <SelectValue className="text-white" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-emerald-600 border border-emerald-500 shadow-lg z-50">
+                    {Object.entries(INTERACTION_MODES).map(([key, mode]) => (
+                      <SelectItem key={key} value={key} className="text-white hover:bg-emerald-700 focus:bg-emerald-700 data-[highlighted]:bg-emerald-700 data-[state=checked]:bg-emerald-800">
+                        <div className="flex items-center">
+                          <span className="mr-2 text-white">{mode.icon}</span>
+                          <span className="text-white">{mode.name}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             {/* AI Provider */}
             <div>
               <Label className="text-sm font-medium text-gray-700 mb-3 block">AI Provider</Label>
-              <Select value={selectedProvider} onValueChange={handleProviderChange}>
-                <SelectTrigger className="w-full bg-white border-gray-300 text-gray-900 focus:border-teal-500 focus:ring-teal-500">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-teal-600 border border-teal-500 shadow-lg">
+              
+              {/* Mobile: Use native select */}
+              <div className="block md:hidden relative">
+                <select
+                  value={selectedProvider}
+                  onChange={(e) => handleProviderChange(e.target.value)}
+                  className="w-full min-h-[44px] text-base px-4 py-3 bg-teal-600 border border-teal-500 text-white rounded-lg focus:ring-2 focus:ring-teal-400 focus:border-teal-400 appearance-none pr-10"
+                >
                   {Object.entries(AI_PROVIDERS).map(([key, provider]) => (
-                    <SelectItem key={key} value={key} className="text-white hover:bg-teal-700 focus:bg-teal-700 data-[highlighted]:bg-teal-700">
-                      <div className="flex items-center">
-                        <span className="mr-2 text-white">{provider.icon}</span>
-                        <span className="text-white">{provider.name}</span>
-                        <span className="ml-auto text-xs text-teal-100">({provider.badge})</span>
-                      </div>
-                    </SelectItem>
+                    <option key={key} value={key} className="bg-teal-600 text-white">
+                      {provider.name} ({provider.badge})
+                    </option>
                   ))}
-                </SelectContent>
-              </Select>
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
+                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+
+              {/* Desktop: Use Radix UI Select */}
+              <div className="hidden md:block">
+                <Select value={selectedProvider} onValueChange={handleProviderChange}>
+                  <SelectTrigger className="w-full bg-teal-600 border-teal-500 text-white focus:border-teal-400 focus:ring-teal-400 hover:bg-teal-700 [&>svg]:text-white">
+                    <SelectValue className="text-white" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-teal-600 border border-teal-500 shadow-lg z-50">
+                    {Object.entries(AI_PROVIDERS).map(([key, provider]) => (
+                      <SelectItem key={key} value={key} className="text-white hover:bg-teal-700 focus:bg-teal-700 data-[highlighted]:bg-teal-700 data-[state=checked]:bg-teal-800">
+                        <div className="flex items-center">
+                          <span className="mr-2 text-white">{provider.icon}</span>
+                          <span className="text-white">{provider.name}</span>
+                          <span className="ml-auto text-xs text-teal-100">({provider.badge})</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             {/* Quick Actions */}
@@ -2546,20 +2619,20 @@ Format as a realistic conversation with clear speaker labels and include decisio
                     </label>
                     <div className="relative">
                       {/* Mobile: Use native select */}
-                      <div className="block md:hidden">
+                      <div className="block md:hidden relative">
                         <select
                           value={selectedRole}
                           onChange={(e) => handleRoleChange(e.target.value)}
-                          className="w-full min-h-[44px] text-base px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent appearance-none"
+                          className="w-full min-h-[44px] text-base px-4 py-3 bg-teal-600 border border-teal-500 text-white rounded-lg focus:ring-2 focus:ring-teal-400 focus:border-teal-400 appearance-none pr-10"
                         >
                           {Object.entries(AGILE_ROLES).map(([key, role]) => (
-                            <option key={key} value={key}>
+                            <option key={key} value={key} className="bg-teal-600 text-white">
                               {role.name}
                             </option>
                           ))}
                         </select>
-                        <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
+                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                           </svg>
                         </div>
@@ -2606,20 +2679,20 @@ Format as a realistic conversation with clear speaker labels and include decisio
                     </label>
                     <div className="relative">
                       {/* Mobile: Use native select */}
-                      <div className="block md:hidden">
+                      <div className="block md:hidden relative">
                         <select
                           value={selectedMode}
                           onChange={(e) => handleModeChange(e.target.value)}
-                          className="w-full min-h-[44px] text-base px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent appearance-none"
+                          className="w-full min-h-[44px] text-base px-4 py-3 bg-emerald-600 border border-emerald-500 text-white rounded-lg focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 appearance-none pr-10"
                         >
                           {Object.entries(INTERACTION_MODES).map(([key, mode]) => (
-                            <option key={key} value={key}>
+                            <option key={key} value={key} className="bg-emerald-600 text-white">
                               {mode.name}
                             </option>
                           ))}
                         </select>
-                        <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
+                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                           </svg>
                         </div>
@@ -2666,20 +2739,20 @@ Format as a realistic conversation with clear speaker labels and include decisio
                     </label>
                     <div className="relative">
                       {/* Mobile: Use native select */}
-                      <div className="block md:hidden">
+                      <div className="block md:hidden relative">
                         <select
                           value={selectedProvider}
                           onChange={(e) => handleProviderChange(e.target.value)}
-                          className="w-full min-h-[44px] text-base px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent appearance-none"
+                          className="w-full min-h-[44px] text-base px-4 py-3 bg-teal-600 border border-teal-500 text-white rounded-lg focus:ring-2 focus:ring-teal-400 focus:border-teal-400 appearance-none pr-10"
                         >
                           {Object.entries(AI_PROVIDERS).map(([key, provider]) => (
-                            <option key={key} value={key}>
+                            <option key={key} value={key} className="bg-teal-600 text-white">
                               {provider.name} ({provider.badge})
                             </option>
                           ))}
                         </select>
-                        <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
+                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                           </svg>
                         </div>
