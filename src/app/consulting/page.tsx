@@ -254,7 +254,7 @@ function WhyChooseSection() {
               <div className={`absolute -inset-1 bg-gradient-to-r ${item.gradient} rounded-2xl blur opacity-0 group-hover:opacity-30 transition duration-1000 group-hover:duration-200`}></div>
               
               {/* Main Card */}
-              <div className={`relative glass-effect-light rounded-2xl border border-white/20 p-8 h-full hover:bg-white/80 card-hover-optimized shadow-lg hover:shadow-2xl text-center`}>
+              <div className={`relative glass-effect-light rounded-2xl border border-white/20 p-8 h-full hover:bg-white/80 card-hover-optimized shadow-lg hover:shadow-2xl text-center bg-white/10`}>
                 {/* Icon Container */}
                 <div className="relative mb-6">
                   <div className={`w-20 h-20 bg-gradient-to-br ${item.gradient} rounded-2xl flex items-center justify-center mx-auto mb-6 text-white shadow-2xl transition-transform-smooth group-hover:scale-110`}>
@@ -267,7 +267,7 @@ function WhyChooseSection() {
                   <h3 className="text-xl font-bold text-white mb-4 group-hover:text-cyan-200 transition-colors-smooth">
                     {item.title}
                   </h3>
-                  <p className="text-blue-200/80 leading-relaxed text-base group-hover:text-white/90 transition-colors-smooth">
+                  <p className="text-white/90 leading-relaxed text-base group-hover:text-white transition-colors-smooth">
                     {item.description}
                   </p>
                 </div>

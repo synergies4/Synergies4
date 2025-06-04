@@ -1661,7 +1661,7 @@ export default function SynergizeAgile() {
                   <div className="w-16 h-16 bg-gradient-to-br from-teal-100 to-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 text-teal-600 group-hover:scale-110 transition-transform duration-300">
                     {mode.icon}
                   </div>
-                  <CardTitle className="text-xl group-hover:text-teal-600 transition-colors">
+                  <CardTitle className="text-xl text-gray-900 group-hover:text-teal-600 transition-colors">
                     {mode.name}
                   </CardTitle>
                 </CardHeader>
@@ -1699,7 +1699,7 @@ export default function SynergizeAgile() {
                   <div className={`w-16 h-16 bg-gradient-to-br ${role.color} rounded-full flex items-center justify-center mx-auto mb-4 text-white group-hover:scale-110 transition-transform duration-300`}>
                     {role.icon}
                   </div>
-                  <CardTitle className="text-xl group-hover:text-teal-600 transition-colors">
+                  <CardTitle className="text-xl text-gray-900 group-hover:text-teal-600 transition-colors">
                     {role.name}
                   </CardTitle>
                   <p className="text-gray-600 text-sm">

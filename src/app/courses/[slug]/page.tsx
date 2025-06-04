@@ -346,8 +346,8 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                 <div className="flex items-center space-x-4 mb-4">
                   <Button variant="outline" size="sm" asChild className="bg-white/90 text-gray-900 border-white/30 hover:bg-white hover:text-gray-900 transition-all duration-300">
                     <Link href="/courses">
-                      <ArrowLeft className="w-4 h-4 mr-2" />
-                      Back to Courses
+                      <ArrowLeft className="w-4 h-4 mr-2 text-gray-900" />
+                      <span className="text-gray-900">Back to Courses</span>
                     </Link>
                   </Button>
                   <Badge className="bg-white/20 text-white border-white/30">
@@ -355,7 +355,7 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                   </Badge>
                 </div>
 
-                <h1 className="text-4xl md:text-5xl font-bold leading-tight">
+                <h1 className="text-4xl md:text-5xl font-bold leading-tight text-white">
                   {course.title}
                 </h1>
                 

@@ -438,9 +438,9 @@ function CourseDirectorySection() {
                         className="bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all group-hover:scale-105 rounded-xl border-0"
                       >
                         <Link href={`/courses/${createCourseSlug(course.title)}`}>
-                          <span className="flex items-center">
+                          <span className="flex items-center text-white">
                             Start Learning
-                            <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                            <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform text-white" />
                           </span>
                         </Link>
                       </Button>
