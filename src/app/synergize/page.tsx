@@ -1378,6 +1378,9 @@ export default function SynergizeAgile() {
   const chatContainerRef = useRef<HTMLDivElement>(null);
   // Mobile scroll indicator state
   const [showScrollIndicator, setShowScrollIndicator] = useState(false);
+  // Response counter for session limit
+  const [responseCount, setResponseCount] = useState(0);
+  const maxResponses = 3;
 
   // Check for mobile device and speech recognition support
   useEffect(() => {
@@ -1593,16 +1596,23 @@ export default function SynergizeAgile() {
     };
 
     const container = chatContainerRef.current;
-    container.addEventListener('scroll', handleScroll);
-    handleScroll(); // Check initial state
-
-    return () => {
-      container?.removeEventListener('scroll', handleScroll);
-    };
-  }, [isMobile, messages.length]);
+    if (container) {
+      container.addEventListener('scroll', handleScroll);
+      handleScroll(); // Check initial state
+      
+      return () => {
+        container.removeEventListener('scroll', handleScroll);
+      };
+    }
+  }, [isMobile, messages.length, chatContainerRef.current]);
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim() && files.length === 0) return;
+
+    // Check if we've reached the response limit
+    if (responseCount >= maxResponses) {
+      return; // Don't allow more messages
+    }
 
     // Switch to full chat view after first message
     if (!isFullChatView) {
@@ -1693,6 +1703,27 @@ export default function SynergizeAgile() {
       };
 
       setMessages(prev => [...prev, aiMessage]);
+      
+      // Increment response count
+      const newCount = responseCount + 1;
+      setResponseCount(newCount);
+      
+      // If we've reached the limit, add the "Get in Touch" message
+      if (newCount >= maxResponses) {
+        setTimeout(() => {
+          const limitMessage: Message = {
+            id: (Date.now() + 2).toString(),
+            type: 'ai',
+            content: "🎯 **You've reached your session limit!**\n\nWant to continue your Agile learning journey with unlimited access? Our premium plans offer:\n\n• **Unlimited AI conversations**\n• **Advanced presentation tools**\n• **Priority support**\n• **Custom training scenarios**\n\nReady to unlock your full potential?",
+            timestamp: new Date(),
+            mode: selectedMode,
+            role: selectedRole,
+            provider: selectedProvider
+          };
+          setMessages(prev => [...prev, limitMessage]);
+        }, 1000);
+      }
+      
     } catch (error) {
       console.error('Chat Error:', error);
       
@@ -1976,6 +2007,75 @@ export default function SynergizeAgile() {
     );
   };
 
+  // Session Limit Display Component
+  const SessionLimitDisplay = ({ messageContent }: { messageContent: string }) => {
+    return (
+      <div className="space-y-4">
+        <div className="p-6 bg-gradient-to-br from-teal-50 to-emerald-50 border-2 border-teal-200 rounded-xl">
+          <div className="text-center mb-4">
+            <div className="w-16 h-16 bg-gradient-to-r from-teal-600 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-white font-bold text-xl">S4</span>
+            </div>
+            <div className="space-y-2">
+              {messageContent.split('\n').map((line, idx) => {
+                if (line.startsWith('🎯 **')) {
+                  return (
+                    <h3 key={idx} className="text-xl font-bold text-teal-800">
+                      🎯 You've reached your session limit!
+                    </h3>
+                  );
+                } else if (line.startsWith('Want to continue')) {
+                  return (
+                    <p key={idx} className="text-gray-700 text-base">
+                      {line}
+                    </p>
+                  );
+                } else if (line.startsWith('• **')) {
+                  const cleanLine = line.replace(/\*\*/g, '').replace('• ', '');
+                  return (
+                    <div key={idx} className="flex items-center text-sm text-gray-600">
+                      <CheckCircle className="h-4 w-4 text-teal-500 mr-2 flex-shrink-0" />
+                      <span>{cleanLine}</span>
+                    </div>
+                  );
+                } else if (line.startsWith('Ready to unlock')) {
+                  return (
+                    <p key={idx} className="text-teal-700 font-medium text-base">
+                      {line}
+                    </p>
+                  );
+                }
+                return null;
+              })}
+            </div>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button
+              onClick={() => {
+                window.open('/contact', '_blank');
+              }}
+              className="flex-1 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-semibold py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+            >
+              <MessageSquare className="h-5 w-5 mr-2" />
+              Get in Touch
+            </Button>
+            <Button
+              onClick={() => {
+                window.open('/contact#plans-pricing', '_blank');
+              }}
+              variant="outline"
+              className="flex-1 bg-white border-2 border-teal-600 text-teal-600 hover:bg-teal-50 font-semibold py-3 rounded-lg transition-all duration-300"
+            >
+              <Award className="h-5 w-5 mr-2" />
+              View Plans
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // Full Chat View Component
   const FullChatView = () => (
     <div className="h-screen flex bg-gray-50">
@@ -2182,44 +2282,57 @@ export default function SynergizeAgile() {
       <div className="flex-1 flex flex-col min-h-0 relative">
         {/* Chat Header */}
         <div className="bg-white border-b border-gray-200 p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSidebarOpen(true)}
-                className="lg:hidden"
-              >
-                <Menu className="h-5 w-5" />
-              </Button>
-              
-              {/* Synergies Logo - Link to Home */}
-              <Link 
-                href="/" 
-                className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
-                title="Back to Home"
-              >
-                <div className="w-8 h-8 bg-gradient-to-r from-teal-600 to-emerald-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">S4</span>
-                </div>
-                <span className="hidden sm:block text-lg font-bold text-gray-900">Synergies4</span>
-              </Link>
-              
-              <div className="w-px h-6 bg-gray-300"></div>
-              
-              <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${currentRole.color} flex items-center justify-center text-white`}>
-                {currentRole.icon}
+          <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
+            {/* Top Row - Logo and Menu */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSidebarOpen(true)}
+                  className="lg:hidden"
+                >
+                  <Menu className="h-5 w-5" />
+                </Button>
+                
+                {/* Synergies Logo - Link to Home */}
+                <Link 
+                  href="/" 
+                  className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
+                  title="Back to Home"
+                >
+                  <div className="w-8 h-8 bg-gradient-to-r from-teal-600 to-emerald-600 rounded-lg flex items-center justify-center">
+                    <span className="text-white font-bold text-sm">S4</span>
+                  </div>
+                  <span className="hidden sm:block text-lg font-bold text-gray-900">Synergies4</span>
+                </Link>
               </div>
-              <div>
-                <h1 className="text-lg font-semibold text-gray-900">
-                  {currentRole.name} Assistant
-                </h1>
-                <p className="text-sm text-gray-500">{currentMode.name}</p>
-              </div>
+              
+              <Badge className={`${currentProvider.badgeColor} lg:hidden`}>
+                {currentProvider.badge}
+              </Badge>
             </div>
-            <Badge className={currentProvider.badgeColor}>
-              {currentProvider.badge}
-            </Badge>
+
+            {/* Second Row - AI Assistant Info */}
+            <div className="flex items-center justify-between lg:justify-start lg:space-x-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-px h-6 bg-gray-300 hidden lg:block"></div>
+                
+                <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${currentRole.color} flex items-center justify-center text-white`}>
+                  {currentRole.icon}
+                </div>
+                <div>
+                  <h1 className="text-lg font-semibold text-gray-900">
+                    {currentRole.name} Assistant
+                  </h1>
+                  <p className="text-sm text-gray-500">{currentMode.name}</p>
+                </div>
+              </div>
+              
+              <Badge className={`${currentProvider.badgeColor} hidden lg:block`}>
+                {currentProvider.badge}
+              </Badge>
+            </div>
           </div>
         </div>
 
@@ -2271,6 +2384,8 @@ export default function SynergizeAgile() {
                         </p>
                         <PresentationDisplay messageContent={message.content} />
                       </div>
+                    ) : message.type === 'ai' && message.content.includes("You've reached your session limit") ? (
+                      <SessionLimitDisplay messageContent={message.content} />
                     ) : (
                       <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
                         {message.content}
@@ -2318,15 +2433,17 @@ export default function SynergizeAgile() {
 
         {/* Mobile Scroll Indicator */}
         {isMobile && showScrollIndicator && (
-          <div className="absolute bottom-20 right-4 z-10">
-            <div 
-              className="bg-teal-600 text-white p-2 rounded-full shadow-lg animate-bounce cursor-pointer"
+          <div className="absolute bottom-24 right-4 z-50">
+            <button
+              type="button" 
+              className="bg-teal-600 text-white p-3 rounded-full shadow-lg animate-bounce cursor-pointer hover:bg-teal-700 transition-colors touch-manipulation"
               onClick={() => scrollToBottom()}
+              style={{ minHeight: '48px', minWidth: '48px' }}
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
               </svg>
-            </div>
+            </button>
           </div>
         )}
 
@@ -2547,6 +2664,7 @@ Format as a realistic conversation with clear speaker labels and include decisio
               size="sm"
               onClick={() => fileInputRef.current?.click()}
               className="flex-shrink-0 bg-white border-gray-300 text-gray-900 hover:bg-gray-50"
+              disabled={responseCount >= maxResponses}
             >
               <Upload className="h-4 w-4" />
             </Button>
@@ -2557,6 +2675,7 @@ Format as a realistic conversation with clear speaker labels and include decisio
                 size="sm"
                 onClick={isListening ? stopVoiceInput : startVoiceInput}
                 className={`flex-shrink-0 ${isListening ? 'bg-red-50 border-red-300 text-red-600' : 'bg-white border-gray-300 text-gray-900 hover:bg-gray-50'}`}
+                disabled={responseCount >= maxResponses}
               >
                 {isListening ? <MicOff className="h-4 w-4 animate-pulse" /> : <Mic className="h-4 w-4" />}
               </Button>
@@ -2567,30 +2686,22 @@ Format as a realistic conversation with clear speaker labels and include decisio
                 key="main-chat-input"
                 value={inputMessage}
                 onChange={handleInputChange}
-                placeholder={isMobile ? "Ask your AI assistant..." : `Ask your ${currentRole.name} assistant anything about Agile...`}
-                className={`min-h-[44px] max-h-[120px] resize-none pr-12 text-gray-900 bg-white border-gray-300 placeholder:text-gray-500 ${isMobile ? 'text-base' : ''}`}
+                placeholder={responseCount >= maxResponses ? "Session limit reached - Get in touch for unlimited access!" : (isMobile ? "Ask your AI assistant..." : `Ask your ${currentRole.name} assistant anything...`)}
+                className={`min-h-[50px] max-h-[150px] resize-none pr-12 text-gray-900 bg-white border-gray-300 placeholder:text-gray-500 ${responseCount >= maxResponses ? 'opacity-50 cursor-not-allowed' : ''}`}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     handleSendMessage();
                   }
                 }}
-                rows={isMobile ? 2 : 1}
+                disabled={responseCount >= maxResponses}
               />
-              
-              {/* Voice feedback indicator */}
-              {isListening && (
-                <div className="absolute top-2 right-14 flex items-center space-x-1 text-red-600">
-                  <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
-                  <span className="text-xs">Listening...</span>
-                </div>
-              )}
             </div>
 
             <Button
               onClick={handleSendMessage}
-              disabled={isLoading || (!inputMessage.trim() && files.length === 0)}
-              className={`flex-shrink-0 bg-gradient-to-r ${currentRole.color} hover:opacity-90 transition-opacity h-[50px] px-6`}
+              disabled={isLoading || (!inputMessage.trim() && files.length === 0) || responseCount >= maxResponses}
+              className={`flex-shrink-0 min-h-[50px] px-6 bg-gradient-to-r ${currentRole.color} hover:opacity-90 transition-opacity ${responseCount >= maxResponses ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               {isLoading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -2600,11 +2711,28 @@ Format as a realistic conversation with clear speaker labels and include decisio
             </Button>
           </div>
 
-          {isListening && (
-            <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
-              <div className="flex items-center space-x-2 text-red-700">
-                <div className="w-3 h-3 bg-red-500 rounded-full animate-bounce"></div>
-                <span className="text-sm font-medium">Listening for your voice...</span>
+          {/* Session Limit Message */}
+          {responseCount >= maxResponses && (
+            <div className="mt-3 p-4 bg-teal-50 border border-teal-200 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-gradient-to-r from-teal-600 to-emerald-600 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="text-white font-bold text-sm">S4</span>
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-teal-800">
+                    Ready for unlimited conversations?
+                  </p>
+                  <p className="text-xs text-teal-600 mt-1">
+                    Upgrade to continue your Agile learning journey
+                  </p>
+                </div>
+                <Button
+                  size="sm"
+                  onClick={() => window.open('/contact', '_blank')}
+                  className="bg-teal-600 hover:bg-teal-700 text-white text-xs px-4 py-2"
+                >
+                  Get in Touch
+                </Button>
               </div>
             </div>
           )}
@@ -2733,496 +2861,507 @@ Format as a realistic conversation with clear speaker labels and include decisio
       <section id="agile-assistant" className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-12">
-              <Badge className="mb-4 bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200">
-                <Brain className="w-4 h-4 mr-2" />
-                AI Assistant
-              </Badge>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-                Your Personal Agile Training Assistant
-              </h2>
+            {/* Header with Logo */}
+            <div className="text-center mb-8">
+              <div className="flex items-center justify-center mb-6">
+                <div className="w-12 h-12 bg-gradient-to-r from-teal-600 to-emerald-600 rounded-xl flex items-center justify-center mr-4">
+                  <span className="text-white font-bold text-lg">S4</span>
+                </div>
+                <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
+                  AI Assistant
+                </h2>
+              </div>
               <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-                Select your role and interaction mode to get started with personalized Agile training
+                Get instant answers to your Agile questions with personalized, role-specific guidance
               </p>
             </div>
 
-            {/* Configuration Panel */}
-            <Card className="mb-8 bg-gradient-to-r from-teal-50 to-emerald-50 border-0 shadow-lg relative">
-              <CardHeader>
-                <CardTitle className="text-center text-xl">Configure Your Training Session</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="relative">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Select Your Agile Role
-                    </label>
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+              {/* Left Side - Configuration Controls */}
+              <div className="lg:col-span-1">
+                <Card className="h-fit bg-gradient-to-br from-teal-50 to-emerald-50 border-0 shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="text-lg text-center">Training Setup</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
                     <div className="relative">
-                      {/* Mobile: Use native select */}
-                      <div className="block md:hidden relative">
-                        <select
-                          value={selectedRole}
-                          onChange={(e) => handleRoleChange(e.target.value)}
-                          className="w-full min-h-[44px] text-base px-4 py-3 bg-teal-600 border border-teal-500 text-white rounded-lg focus:ring-2 focus:ring-teal-400 focus:border-teal-400 appearance-none pr-10"
-                        >
-                          {Object.entries(AGILE_ROLES).map(([key, role]) => (
-                            <option key={key} value={key} className="bg-teal-600 text-white">
-                              {role.name}
-                            </option>
-                          ))}
-                        </select>
-                        <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                          </svg>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Select Your Agile Role
+                      </label>
+                      <div className="relative">
+                        {/* Mobile: Use native select */}
+                        <div className="block md:hidden relative">
+                          <select
+                            value={selectedRole}
+                            onChange={(e) => handleRoleChange(e.target.value)}
+                            className="w-full min-h-[44px] text-base px-4 py-3 bg-teal-600 border border-teal-500 text-white rounded-lg focus:ring-2 focus:ring-teal-400 focus:border-teal-400 appearance-none pr-10"
+                          >
+                            {Object.entries(AGILE_ROLES).map(([key, role]) => (
+                              <option key={key} value={key} className="bg-teal-600 text-white">
+                                {role.name}
+                              </option>
+                            ))}
+                          </select>
+                          <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
+                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </div>
+                        </div>
+                        
+                        {/* Desktop: Use Radix UI Select */}
+                        <div className="hidden md:block">
+                          <Select value={selectedRole} onValueChange={handleRoleChange}>
+                            <SelectTrigger className="w-full focus:ring-2 focus:ring-teal-500 focus:border-transparent touch-manipulation min-h-[44px] text-base text-gray-900 bg-white border-gray-300">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent 
+                              className="z-[50] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
+                              position="popper"
+                              sideOffset={4}
+                              align="start"
+                              onCloseAutoFocus={(e) => e.preventDefault()}
+                              onEscapeKeyDown={(e) => e.preventDefault()}
+                            >
+                              <div className="max-h-[250px] overflow-y-auto">
+                                {Object.entries(AGILE_ROLES).map(([key, role]) => (
+                                  <SelectItem 
+                                    key={key} 
+                                    value={key} 
+                                    className="focus:bg-teal-50 cursor-pointer min-h-[44px] px-4 py-3 data-[highlighted]:bg-teal-50 data-[state=checked]:bg-teal-100 text-gray-900"
+                                  >
+                                    <div className="flex items-center w-full">
+                                      <span className="flex-shrink-0">{role.icon}</span>
+                                      <span className="ml-2 flex-1 text-left">{role.name}</span>
+                                    </div>
+                                  </SelectItem>
+                                ))}
+                              </div>
+                            </SelectContent>
+                          </Select>
                         </div>
                       </div>
-                      
-                      {/* Desktop: Use Radix UI Select */}
-                      <div className="hidden md:block">
-                        <Select value={selectedRole} onValueChange={handleRoleChange}>
-                          <SelectTrigger className="w-full focus:ring-2 focus:ring-teal-500 focus:border-transparent touch-manipulation min-h-[44px] text-base text-gray-900 bg-white border-gray-300">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent 
-                            className="z-[50] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
-                            position="popper"
-                            sideOffset={4}
-                            align="start"
-                            onCloseAutoFocus={(e) => e.preventDefault()}
-                            onEscapeKeyDown={(e) => e.preventDefault()}
-                          >
-                            <div className="max-h-[250px] overflow-y-auto">
-                              {Object.entries(AGILE_ROLES).map(([key, role]) => (
-                                <SelectItem 
-                                  key={key} 
-                                  value={key} 
-                                  className="focus:bg-teal-50 cursor-pointer min-h-[44px] px-4 py-3 data-[highlighted]:bg-teal-50 data-[state=checked]:bg-teal-100 text-gray-900"
-                                >
-                                  <div className="flex items-center w-full">
-                                    <span className="flex-shrink-0">{role.icon}</span>
-                                    <span className="ml-2 flex-1 text-left">{role.name}</span>
-                                  </div>
-                                </SelectItem>
-                              ))}
-                            </div>
-                          </SelectContent>
-                        </Select>
-                      </div>
+                      <p className="text-sm text-gray-600 mt-1">{currentRole.description}</p>
                     </div>
-                    <p className="text-sm text-gray-600 mt-1">{currentRole.description}</p>
-                  </div>
 
-                  <div className="relative">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Choose Interaction Mode
-                    </label>
                     <div className="relative">
-                      {/* Mobile: Use native select */}
-                      <div className="block md:hidden relative">
-                        <select
-                          value={selectedMode}
-                          onChange={(e) => handleModeChange(e.target.value)}
-                          className="w-full min-h-[44px] text-base px-4 py-3 bg-emerald-600 border border-emerald-500 text-white rounded-lg focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 appearance-none pr-10"
-                        >
-                          {Object.entries(INTERACTION_MODES).map(([key, mode]) => (
-                            <option key={key} value={key} className="bg-emerald-600 text-white">
-                              {mode.name}
-                            </option>
-                          ))}
-                        </select>
-                        <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                          </svg>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Choose Interaction Mode
+                      </label>
+                      <div className="relative">
+                        {/* Mobile: Use native select */}
+                        <div className="block md:hidden relative">
+                          <select
+                            value={selectedMode}
+                            onChange={(e) => handleModeChange(e.target.value)}
+                            className="w-full min-h-[44px] text-base px-4 py-3 bg-emerald-600 border border-emerald-500 text-white rounded-lg focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 appearance-none pr-10"
+                          >
+                            {Object.entries(INTERACTION_MODES).map(([key, mode]) => (
+                              <option key={key} value={key} className="bg-emerald-600 text-white">
+                                {mode.name}
+                              </option>
+                            ))}
+                          </select>
+                          <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
+                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </div>
+                        </div>
+                        
+                        {/* Desktop: Use Radix UI Select */}
+                        <div className="hidden md:block">
+                          <Select value={selectedMode} onValueChange={handleModeChange}>
+                            <SelectTrigger className="w-full focus:ring-2 focus:ring-teal-500 focus:border-transparent touch-manipulation min-h-[44px] text-base text-gray-900 bg-white border-gray-300">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent 
+                              className="z-[50] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
+                              position="popper"
+                              sideOffset={4}
+                              align="start"
+                              onCloseAutoFocus={(e) => e.preventDefault()}
+                              onEscapeKeyDown={(e) => e.preventDefault()}
+                            >
+                              <div className="max-h-[250px] overflow-y-auto">
+                                {Object.entries(INTERACTION_MODES).map(([key, mode]) => (
+                                  <SelectItem 
+                                    key={key} 
+                                    value={key} 
+                                    className="focus:bg-teal-50 cursor-pointer min-h-[44px] px-4 py-3 data-[highlighted]:bg-teal-50 data-[state=checked]:bg-teal-100 text-gray-900"
+                                  >
+                                    <div className="flex items-center w-full">
+                                      <span className="flex-shrink-0">{mode.icon}</span>
+                                      <span className="ml-2 flex-1 text-left">{mode.name}</span>
+                                    </div>
+                                  </SelectItem>
+                                ))}
+                              </div>
+                            </SelectContent>
+                          </Select>
                         </div>
                       </div>
-                      
-                      {/* Desktop: Use Radix UI Select */}
-                      <div className="hidden md:block">
-                        <Select value={selectedMode} onValueChange={handleModeChange}>
-                          <SelectTrigger className="w-full focus:ring-2 focus:ring-teal-500 focus:border-transparent touch-manipulation min-h-[44px] text-base text-gray-900 bg-white border-gray-300">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent 
-                            className="z-[50] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
-                            position="popper"
-                            sideOffset={4}
-                            align="start"
-                            onCloseAutoFocus={(e) => e.preventDefault()}
-                            onEscapeKeyDown={(e) => e.preventDefault()}
-                          >
-                            <div className="max-h-[250px] overflow-y-auto">
-                              {Object.entries(INTERACTION_MODES).map(([key, mode]) => (
-                                <SelectItem 
-                                  key={key} 
-                                  value={key} 
-                                  className="focus:bg-teal-50 cursor-pointer min-h-[44px] px-4 py-3 data-[highlighted]:bg-teal-50 data-[state=checked]:bg-teal-100 text-gray-900"
-                                >
-                                  <div className="flex items-center w-full">
-                                    <span className="flex-shrink-0">{mode.icon}</span>
-                                    <span className="ml-2 flex-1 text-left">{mode.name}</span>
-                                  </div>
-                                </SelectItem>
-                              ))}
-                            </div>
-                          </SelectContent>
-                        </Select>
-                      </div>
+                      <p className="text-sm text-gray-600 mt-1">{currentMode.description}</p>
                     </div>
-                    <p className="text-sm text-gray-600 mt-1">{currentMode.description}</p>
-                  </div>
 
-                  <div className="relative">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Select AI Provider
-                    </label>
                     <div className="relative">
-                      {/* Mobile: Use native select */}
-                      <div className="block md:hidden relative">
-                        <select
-                          value={selectedProvider}
-                          onChange={(e) => handleProviderChange(e.target.value)}
-                          className="w-full min-h-[44px] text-base px-4 py-3 bg-teal-600 border border-teal-500 text-white rounded-lg focus:ring-2 focus:ring-teal-400 focus:border-teal-400 appearance-none pr-10"
-                        >
-                          {Object.entries(AI_PROVIDERS).map(([key, provider]) => (
-                            <option key={key} value={key} className="bg-teal-600 text-white">
-                              {provider.name} ({provider.badge})
-                            </option>
-                          ))}
-                        </select>
-                        <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                          </svg>
-                        </div>
-                      </div>
-                      
-                      {/* Desktop: Use Radix UI Select */}
-                      <div className="hidden md:block">
-                        <Select value={selectedProvider} onValueChange={handleProviderChange}>
-                          <SelectTrigger className="w-full focus:ring-2 focus:ring-teal-500 focus:border-transparent touch-manipulation min-h-[44px] text-base text-gray-900 bg-white border-gray-300">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent 
-                            className="z-[50] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
-                            position="popper"
-                            sideOffset={4}
-                            align="start"
-                            onCloseAutoFocus={(e) => e.preventDefault()}
-                            onEscapeKeyDown={(e) => e.preventDefault()}
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Select AI Provider
+                      </label>
+                      <div className="relative">
+                        {/* Mobile: Use native select */}
+                        <div className="block md:hidden relative">
+                          <select
+                            value={selectedProvider}
+                            onChange={(e) => handleProviderChange(e.target.value)}
+                            className="w-full min-h-[44px] text-base px-4 py-3 bg-teal-600 border border-teal-500 text-white rounded-lg focus:ring-2 focus:ring-teal-400 focus:border-teal-400 appearance-none pr-10"
                           >
-                            <div className="max-h-[250px] overflow-y-auto">
-                              {Object.entries(AI_PROVIDERS).map(([key, provider]) => (
-                                <SelectItem 
-                                  key={key} 
-                                  value={key} 
-                                  className="focus:bg-teal-50 cursor-pointer min-h-[44px] px-4 py-3 data-[highlighted]:bg-teal-50 data-[state=checked]:bg-teal-100 text-gray-900"
-                                >
-                                  <div className="flex items-center w-full">
-                                    <span className="flex-shrink-0">{provider.icon}</span>
-                                    <span className="ml-2 flex-1 text-left">{provider.name}</span>
-                                    <span className="ml-1 text-xs text-gray-500 flex-shrink-0">({provider.badge})</span>
-                                  </div>
-                                </SelectItem>
-                              ))}
-                            </div>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    <p className="text-sm text-gray-600 mt-1">Powered by {currentProvider.badge}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Chat Interface */}
-            <Card className="h-[600px] flex flex-col border-0 shadow-xl overflow-hidden relative">
-              <CardHeader className={`bg-gradient-to-r ${currentRole.color} text-white rounded-t-lg flex-shrink-0`}>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    {currentRole.icon}
-                    <div>
-                      <CardTitle className="text-lg">{currentRole.name} Assistant</CardTitle>
-                      <p className="text-sm opacity-90">{currentMode.name}</p>
-                    </div>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={clearChat}
-                    className="text-white hover:bg-white/20"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </CardHeader>
-
-              <CardContent className="flex-1 flex flex-col p-0 min-h-0 overflow-hidden">
-                {/* Messages */}
-                <div 
-                  className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 min-h-0 overscroll-contain touch-pan-y"
-                  data-chat-container="true"
-                  style={{
-                    WebkitOverflowScrolling: 'touch',
-                    scrollBehavior: 'smooth',
-                    touchAction: 'pan-y'
-                  }}
-                >
-                  {messages.length === 0 && (
-                    <div className="flex items-center justify-center h-full">
-                      <div className="text-center">
-                        <div className={`w-16 h-16 bg-gradient-to-r ${currentRole.color} rounded-full flex items-center justify-center mx-auto mb-4`}>
-                          <Bot className="h-8 w-8 text-white" />
+                            {Object.entries(AI_PROVIDERS).map(([key, provider]) => (
+                              <option key={key} value={key} className="bg-teal-600 text-white">
+                                {provider.name} ({provider.badge})
+                              </option>
+                            ))}
+                          </select>
+                          <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
+                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </div>
                         </div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                          {currentRole.name} Assistant
-                        </h3>
-                        <p className="text-gray-600 max-w-sm">
-                          Ready to help with {currentMode.description.toLowerCase()}. Start by typing your question below.
-                        </p>
+                        
+                        {/* Desktop: Use Radix UI Select */}
+                        <div className="hidden md:block">
+                          <Select value={selectedProvider} onValueChange={handleProviderChange}>
+                            <SelectTrigger className="w-full focus:ring-2 focus:ring-teal-500 focus:border-transparent touch-manipulation min-h-[44px] text-base text-gray-900 bg-white border-gray-300">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent 
+                              className="z-[50] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
+                              position="popper"
+                              sideOffset={4}
+                              align="start"
+                              onCloseAutoFocus={(e) => e.preventDefault()}
+                              onEscapeKeyDown={(e) => e.preventDefault()}
+                            >
+                              <div className="max-h-[250px] overflow-y-auto">
+                                {Object.entries(AI_PROVIDERS).map(([key, provider]) => (
+                                  <SelectItem 
+                                    key={key} 
+                                    value={key} 
+                                    className="focus:bg-teal-50 cursor-pointer min-h-[44px] px-4 py-3 data-[highlighted]:bg-teal-50 data-[state=checked]:bg-teal-100 text-gray-900"
+                                  >
+                                    <div className="flex items-center w-full">
+                                      <span className="flex-shrink-0">{provider.icon}</span>
+                                      <span className="ml-2 flex-1 text-left">{provider.name}</span>
+                                      <span className="ml-1 text-xs text-gray-500 flex-shrink-0">({provider.badge})</span>
+                                    </div>
+                                  </SelectItem>
+                                ))}
+                              </div>
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
+                      <p className="text-sm text-gray-600 mt-1">Powered by {currentProvider.badge}</p>
                     </div>
-                  )}
-                  
-                  {messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div
-                        className={`max-w-[80%] rounded-lg p-4 break-words ${
-                          message.type === 'user'
-                            ? 'bg-teal-600 text-white'
-                            : 'bg-white border shadow-sm'
-                        }`}
+                  </CardContent>
+                </Card>
+
+                {/* Chat Interface */}
+                <Card className="h-[600px] flex flex-col border-0 shadow-xl overflow-hidden relative">
+                  <CardHeader className={`bg-gradient-to-r ${currentRole.color} text-white rounded-t-lg flex-shrink-0`}>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        {currentRole.icon}
+                        <div>
+                          <CardTitle className="text-lg">{currentRole.name} Assistant</CardTitle>
+                          <p className="text-sm opacity-90">{currentMode.name}</p>
+                        </div>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={clearChat}
+                        className="text-white hover:bg-white/20"
                       >
-                        <div className="flex items-start space-x-3">
-                          {message.type === 'ai' && (
-                            <div className={`w-6 h-6 rounded-full bg-gradient-to-r ${currentRole.color} flex items-center justify-center flex-shrink-0 mt-1`}>
-                              <Bot className="h-3 w-3 text-white" />
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </CardHeader>
+
+                  <CardContent className="flex-1 flex flex-col p-0 min-h-0 overflow-hidden">
+                    {/* Messages */}
+                    <div 
+                      className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 min-h-0 overscroll-contain touch-pan-y"
+                      data-chat-container="true"
+                      style={{
+                        WebkitOverflowScrolling: 'touch',
+                        scrollBehavior: 'smooth',
+                        touchAction: 'pan-y'
+                      }}
+                    >
+                      {messages.length === 0 && (
+                        <div className="flex items-center justify-center h-full">
+                          <div className="text-center">
+                            <div className={`w-16 h-16 bg-gradient-to-r ${currentRole.color} rounded-full flex items-center justify-center mx-auto mb-4`}>
+                              <Bot className="h-8 w-8 text-white" />
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                              {currentRole.name} Assistant
+                            </h3>
+                            <p className="text-gray-600 max-w-sm">
+                              Ready to help with {currentMode.description.toLowerCase()}. Start by typing your question below.
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {messages.map((message) => (
+                        <div
+                          key={message.id}
+                          className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                        >
+                          <div
+                            className={`max-w-[80%] rounded-lg p-4 break-words ${
+                              message.type === 'user'
+                                ? 'bg-teal-600 text-white'
+                                : 'bg-white border shadow-sm'
+                            }`}
+                          >
+                            <div className="flex items-start space-x-3">
+                              {message.type === 'ai' && (
+                                <div className={`w-6 h-6 rounded-full bg-gradient-to-r ${currentRole.color} flex items-center justify-center flex-shrink-0 mt-1`}>
+                                  <Bot className="h-3 w-3 text-white" />
+                                </div>
+                              )}
+                              <div className="flex-1 min-w-0">
+                                {/* Check if message contains presentation JSON */}
+                                {message.type === 'ai' && (message.content.includes('"slides"') || message.content.includes('"title"')) ? (
+                                  <div className="space-y-4">
+                                    <p className="text-sm text-green-600 font-medium">
+                                      ✅ Presentation generated successfully!
+                                    </p>
+                                    <PresentationDisplay messageContent={message.content} />
+                                  </div>
+                                ) : message.type === 'ai' && message.content.includes("You've reached your session limit") ? (
+                                  <SessionLimitDisplay messageContent={message.content} />
+                                ) : (
+                                  <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+                                    {message.content}
+                                  </p>
+                                )}
+                                <div className="flex items-center justify-between mt-3">
+                                  <div className="flex items-center space-x-2">
+                                    <span className={`text-xs ${message.type === 'user' ? 'text-teal-100' : 'text-gray-500'}`}>
+                                      {message.timestamp.toLocaleTimeString()}
+                                    </span>
+                                    {message.type === 'ai' && message.provider && (
+                                      <Badge className={AI_PROVIDERS[message.provider].badgeColor}>
+                                        {AI_PROVIDERS[message.provider].badge}
+                                      </Badge>
+                                    )}
+                                  </div>
+                                  {message.type === 'ai' && (
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => copyMessage(message.content)}
+                                      className="h-6 w-6 p-0 hover:bg-gray-100 flex-shrink-0"
+                                    >
+                                      <Copy className="h-3 w-3" />
+                                    </Button>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                      
+                      {isLoading && (
+                        <div className="flex justify-start">
+                          <div className="bg-white border shadow-sm rounded-lg p-4 max-w-[80%]">
+                            <div className="flex items-center space-x-2">
+                              <div className={`w-6 h-6 rounded-full bg-gradient-to-r ${currentRole.color} flex items-center justify-center`}>
+                                <Bot className="h-3 w-3 text-white" />
+                              </div>
+                              <div className="flex space-x-1">
+                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      <div ref={messagesEndRef} />
+                    </div>
+
+                    {/* Specialized Mode Interface */}
+                    <div className="border-t bg-white p-4 flex-shrink-0 max-h-[300px] overflow-y-auto relative">
+                      {selectedMode === 'presentation' && (
+                        <PresentationGenerator
+                          currentRole={currentRole}
+                          inputMessage={inputMessage}
+                          setInputMessage={setInputMessage}
+                          handleSendMessage={handleSendMessage}
+                          isLoading={isLoading}
+                          messages={messages}
+                          copyMessage={copyMessage}
+                          selectedProvider={selectedProvider}
+                        />
+                      )}
+                      
+                      {selectedMode === 'scenario' && (
+                        <ScenarioSimulator
+                          currentRole={currentRole}
+                          inputMessage={inputMessage}
+                          setInputMessage={setInputMessage}
+                          handleSendMessage={handleSendMessage}
+                          isLoading={isLoading}
+                          messages={messages}
+                          copyMessage={copyMessage}
+                          selectedProvider={selectedProvider}
+                        />
+                      )}
+                      
+                      {selectedMode === 'advisor' && (
+                        <RoleBasedAdvisor
+                          currentRole={currentRole}
+                          inputMessage={inputMessage}
+                          setInputMessage={setInputMessage}
+                          handleSendMessage={handleSendMessage}
+                          isLoading={isLoading}
+                          messages={messages}
+                          copyMessage={copyMessage}
+                          selectedProvider={selectedProvider}
+                        />
+                      )}
+                      
+                      {selectedMode === 'chat' && (
+                        <div className="space-y-4">
+                          {/* File Upload Area for Chat Mode */}
+                          {files.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                              {files.map((file, index) => (
+                                <div key={index} className="flex items-center bg-gray-100 rounded-lg p-2 border">
+                                  <FileText className="h-4 w-4 text-gray-500 mr-2" />
+                                  <span className="text-sm text-gray-700 truncate max-w-[150px]">
+                                    {file.name}
+                                  </span>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => removeFile(index)}
+                                    className="h-6 w-6 p-0 ml-2 hover:bg-gray-100"
+                                  >
+                                    <Trash2 className="h-3 w-3" />
+                                  </Button>
+                                </div>
+                              ))}
                             </div>
                           )}
-                          <div className="flex-1 min-w-0">
-                            {/* Check if message contains presentation JSON */}
-                            {message.type === 'ai' && (message.content.includes('"slides"') || message.content.includes('"title"')) ? (
-                              <div className="space-y-4">
-                                <p className="text-sm text-green-600 font-medium">
-                                  ✅ Presentation generated successfully!
-                                </p>
-                                <PresentationDisplay messageContent={message.content} />
-                              </div>
-                            ) : (
-                              <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
-                                {message.content}
-                              </p>
+                          
+                          {/* Chat Input */}
+                          <div className="flex space-x-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => fileInputRef.current?.click()}
+                              className="flex-shrink-0 min-h-[44px] min-w-[44px]"
+                              title="Upload file"
+                              disabled={responseCount >= maxResponses}
+                            >
+                              <Upload className="h-4 w-4" />
+                            </Button>
+                            
+                            {speechSupported && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={isListening ? stopVoiceInput : startVoiceInput}
+                                className={`flex-shrink-0 min-h-[44px] min-w-[44px] ${
+                                  isListening ? 'bg-red-50 border-red-300 text-red-600' : ''
+                                }`}
+                                title={isListening ? "Stop voice input" : "Start voice input"}
+                                disabled={responseCount >= maxResponses}
+                              >
+                                {isListening ? <MicOff className="h-4 w-4 animate-pulse" /> : <Mic className="h-4 w-4" />}
+                              </Button>
                             )}
-                            <div className="flex items-center justify-between mt-3">
-                              <div className="flex items-center space-x-2">
-                                <span className={`text-xs ${message.type === 'user' ? 'text-teal-100' : 'text-gray-500'}`}>
-                                  {message.timestamp.toLocaleTimeString()}
-                                </span>
-                                {message.type === 'ai' && message.provider && (
-                                  <Badge className={AI_PROVIDERS[message.provider].badgeColor}>
-                                    {AI_PROVIDERS[message.provider].badge}
-                                  </Badge>
-                                )}
-                              </div>
-                              {message.type === 'ai' && (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => copyMessage(message.content)}
-                                  className="h-6 w-6 p-0 hover:bg-gray-100 flex-shrink-0"
-                                >
-                                  <Copy className="h-3 w-3" />
-                                </Button>
+                            
+                            <div className="flex-1 relative">
+                              <Textarea
+                                key="main-interface-chat-input"
+                                value={inputMessage}
+                                onChange={handleInputChange}
+                                placeholder={responseCount >= maxResponses ? "Session limit reached - Get in touch for unlimited access!" : (isMobile ? "Ask your AI assistant..." : `Ask your ${currentRole.name} assistant anything about Agile...`)}
+                                className={`min-h-[44px] max-h-[120px] resize-none pr-12 text-gray-900 bg-white border-gray-300 placeholder:text-gray-500 ${isMobile ? 'text-base' : ''} ${responseCount >= maxResponses ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter' && !e.shiftKey) {
+                                    e.preventDefault();
+                                    handleSendMessage();
+                                  }
+                                }}
+                                rows={isMobile ? 2 : 1}
+                                disabled={responseCount >= maxResponses}
+                              />
+                              
+                              {/* Voice feedback indicator */}
+                              {isListening && (
+                                <div className="absolute top-2 right-14 flex items-center space-x-1 text-red-600">
+                                  <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
+                                  <span className="text-xs">Listening...</span>
+                                </div>
                               )}
                             </div>
+                            
+                            <Button
+                              onClick={handleSendMessage}
+                              disabled={isLoading || (!inputMessage.trim() && files.length === 0) || responseCount >= maxResponses}
+                              className={`flex-shrink-0 min-h-[44px] min-w-[44px] bg-gradient-to-r ${currentRole.color} hover:opacity-90 transition-opacity ${responseCount >= maxResponses ? 'opacity-50 cursor-not-allowed' : ''}`}
+                              title="Send message"
+                            >
+                              {isLoading ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Send className="h-4 w-4" />
+                              )}
+                            </Button>
                           </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  
-                  {isLoading && (
-                    <div className="flex justify-start">
-                      <div className="bg-white border shadow-sm rounded-lg p-4 max-w-[80%]">
-                        <div className="flex items-center space-x-2">
-                          <div className={`w-6 h-6 rounded-full bg-gradient-to-r ${currentRole.color} flex items-center justify-center`}>
-                            <Bot className="h-3 w-3 text-white" />
-                          </div>
-                          <div className="flex space-x-1">
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  <div ref={messagesEndRef} />
-                </div>
-
-                {/* Specialized Mode Interface */}
-                <div className="border-t bg-white p-4 flex-shrink-0 max-h-[300px] overflow-y-auto relative">
-                  {selectedMode === 'presentation' && (
-                    <PresentationGenerator
-                      currentRole={currentRole}
-                      inputMessage={inputMessage}
-                      setInputMessage={setInputMessage}
-                      handleSendMessage={handleSendMessage}
-                      isLoading={isLoading}
-                      messages={messages}
-                      copyMessage={copyMessage}
-                      selectedProvider={selectedProvider}
-                    />
-                  )}
-                  
-                  {selectedMode === 'scenario' && (
-                    <ScenarioSimulator
-                      currentRole={currentRole}
-                      inputMessage={inputMessage}
-                      setInputMessage={setInputMessage}
-                      handleSendMessage={handleSendMessage}
-                      isLoading={isLoading}
-                      messages={messages}
-                      copyMessage={copyMessage}
-                      selectedProvider={selectedProvider}
-                    />
-                  )}
-                  
-                  {selectedMode === 'advisor' && (
-                    <RoleBasedAdvisor
-                      currentRole={currentRole}
-                      inputMessage={inputMessage}
-                      setInputMessage={setInputMessage}
-                      handleSendMessage={handleSendMessage}
-                      isLoading={isLoading}
-                      messages={messages}
-                      copyMessage={copyMessage}
-                      selectedProvider={selectedProvider}
-                    />
-                  )}
-                  
-                  {selectedMode === 'chat' && (
-                    <div className="space-y-4">
-                      {/* File Upload Area for Chat Mode */}
-                      {files.length > 0 && (
-                        <div className="flex flex-wrap gap-2">
-                          {files.map((file, index) => (
-                            <div key={index} className="flex items-center bg-gray-100 rounded-lg p-2 border">
-                              <FileText className="h-4 w-4 text-gray-500 mr-2" />
-                              <span className="text-sm text-gray-700 truncate max-w-[150px]">
-                                {file.name}
-                              </span>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => removeFile(index)}
-                                className="h-6 w-6 p-0 ml-2 hover:bg-gray-100"
-                              >
-                                <Trash2 className="h-3 w-3" />
-                              </Button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                      
-                      {/* Chat Input */}
-                      <div className="flex space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => fileInputRef.current?.click()}
-                          className="flex-shrink-0 min-h-[44px] min-w-[44px]"
-                          title="Upload file"
-                        >
-                          <Upload className="h-4 w-4" />
-                        </Button>
-                        
-                        {speechSupported && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={isListening ? stopVoiceInput : startVoiceInput}
-                            className={`flex-shrink-0 min-h-[44px] min-w-[44px] ${
-                              isListening ? 'bg-red-50 border-red-300 text-red-600' : ''
-                            }`}
-                            title={isListening ? "Stop voice input" : "Start voice input"}
-                          >
-                            {isListening ? <MicOff className="h-4 w-4 animate-pulse" /> : <Mic className="h-4 w-4" />}
-                          </Button>
-                        )}
-                        
-                        <div className="flex-1 relative">
-                          <Textarea
-                            key="main-interface-chat-input"
-                            value={inputMessage}
-                            onChange={handleInputChange}
-                            placeholder={isMobile ? "Ask your AI assistant..." : `Ask your ${currentRole.name} assistant anything about Agile...`}
-                            className={`min-h-[44px] max-h-[120px] resize-none pr-12 text-gray-900 bg-white border-gray-300 placeholder:text-gray-500 ${isMobile ? 'text-base' : ''}`}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter' && !e.shiftKey) {
-                                e.preventDefault();
-                                handleSendMessage();
-                              }
-                            }}
-                            rows={isMobile ? 2 : 1}
-                          />
                           
-                          {/* Voice feedback indicator */}
-                          {isListening && (
-                            <div className="absolute top-2 right-14 flex items-center space-x-1 text-red-600">
-                              <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
-                              <span className="text-xs">Listening...</span>
+                          {/* Session Limit Message for Main Interface */}
+                          {responseCount >= maxResponses && (
+                            <div className="mt-3 p-4 bg-teal-50 border border-teal-200 rounded-lg">
+                              <div className="flex items-center space-x-3">
+                                <div className="w-8 h-8 bg-gradient-to-r from-teal-600 to-emerald-600 rounded-full flex items-center justify-center flex-shrink-0">
+                                  <span className="text-white font-bold text-sm">S4</span>
+                                </div>
+                                <div className="flex-1">
+                                  <p className="text-sm font-medium text-teal-800">
+                                    Ready for unlimited conversations?
+                                  </p>
+                                  <p className="text-xs text-teal-600 mt-1">
+                                    Upgrade to continue your Agile learning journey
+                                  </p>
+                                </div>
+                                <Button
+                                  size="sm"
+                                  onClick={() => window.open('/contact', '_blank')}
+                                  className="bg-teal-600 hover:bg-teal-700 text-white text-xs px-4 py-2"
+                                >
+                                  Get in Touch
+                                </Button>
+                              </div>
                             </div>
                           )}
                         </div>
-                        
-                        <Button
-                          onClick={handleSendMessage}
-                          disabled={isLoading || (!inputMessage.trim() && files.length === 0)}
-                          className={`flex-shrink-0 min-h-[44px] min-w-[44px] bg-gradient-to-r ${currentRole.color} hover:opacity-90 transition-opacity`}
-                          title="Send message"
-                        >
-                          {isLoading ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <Send className="h-4 w-4" />
-                          )}
-                        </Button>
-                      </div>
-                      
-                      {/* Mobile-specific voice input feedback */}
-                      {isMobile && isListening && (
-                        <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-                          <div className="flex items-center space-x-2 text-red-700">
-                            <div className="w-3 h-3 bg-red-500 rounded-full animate-bounce"></div>
-                            <span className="text-sm font-medium">Listening for your voice...</span>
-                          </div>
-                          <p className="text-xs text-red-600 mt-1">Speak clearly and pause when finished</p>
-                        </div>
-                      )}
-                      
-                      {/* Enhanced mobile tips */}
-                      {isMobile && !hasInitialized && (
-                        <div className="mt-2 p-3 bg-teal-50 border border-teal-200 rounded-lg">
-                          <h4 className="text-sm font-medium text-teal-800 mb-2">Mobile Tips:</h4>
-                          <ul className="text-xs text-teal-700 space-y-1">
-                            <li>• Tap the microphone to use voice input</li>
-                            <li>• Swipe up to scroll through messages</li>
-                            <li>• Long-press messages to copy them</li>
-                            {speechSupported && <li>• Voice input works best in quiet environments</li>}
-                          </ul>
-                        </div>
                       )}
                     </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
 
             <input
               ref={fileInputRef}
