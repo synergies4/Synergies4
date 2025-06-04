@@ -27,7 +27,8 @@ import {
   MessageSquare,
   GraduationCap,
   Globe,
-  BarChart3
+  BarChart3,
+  ArrowDown
 } from 'lucide-react';
 import HeroSection from '@/components/shared/HeroSection';
 
@@ -150,10 +151,10 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Enhanced Scroll Indicator with Centered Text - Fixed Positioning */}
+        {/* Enhanced Scroll Indicator with Down Arrow - Fixed Positioning */}
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2">
-          <div className="w-6 h-10 border-2 border-gray-600/30 rounded-full flex justify-center relative group hover:border-gray-600/50 transition-colors animate-bounce">
-            <div className="w-1 h-3 bg-gradient-to-b from-gray-600/60 to-transparent rounded-full mt-2 animate-pulse group-hover:from-cyan-600/80 transition-colors"></div>
+          <div className="p-3 rounded-full border-2 border-gray-600/30 hover:border-gray-600/50 transition-colors animate-bounce group cursor-pointer">
+            <ArrowDown className="w-6 h-6 text-gray-600/60 group-hover:text-cyan-600/80 transition-colors" />
           </div>
           <div className="text-gray-600/60 text-sm font-medium animate-pulse">
             Scroll to explore

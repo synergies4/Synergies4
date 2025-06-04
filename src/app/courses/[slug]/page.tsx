@@ -87,6 +87,7 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
     enrollment: any;
   } | null>(null);
   const [enrolling, setEnrolling] = useState(false);
+  const [showFullDescription, setShowFullDescription] = useState(false);
 
   useEffect(() => {
     fetchCourseData();
@@ -360,8 +361,20 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                 </h1>
                 
                 <p className="text-xl text-blue-100 leading-relaxed">
-                  {course.short_desc || course.description}
+                  {showFullDescription ? course.description : course.short_desc || course.description}
                 </p>
+
+                {/* Read More Button - Only show if there's a meaningful difference */}
+                {course.short_desc && course.description && course.short_desc !== course.description && course.description.length > course.short_desc.length + 50 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowFullDescription(!showFullDescription)}
+                    className="text-blue-200 hover:text-white hover:bg-white/10 p-0 h-auto font-normal underline"
+                  >
+                    {showFullDescription ? 'Show Less' : 'Read More'}
+                  </Button>
+                )}
 
                 <div className="flex flex-wrap gap-4 text-sm">
                   <div className="flex items-center bg-white/10 px-3 py-2 rounded-lg">
