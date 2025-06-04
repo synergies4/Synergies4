@@ -39,7 +39,9 @@ import {
   Globe,
   Download,
   Mic,
-  MicOff
+  MicOff,
+  X,
+  Menu
 } from 'lucide-react';
 
 // Agile roles and their specific capabilities - Updated with professional color scheme
@@ -1368,6 +1370,8 @@ export default function SynergizeAgile() {
   const [isListening, setIsListening] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isFullChatView, setIsFullChatView] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<any>(null);
@@ -1524,6 +1528,11 @@ export default function SynergizeAgile() {
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim() && files.length === 0) return;
+
+    // Switch to full chat view after first message
+    if (!isFullChatView) {
+      setIsFullChatView(true);
+    }
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -1699,6 +1708,359 @@ export default function SynergizeAgile() {
   const currentRole = AGILE_ROLES[selectedRole as keyof typeof AGILE_ROLES];
   const currentMode = INTERACTION_MODES[selectedMode as keyof typeof INTERACTION_MODES];
   const currentProvider = AI_PROVIDERS[selectedProvider];
+
+  // Full Chat View Component
+  const FullChatView = () => (
+    <div className="h-screen flex bg-gray-50">
+      {/* Sidebar */}
+      <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 fixed lg:relative z-30 w-80 h-full bg-white border-r border-gray-200 shadow-lg transition-transform duration-300`}>
+        <div className="flex flex-col h-full">
+          {/* Sidebar Header */}
+          <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-teal-50 to-emerald-50">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-gray-900">AI Assistant</h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSidebarOpen(false)}
+                className="lg:hidden"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            <p className="text-sm text-gray-600 mt-1">{currentMode.description}</p>
+          </div>
+
+          {/* Controls */}
+          <div className="flex-1 p-6 space-y-6 overflow-y-auto">
+            {/* Role Selection */}
+            <div>
+              <Label className="text-sm font-medium text-gray-700 mb-3 block">Your Role</Label>
+              <Select value={selectedRole} onValueChange={handleRoleChange}>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(AGILE_ROLES).map(([key, role]) => (
+                    <SelectItem key={key} value={key}>
+                      <div className="flex items-center">
+                        <span className="mr-2">{role.icon}</span>
+                        {role.name}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-gray-500 mt-2">{currentRole.description}</p>
+            </div>
+
+            {/* Mode Selection */}
+            <div>
+              <Label className="text-sm font-medium text-gray-700 mb-3 block">Interaction Mode</Label>
+              <Select value={selectedMode} onValueChange={handleModeChange}>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(INTERACTION_MODES).map(([key, mode]) => (
+                    <SelectItem key={key} value={key}>
+                      <div className="flex items-center">
+                        <span className="mr-2">{mode.icon}</span>
+                        {mode.name}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* AI Provider */}
+            <div>
+              <Label className="text-sm font-medium text-gray-700 mb-3 block">AI Provider</Label>
+              <Select value={selectedProvider} onValueChange={handleProviderChange}>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(AI_PROVIDERS).map(([key, provider]) => (
+                    <SelectItem key={key} value={key}>
+                      <div className="flex items-center">
+                        <span className="mr-2">{provider.icon}</span>
+                        {provider.name}
+                        <span className="ml-auto text-xs text-gray-500">({provider.badge})</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Specialized Mode Interface */}
+            {selectedMode !== 'chat' && (
+              <div className="border-t pt-6">
+                <h3 className="text-sm font-medium text-gray-700 mb-3">Mode Tools</h3>
+                {selectedMode === 'presentation' && (
+                  <PresentationGenerator
+                    currentRole={currentRole}
+                    inputMessage={inputMessage}
+                    setInputMessage={setInputMessage}
+                    handleSendMessage={handleSendMessage}
+                    isLoading={isLoading}
+                    messages={messages}
+                    copyMessage={copyMessage}
+                    selectedProvider={selectedProvider}
+                  />
+                )}
+                {selectedMode === 'scenario' && (
+                  <ScenarioSimulator
+                    currentRole={currentRole}
+                    inputMessage={inputMessage}
+                    setInputMessage={setInputMessage}
+                    handleSendMessage={handleSendMessage}
+                    isLoading={isLoading}
+                    messages={messages}
+                    copyMessage={copyMessage}
+                    selectedProvider={selectedProvider}
+                  />
+                )}
+                {selectedMode === 'advisor' && (
+                  <RoleBasedAdvisor
+                    currentRole={currentRole}
+                    inputMessage={inputMessage}
+                    setInputMessage={setInputMessage}
+                    handleSendMessage={handleSendMessage}
+                    isLoading={isLoading}
+                    messages={messages}
+                    copyMessage={copyMessage}
+                    selectedProvider={selectedProvider}
+                  />
+                )}
+              </div>
+            )}
+
+            {/* Quick Actions */}
+            <div className="border-t pt-6">
+              <h3 className="text-sm font-medium text-gray-700 mb-3">Quick Actions</h3>
+              <div className="space-y-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={clearChat}
+                  className="w-full justify-start"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Clear Chat
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsFullChatView(false)}
+                  className="w-full justify-start"
+                >
+                  <ArrowRight className="h-4 w-4 mr-2 rotate-180" />
+                  Back to Setup
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Sidebar Overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Main Chat Area */}
+      <div className="flex-1 flex flex-col min-h-0">
+        {/* Chat Header */}
+        <div className="bg-white border-b border-gray-200 p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSidebarOpen(true)}
+                className="lg:hidden"
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+              <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${currentRole.color} flex items-center justify-center text-white`}>
+                {currentRole.icon}
+              </div>
+              <div>
+                <h1 className="text-lg font-semibold text-gray-900">
+                  {currentRole.name} Assistant
+                </h1>
+                <p className="text-sm text-gray-500">{currentMode.name}</p>
+              </div>
+            </div>
+            <Badge className={currentProvider.badgeColor}>
+              {currentProvider.badge}
+            </Badge>
+          </div>
+        </div>
+
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-6" ref={chatContainerRef}>
+          {messages.length === 0 && (
+            <div className="text-center py-12">
+              <div className={`w-16 h-16 rounded-full bg-gradient-to-r ${currentRole.color} flex items-center justify-center mx-auto mb-4`}>
+                <Bot className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Welcome to your {currentRole.name} Assistant
+              </h3>
+              <p className="text-gray-600 max-w-md mx-auto">
+                I'm here to help you with {currentMode.description.toLowerCase()}. How can I assist you today?
+              </p>
+            </div>
+          )}
+
+          {messages.map((message) => (
+            <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div className={`max-w-[80%] ${message.type === 'user' ? 'bg-teal-600 text-white' : 'bg-white border'} rounded-2xl p-4 shadow-sm`}>
+                <div className="flex items-start space-x-3">
+                  {message.type === 'ai' && (
+                    <div className={`w-8 h-8 rounded-full bg-gradient-to-r ${currentRole.color} flex items-center justify-center flex-shrink-0`}>
+                      <Bot className="h-4 w-4 text-white" />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+                      {message.content}
+                    </p>
+                    <div className="flex items-center justify-between mt-3">
+                      <span className={`text-xs ${message.type === 'user' ? 'text-teal-100' : 'text-gray-500'}`}>
+                        {message.timestamp.toLocaleTimeString()}
+                      </span>
+                      {message.type === 'ai' && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => copyMessage(message.content)}
+                          className="h-6 w-6 p-0 hover:bg-gray-100"
+                        >
+                          <Copy className="h-3 w-3" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+
+          {isLoading && (
+            <div className="flex justify-start">
+              <div className="bg-white border rounded-2xl p-4 shadow-sm max-w-[80%]">
+                <div className="flex items-center space-x-3">
+                  <div className={`w-8 h-8 rounded-full bg-gradient-to-r ${currentRole.color} flex items-center justify-center`}>
+                    <Bot className="h-4 w-4 text-white" />
+                  </div>
+                  <div className="flex space-x-1">
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Input Area */}
+        <div className="bg-white border-t border-gray-200 p-4">
+          {files.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-4">
+              {files.map((file, index) => (
+                <div key={index} className="flex items-center bg-gray-100 rounded-lg p-2 border">
+                  <FileText className="h-4 w-4 text-gray-500 mr-2" />
+                  <span className="text-sm text-gray-700 truncate max-w-[150px]">
+                    {file.name}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeFile(index)}
+                    className="h-6 w-6 p-0 ml-2 hover:bg-gray-200"
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="flex items-end space-x-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => fileInputRef.current?.click()}
+              className="flex-shrink-0"
+            >
+              <Upload className="h-4 w-4" />
+            </Button>
+
+            {speechSupported && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={isListening ? stopVoiceInput : startVoiceInput}
+                className={`flex-shrink-0 ${isListening ? 'bg-red-50 border-red-300 text-red-600' : ''}`}
+              >
+                {isListening ? <MicOff className="h-4 w-4 animate-pulse" /> : <Mic className="h-4 w-4" />}
+              </Button>
+            )}
+
+            <div className="flex-1 relative">
+              <Textarea
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                placeholder={`Ask your ${currentRole.name} assistant anything...`}
+                className="min-h-[50px] max-h-[150px] resize-none pr-12 text-gray-900 bg-gray-50 border-gray-300"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendMessage();
+                  }
+                }}
+              />
+            </div>
+
+            <Button
+              onClick={handleSendMessage}
+              disabled={isLoading || (!inputMessage.trim() && files.length === 0)}
+              className={`flex-shrink-0 bg-gradient-to-r ${currentRole.color} hover:opacity-90 transition-opacity h-[50px] px-6`}
+            >
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
+
+          {isListening && (
+            <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <div className="flex items-center space-x-2 text-red-700">
+                <div className="w-3 h-3 bg-red-500 rounded-full animate-bounce"></div>
+                <span className="text-sm font-medium">Listening for your voice...</span>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
+  if (isFullChatView) {
+    return <FullChatView />;
+  }
 
   return (
     <PageLayout>
