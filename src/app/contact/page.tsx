@@ -126,6 +126,11 @@ export default function Contact() {
           icon: <ArrowRight className="w-4 h-4" />
         }}
         backgroundVariant="gradient"
+        customColors={{
+          background: "bg-gradient-to-br from-rose-50 via-pink-50 to-red-50",
+          accent: "bg-gradient-to-br from-rose-400/20 to-pink-400/25",
+          particles: "bg-gradient-to-r from-rose-400 to-pink-400"
+        }}
       />
 
       {/* Contact Form Section */}

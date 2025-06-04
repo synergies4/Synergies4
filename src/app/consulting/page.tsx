@@ -50,7 +50,12 @@ export default function Consulting() {
           href: "#consulting-services",
           icon: <ArrowRight className="w-4 h-4" />
         }}
-        backgroundVariant="pattern"
+        backgroundVariant="gradient"
+        customColors={{
+          background: "bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50",
+          accent: "bg-gradient-to-br from-green-400/20 to-emerald-400/25",
+          particles: "bg-gradient-to-r from-green-400 to-emerald-400"
+        }}
       />
 
       {/* Services Section */}

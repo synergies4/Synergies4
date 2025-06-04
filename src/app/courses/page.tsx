@@ -65,6 +65,11 @@ export default function Courses() {
           icon: <Download className="w-4 h-4" />
         }}
         backgroundVariant="gradient"
+        customColors={{
+          background: "bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50",
+          accent: "bg-gradient-to-br from-blue-400/20 to-indigo-400/25",
+          particles: "bg-gradient-to-r from-blue-400 to-indigo-400"
+        }}
       />
 
       {/* Course Directory Section */}

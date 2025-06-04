@@ -71,6 +71,11 @@ export default function IndustryInsight() {
           icon: <ArrowRight className="w-4 h-4" />
         }}
         backgroundVariant="gradient"
+        customColors={{
+          background: "bg-gradient-to-br from-purple-50 via-violet-50 to-indigo-50",
+          accent: "bg-gradient-to-br from-purple-400/20 to-violet-400/25",
+          particles: "bg-gradient-to-r from-purple-400 to-violet-400"
+        }}
       />
 
       {/* Industry Leaders Speak Section */}

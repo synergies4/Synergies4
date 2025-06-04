@@ -1636,6 +1636,11 @@ export default function SynergizeAgile() {
           icon: <ArrowRight className="w-4 h-4" />
         }}
         backgroundVariant="gradient"
+        customColors={{
+          background: "bg-gradient-to-br from-cyan-50 via-teal-50 to-blue-50",
+          accent: "bg-gradient-to-br from-cyan-400/20 to-teal-400/25",
+          particles: "bg-gradient-to-r from-cyan-400 to-teal-400"
+        }}
       />
 
       {/* Features Section */}

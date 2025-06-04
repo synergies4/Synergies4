@@ -49,6 +49,11 @@ export default function AboutUs() {
           icon: <MessageSquare className="w-4 h-4" />
         }}
         backgroundVariant="gradient"
+        customColors={{
+          background: "bg-gradient-to-br from-emerald-50 via-teal-50 to-green-50",
+          accent: "bg-gradient-to-br from-emerald-400/20 to-teal-400/25",
+          particles: "bg-gradient-to-r from-emerald-400 to-teal-400"
+        }}
       />
 
       {/* Mission Section */}

@@ -50,6 +50,11 @@ export default function Coaching() {
           icon: <ArrowRight className="w-4 h-4" />
         }}
         backgroundVariant="gradient"
+        customColors={{
+          background: "bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50",
+          accent: "bg-gradient-to-br from-orange-400/20 to-amber-400/25",
+          particles: "bg-gradient-to-r from-orange-400 to-amber-400"
+        }}
       />
 
       {/* Why Choose Section */}
