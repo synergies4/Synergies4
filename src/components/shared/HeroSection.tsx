@@ -134,14 +134,14 @@ export default function HeroSection({
               asChild
               variant="outline"
               size="lg"
-              className="border-2 border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white px-8 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105 bg-white"
+              className="border-2 border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white px-8 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105 bg-white group"
             >
               <Link href={secondaryCTA.href} className="flex items-center">
-                <span className="text-gray-900 hover:text-white font-semibold">
+                <span className="text-gray-900 group-hover:text-white font-semibold">
                   {secondaryCTA.text}
                 </span>
                 {secondaryCTA.icon && (
-                  <span className="ml-2">
+                  <span className="ml-2 text-gray-900 group-hover:text-white">
                     {secondaryCTA.icon}
                   </span>
                 )}
