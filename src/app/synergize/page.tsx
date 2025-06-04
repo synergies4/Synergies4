@@ -1358,41 +1358,50 @@ const RoleBasedAdvisor = ({
   );
 };
 
-// Memoized Stable Input Component to prevent focus loss
-const StableChatInput = React.memo(({ 
-  value, 
-  onChange, 
-  onKeyDown, 
-  placeholder, 
-  disabled, 
-  className 
-}: {
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-  onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
-  placeholder: string;
-  disabled: boolean;
-  className: string;
-}) => {
-  const inputRef = useRef<HTMLTextAreaElement>(null);
-  
+// COMPLETELY ISOLATED INPUT COMPONENT - DEFINED OUTSIDE MAIN COMPONENT
+const IsolatedChatInput = React.memo(React.forwardRef<
+  HTMLTextAreaElement,
+  {
+    value: string;
+    onChange: (value: string) => void;
+    onSubmit: () => void;
+    placeholder: string;
+    disabled: boolean;
+    className: string;
+  }
+>(({ value, onChange, onSubmit, placeholder, disabled, className }, ref) => {
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    e.stopPropagation();
+    onChange(e.target.value);
+  }, [onChange]);
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      e.stopPropagation();
+      onSubmit();
+    }
+  }, [onSubmit]);
+
   return (
     <Textarea
-      ref={inputRef}
+      ref={ref}
       value={value}
-      onChange={onChange}
-      onKeyDown={onKeyDown}
+      onChange={handleChange}
+      onKeyDown={handleKeyDown}
       placeholder={placeholder}
       disabled={disabled}
       className={className}
       autoComplete="off"
       spellCheck="false"
-      data-testid="stable-chat-input"
+      autoCorrect="off"
+      autoCapitalize="off"
+      data-isolated-input="true"
     />
   );
-});
+}));
 
-StableChatInput.displayName = 'StableChatInput';
+IsolatedChatInput.displayName = 'IsolatedChatInput';
 
 export default function SynergizeAgile() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -1412,6 +1421,7 @@ export default function SynergizeAgile() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<any>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const inputMessageRef = useRef<HTMLTextAreaElement>(null);
   // Mobile scroll indicator state
   const [showScrollIndicator, setShowScrollIndicator] = useState(false);
   // Response counter for session limit
@@ -1848,8 +1858,8 @@ export default function SynergizeAgile() {
   }, []);
 
   // Stable input change handler to prevent focus loss
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setInputMessage(e.target.value);
+  const handleInputChange = useCallback((value: string) => {
+    setInputMessage(value);
   }, []);
 
   // Stable key down handler to prevent focus loss
@@ -2736,13 +2746,14 @@ Format as a realistic conversation with clear speaker labels and include decisio
             )}
 
             <div className="flex-1 relative">
-              <StableChatInput
+              <IsolatedChatInput
                 value={inputMessage}
                 onChange={handleInputChange}
-                onKeyDown={handleKeyDown}
+                onSubmit={handleSendMessage}
                 placeholder={stablePlaceholder}
                 disabled={stableDisabled}
                 className={stableClassName}
+                ref={inputMessageRef}
               />
             </div>
 
@@ -3339,13 +3350,14 @@ Format as a realistic conversation with clear speaker labels and include decisio
                           )}
                           
                           <div className="flex-1 relative">
-                            <StableChatInput
+                            <IsolatedChatInput
                               value={inputMessage}
                               onChange={handleInputChange}
-                              onKeyDown={handleKeyDown}
+                              onSubmit={handleSendMessage}
                               placeholder={stableMainPlaceholder}
                               disabled={stableDisabled}
                               className={stableMainClassName}
+                              ref={inputMessageRef}
                             />
                             
                             {/* Voice feedback indicator */}
