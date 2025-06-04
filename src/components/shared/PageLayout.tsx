@@ -72,7 +72,7 @@ interface NavigationProps {
 }
 
 function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
-  const { user, signOut } = useAuth();
+  const { user, signOut, userProfile } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(140);
 
@@ -200,9 +200,9 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
 
               {user ? (
                 <div className="flex items-center space-x-2">
-                  <Link href="/dashboard">
+                  <Link href={userProfile?.role === 'ADMIN' ? '/admin' : '/dashboard'}>
                     <Button variant="outline" size="sm" className="text-gray-900 hover:text-teal-600 border-gray-400 hover:border-teal-500 hover:bg-teal-50 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-white">
-                      Dashboard
+                      {userProfile?.role === 'ADMIN' ? 'Admin Dashboard' : 'Dashboard'}
                     </Button>
                   </Link>
                   <Button
@@ -339,9 +339,9 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                           <span className="text-gray-700 font-medium text-sm">Welcome back!</span>
                         </div>
                         <Button variant="outline" className="w-full text-base py-3 h-12 border-gray-300 text-gray-900 hover:text-teal-600 hover:bg-teal-50 hover:border-teal-300 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-white font-semibold" asChild>
-                          <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} role="menuitem">
+                          <Link href={userProfile?.role === 'ADMIN' ? '/admin' : '/dashboard'} onClick={() => setMobileMenuOpen(false)} role="menuitem">
                             <BarChart3 className="w-5 h-5 mr-2" />
-                            Dashboard
+                            {userProfile?.role === 'ADMIN' ? 'Admin Dashboard' : 'Dashboard'}
                           </Link>
                         </Button>
                         <Button
