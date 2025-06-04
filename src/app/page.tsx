@@ -110,9 +110,9 @@ export default function HomePage() {
               asChild
             >
               <Link href="/courses">
-                <span className="flex items-center justify-center text-white font-semibold">
+                <span className="flex items-center justify-center text-white group-hover:text-white font-semibold">
                   Explore Courses
-                  <ArrowRight className="h-4 sm:h-5 w-4 sm:w-5 ml-2 group-hover:translate-x-1 transition-transform text-white" />
+                  <ArrowRight className="h-4 sm:h-5 w-4 sm:w-5 ml-2 group-hover:translate-x-1 transition-transform text-white group-hover:text-white" />
                 </span>
               </Link>
             </Button>
@@ -123,8 +123,8 @@ export default function HomePage() {
               asChild
             >
               <Link href="/synergize">
-                <span className="flex items-center justify-center text-white">
-                  <Brain className="h-4 sm:h-5 w-4 sm:w-5 mr-2 group-hover:scale-110 transition-transform text-white" />
+                <span className="flex items-center justify-center text-white group-hover:text-white">
+                  <Brain className="h-4 sm:h-5 w-4 sm:w-5 mr-2 group-hover:scale-110 transition-transform text-white group-hover:text-white" />
                   Try AI Assistant
                 </span>
               </Link>
@@ -318,9 +318,9 @@ function ValuePropositionsSection() {
               asChild
             >
               <Link href="/courses">
-                <span className="flex items-center justify-center text-white font-semibold">
+                <span className="flex items-center justify-center text-white group-hover:text-white font-semibold">
                   Explore Our Courses
-                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform text-white" />
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform text-white group-hover:text-white" />
                 </span>
               </Link>
             </Button>
@@ -331,8 +331,8 @@ function ValuePropositionsSection() {
               asChild
             >
               <Link href="/synergize">
-                <span className="flex items-center justify-center">
-                  <Brain className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
+                <span className="flex items-center justify-center text-teal-600 group-hover:text-teal-600">
+                  <Brain className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform text-teal-600 group-hover:text-teal-600" />
                   Try AI Assistant
                 </span>
               </Link>
@@ -589,12 +589,12 @@ function FeaturedCoursesSection() {
                     {/* CTA Button */}
                     <Button 
                       asChild 
-                      className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all group-hover:scale-105 rounded-xl border-0"
+                      className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all group-hover:scale-105 rounded-xl border-0 group"
                     >
                       <Link href={`/courses/${createCourseSlug(course.title)}`}>
-                        <span className="flex items-center justify-center text-white font-semibold">
+                        <span className="flex items-center justify-center text-white group-hover:text-white font-semibold">
                           Start Learning
-                          <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform text-white" />
+                          <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform text-white group-hover:text-white" />
                         </span>
                       </Link>
                     </Button>
@@ -610,12 +610,14 @@ function FeaturedCoursesSection() {
           <div className="inline-flex items-center space-x-4">
             <Button 
               size="lg" 
-              className="bg-gradient-to-r from-cyan-500 to-teal-600 hover:from-cyan-600 hover:to-teal-700 text-white px-8 py-4 rounded-xl shadow-2xl hover:shadow-cyan-500/25 transition-all hover:scale-105 border-0"
+              className="bg-gradient-to-r from-cyan-500 to-teal-600 hover:from-cyan-600 hover:to-teal-700 text-white px-8 py-4 rounded-xl shadow-2xl hover:shadow-cyan-500/25 transition-all hover:scale-105 border-0 group"
               asChild
             >
               <Link href="/courses">
-                View All Courses
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                <span className="flex items-center justify-center text-white group-hover:text-white font-semibold">
+                  View All Courses
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform text-white group-hover:text-white" />
+                </span>
               </Link>
             </Button>
             
@@ -814,11 +816,11 @@ function CertificationsSection() {
                 {/* CTA Button - Always at bottom */}
                 <div className="mt-auto">
                   <Button 
-                    className={`w-full bg-gradient-to-r ${getProgressColor(cert.level)} hover:shadow-lg text-white font-semibold shadow-md transition-all group-hover:scale-105`}
+                    className={`w-full bg-gradient-to-r ${getProgressColor(cert.level)} hover:shadow-lg text-white font-semibold shadow-md transition-all group-hover:scale-105 group`}
                   >
-                    <span className="flex items-center justify-center text-white font-semibold">
+                    <span className="flex items-center justify-center text-white group-hover:text-white font-semibold">
                       Start Certification
-                      <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform text-white" />
+                      <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform text-white group-hover:text-white" />
                     </span>
                   </Button>
                 </div>
@@ -839,12 +841,14 @@ function CertificationsSection() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
                 size="lg" 
-                className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all hover:scale-105"
+                className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all hover:scale-105 group"
                 asChild
               >
                 <Link href="/courses">
-                  Browse All Certifications
-                  <ArrowRight className="h-5 w-5 ml-2" />
+                  <span className="flex items-center justify-center text-white group-hover:text-white font-semibold">
+                    Browse All Certifications
+                    <ArrowRight className="h-5 w-5 ml-2 text-white group-hover:text-white" />
+                  </span>
                 </Link>
               </Button>
               <Button 
@@ -854,8 +858,8 @@ function CertificationsSection() {
                 asChild
               >
                 <Link href="/contact">
-                  <span className="flex items-center justify-center text-gray-900 font-semibold">
-                    <MessageSquare className="h-5 w-5 mr-2" />
+                  <span className="flex items-center justify-center text-gray-900 group-hover:text-gray-900 font-semibold">
+                    <MessageSquare className="h-5 w-5 mr-2 text-gray-900 group-hover:text-gray-900" />
                     Talk to an Advisor
                   </span>
                 </Link>
@@ -1075,9 +1079,9 @@ function CTASection() {
               asChild
             >
               <Link href="/courses">
-                <span className="flex items-center justify-center text-white font-semibold">
+                <span className="flex items-center justify-center text-white group-hover:text-white font-semibold">
                   Start Learning Today
-                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform text-white" />
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform text-white group-hover:text-white" />
                 </span>
               </Link>
             </Button>
@@ -1088,8 +1092,8 @@ function CTASection() {
               asChild
             >
               <Link href="/contact">
-                <span className="flex items-center justify-center text-gray-900 font-semibold">
-                  <MessageSquare className="h-5 w-5 mr-2" />
+                <span className="flex items-center justify-center text-white group-hover:text-teal-600 font-semibold">
+                  <MessageSquare className="h-5 w-5 mr-2 text-white group-hover:text-teal-600" />
                   Talk to an Expert
                 </span>
               </Link>
