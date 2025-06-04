@@ -280,8 +280,8 @@ export default function StudentDashboard() {
                       <div
                         key={enrollment.id}
                       >
-                        <Card className="h-full hover:shadow-lg transition-shadow bg-white border border-gray-200 shadow-sm">
-                          <div className="aspect-video relative overflow-hidden rounded-t-lg">
+                        <Card className="h-full hover:shadow-lg transition-shadow bg-white border border-gray-200 shadow-sm flex flex-col">
+                          <div className="aspect-video relative overflow-hidden rounded-t-lg flex-shrink-0">
                             {enrollment.course.image ? (
                               <img
                                 src={enrollment.course.image}
@@ -300,8 +300,8 @@ export default function StudentDashboard() {
                             </div>
                           </div>
                           
-                          <CardContent className="p-4 md:p-6">
-                            <div className="space-y-3 md:space-y-4">
+                          <CardContent className="p-4 md:p-6 flex flex-col flex-1">
+                            <div className="space-y-3 md:space-y-4 flex-1">
                               <div>
                                 <h3 className="font-semibold text-base md:text-lg text-gray-900 mb-2">
                                   {enrollment.course.title}
@@ -338,7 +338,10 @@ export default function StudentDashboard() {
                                   ></div>
                                 </div>
                               </div>
+                            </div>
 
+                            {/* Button area - always at bottom */}
+                            <div className="mt-4 flex-shrink-0">
                               <div className="flex gap-2">
                                 {enrollment.status === 'COMPLETED' ? (
                                   <Button variant="outline" className="flex-1 text-xs md:text-sm py-2" disabled>
