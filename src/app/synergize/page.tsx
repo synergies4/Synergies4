@@ -704,128 +704,202 @@ const PresentationGenerator = ({
         </p>
       </div>
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div>
-          <Label htmlFor="topic" className="text-sm font-medium text-gray-700">
-            Presentation Topic *
-          </Label>
-          <Input
-            id="topic"
-            value={presentationTopic}
-            onChange={(e) => setPresentationTopic(e.target.value)}
-            placeholder="e.g., Sprint Planning Best Practices"
-            className="mt-1 text-sm sm:text-base min-h-[44px] text-gray-900 bg-white border-gray-300 placeholder:text-gray-500"
-          />
+      {/* Mobile-Optimized Form Layout */}
+      <div className="space-y-4">
+        {/* Step 1: Basic Information */}
+        <div className="bg-white rounded-lg p-4 border-2 border-teal-100 shadow-sm">
+          <div className="flex items-center mb-3">
+            <div className="w-6 h-6 rounded-full bg-teal-500 text-white flex items-center justify-center text-xs font-bold mr-3">1</div>
+            <h4 className="font-semibold text-gray-900">Basic Information</h4>
+          </div>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="topic" className="text-sm font-medium text-gray-700 mb-1 block">
+                Presentation Topic *
+              </Label>
+              <Input
+                id="topic"
+                value={presentationTopic}
+                onChange={(e) => setPresentationTopic(e.target.value)}
+                placeholder="e.g., Sprint Planning Best Practices"
+                className="min-h-[48px] text-base text-gray-900 bg-white border-gray-300 placeholder:text-gray-500 focus:border-teal-500 focus:ring-teal-500"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="audience" className="text-sm font-medium text-gray-700 mb-1 block">
+                Target Audience *
+              </Label>
+              <Input
+                id="audience"
+                value={audience}
+                onChange={(e) => setAudience(e.target.value)}
+                placeholder="e.g., Development teams"
+                className="min-h-[48px] text-base text-gray-900 bg-white border-gray-300 placeholder:text-gray-500 focus:border-teal-500 focus:ring-teal-500"
+              />
+            </div>
+          </div>
         </div>
-        
-        <div>
-          <Label htmlFor="audience" className="text-sm font-medium text-gray-700">
-            Target Audience *
-          </Label>
-          <Input
-            id="audience"
-            value={audience}
-            onChange={(e) => setAudience(e.target.value)}
-            placeholder="e.g., Development teams"
-            className="mt-1 text-sm sm:text-base min-h-[44px] text-gray-900 bg-white border-gray-300 placeholder:text-gray-500"
-          />
+
+        {/* Step 2: Presentation Settings */}
+        <div className="bg-white rounded-lg p-4 border-2 border-emerald-100 shadow-sm">
+          <div className="flex items-center mb-3">
+            <div className="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold mr-3">2</div>
+            <h4 className="font-semibold text-gray-900">Presentation Settings</h4>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="slideCount" className="text-sm font-medium text-gray-700 mb-1 block">
+                Number of Slides
+              </Label>
+              <Select value={slideCount.toString()} onValueChange={(value) => setSlideCount(parseInt(value))}>
+                <SelectTrigger className="min-h-[48px] text-base text-gray-900 bg-white border-gray-300 focus:border-emerald-500 focus:ring-emerald-500">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-white border border-gray-200 z-50">
+                  {[3, 5, 7, 10, 15].map(count => (
+                    <SelectItem key={count} value={count.toString()} className="text-gray-900 min-h-[44px] px-4 py-3">
+                      {count} slides
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <Label htmlFor="style" className="text-sm font-medium text-gray-700 mb-1 block">
+                Presentation Style
+              </Label>
+              <Select value={presentationStyle} onValueChange={setPresentationStyle}>
+                <SelectTrigger className="min-h-[48px] text-base text-gray-900 bg-white border-gray-300 focus:border-emerald-500 focus:ring-emerald-500">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-white border border-gray-200 z-50">
+                  <SelectItem value="professional" className="text-gray-900 min-h-[44px] px-4 py-3">Professional</SelectItem>
+                  <SelectItem value="creative" className="text-gray-900 min-h-[44px] px-4 py-3">Creative</SelectItem>
+                  <SelectItem value="minimalist" className="text-gray-900 min-h-[44px] px-4 py-3">Minimalist</SelectItem>
+                  <SelectItem value="engaging" className="text-gray-900 min-h-[44px] px-4 py-3">Engaging</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </div>
-        
-        <div>
-          <Label htmlFor="slideCount" className="text-sm font-medium text-gray-700">
-            Number of Slides
-          </Label>
-          <Select value={slideCount.toString()} onValueChange={(value) => setSlideCount(parseInt(value))}>
-            <SelectTrigger className="mt-1 min-h-[44px] text-sm sm:text-base text-gray-900 bg-white border-gray-300">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="bg-white border border-gray-200">
-              {[3, 5, 7, 10, 15].map(count => (
-                <SelectItem key={count} value={count.toString()} className="text-gray-900">
-                  {count} slides
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <div>
-          <Label htmlFor="style" className="text-sm font-medium text-gray-700">
-            Presentation Style
-          </Label>
-          <Select value={presentationStyle} onValueChange={setPresentationStyle}>
-            <SelectTrigger className="mt-1 min-h-[44px] text-sm sm:text-base text-gray-900 bg-white border-gray-300">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="bg-white border border-gray-200">
-              <SelectItem value="professional" className="text-gray-900">Professional</SelectItem>
-              <SelectItem value="creative" className="text-gray-900">Creative</SelectItem>
-              <SelectItem value="minimalist" className="text-gray-900">Minimalist</SelectItem>
-              <SelectItem value="engaging" className="text-gray-900">Engaging</SelectItem>
-            </SelectContent>
-          </Select>
+
+        {/* Step 3: Additional Options */}
+        <div className="bg-white rounded-lg p-4 border-2 border-blue-100 shadow-sm">
+          <div className="flex items-center mb-3">
+            <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold mr-3">3</div>
+            <h4 className="font-semibold text-gray-900">Additional Options</h4>
+          </div>
+          <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
+            <input
+              type="checkbox"
+              id="includeImages"
+              checked={includeImages}
+              onChange={(e) => setIncludeImages(e.target.checked)}
+              className="w-5 h-5 text-blue-600 bg-white border-2 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+            />
+            <Label htmlFor="includeImages" className="text-sm font-medium text-gray-700 cursor-pointer select-none">
+              Generate DALL-E images for each slide
+            </Label>
+          </div>
         </div>
       </div>
-      
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-4 space-y-4 sm:space-y-0">
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            id="includeImages"
-            checked={includeImages}
-            onChange={(e) => setIncludeImages(e.target.checked)}
-            className="rounded"
-          />
-          <Label htmlFor="includeImages" className="text-sm">
-            Generate DALL-E images for each slide
-          </Label>
+
+      {/* Mobile Scroll Indicator */}
+      <div className="block sm:hidden text-center py-2">
+        <div className="inline-flex items-center space-x-2 text-gray-500 text-xs">
+          <svg className="w-4 h-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7-7-7" />
+          </svg>
+          <span>Scroll down to generate</span>
+          <svg className="w-4 h-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7-7-7" />
+          </svg>
         </div>
-        
-        {generatedSlides.length > 0 && (
-          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
-            <Button 
-              onClick={() => setShowPresentation(true)}
-              className="bg-teal-600 hover:bg-teal-700 text-sm sm:text-base min-h-[44px]"
-            >
-              <Presentation className="h-4 w-4 mr-2" />
-              Present Slides
-            </Button>
-            <Button 
-              onClick={exportToPDF}
-              variant="outline"
-              className="bg-emerald-50 hover:bg-emerald-100 border-emerald-200 text-sm sm:text-base min-h-[44px]"
-            >
-              <Download className="h-4 w-4 mr-2" />
-              Export PDF
-            </Button>
-          </div>
-        )}
       </div>
-      
-      {isGeneratingImages && (
-        <div className="p-4 bg-teal-50 rounded-lg">
-          <div className="flex items-center space-x-2">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            <span className="text-sm">Generating images for slide {currentImageIndex} of {slideCount}...</span>
+
+      {/* Generate Button - More Prominent */}
+      <div className="sticky bottom-0 bg-gradient-to-t from-white via-white to-transparent pt-4 pb-4 sm:pb-0 sm:bg-none sm:static">
+        <Button 
+          onClick={generatePresentation}
+          disabled={!presentationTopic || !audience || isLoading}
+          className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-base font-semibold min-h-[52px] shadow-lg transform transition-all duration-200 hover:scale-[1.02] disabled:scale-100 disabled:shadow-none"
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="h-5 w-5 animate-spin mr-3" />
+              Generating Your Presentation...
+            </>
+          ) : (
+            <>
+              <Presentation className="h-5 w-5 mr-3" />
+              Generate {slideCount}-Slide Presentation
+            </>
+          )}
+        </Button>
+        
+        {/* Progress indicator for required fields */}
+        <div className="mt-2 text-center">
+          <div className="text-xs text-gray-500">
+            {!presentationTopic || !audience ? (
+              <span className="text-orange-600 font-medium">
+                ⚠️ Please fill in both required fields above
+              </span>
+            ) : (
+              <span className="text-green-600 font-medium">
+                ✓ Ready to generate presentation
+              </span>
+            )}
           </div>
+        </div>
+      </div>
+
+      {/* Existing content continues below... */}
+      {/* Results Section */}
+      {generatedSlides.length > 0 && (
+        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full">
+          <Button 
+            onClick={() => setShowPresentation(true)}
+            className="bg-teal-600 hover:bg-teal-700 text-sm sm:text-base min-h-[44px] flex-1"
+          >
+            <Presentation className="h-4 w-4 mr-2" />
+            Present Slides
+          </Button>
+          <Button 
+            onClick={exportToPDF}
+            variant="outline"
+            className="bg-emerald-50 hover:bg-emerald-100 border-emerald-200 text-sm sm:text-base min-h-[44px] flex-1"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Export PDF
+          </Button>
         </div>
       )}
       
-      <Button 
-        onClick={generatePresentation}
-        disabled={!presentationTopic || !audience || isLoading}
-        className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-sm sm:text-base min-h-[44px]"
-      >
-        {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Presentation className="h-4 w-4 mr-2" />}
-        Generate {slideCount}-Slide Presentation
-      </Button>
+      {isGeneratingImages && (
+        <div className="p-4 bg-teal-50 rounded-lg border border-teal-200">
+          <div className="flex items-center space-x-3">
+            <Loader2 className="h-5 w-5 animate-spin text-teal-600" />
+            <span className="text-sm font-medium text-teal-800">
+              Generating images for slide {currentImageIndex} of {slideCount}...
+            </span>
+          </div>
+          <div className="mt-2 w-full bg-teal-100 rounded-full h-2">
+            <div 
+              className="bg-teal-600 h-2 rounded-full transition-all duration-500"
+              style={{ width: `${(currentImageIndex / slideCount) * 100}%` }}
+            ></div>
+          </div>
+        </div>
+      )}
       
       {/* Enhanced Slide Preview - Mobile Optimized */}
       {generatedSlides.length > 0 && (
         <div className="mt-6 space-y-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0">
             <h3 className="text-lg font-semibold">Presentation Preview</h3>
-            <Badge variant="outline" className="bg-teal-50 text-teal-700 border-teal-200">
+            <Badge variant="outline" className="bg-teal-50 text-teal-700 border-teal-200 text-sm">
               {generatedSlides.length} slides ready
             </Badge>
           </div>
@@ -2237,7 +2311,7 @@ export default function SynergizeAgile() {
             <Button 
               size="lg" 
               variant="outline" 
-              className="text-lg px-8 py-6 border-2 border-white text-white hover:bg-white hover:text-teal-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+              className="text-lg px-8 py-6 border-2 border-white text-gray-900 bg-white hover:bg-white hover:text-teal-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
               asChild
             >
               <Link href="/courses">
