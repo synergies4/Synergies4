@@ -1924,15 +1924,15 @@ export default function SynergizeAgile() {
             <div>
               <Label className="text-sm font-medium text-gray-700 mb-3 block">Your Role</Label>
               <Select value={selectedRole} onValueChange={handleRoleChange}>
-                <SelectTrigger className="w-full bg-white border-gray-300 text-gray-900">
+                <SelectTrigger className="w-full bg-white border-gray-300 text-gray-900 focus:border-teal-500 focus:ring-teal-500">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-white border border-gray-300 shadow-lg">
+                <SelectContent className="bg-teal-600 border border-teal-500 shadow-lg">
                   {Object.entries(AGILE_ROLES).map(([key, role]) => (
-                    <SelectItem key={key} value={key} className="text-gray-900 hover:bg-gray-50">
+                    <SelectItem key={key} value={key} className="text-white hover:bg-teal-700 focus:bg-teal-700 data-[highlighted]:bg-teal-700">
                       <div className="flex items-center">
-                        <span className="mr-2">{role.icon}</span>
-                        {role.name}
+                        <span className="mr-2 text-white">{role.icon}</span>
+                        <span className="text-white">{role.name}</span>
                       </div>
                     </SelectItem>
                   ))}
@@ -1945,15 +1945,15 @@ export default function SynergizeAgile() {
             <div>
               <Label className="text-sm font-medium text-gray-700 mb-3 block">Interaction Mode</Label>
               <Select value={selectedMode} onValueChange={handleModeChange}>
-                <SelectTrigger className="w-full bg-white border-gray-300 text-gray-900">
+                <SelectTrigger className="w-full bg-white border-gray-300 text-gray-900 focus:border-emerald-500 focus:ring-emerald-500">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-white border border-gray-300 shadow-lg">
+                <SelectContent className="bg-emerald-600 border border-emerald-500 shadow-lg">
                   {Object.entries(INTERACTION_MODES).map(([key, mode]) => (
-                    <SelectItem key={key} value={key} className="text-gray-900 hover:bg-gray-50">
+                    <SelectItem key={key} value={key} className="text-white hover:bg-emerald-700 focus:bg-emerald-700 data-[highlighted]:bg-emerald-700">
                       <div className="flex items-center">
-                        <span className="mr-2">{mode.icon}</span>
-                        {mode.name}
+                        <span className="mr-2 text-white">{mode.icon}</span>
+                        <span className="text-white">{mode.name}</span>
                       </div>
                     </SelectItem>
                   ))}
@@ -1965,16 +1965,16 @@ export default function SynergizeAgile() {
             <div>
               <Label className="text-sm font-medium text-gray-700 mb-3 block">AI Provider</Label>
               <Select value={selectedProvider} onValueChange={handleProviderChange}>
-                <SelectTrigger className="w-full bg-white border-gray-300 text-gray-900">
+                <SelectTrigger className="w-full bg-white border-gray-300 text-gray-900 focus:border-teal-500 focus:ring-teal-500">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-white border border-gray-300 shadow-lg">
+                <SelectContent className="bg-teal-600 border border-teal-500 shadow-lg">
                   {Object.entries(AI_PROVIDERS).map(([key, provider]) => (
-                    <SelectItem key={key} value={key} className="text-gray-900 hover:bg-gray-50">
+                    <SelectItem key={key} value={key} className="text-white hover:bg-teal-700 focus:bg-teal-700 data-[highlighted]:bg-teal-700">
                       <div className="flex items-center">
-                        <span className="mr-2">{provider.icon}</span>
-                        {provider.name}
-                        <span className="ml-auto text-xs text-gray-500">({provider.badge})</span>
+                        <span className="mr-2 text-white">{provider.icon}</span>
+                        <span className="text-white">{provider.name}</span>
+                        <span className="ml-auto text-xs text-teal-100">({provider.badge})</span>
                       </div>
                     </SelectItem>
                   ))}
@@ -2199,35 +2199,105 @@ export default function SynergizeAgile() {
               )}
               
               {selectedMode === 'scenario' && (
-                <div className="space-y-4">
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Person 1 Configuration */}
+                    <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
+                      <h4 className="font-semibold text-emerald-800 mb-3">Person 1</h4>
+                      <div className="space-y-3">
+                        <div>
+                          <Label className="text-sm font-medium text-gray-700">Role</Label>
+                          <select className="mt-1 w-full min-h-[40px] text-sm px-3 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                            <option value="Scrum Master">Scrum Master</option>
+                            <option value="Product Owner">Product Owner</option>
+                            <option value="Developer">Developer</option>
+                            <option value="Stakeholder">Stakeholder</option>
+                            <option value="Team Lead">Team Lead</option>
+                            <option value="Agile Coach">Agile Coach</option>
+                          </select>
+                        </div>
+                        <div>
+                          <Label className="text-sm font-medium text-gray-700">Context & Goals</Label>
+                          <Textarea
+                            placeholder="What is this person's perspective, goals, and concerns?"
+                            className="mt-1 text-sm bg-white border-gray-300 text-gray-900"
+                            rows={3}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Person 2 Configuration */}
+                    <div className="p-4 bg-teal-50 border border-teal-200 rounded-lg">
+                      <h4 className="font-semibold text-teal-800 mb-3">Person 2</h4>
+                      <div className="space-y-3">
+                        <div>
+                          <Label className="text-sm font-medium text-gray-700">Role</Label>
+                          <select className="mt-1 w-full min-h-[40px] text-sm px-3 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent">
+                            <option value="Product Owner">Product Owner</option>
+                            <option value="Scrum Master">Scrum Master</option>
+                            <option value="Developer">Developer</option>
+                            <option value="Stakeholder">Stakeholder</option>
+                            <option value="Team Lead">Team Lead</option>
+                            <option value="Agile Coach">Agile Coach</option>
+                          </select>
+                        </div>
+                        <div>
+                          <Label className="text-sm font-medium text-gray-700">Context & Goals</Label>
+                          <Textarea
+                            placeholder="What is this person's perspective, goals, and concerns?"
+                            className="mt-1 text-sm bg-white border-gray-300 text-gray-900"
+                            rows={3}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Scenario Context */}
                   <div>
                     <Label className="text-sm font-medium text-gray-700">Scenario Context</Label>
                     <Textarea
-                      placeholder="Describe the scenario you want to simulate..."
+                      placeholder="Describe the situation, challenge, or meeting context that these two people will navigate together..."
                       className="mt-1 bg-white border-gray-300 text-gray-900"
-                      rows={3}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && e.ctrlKey) {
-                          const context = (e.target as HTMLTextAreaElement).value;
-                          setInputMessage(`Simulate this scenario: ${context}`);
-                          handleSendMessage();
-                        }
-                      }}
+                      rows={4}
                     />
                   </div>
+
                   <Button
                     onClick={() => {
-                      const textarea = document.querySelector('textarea') as HTMLTextAreaElement;
-                      if (textarea?.value) {
-                        setInputMessage(`Simulate this scenario: ${textarea.value}`);
+                      const person1Role = document.querySelector('select:nth-of-type(1)') as HTMLSelectElement;
+                      const person1Context = document.querySelector('textarea:nth-of-type(1)') as HTMLTextAreaElement;
+                      const person2Role = document.querySelector('select:nth-of-type(2)') as HTMLSelectElement;
+                      const person2Context = document.querySelector('textarea:nth-of-type(2)') as HTMLTextAreaElement;
+                      const scenarioContext = document.querySelector('textarea:nth-of-type(3)') as HTMLTextAreaElement;
+                      
+                      if (person1Context?.value && person2Context?.value && scenarioContext?.value) {
+                        const prompt = `Create a realistic Agile scenario simulation between a ${person1Role.value} and a ${person2Role.value}.
+
+Scenario Context: ${scenarioContext.value}
+
+${person1Role.value} Context: ${person1Context.value}
+${person2Role.value} Context: ${person2Context.value}
+
+Generate a dialogue with:
+1. Initial situation setup
+2. 3-4 exchanges between both roles
+3. Challenges that arise
+4. Resolution approach
+5. Learning outcomes
+
+Format as a realistic conversation with clear speaker labels and include decision points where I can choose different paths.`;
+                        
+                        setInputMessage(prompt);
                         handleSendMessage();
                       }
                     }}
                     disabled={isLoading}
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
                   >
                     <PlayCircle className="h-4 w-4 mr-2" />
-                    Start Scenario
+                    Start Scenario Simulation
                   </Button>
                 </div>
               )}
