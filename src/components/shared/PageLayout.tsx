@@ -126,21 +126,21 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
 
   return (
     <>
-      {/* Countdown Banner - Fixed Mobile Layout */}
+      {/* AI Assistant Promotion Banner - Fixed Mobile Layout */}
       <div className="bg-gradient-to-r from-teal-600 to-emerald-600 text-white py-3 px-4" role="banner">
         <div className="container mx-auto">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-center">
-            <p className="text-sm sm:text-base font-medium">
-              🚀 Expand your potential through learning. Offering earlybirds a discount of $295.00.
-            </p>
-            <div className="flex gap-1 sm:gap-2 text-xs sm:text-sm" aria-label="Countdown timer">
-              {['00 Days', '00 Hours', '00 Minutes', '00 Seconds'].map((time, index) => (
-                <Badge key={index} variant="secondary" className="bg-white/20 text-white border-white/30 px-2 py-1 text-xs">
-                  {time}
-                </Badge>
-              ))}
+          <Link href="/synergize" className="block hover:opacity-90 transition-opacity">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-center cursor-pointer">
+              <p className="text-sm sm:text-base font-medium">
+                🚀 Try our AI learning assistant - Get personalized course recommendations instantly.
+              </p>
+              <div className="flex items-center gap-2 text-xs sm:text-sm bg-white/20 rounded-full px-3 py-1 hover:bg-white/30 transition-colors">
+                <Brain className="w-4 h-4" />
+                <span>Try Synergize AI</span>
+                <ArrowRight className="w-3 h-3" />
+              </div>
             </div>
-          </div>
+          </Link>
         </div>
       </div>
 
