@@ -264,10 +264,10 @@ function WhyChooseSection() {
 
                 {/* Content */}
                 <div>
-                  <h3 className="text-xl font-bold text-gray-100 mb-4 group-hover:text-cyan-200 transition-colors-smooth">
+                  <h3 className="text-xl font-bold text-gray-100 mb-4 group-hover:text-gray-900 transition-colors-smooth">
                     {item.title}
                   </h3>
-                  <p className="text-gray-200 leading-relaxed text-base group-hover:text-white transition-colors-smooth">
+                  <p className="text-gray-200 leading-relaxed text-base group-hover:text-gray-700 transition-colors-smooth">
                     {item.description}
                   </p>
                 </div>
@@ -360,7 +360,7 @@ function CaseStudiesSection() {
               <div className={`relative glass-effect-light rounded-2xl border border-white/20 p-8 h-full hover:bg-white/80 card-hover-optimized shadow-lg hover:shadow-2xl text-center`}>
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
-                  <Badge variant="outline" className="text-sm bg-white/10 border-white/30 text-white">
+                  <Badge variant="outline" className="text-sm bg-white/90 border-gray-300 text-gray-800">
                     {study.industry}
                   </Badge>
                   <div className="flex">
@@ -371,29 +371,29 @@ function CaseStudiesSection() {
                 </div>
 
                 {/* Company */}
-                <h3 className="text-2xl font-bold text-gray-100 mb-4 group-hover:text-cyan-200 transition-colors-smooth">
+                <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-blue-600 transition-colors-smooth">
                   {study.company}
                 </h3>
 
                 {/* Challenge & Solution */}
                 <div className="space-y-4 mb-6">
                   <div>
-                    <h4 className="text-lg font-semibold text-gray-200 mb-2 group-hover:text-white transition-colors-smooth">Challenge:</h4>
-                    <p className="text-gray-200 leading-relaxed group-hover:text-white/90 transition-colors-smooth">{study.challenge}</p>
+                    <h4 className="text-lg font-semibold text-gray-800 mb-2 group-hover:text-gray-900 transition-colors-smooth">Challenge:</h4>
+                    <p className="text-gray-700 leading-relaxed group-hover:text-gray-900 transition-colors-smooth">{study.challenge}</p>
                   </div>
                   <div>
-                    <h4 className="text-lg font-semibold text-gray-200 mb-2 group-hover:text-white transition-colors-smooth">Solution:</h4>
-                    <p className="text-gray-200 leading-relaxed group-hover:text-white/90 transition-colors-smooth">{study.solution}</p>
+                    <h4 className="text-lg font-semibold text-gray-800 mb-2 group-hover:text-gray-900 transition-colors-smooth">Solution:</h4>
+                    <p className="text-gray-700 leading-relaxed group-hover:text-gray-900 transition-colors-smooth">{study.solution}</p>
                   </div>
                 </div>
 
                 {/* Results */}
                 <div className="mb-6">
-                  <h4 className="text-lg font-semibold text-yellow-300 mb-4 group-hover:text-yellow-200 transition-colors-smooth">Key Results:</h4>
+                  <h4 className="text-lg font-semibold text-yellow-600 mb-4 group-hover:text-yellow-700 transition-colors-smooth">Key Results:</h4>
                   <div className="grid grid-cols-1 gap-3">
                     {study.results.map((result, idx) => (
-                      <div key={idx} className="flex items-center text-gray-200 group-hover:text-white/90 transition-colors-smooth">
-                        <CheckCircle className="h-5 w-5 text-green-400 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform duration-300" />
+                      <div key={idx} className="flex items-center text-gray-700 group-hover:text-gray-900 transition-colors-smooth">
+                        <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform duration-300" />
                         <span className="font-medium">{result}</span>
                       </div>
                     ))}
@@ -401,7 +401,7 @@ function CaseStudiesSection() {
                 </div>
 
                 {/* Testimonial */}
-                <blockquote className="text-gray-100 italic leading-relaxed mb-4 group-hover:text-white transition-colors-smooth font-light text-lg border-l-4 border-yellow-400 pl-4">
+                <blockquote className="text-gray-800 italic leading-relaxed mb-4 group-hover:text-gray-900 transition-colors-smooth font-light text-lg border-l-4 border-yellow-400 pl-4">
                   "{study.testimonial}"
                 </blockquote>
                 <p className="text-yellow-300 font-semibold group-hover:text-yellow-200 transition-colors-smooth">— {study.author}</p>
