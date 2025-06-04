@@ -225,6 +225,31 @@ function CourseDirectorySection() {
             <span className="text-blue-600 font-medium"> AI innovation </span>
             with proven methodologies and real-world application.
           </p>
+          
+          {/* Strategic Quotes Section */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto mt-16 mb-8">
+            {/* Rob Thomas Quote */}
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-600 rounded-r-xl p-6 shadow-lg">
+              <blockquote className="text-lg font-semibold text-gray-900 italic mb-4 leading-relaxed">
+                "AI is not going to replace managers, but managers who use AI will replace the managers who do not."
+              </blockquote>
+              <cite className="flex items-center text-gray-700 font-medium">
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center mr-3 text-white text-sm font-bold">RT</div>
+                <span className="text-sm">Rob Thomas, IBM Senior Vice President</span>
+              </cite>
+            </div>
+
+            {/* Dario Amodei Quote */}
+            <div className="bg-gradient-to-r from-purple-50 to-pink-50 border-l-4 border-purple-600 rounded-r-xl p-6 shadow-lg">
+              <blockquote className="text-lg font-semibold text-gray-900 italic mb-4 leading-relaxed">
+                "AI could eliminate up to 50% of entry-level white-collar jobs within the next five years."
+              </blockquote>
+              <cite className="flex items-center text-gray-700 font-medium">
+                <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center mr-3 text-white text-sm font-bold">DA</div>
+                <span className="text-sm">Dario Amodei, CEO of Anthropic</span>
+              </cite>
+            </div>
+          </div>
         </div>
 
         {/* Enhanced Search and Filter */}

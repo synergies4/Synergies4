@@ -112,6 +112,19 @@ function WhyChooseSection() {
             <span className="text-blue-600 font-medium"> AI-powered insights </span>
             to accelerate your professional development and unlock your leadership potential.
           </p>
+          
+          {/* Leadership Quote */}
+          <div className="mt-16 mb-8">
+            <div className="max-w-4xl mx-auto p-8 bg-gradient-to-r from-gray-50 to-slate-50 border-l-4 border-gray-600 rounded-r-xl shadow-lg">
+              <blockquote className="text-xl md:text-2xl font-semibold text-gray-900 italic mb-6 leading-relaxed text-center">
+                "Adaptive leadership is essential in navigating structural transformations within global economies and organizations."
+              </blockquote>
+              <cite className="flex items-center justify-center text-gray-700 font-medium">
+                <div className="w-10 h-10 bg-gradient-to-r from-gray-600 to-slate-600 rounded-full flex items-center justify-center mr-4 text-white text-sm font-bold">OG</div>
+                <span className="text-lg">Olaf Groth, Futurist and Strategist</span>
+              </cite>
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

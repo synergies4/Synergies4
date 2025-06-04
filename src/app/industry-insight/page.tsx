@@ -73,12 +73,198 @@ export default function IndustryInsight() {
         backgroundVariant="gradient"
       />
 
+      {/* Industry Leaders Speak Section */}
+      <IndustryLeadersSection />
+
       {/* Blog Posts Section */}
       <BlogPostsSection />
 
       {/* Newsletter Section */}
       <NewsletterSection />
     </PageLayout>
+  );
+}
+
+// Industry Leaders Section Component
+function IndustryLeadersSection() {
+  const quotes = [
+    {
+      quote: "You're going to lose your job to someone who is using AI.",
+      author: "Jensen Huang",
+      title: "CEO of Nvidia",
+      initials: "JH",
+      gradient: "from-red-500 to-orange-500",
+      bgGradient: "from-red-50 to-orange-50",
+      category: "Urgency"
+    },
+    {
+      quote: "AI is not going to replace managers, but managers who use AI will replace the managers who do not.",
+      author: "Rob Thomas",
+      title: "IBM Senior Vice President",
+      initials: "RT",
+      gradient: "from-blue-600 to-indigo-600",
+      bgGradient: "from-blue-50 to-indigo-50",
+      category: "Leadership"
+    },
+    {
+      quote: "AI could eliminate up to 50% of entry-level white-collar jobs within the next five years.",
+      author: "Dario Amodei",
+      title: "CEO of Anthropic",
+      initials: "DA",
+      gradient: "from-purple-600 to-pink-600",
+      bgGradient: "from-purple-50 to-pink-50",
+      category: "Future Impact"
+    },
+    {
+      quote: "The real value of AI will be in its ability to empower humans to make better decisions faster.",
+      author: "Peter Diamandis",
+      title: "Entrepreneur and Engineer",
+      initials: "PD",
+      gradient: "from-green-600 to-emerald-600",
+      bgGradient: "from-green-50 to-emerald-50",
+      category: "Empowerment"
+    },
+    {
+      quote: "There's a lot of automation that can happen that isn't a replacement of humans, but of mind-numbing behavior.",
+      author: "Stewart Butterfield",
+      title: "CEO & Co-Founder of Slack",
+      initials: "SB",
+      gradient: "from-yellow-600 to-orange-600",
+      bgGradient: "from-yellow-50 to-orange-50",
+      category: "Automation"
+    },
+    {
+      quote: "AI will be one of humanity's most consequential technologies, transforming virtually every industry and aspect of civilization.",
+      author: "Carl Benedikt Frey",
+      title: "Economist and Author",
+      initials: "CF",
+      gradient: "from-teal-600 to-cyan-600",
+      bgGradient: "from-teal-50 to-cyan-50",
+      category: "Transformation"
+    },
+    {
+      quote: "Superhuman innovation is about humans and AI working together to achieve outcomes neither could alone.",
+      author: "Chris Duffey",
+      title: "Author and AI Technologist",
+      initials: "CD",
+      gradient: "from-cyan-600 to-blue-600",
+      bgGradient: "from-cyan-50 to-blue-50",
+      category: "Collaboration"
+    },
+    {
+      quote: "Adaptive leadership is essential in navigating structural transformations within global economies and organizations.",
+      author: "Olaf Groth",
+      title: "Futurist and Strategist",
+      initials: "OG",
+      gradient: "from-gray-600 to-slate-600",
+      bgGradient: "from-gray-50 to-slate-50",
+      category: "Adaptation"
+    }
+  ];
+
+  return (
+    <section className="py-20 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 relative overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-blue-400/10 to-teal-600/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-br from-cyan-400/10 to-blue-600/10 rounded-full blur-3xl animate-pulse animation-delay-1000"></div>
+      </div>
+
+      <div className="container mx-auto px-4 relative z-10">
+        {/* Section Header */}
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center px-6 py-3 bg-white/80 backdrop-blur-sm rounded-full border border-gray-200/50 mb-8">
+            <MessageSquare className="w-5 h-5 text-blue-600 mr-3" />
+            <span className="text-gray-700 font-medium">Industry Leaders Speak</span>
+          </div>
+          
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+            What Top Leaders Say About
+            <span className="block bg-gradient-to-r from-blue-600 via-teal-600 to-emerald-600 bg-clip-text text-transparent">
+              AI Reskilling
+            </span>
+          </h2>
+          
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Hear from industry visionaries and thought leaders about the urgent need for AI reskilling and the transformation happening across white-collar professions.
+          </p>
+        </div>
+
+        {/* Quotes Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-7xl mx-auto">
+          {quotes.map((item, index) => (
+            <div
+              key={index}
+              className={`group relative animate-fade-in-up bg-gradient-to-br ${item.bgGradient} border border-gray-200/50 rounded-2xl p-8 transition-all hover:scale-105 hover:shadow-xl`}
+              style={{ animationDelay: `${index * 150}ms` }}
+            >
+              {/* Category Badge */}
+              <div className="mb-6">
+                <Badge className={`bg-gradient-to-r ${item.gradient} text-white border-0 shadow-lg`}>
+                  {item.category}
+                </Badge>
+              </div>
+
+              {/* Quote */}
+              <blockquote className="text-lg md:text-xl font-semibold text-gray-900 italic mb-8 leading-relaxed">
+                "{item.quote}"
+              </blockquote>
+
+              {/* Author */}
+              <cite className="flex items-center not-italic">
+                <div className={`w-12 h-12 bg-gradient-to-r ${item.gradient} rounded-full flex items-center justify-center mr-4 text-white font-bold shadow-lg group-hover:scale-110 transition-transform`}>
+                  {item.initials}
+                </div>
+                <div>
+                  <div className="font-semibold text-gray-900 text-lg">{item.author}</div>
+                  <div className="text-gray-600 text-sm">{item.title}</div>
+                </div>
+              </cite>
+            </div>
+          ))}
+        </div>
+
+        {/* Call to Action */}
+        <div className="text-center mt-16">
+          <div className="max-w-3xl mx-auto p-8 bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-2xl shadow-lg">
+            <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+              Don't Get Left Behind
+            </h3>
+            <p className="text-lg text-gray-600 mb-8">
+              The future belongs to those who embrace AI and reskill themselves. Start your transformation journey today.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button 
+                size="lg" 
+                className="bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
+                asChild
+              >
+                <Link href="/courses">
+                  <span className="flex items-center justify-center text-white font-semibold">
+                    Explore Courses
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </span>
+                </Link>
+              </Button>
+              
+              <Button 
+                size="lg" 
+                variant="outline"
+                className="border-2 border-gray-300 hover:border-teal-500 hover:bg-teal-50 px-8 py-4 rounded-xl transition-all hover:scale-105"
+                asChild
+              >
+                <Link href="/coaching">
+                  <span className="flex items-center justify-center">
+                    <Users className="mr-2 h-5 w-5" />
+                    Get Coaching
+                  </span>
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 

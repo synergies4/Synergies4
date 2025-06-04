@@ -298,6 +298,31 @@ function SpecialSection() {
             <span className="text-teal-600 font-medium"> transform how people think, </span>
             work, and lead
           </p>
+          
+          {/* Transformation Quotes */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto mt-16 mb-8">
+            {/* Peter Diamandis Quote */}
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-600 rounded-r-xl p-6 shadow-lg">
+              <blockquote className="text-lg font-semibold text-gray-900 italic mb-4 leading-relaxed">
+                "The real value of AI will be in its ability to empower humans to make better decisions faster."
+              </blockquote>
+              <cite className="flex items-center text-gray-700 font-medium">
+                <div className="w-8 h-8 bg-gradient-to-r from-green-600 to-emerald-600 rounded-full flex items-center justify-center mr-3 text-white text-sm font-bold">PD</div>
+                <span className="text-sm">Peter Diamandis, Entrepreneur and Engineer</span>
+              </cite>
+            </div>
+
+            {/* Carl Benedikt Frey Quote */}
+            <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border-l-4 border-teal-600 rounded-r-xl p-6 shadow-lg">
+              <blockquote className="text-lg font-semibold text-gray-900 italic mb-4 leading-relaxed">
+                "AI will be one of humanity's most consequential technologies, transforming virtually every industry and aspect of civilization."
+              </blockquote>
+              <cite className="flex items-center text-gray-700 font-medium">
+                <div className="w-8 h-8 bg-gradient-to-r from-teal-600 to-cyan-600 rounded-full flex items-center justify-center mr-3 text-white text-sm font-bold">CF</div>
+                <span className="text-sm">Carl Benedikt Frey, Economist and Author</span>
+              </cite>
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
