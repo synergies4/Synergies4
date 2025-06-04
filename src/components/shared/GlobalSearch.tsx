@@ -109,17 +109,50 @@ export default function GlobalSearch({
     if (isOpen && searchInputRef.current) {
       searchInputRef.current.focus();
       // Prevent body scroll when search is open
-      document.body.style.overflow = 'hidden';
+      const scrollY = document.documentElement.style.getPropertyValue('--scroll-y');
+      const body = document.body;
+      body.style.position = 'fixed';
+      body.style.top = `-${scrollY}`;
+      body.style.left = '0';
+      body.style.right = '0';
+      body.style.overflow = 'hidden';
+      body.style.width = '100%';
     } else {
       // Restore body scroll when search is closed
-      document.body.style.overflow = 'unset';
+      const body = document.body;
+      const scrollY = body.style.top;
+      body.style.position = '';
+      body.style.top = '';
+      body.style.left = '';
+      body.style.right = '';
+      body.style.overflow = '';
+      body.style.width = '';
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY || '0') * -1);
+      }
     }
 
     // Cleanup function to restore scroll
     return () => {
-      document.body.style.overflow = 'unset';
+      const body = document.body;
+      body.style.position = '';
+      body.style.top = '';
+      body.style.left = '';
+      body.style.right = '';
+      body.style.overflow = '';
+      body.style.width = '';
     };
   }, [isOpen]);
+
+  // Store scroll position for scroll lock
+  useEffect(() => {
+    const updateScrollY = () => {
+      document.documentElement.style.setProperty('--scroll-y', `${window.scrollY}px`);
+    };
+    document.addEventListener('scroll', updateScrollY);
+    updateScrollY();
+    return () => document.removeEventListener('scroll', updateScrollY);
+  }, []);
 
   // Debounced search
   useEffect(() => {

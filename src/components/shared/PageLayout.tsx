@@ -374,14 +374,6 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
                       </div>
                     )}
                   </div>
-                  
-                  {/* Extra padding to test scroll */}
-                  <div className="py-8">
-                    <p className="text-gray-500 text-center text-sm">Scroll test area</p>
-                  </div>
-                  <div className="py-8">
-                    <p className="text-gray-500 text-center text-sm">More content to test scrolling</p>
-                  </div>
                 </div>
               </div>
             </div>

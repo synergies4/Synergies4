@@ -263,19 +263,19 @@ function ValuePropositionsSection() {
               style={{ animationDelay: `${index * 150}ms` }}
             >
               {/* Glow Effect */}
-              <div className={`absolute -inset-1 bg-gradient-to-r ${item.gradient} rounded-2xl blur opacity-0 group-hover:opacity-75 transition duration-150`}></div>
+              <div className={`absolute -inset-1 bg-gradient-to-r ${item.gradient} rounded-2xl blur opacity-0 group-hover:opacity-75 transition duration-500`}></div>
               
               {/* Main Card */}
-              <div className={`relative bg-gradient-to-br ${item.gradient} border border-white/15 transition-all duration-150 group-hover:scale-105 shadow-lg hover:shadow-2xl rounded-2xl p-8 text-center backdrop-blur-sm bg-white/15 h-full flex flex-col`}>
+              <div className={`relative bg-gradient-to-br ${item.gradient} border border-white/15 transition-all duration-500 group-hover:scale-105 shadow-lg hover:shadow-2xl rounded-2xl p-8 text-center backdrop-blur-sm bg-white/15 h-full flex flex-col`}>
                 {/* Icon Container */}
                 <div className="relative mb-6">
-                  <div className={`w-20 h-20 bg-gradient-to-br ${item.gradient} rounded-2xl flex items-center justify-center mx-auto mb-6 text-white shadow-2xl group-hover:scale-110 transition-all duration-150`}>
+                  <div className={`w-20 h-20 bg-gradient-to-br ${item.gradient} rounded-2xl flex items-center justify-center mx-auto mb-6 text-white shadow-2xl group-hover:scale-110 transition-all duration-500`}>
                     {item.icon}
                   </div>
                 </div>
                 
                 {/* Content */}
-                <h3 className="text-xl font-bold text-white mb-4 group-hover:text-cyan-200 transition-colors duration-150">
+                <h3 className="text-xl font-bold text-white mb-4 group-hover:text-cyan-200 transition-colors duration-500">
                   {item.title}
                 </h3>
                 <p className="text-white/90 text-sm leading-relaxed flex-1">
@@ -487,7 +487,7 @@ function FeaturedCoursesSection() {
                 className={`group relative animate-fade-in-up animation-delay-${index * 200}`}
               >
                 {/* Card Glow Effect */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-teal-500 via-emerald-500 to-cyan-500 rounded-2xl blur opacity-0 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
+                <div className="absolute -inset-1 bg-gradient-to-r from-teal-500 via-emerald-500 to-cyan-500 rounded-2xl blur opacity-0 group-hover:opacity-75 transition duration-500"></div>
                 
                 {/* Main Card */}
                 <div className="relative bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden shadow-2xl hover:bg-white/15 transition-all duration-500 group-hover:scale-105 group-hover:-translate-y-3 flex flex-col h-full">
@@ -523,12 +523,12 @@ function FeaturedCoursesSection() {
                   {/* Card Content */}
                   <div className="flex flex-col flex-1 p-6">
                     {/* Title */}
-                    <h3 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-200 transition-colors duration-300 line-clamp-2 min-h-[3.5rem] flex items-start">
+                    <h3 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-200 transition-colors duration-500 line-clamp-2 min-h-[3.5rem] flex items-start">
                       {course.title}
                     </h3>
                     
                     {/* Description */}
-                    <p className="text-gray-200/80 text-sm leading-relaxed mb-4 flex-1 group-hover:text-white/90 transition-colors duration-300">
+                    <p className="text-gray-200/80 text-sm leading-relaxed mb-4 flex-1 group-hover:text-white/90 transition-colors duration-500">
                       {course.short_desc}
                     </p>
 
