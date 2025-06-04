@@ -2053,7 +2053,7 @@ export default function SynergizeAgile() {
           <div className="flex flex-col sm:flex-row gap-3">
             <Button
               onClick={() => {
-                window.open('/contact', '_blank');
+                window.location.href = '/contact';
               }}
               className="flex-1 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-semibold py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
             >
@@ -2062,10 +2062,10 @@ export default function SynergizeAgile() {
             </Button>
             <Button
               onClick={() => {
-                window.open('/contact#plans-pricing', '_blank');
+                window.location.href = '/contact#plans-pricing';
               }}
               variant="outline"
-              className="flex-1 bg-white border-2 border-teal-600 text-teal-600 hover:bg-teal-50 font-semibold py-3 rounded-lg transition-all duration-300"
+              className="flex-1 bg-white border-2 border-teal-600 text-teal-600 hover:bg-teal-50 hover:text-teal-700 font-semibold py-3 rounded-lg transition-all duration-300"
             >
               <Award className="h-5 w-5 mr-2" />
               View Plans
@@ -2086,13 +2086,8 @@ export default function SynergizeAgile() {
           <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-teal-50 to-emerald-50">
             <div className="flex items-center justify-between">
               <div>
-                <div className="flex items-center space-x-2 mb-2">
-                  <div className="w-6 h-6 bg-gradient-to-r from-teal-600 to-emerald-600 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-xs">S4</span>
-                  </div>
-                  <span className="text-base font-bold text-gray-900">Synergies4</span>
-                </div>
-                <h2 className="text-lg font-semibold text-gray-900">AI Assistant</h2>
+                <h2 className="text-lg font-semibold text-gray-900 mb-2">Synergies4</h2>
+                <h3 className="text-base font-medium text-gray-700">AI Assistant</h3>
               </div>
               <Button
                 variant="ghost"
@@ -2290,57 +2285,42 @@ export default function SynergizeAgile() {
       <div className="flex-1 flex flex-col min-h-0 relative">
         {/* Chat Header */}
         <div className="bg-white border-b border-gray-200 p-4">
-          <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
-            {/* Top Row - Logo and Menu */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setSidebarOpen(true)}
-                  className="lg:hidden"
-                >
-                  <Menu className="h-5 w-5" />
-                </Button>
-                
-                {/* Synergies Logo - Link to Home */}
-                <Link 
-                  href="/" 
-                  className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
-                  title="Back to Home"
-                >
-                  <div className="w-8 h-8 bg-gradient-to-r from-teal-600 to-emerald-600 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">S4</span>
-                  </div>
-                  <span className="hidden sm:block text-lg font-bold text-gray-900">Synergies4</span>
-                </Link>
-              </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSidebarOpen(true)}
+                className="lg:hidden"
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
               
-              <Badge className={`${currentProvider.badgeColor} lg:hidden`}>
-                {currentProvider.badge}
-              </Badge>
-            </div>
-
-            {/* Second Row - AI Assistant Info */}
-            <div className="flex items-center justify-between lg:justify-start lg:space-x-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-px h-6 bg-gray-300 hidden lg:block"></div>
-                
-                <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${currentRole.color} flex items-center justify-center text-white`}>
-                  {currentRole.icon}
-                </div>
-                <div>
-                  <h1 className="text-lg font-semibold text-gray-900">
-                    {currentRole.name} Assistant
-                  </h1>
-                  <p className="text-sm text-gray-500">{currentMode.name}</p>
-                </div>
-              </div>
+              {/* Synergies Logo - Link to Home */}
+              <Link 
+                href="/" 
+                className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
+                title="Back to Home"
+              >
+                <span className="text-lg font-bold text-gray-900">Synergies4</span>
+              </Link>
               
-              <Badge className={`${currentProvider.badgeColor} hidden lg:block`}>
-                {currentProvider.badge}
-              </Badge>
+              <div className="w-px h-6 bg-gray-300 hidden sm:block"></div>
+              
+              <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${currentRole.color} flex items-center justify-center text-white`}>
+                {currentRole.icon}
+              </div>
+              <div>
+                <h1 className="text-lg font-semibold text-gray-900">
+                  {currentRole.name} Assistant
+                </h1>
+                <p className="text-sm text-gray-500">{currentMode.name}</p>
+              </div>
             </div>
+            
+            <Badge className={currentProvider.badgeColor}>
+              {currentProvider.badge}
+            </Badge>
           </div>
         </div>
 
@@ -2691,7 +2671,7 @@ Format as a realistic conversation with clear speaker labels and include decisio
 
             <div className="flex-1 relative">
               <Textarea
-                key="main-chat-input"
+                key="full-chat-input"
                 value={inputMessage}
                 onChange={handleInputChange}
                 placeholder={responseCount >= maxResponses ? "Session limit reached - Get in touch for unlimited access!" : (isMobile ? "Ask your AI assistant..." : `Ask your ${currentRole.name} assistant anything...`)}
@@ -2736,7 +2716,7 @@ Format as a realistic conversation with clear speaker labels and include decisio
                 </div>
                 <Button
                   size="sm"
-                  onClick={() => window.open('/contact', '_blank')}
+                  onClick={() => window.location.href = '/contact'}
                   className="bg-teal-600 hover:bg-teal-700 text-white text-xs px-4 py-2"
                 >
                   Get in Touch
@@ -3355,7 +3335,7 @@ Format as a realistic conversation with clear speaker labels and include decisio
                               </div>
                               <Button
                                 size="sm"
-                                onClick={() => window.open('/contact', '_blank')}
+                                onClick={() => window.location.href = '/contact'}
                                 className="bg-teal-600 hover:bg-teal-700 text-white text-xs px-4 py-2"
                               >
                                 Get in Touch
