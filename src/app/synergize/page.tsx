@@ -2785,7 +2785,7 @@ Format as a realistic conversation with clear speaker labels and include decisio
             </div>
 
             <Button
-              onClick={handleSendMessage}
+              onClick={() => handleSendMessage()}
               disabled={isLoading || (!inputMessage.trim() && files.length === 0) || responseCount >= maxResponses}
               className={`flex-shrink-0 min-h-[50px] px-6 bg-gradient-to-r ${currentRole.color} hover:opacity-90 transition-opacity ${responseCount >= maxResponses ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
@@ -3396,9 +3396,9 @@ Format as a realistic conversation with clear speaker labels and include decisio
                           </div>
                           
                           <Button
-                            onClick={handleSendMessage}
+                            onClick={() => handleSendMessage()}
                             disabled={isLoading || (!inputMessage.trim() && files.length === 0) || responseCount >= maxResponses}
-                            className={`flex-shrink-0 min-h-[44px] min-w-[44px] bg-gradient-to-r ${currentRole.color} hover:opacity-90 transition-opacity ${responseCount >= maxResponses ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`flex-shrink-0 min-h-[50px] px-6 bg-gradient-to-r ${currentRole.color} hover:opacity-90 transition-opacity ${responseCount >= maxResponses ? 'opacity-50 cursor-not-allowed' : ''}`}
                             title="Send message"
                           >
                             {isLoading ? (
