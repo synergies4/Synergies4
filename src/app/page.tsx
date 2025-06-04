@@ -84,12 +84,12 @@ export default function HomePage() {
           
           {/* Urgent Quote from Jensen Huang */}
           <div className="mb-8 sm:mb-12">
-            <div className="max-w-4xl mx-auto p-6 sm:p-8 bg-gradient-to-r from-red-50 via-orange-50 to-red-50 border-l-4 border-red-500 rounded-r-xl shadow-lg">
+            <div className="max-w-4xl mx-auto p-6 sm:p-8 bg-gradient-to-r from-slate-50 via-gray-50 to-slate-50 border-l-4 border-slate-600 rounded-r-xl shadow-lg">
               <blockquote className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900 italic mb-4 leading-relaxed">
                 "You're going to lose your job to someone who is using AI."
               </blockquote>
               <cite className="flex items-center justify-center text-gray-700 font-medium">
-                <div className="w-8 h-8 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center mr-3 text-white text-sm font-bold">JH</div>
+                <div className="w-8 h-8 bg-gradient-to-r from-slate-600 to-gray-600 rounded-full flex items-center justify-center mr-3 text-white text-sm font-bold">JH</div>
                 <span className="text-base sm:text-lg">Jensen Huang, CEO of Nvidia</span>
               </cite>
             </div>
@@ -239,9 +239,9 @@ function ValuePropositionsSection() {
               <blockquote className="text-lg md:text-xl font-semibold text-white italic mb-4 leading-relaxed text-center">
                 "Superhuman innovation is about humans and AI working together to achieve outcomes neither could alone."
               </blockquote>
-              <cite className="flex items-center justify-center text-gray-200 font-medium">
+              <cite className="flex items-center justify-center text-white font-medium">
                 <div className="w-8 h-8 bg-gradient-to-r from-cyan-400 to-teal-400 rounded-full flex items-center justify-center mr-3 text-gray-900 text-sm font-bold">CD</div>
-                <span>Chris Duffey, Author and AI Technologist</span>
+                <span className="text-white">Chris Duffey, Author and AI Technologist</span>
               </cite>
             </div>
           </div>
@@ -568,7 +568,7 @@ function FeaturedCoursesSection() {
                         </div>
                         <span className="text-gray-200 font-medium ml-1">{course.rating || '4.8'}</span>
                       </div>
-                      <div className="flex items-center text-gray-300/80">
+                      <div className="flex items-center text-gray-200 group-hover:text-white transition-colors">
                         <Users className="h-4 w-4 mr-1" />
                         <span>{course.students || '1,200'}+</span>
                       </div>
@@ -850,12 +850,14 @@ function CertificationsSection() {
               <Button 
                 size="lg" 
                 variant="outline" 
-                className="border-2 border-gray-600 text-gray-900 hover:bg-gray-100 hover:border-gray-700 shadow-lg hover:shadow-xl transition-all hover:scale-105 bg-white"
+                className="border-2 border-gray-600 text-gray-900 hover:bg-gray-100 hover:border-gray-700 shadow-lg hover:shadow-xl transition-all hover:scale-105 bg-white group"
                 asChild
               >
                 <Link href="/contact">
-                  Talk to an Advisor
-                  <MessageSquare className="h-5 w-5 ml-2" />
+                  <span className="flex items-center justify-center text-gray-900 font-semibold">
+                    <MessageSquare className="h-5 w-5 mr-2" />
+                    Talk to an Advisor
+                  </span>
                 </Link>
               </Button>
             </div>
@@ -1086,8 +1088,8 @@ function CTASection() {
               asChild
             >
               <Link href="/contact">
-                <span className="flex items-center justify-center text-white font-semibold group-hover:text-teal-600">
-                  <MessageSquare className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
+                <span className="flex items-center justify-center text-gray-900 font-semibold">
+                  <MessageSquare className="h-5 w-5 mr-2" />
                   Talk to an Expert
                 </span>
               </Link>
