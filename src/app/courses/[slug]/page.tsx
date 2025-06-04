@@ -426,41 +426,52 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                 {modules.length > 0 && (
                   <div className="animate-fade-in-up animation-delay-200">
                     <h2 className="text-3xl font-bold text-gray-900 mb-6">Course Curriculum</h2>
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                       {modules.map((module, index) => (
-                        <Card key={module.id} className="border-l-4 border-l-blue-500 hover:shadow-lg transition-shadow duration-300">
-                          <CardHeader>
-                            <CardTitle className="flex items-center justify-between">
-                              <span>Module {module.order_num}: {module.title}</span>
-                              {module.duration && (
-                                <Badge variant="outline">
-                                  <Clock className="w-3 h-3 mr-1" />
-                                  {module.duration}
-                                </Badge>
-                              )}
-                            </CardTitle>
-                            <CardDescription>{module.description}</CardDescription>
-                          </CardHeader>
-                          {module.lessons.length > 0 && (
-                            <CardContent>
-                              <div className="space-y-2">
-                                {module.lessons.map((lesson) => (
-                                  <div key={lesson.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200">
-                                    <div className="flex items-center space-x-3">
-                                      <div className={`p-1 rounded ${getContentTypeColor(lesson.content)}`}>
-                                        {getContentTypeIcon(lesson.content)}
-                                      </div>
-                                      <span className="font-medium">{lesson.title}</span>
-                                    </div>
-                                    {lesson.duration && (
-                                      <span className="text-sm text-gray-500">{lesson.duration}</span>
-                                    )}
-                                  </div>
-                                ))}
+                        <div key={module.id} className="relative group">
+                          {/* Glow Effect */}
+                          <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition-opacity"></div>
+                          
+                          {/* Main Module Card */}
+                          <div className="relative bg-gradient-to-br from-blue-50 to-purple-50 border border-blue-200/50 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all group-hover:scale-105">
+                            {/* Module Header */}
+                            <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6">
+                              <div className="flex items-center justify-between">
+                                <h3 className="text-xl font-bold">
+                                  Module {module.order_num}: {module.title}
+                                </h3>
+                                {module.duration && (
+                                  <Badge className="bg-white/20 text-white border-white/30">
+                                    <Clock className="w-3 h-3 mr-1" />
+                                    {module.duration}
+                                  </Badge>
+                                )}
                               </div>
-                            </CardContent>
-                          )}
-                        </Card>
+                              <p className="text-blue-100 mt-2">{module.description}</p>
+                            </div>
+                            
+                            {/* Module Content */}
+                            {module.lessons.length > 0 && (
+                              <div className="p-6 bg-white/70">
+                                <div className="space-y-3">
+                                  {module.lessons.map((lesson) => (
+                                    <div key={lesson.id} className="flex items-center justify-between p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all hover:scale-105 border border-gray-100">
+                                      <div className="flex items-center space-x-3">
+                                        <div className={`p-2 rounded-lg ${getContentTypeColor(lesson.content)}`}>
+                                          {getContentTypeIcon(lesson.content)}
+                                        </div>
+                                        <span className="font-medium text-gray-900">{lesson.title}</span>
+                                      </div>
+                                      {lesson.duration && (
+                                        <span className="text-sm text-gray-500 font-medium">{lesson.duration}</span>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -489,61 +500,90 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
 
               {/* Sidebar - Fixed positioning removed */}
               <div className="space-y-8">
-                {/* Course Stats */}
-                <Card className="animate-fade-in-up animation-delay-400">
-                  <CardHeader>
-                    <CardTitle>Course Details</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Level</span>
-                      <Badge variant="outline">{course.level}</Badge>
-                    </div>
-                    {course.duration && (
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Duration</span>
-                        <span className="font-medium">{course.duration}</span>
+                {/* Course Details */}
+                <div className="animate-fade-in-up animation-delay-400">
+                  <div className="relative group">
+                    {/* Glow Effect */}
+                    <div className="absolute -inset-1 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition-opacity"></div>
+                    
+                    {/* Main Card */}
+                    <div className="relative bg-gradient-to-br from-teal-50 to-emerald-50 border border-teal-200/50 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all group-hover:scale-105">
+                      <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                        <Award className="w-5 h-5 mr-2 text-teal-600" />
+                        Course Details
+                      </h3>
+                      
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center p-3 bg-white/70 rounded-lg">
+                          <span className="text-gray-700 font-medium">Level</span>
+                          <Badge className="bg-gradient-to-r from-teal-600 to-emerald-600 text-white border-0">
+                            {course.level}
+                          </Badge>
+                        </div>
+                        
+                        {course.duration && (
+                          <div className="flex justify-between items-center p-3 bg-white/70 rounded-lg">
+                            <span className="text-gray-700 font-medium">Duration</span>
+                            <span className="font-semibold text-gray-900">{course.duration}</span>
+                          </div>
+                        )}
+                        
+                        <div className="flex justify-between items-center p-3 bg-white/70 rounded-lg">
+                          <span className="text-gray-700 font-medium">Category</span>
+                          <span className="font-semibold text-teal-700">{course.category}</span>
+                        </div>
+                        
+                        <div className="flex justify-between items-center p-3 bg-white/70 rounded-lg">
+                          <span className="text-gray-700 font-medium">Certificate</span>
+                          <CheckCircle className="w-5 h-5 text-emerald-600" />
+                        </div>
+                        
+                        <div className="mt-6 p-4 bg-gradient-to-r from-teal-600 to-emerald-600 rounded-xl text-center">
+                          <div className="text-2xl font-bold text-white mb-3">
+                            {formatPrice(course.price)}
+                          </div>
+                          <div className="space-y-3">
+                            {getEnrollmentButton()}
+                          </div>
+                        </div>
                       </div>
-                    )}
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Category</span>
-                      <span className="font-medium">{course.category}</span>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Certificate</span>
-                      <CheckCircle className="w-5 h-5 text-green-600" />
-                    </div>
-                    <Separator />
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-blue-600 mb-2">
-                        {formatPrice(course.price)}
-                      </div>
-                      {getEnrollmentButton()}
-                    </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
 
                 {/* Course Features */}
-                <Card className="animate-fade-in-up animation-delay-500">
-                  <CardHeader>
-                    <CardTitle>Course Features</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    {[
-                      { icon: <BookOpen className="w-4 h-4" />, text: 'Comprehensive curriculum' },
-                      { icon: <Users className="w-4 h-4" />, text: 'Expert instructors' },
-                      { icon: <Award className="w-4 h-4" />, text: 'Industry certification' },
-                      { icon: <Clock className="w-4 h-4" />, text: 'Flexible scheduling' },
-                      { icon: <Globe className="w-4 h-4" />, text: 'Online access' },
-                      { icon: <MessageSquare className="w-4 h-4" />, text: 'Community support' }
-                    ].map((feature, index) => (
-                      <div key={index} className="flex items-center space-x-3">
-                        <div className="text-blue-600">{feature.icon}</div>
-                        <span className="text-gray-700">{feature.text}</span>
+                <div className="animate-fade-in-up animation-delay-500">
+                  <div className="relative group">
+                    {/* Glow Effect */}
+                    <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition-opacity"></div>
+                    
+                    {/* Main Card */}
+                    <div className="relative bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200/50 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all group-hover:scale-105">
+                      <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                        <Star className="w-5 h-5 mr-2 text-blue-600" />
+                        Course Features
+                      </h3>
+                      
+                      <div className="space-y-3">
+                        {[
+                          { icon: <BookOpen className="w-4 h-4" />, text: 'Comprehensive curriculum', color: 'text-blue-600' },
+                          { icon: <Users className="w-4 h-4" />, text: 'Expert instructors', color: 'text-emerald-600' },
+                          { icon: <Award className="w-4 h-4" />, text: 'Industry certification', color: 'text-teal-600' },
+                          { icon: <Clock className="w-4 h-4" />, text: 'Flexible scheduling', color: 'text-cyan-600' },
+                          { icon: <Globe className="w-4 h-4" />, text: 'Online access', color: 'text-blue-600' },
+                          { icon: <MessageSquare className="w-4 h-4" />, text: 'Community support', color: 'text-emerald-600' }
+                        ].map((feature, index) => (
+                          <div key={index} className="flex items-center space-x-3 p-3 bg-white/70 rounded-lg hover:bg-white/90 transition-all">
+                            <div className={`${feature.color} p-1 bg-white rounded-lg shadow-sm`}>
+                              {feature.icon}
+                            </div>
+                            <span className="text-gray-700 font-medium">{feature.text}</span>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </CardContent>
-                </Card>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
