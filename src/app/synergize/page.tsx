@@ -1816,11 +1816,6 @@ export default function SynergizeAgile() {
     setInputMessage(e.target.value);
   }, []);
 
-  // Prevent re-renders that cause focus loss
-  const stableRoleData = useMemo(() => currentRole, [selectedRole]);
-  const stableModeData = useMemo(() => currentMode, [selectedMode]);
-  const stableProviderData = useMemo(() => currentProvider, [selectedProvider]);
-
   const currentRole = AGILE_ROLES[selectedRole as keyof typeof AGILE_ROLES];
   const currentMode = INTERACTION_MODES[selectedMode as keyof typeof INTERACTION_MODES];
   const currentProvider = AI_PROVIDERS[selectedProvider];
@@ -2289,7 +2284,7 @@ export default function SynergizeAgile() {
       )}
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col min-h-0 relative">
+      <div className={`flex-1 flex flex-col min-h-0 relative ${isMobile ? 'pb-20' : ''}`}>
         {/* Chat Header */}
         <div className="bg-white border-b border-gray-200 p-4">
           <div className="flex items-center justify-between">
@@ -2329,7 +2324,7 @@ export default function SynergizeAgile() {
             WebkitOverflowScrolling: 'touch',
             scrollBehavior: 'smooth',
             touchAction: 'pan-y',
-            paddingBottom: isMobile ? '120px' : '20px' // Extra padding on mobile for input area
+            paddingBottom: isMobile ? '140px' : '20px' // Extra padding on mobile for fixed input area
           }}
         >
           {messages.length === 0 && (
@@ -2418,7 +2413,7 @@ export default function SynergizeAgile() {
 
         {/* Mobile Scroll Indicator */}
         {isMobile && showScrollIndicator && (
-          <div className="absolute bottom-32 right-4 z-50">
+          <div className="fixed bottom-24 right-4 z-40">
             <button
               type="button" 
               className="bg-teal-600 text-white p-3 rounded-full shadow-lg animate-bounce cursor-pointer hover:bg-teal-700 transition-colors touch-manipulation"
@@ -2440,7 +2435,7 @@ export default function SynergizeAgile() {
         )}
 
         {/* Input Area */}
-        <div className="bg-white border-t border-gray-200 p-4">
+        <div className={`bg-white border-t border-gray-200 p-4 ${isMobile ? 'fixed bottom-0 left-0 right-0 z-50 shadow-lg' : ''}`}>
           {files.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-4">
               {files.map((file, index) => (
