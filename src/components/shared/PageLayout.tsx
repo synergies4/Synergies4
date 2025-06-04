@@ -32,6 +32,7 @@ import GlobalSearch from '@/components/shared/GlobalSearch';
 // Scroll to top component
 function ScrollToTop() {
   const [isVisible, setIsVisible] = useState(false);
+  const [isDarkBackground, setIsDarkBackground] = useState(false);
 
   useEffect(() => {
     const toggleVisibility = () => {
@@ -39,6 +40,30 @@ function ScrollToTop() {
         setIsVisible(true);
       } else {
         setIsVisible(false);
+      }
+      
+      // Check background color dynamically
+      const viewportHeight = window.innerHeight;
+      const scrollY = window.pageYOffset;
+      const elementBehind = document.elementFromPoint(
+        window.innerWidth - 100, // Bottom right area
+        viewportHeight - 100
+      );
+      
+      if (elementBehind) {
+        const computedStyle = window.getComputedStyle(elementBehind);
+        const bgColor = computedStyle.backgroundColor;
+        const bgImage = computedStyle.backgroundImage;
+        
+        // Check if element has dark background
+        const isDark = bgColor.includes('rgb(') && (
+          bgColor.includes('slate') || 
+          bgColor.includes('gray-9') ||
+          bgColor.includes('black') ||
+          bgImage.includes('gradient') && bgImage.includes('slate')
+        );
+        
+        setIsDarkBackground(isDark);
       }
     };
 
@@ -58,9 +83,31 @@ function ScrollToTop() {
   return (
     <button
       onClick={scrollToTop}
-      className="fixed bottom-8 right-8 z-50 bg-teal-600 hover:bg-teal-700 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
+      className={`fixed bottom-6 right-6 z-50 p-3 rounded-full shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-110 group backdrop-blur-sm border-2 ${
+        isDarkBackground 
+          ? 'bg-white/90 hover:bg-white text-gray-900 border-white/30 shadow-white/20' 
+          : 'bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white border-teal-500/30 shadow-teal-500/20'
+      }`}
+      style={{ 
+        minHeight: '48px', 
+        minWidth: '48px',
+        // Dynamic background based on page content
+        background: isDarkBackground 
+          ? 'rgba(255, 255, 255, 0.95)' 
+          : 'linear-gradient(135deg, #0d9488 0%, #10b981 100%)'
+      }}
+      title="Scroll to top"
     >
-      <ChevronUp className="h-6 w-6" />
+      <ChevronUp className={`h-6 w-6 transition-transform duration-300 group-hover:scale-110 ${
+        isDarkBackground ? 'text-gray-900' : 'text-white'
+      }`} />
+      
+      {/* Glow effect */}
+      <div className={`absolute -inset-1 rounded-full blur opacity-0 group-hover:opacity-30 transition-opacity duration-300 ${
+        isDarkBackground 
+          ? 'bg-white' 
+          : 'bg-gradient-to-r from-teal-400 to-emerald-400'
+      }`} />
     </button>
   );
 }
@@ -69,14 +116,15 @@ function ScrollToTop() {
 interface NavigationProps {
   isSearchOpen: boolean;
   setIsSearchOpen: (open: boolean) => void;
+  headerVisible: boolean;
+  lastScrollY: number;
 }
 
-function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
-  const { user, signOut, userProfile } = useAuth();
+function Navigation({ isSearchOpen, setIsSearchOpen, headerVisible, lastScrollY }: NavigationProps) {
+  const { user, userProfile, signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [headerHeight, setHeaderHeight] = useState(140);
+  const [headerHeight, setHeaderHeight] = useState(0);
 
-  // Close mobile menu on escape key and calculate dynamic header height
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && mobileMenuOpen) {
@@ -125,9 +173,15 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
   ];
 
   return (
-    <>
+    <div className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      headerVisible 
+        ? 'translate-y-0 opacity-100' 
+        : '-translate-y-full opacity-0'
+    }`}>
       {/* AI Assistant Promotion Banner - Fixed Mobile Layout */}
-      <div className="bg-gradient-to-r from-teal-600 to-emerald-600 text-white py-3 px-4" role="banner">
+      <div className={`bg-gradient-to-r from-teal-600 to-emerald-600 text-white py-3 px-4 transition-all duration-300 ${
+        lastScrollY > 50 ? 'opacity-95' : 'opacity-100'
+      }`} role="banner">
         <div className="container mx-auto">
           <Link href="/synergize" className="block hover:opacity-90 transition-opacity">
             <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-center cursor-pointer">
@@ -145,7 +199,11 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
       </div>
 
       {/* Navigation */}
-      <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b shadow-sm" role="navigation" aria-label="Main navigation">
+      <nav className={`z-50 transition-all duration-300 ${
+        lastScrollY > 50 
+          ? 'bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-200/50' 
+          : 'bg-white border-b border-gray-200'
+      }`} role="navigation" aria-label="Main navigation">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
@@ -380,7 +438,7 @@ function Navigation({ isSearchOpen, setIsSearchOpen }: NavigationProps) {
           )}
         </div>
       </nav>
-    </>
+    </div>
   );
 }
 
@@ -483,10 +541,31 @@ export default function PageLayout({ children, showStats = false }: PageLayoutPr
   const { user, userProfile, signOut } = useAuth();
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [headerVisible, setHeaderVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
 
   useEffect(() => {
     const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 300);
+      const currentScrollY = window.scrollY;
+      
+      // Show/hide scroll to top button
+      setShowScrollTop(currentScrollY > 300);
+      
+      // Header hide/show logic
+      if (currentScrollY > 100) { // Start hiding after 100px
+        if (currentScrollY > lastScrollY && currentScrollY > 200) {
+          // Scrolling down - hide header
+          setHeaderVisible(false);
+        } else {
+          // Scrolling up - show header
+          setHeaderVisible(true);
+        }
+      } else {
+        // Always show header when near top
+        setHeaderVisible(true);
+      }
+      
+      setLastScrollY(currentScrollY);
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -508,7 +587,7 @@ export default function PageLayout({ children, showStats = false }: PageLayoutPr
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [lastScrollY]);
 
   // Add smooth scroll behavior
   useEffect(() => {
@@ -531,10 +610,11 @@ export default function PageLayout({ children, showStats = false }: PageLayoutPr
       </div>
       
       <div id="navigation">
-        <Navigation isSearchOpen={isSearchOpen} setIsSearchOpen={setIsSearchOpen} />
+        <Navigation isSearchOpen={isSearchOpen} setIsSearchOpen={setIsSearchOpen} headerVisible={headerVisible} lastScrollY={lastScrollY} />
       </div>
       
-      <main id="main-content" role="main" className="min-h-screen">
+      {/* Add padding-top to account for fixed header */}
+      <main id="main-content" role="main" className="min-h-screen pt-[140px]">
         {children}
       </main>
       

@@ -2085,7 +2085,15 @@ export default function SynergizeAgile() {
           {/* Sidebar Header */}
           <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-teal-50 to-emerald-50">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">AI Assistant</h2>
+              <div>
+                <div className="flex items-center space-x-2 mb-2">
+                  <div className="w-6 h-6 bg-gradient-to-r from-teal-600 to-emerald-600 rounded-lg flex items-center justify-center">
+                    <span className="text-white font-bold text-xs">S4</span>
+                  </div>
+                  <span className="text-base font-bold text-gray-900">Synergies4</span>
+                </div>
+                <h2 className="text-lg font-semibold text-gray-900">AI Assistant</h2>
+              </div>
               <Button
                 variant="ghost"
                 size="sm"
@@ -2861,506 +2869,505 @@ Format as a realistic conversation with clear speaker labels and include decisio
       <section id="agile-assistant" className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
-            {/* Header with Logo */}
+            {/* Header */}
             <div className="text-center mb-8">
-              <div className="flex items-center justify-center mb-6">
-                <div className="w-12 h-12 bg-gradient-to-r from-teal-600 to-emerald-600 rounded-xl flex items-center justify-center mr-4">
-                  <span className="text-white font-bold text-lg">S4</span>
-                </div>
-                <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
-                  AI Assistant
-                </h2>
-              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+                AI Assistant
+              </h2>
               <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
                 Get instant answers to your Agile questions with personalized, role-specific guidance
               </p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-              {/* Left Side - Configuration Controls */}
-              <div className="lg:col-span-1">
-                <Card className="h-fit bg-gradient-to-br from-teal-50 to-emerald-50 border-0 shadow-lg">
-                  <CardHeader>
-                    <CardTitle className="text-lg text-center">Training Setup</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="relative">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Select Your Agile Role
-                      </label>
-                      <div className="relative">
-                        {/* Mobile: Use native select */}
-                        <div className="block md:hidden relative">
-                          <select
-                            value={selectedRole}
-                            onChange={(e) => handleRoleChange(e.target.value)}
-                            className="w-full min-h-[44px] text-base px-4 py-3 bg-teal-600 border border-teal-500 text-white rounded-lg focus:ring-2 focus:ring-teal-400 focus:border-teal-400 appearance-none pr-10"
-                          >
-                            {Object.entries(AGILE_ROLES).map(([key, role]) => (
-                              <option key={key} value={key} className="bg-teal-600 text-white">
-                                {role.name}
-                              </option>
-                            ))}
-                          </select>
-                          <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
-                          </div>
-                        </div>
-                        
-                        {/* Desktop: Use Radix UI Select */}
-                        <div className="hidden md:block">
-                          <Select value={selectedRole} onValueChange={handleRoleChange}>
-                            <SelectTrigger className="w-full focus:ring-2 focus:ring-teal-500 focus:border-transparent touch-manipulation min-h-[44px] text-base text-gray-900 bg-white border-gray-300">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent 
-                              className="z-[50] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
-                              position="popper"
-                              sideOffset={4}
-                              align="start"
-                              onCloseAutoFocus={(e) => e.preventDefault()}
-                              onEscapeKeyDown={(e) => e.preventDefault()}
-                            >
-                              <div className="max-h-[250px] overflow-y-auto">
-                                {Object.entries(AGILE_ROLES).map(([key, role]) => (
-                                  <SelectItem 
-                                    key={key} 
-                                    value={key} 
-                                    className="focus:bg-teal-50 cursor-pointer min-h-[44px] px-4 py-3 data-[highlighted]:bg-teal-50 data-[state=checked]:bg-teal-100 text-gray-900"
-                                  >
-                                    <div className="flex items-center w-full">
-                                      <span className="flex-shrink-0">{role.icon}</span>
-                                      <span className="ml-2 flex-1 text-left">{role.name}</span>
-                                    </div>
-                                  </SelectItem>
-                                ))}
-                              </div>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                      <p className="text-sm text-gray-600 mt-1">{currentRole.description}</p>
-                    </div>
-
-                    <div className="relative">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Choose Interaction Mode
-                      </label>
-                      <div className="relative">
-                        {/* Mobile: Use native select */}
-                        <div className="block md:hidden relative">
-                          <select
-                            value={selectedMode}
-                            onChange={(e) => handleModeChange(e.target.value)}
-                            className="w-full min-h-[44px] text-base px-4 py-3 bg-emerald-600 border border-emerald-500 text-white rounded-lg focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 appearance-none pr-10"
-                          >
-                            {Object.entries(INTERACTION_MODES).map(([key, mode]) => (
-                              <option key={key} value={key} className="bg-emerald-600 text-white">
-                                {mode.name}
-                              </option>
-                            ))}
-                          </select>
-                          <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
-                          </div>
-                        </div>
-                        
-                        {/* Desktop: Use Radix UI Select */}
-                        <div className="hidden md:block">
-                          <Select value={selectedMode} onValueChange={handleModeChange}>
-                            <SelectTrigger className="w-full focus:ring-2 focus:ring-teal-500 focus:border-transparent touch-manipulation min-h-[44px] text-base text-gray-900 bg-white border-gray-300">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent 
-                              className="z-[50] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
-                              position="popper"
-                              sideOffset={4}
-                              align="start"
-                              onCloseAutoFocus={(e) => e.preventDefault()}
-                              onEscapeKeyDown={(e) => e.preventDefault()}
-                            >
-                              <div className="max-h-[250px] overflow-y-auto">
-                                {Object.entries(INTERACTION_MODES).map(([key, mode]) => (
-                                  <SelectItem 
-                                    key={key} 
-                                    value={key} 
-                                    className="focus:bg-teal-50 cursor-pointer min-h-[44px] px-4 py-3 data-[highlighted]:bg-teal-50 data-[state=checked]:bg-teal-100 text-gray-900"
-                                  >
-                                    <div className="flex items-center w-full">
-                                      <span className="flex-shrink-0">{mode.icon}</span>
-                                      <span className="ml-2 flex-1 text-left">{mode.name}</span>
-                                    </div>
-                                  </SelectItem>
-                                ))}
-                              </div>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                      <p className="text-sm text-gray-600 mt-1">{currentMode.description}</p>
-                    </div>
-
-                    <div className="relative">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Select AI Provider
-                      </label>
-                      <div className="relative">
-                        {/* Mobile: Use native select */}
-                        <div className="block md:hidden relative">
-                          <select
-                            value={selectedProvider}
-                            onChange={(e) => handleProviderChange(e.target.value)}
-                            className="w-full min-h-[44px] text-base px-4 py-3 bg-teal-600 border border-teal-500 text-white rounded-lg focus:ring-2 focus:ring-teal-400 focus:border-teal-400 appearance-none pr-10"
-                          >
-                            {Object.entries(AI_PROVIDERS).map(([key, provider]) => (
-                              <option key={key} value={key} className="bg-teal-600 text-white">
-                                {provider.name} ({provider.badge})
-                              </option>
-                            ))}
-                          </select>
-                          <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
-                          </div>
-                        </div>
-                        
-                        {/* Desktop: Use Radix UI Select */}
-                        <div className="hidden md:block">
-                          <Select value={selectedProvider} onValueChange={handleProviderChange}>
-                            <SelectTrigger className="w-full focus:ring-2 focus:ring-teal-500 focus:border-transparent touch-manipulation min-h-[44px] text-base text-gray-900 bg-white border-gray-300">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent 
-                              className="z-[50] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
-                              position="popper"
-                              sideOffset={4}
-                              align="start"
-                              onCloseAutoFocus={(e) => e.preventDefault()}
-                              onEscapeKeyDown={(e) => e.preventDefault()}
-                            >
-                              <div className="max-h-[250px] overflow-y-auto">
-                                {Object.entries(AI_PROVIDERS).map(([key, provider]) => (
-                                  <SelectItem 
-                                    key={key} 
-                                    value={key} 
-                                    className="focus:bg-teal-50 cursor-pointer min-h-[44px] px-4 py-3 data-[highlighted]:bg-teal-50 data-[state=checked]:bg-teal-100 text-gray-900"
-                                  >
-                                    <div className="flex items-center w-full">
-                                      <span className="flex-shrink-0">{provider.icon}</span>
-                                      <span className="ml-2 flex-1 text-left">{provider.name}</span>
-                                      <span className="ml-1 text-xs text-gray-500 flex-shrink-0">({provider.badge})</span>
-                                    </div>
-                                  </SelectItem>
-                                ))}
-                              </div>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                      <p className="text-sm text-gray-600 mt-1">Powered by {currentProvider.badge}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Chat Interface */}
-                <Card className="h-[600px] flex flex-col border-0 shadow-xl overflow-hidden relative">
-                  <CardHeader className={`bg-gradient-to-r ${currentRole.color} text-white rounded-t-lg flex-shrink-0`}>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        {currentRole.icon}
-                        <div>
-                          <CardTitle className="text-lg">{currentRole.name} Assistant</CardTitle>
-                          <p className="text-sm opacity-90">{currentMode.name}</p>
-                        </div>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={clearChat}
-                        className="text-white hover:bg-white/20"
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Role Selection */}
+              <Card className="bg-gradient-to-br from-teal-50 to-emerald-50 border-0 shadow-lg">
+                <CardHeader>
+                  <CardTitle className="text-center">Select Your Agile Role</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {/* Mobile: Use native select */}
+                    <div className="block md:hidden relative">
+                      <select
+                        value={selectedRole}
+                        onChange={(e) => handleRoleChange(e.target.value)}
+                        className="w-full min-h-[44px] text-base px-4 py-3 bg-teal-600 border border-teal-500 text-white rounded-lg focus:ring-2 focus:ring-teal-400 focus:border-teal-400 appearance-none pr-10"
                       >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                        {Object.entries(AGILE_ROLES).map(([key, role]) => (
+                          <option key={key} value={key} className="bg-teal-600 text-white">
+                            {role.name}
+                          </option>
+                        ))}
+                      </select>
+                      <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
+                        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
                     </div>
-                  </CardHeader>
-
-                  <CardContent className="flex-1 flex flex-col p-0 min-h-0 overflow-hidden">
-                    {/* Messages */}
-                    <div 
-                      className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 min-h-0 overscroll-contain touch-pan-y"
-                      data-chat-container="true"
-                      style={{
-                        WebkitOverflowScrolling: 'touch',
-                        scrollBehavior: 'smooth',
-                        touchAction: 'pan-y'
-                      }}
-                    >
-                      {messages.length === 0 && (
-                        <div className="flex items-center justify-center h-full">
-                          <div className="text-center">
-                            <div className={`w-16 h-16 bg-gradient-to-r ${currentRole.color} rounded-full flex items-center justify-center mx-auto mb-4`}>
-                              <Bot className="h-8 w-8 text-white" />
-                            </div>
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                              {currentRole.name} Assistant
-                            </h3>
-                            <p className="text-gray-600 max-w-sm">
-                              Ready to help with {currentMode.description.toLowerCase()}. Start by typing your question below.
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                      
-                      {messages.map((message) => (
-                        <div
-                          key={message.id}
-                          className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                    
+                    {/* Desktop: Use Radix UI Select */}
+                    <div className="hidden md:block">
+                      <Select value={selectedRole} onValueChange={handleRoleChange}>
+                        <SelectTrigger className="w-full focus:ring-2 focus:ring-teal-500 focus:border-transparent touch-manipulation min-h-[44px] text-base text-gray-900 bg-white border-gray-300">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent 
+                          className="z-[50] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
+                          position="popper"
+                          sideOffset={4}
+                          align="start"
+                          onCloseAutoFocus={(e) => e.preventDefault()}
+                          onEscapeKeyDown={(e) => e.preventDefault()}
                         >
-                          <div
-                            className={`max-w-[80%] rounded-lg p-4 break-words ${
-                              message.type === 'user'
-                                ? 'bg-teal-600 text-white'
-                                : 'bg-white border shadow-sm'
-                            }`}
-                          >
-                            <div className="flex items-start space-x-3">
-                              {message.type === 'ai' && (
-                                <div className={`w-6 h-6 rounded-full bg-gradient-to-r ${currentRole.color} flex items-center justify-center flex-shrink-0 mt-1`}>
-                                  <Bot className="h-3 w-3 text-white" />
+                          <div className="max-h-[250px] overflow-y-auto">
+                            {Object.entries(AGILE_ROLES).map(([key, role]) => (
+                              <SelectItem 
+                                key={key} 
+                                value={key} 
+                                className="focus:bg-teal-50 cursor-pointer min-h-[44px] px-4 py-3 data-[highlighted]:bg-teal-50 data-[state=checked]:bg-teal-100 text-gray-900"
+                              >
+                                <div className="flex items-center w-full">
+                                  <span className="flex-shrink-0">{role.icon}</span>
+                                  <span className="ml-2 flex-1 text-left">{role.name}</span>
                                 </div>
-                              )}
-                              <div className="flex-1 min-w-0">
-                                {/* Check if message contains presentation JSON */}
-                                {message.type === 'ai' && (message.content.includes('"slides"') || message.content.includes('"title"')) ? (
-                                  <div className="space-y-4">
-                                    <p className="text-sm text-green-600 font-medium">
-                                      ✅ Presentation generated successfully!
-                                    </p>
-                                    <PresentationDisplay messageContent={message.content} />
-                                  </div>
-                                ) : message.type === 'ai' && message.content.includes("You've reached your session limit") ? (
-                                  <SessionLimitDisplay messageContent={message.content} />
-                                ) : (
-                                  <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
-                                    {message.content}
-                                  </p>
-                                )}
-                                <div className="flex items-center justify-between mt-3">
-                                  <div className="flex items-center space-x-2">
-                                    <span className={`text-xs ${message.type === 'user' ? 'text-teal-100' : 'text-gray-500'}`}>
-                                      {message.timestamp.toLocaleTimeString()}
-                                    </span>
-                                    {message.type === 'ai' && message.provider && (
-                                      <Badge className={AI_PROVIDERS[message.provider].badgeColor}>
-                                        {AI_PROVIDERS[message.provider].badge}
-                                      </Badge>
-                                    )}
-                                  </div>
-                                  {message.type === 'ai' && (
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => copyMessage(message.content)}
-                                      className="h-6 w-6 p-0 hover:bg-gray-100 flex-shrink-0"
-                                    >
-                                      <Copy className="h-3 w-3" />
-                                    </Button>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
+                              </SelectItem>
+                            ))}
                           </div>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <p className="text-sm text-gray-600">{currentRole.description}</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Mode Selection */}
+              <Card className="bg-gradient-to-br from-emerald-50 to-teal-50 border-0 shadow-lg">
+                <CardHeader>
+                  <CardTitle className="text-center">Choose Interaction Mode</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {/* Mobile: Use native select */}
+                    <div className="block md:hidden relative">
+                      <select
+                        value={selectedMode}
+                        onChange={(e) => handleModeChange(e.target.value)}
+                        className="w-full min-h-[44px] text-base px-4 py-3 bg-emerald-600 border border-emerald-500 text-white rounded-lg focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 appearance-none pr-10"
+                      >
+                        {Object.entries(INTERACTION_MODES).map(([key, mode]) => (
+                          <option key={key} value={key} className="bg-emerald-600 text-white">
+                            {mode.name}
+                          </option>
+                        ))}
+                      </select>
+                      <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
+                        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </div>
+                    
+                    {/* Desktop: Use Radix UI Select */}
+                    <div className="hidden md:block">
+                      <Select value={selectedMode} onValueChange={handleModeChange}>
+                        <SelectTrigger className="w-full focus:ring-2 focus:ring-teal-500 focus:border-transparent touch-manipulation min-h-[44px] text-base text-gray-900 bg-white border-gray-300">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent 
+                          className="z-[50] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
+                          position="popper"
+                          sideOffset={4}
+                          align="start"
+                          onCloseAutoFocus={(e) => e.preventDefault()}
+                          onEscapeKeyDown={(e) => e.preventDefault()}
+                        >
+                          <div className="max-h-[250px] overflow-y-auto">
+                            {Object.entries(INTERACTION_MODES).map(([key, mode]) => (
+                              <SelectItem 
+                                key={key} 
+                                value={key} 
+                                className="focus:bg-teal-50 cursor-pointer min-h-[44px] px-4 py-3 data-[highlighted]:bg-teal-50 data-[state=checked]:bg-teal-100 text-gray-900"
+                              >
+                                <div className="flex items-center w-full">
+                                  <span className="flex-shrink-0">{mode.icon}</span>
+                                  <span className="ml-2 flex-1 text-left">{mode.name}</span>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </div>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <p className="text-sm text-gray-600">{currentMode.description}</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* AI Provider Selection */}
+              <Card className="bg-gradient-to-br from-slate-50 to-gray-100 border-0 shadow-lg">
+                <CardHeader>
+                  <CardTitle className="text-center">Select AI Provider</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {/* Mobile: Use native select */}
+                    <div className="block md:hidden relative">
+                      <select
+                        value={selectedProvider}
+                        onChange={(e) => handleProviderChange(e.target.value)}
+                        className="w-full min-h-[44px] text-base px-4 py-3 bg-teal-600 border border-teal-500 text-white rounded-lg focus:ring-2 focus:ring-teal-400 focus:border-teal-400 appearance-none pr-10"
+                      >
+                        {Object.entries(AI_PROVIDERS).map(([key, provider]) => (
+                          <option key={key} value={key} className="bg-teal-600 text-white">
+                            {provider.name} ({provider.badge})
+                          </option>
+                        ))}
+                      </select>
+                      <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
+                        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </div>
+                    
+                    {/* Desktop: Use Radix UI Select */}
+                    <div className="hidden md:block">
+                      <Select value={selectedProvider} onValueChange={handleProviderChange}>
+                        <SelectTrigger className="w-full focus:ring-2 focus:ring-teal-500 focus:border-transparent touch-manipulation min-h-[44px] text-base text-gray-900 bg-white border-gray-300">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent 
+                          className="z-[50] max-h-[300px] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg"
+                          position="popper"
+                          sideOffset={4}
+                          align="start"
+                          onCloseAutoFocus={(e) => e.preventDefault()}
+                          onEscapeKeyDown={(e) => e.preventDefault()}
+                        >
+                          <div className="max-h-[250px] overflow-y-auto">
+                            {Object.entries(AI_PROVIDERS).map(([key, provider]) => (
+                              <SelectItem 
+                                key={key} 
+                                value={key} 
+                                className="focus:bg-teal-50 cursor-pointer min-h-[44px] px-4 py-3 data-[highlighted]:bg-teal-50 data-[state=checked]:bg-teal-100 text-gray-900"
+                              >
+                                <div className="flex items-center w-full">
+                                  <span className="flex-shrink-0">{provider.icon}</span>
+                                  <span className="ml-2 flex-1 text-left">{provider.name}</span>
+                                  <span className="ml-1 text-xs text-gray-500 flex-shrink-0">({provider.badge})</span>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </div>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <p className="text-sm text-gray-600">Powered by {currentProvider.badge}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Chat Interface */}
+            <div className="mt-8">
+              <Card className="h-[600px] flex flex-col border-0 shadow-xl overflow-hidden relative">
+                <CardHeader className={`bg-gradient-to-r ${currentRole.color} text-white rounded-t-lg flex-shrink-0`}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      {currentRole.icon}
+                      <div>
+                        <CardTitle className="text-lg">{currentRole.name} Assistant</CardTitle>
+                        <p className="text-sm opacity-90">{currentMode.name}</p>
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={clearChat}
+                      className="text-white hover:bg-white/20"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardHeader>
+
+                <CardContent className="flex-1 flex flex-col p-0 min-h-0 overflow-hidden">
+                  {/* Messages */}
+                  <div 
+                    className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 min-h-0 overscroll-contain touch-pan-y"
+                    data-chat-container="true"
+                    style={{
+                      WebkitOverflowScrolling: 'touch',
+                      scrollBehavior: 'smooth',
+                      touchAction: 'pan-y'
+                    }}
+                  >
+                    {messages.length === 0 && (
+                      <div className="flex items-center justify-center h-full">
+                        <div className="text-center">
+                          <div className={`w-16 h-16 bg-gradient-to-r ${currentRole.color} rounded-full flex items-center justify-center mx-auto mb-4`}>
+                            <Bot className="h-8 w-8 text-white" />
+                          </div>
+                          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                            {currentRole.name} Assistant
+                          </h3>
+                          <p className="text-gray-600 max-w-sm">
+                            Ready to help with {currentMode.description.toLowerCase()}. Start by typing your question below.
+                          </p>
                         </div>
-                      ))}
-                      
-                      {isLoading && (
-                        <div className="flex justify-start">
-                          <div className="bg-white border shadow-sm rounded-lg p-4 max-w-[80%]">
-                            <div className="flex items-center space-x-2">
-                              <div className={`w-6 h-6 rounded-full bg-gradient-to-r ${currentRole.color} flex items-center justify-center`}>
+                      </div>
+                    )}
+                    
+                    {messages.map((message) => (
+                      <div
+                        key={message.id}
+                        className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                      >
+                        <div
+                          className={`max-w-[80%] rounded-lg p-4 break-words ${
+                            message.type === 'user'
+                              ? 'bg-teal-600 text-white'
+                              : 'bg-white border shadow-sm'
+                          }`}
+                        >
+                          <div className="flex items-start space-x-3">
+                            {message.type === 'ai' && (
+                              <div className={`w-6 h-6 rounded-full bg-gradient-to-r ${currentRole.color} flex items-center justify-center flex-shrink-0 mt-1`}>
                                 <Bot className="h-3 w-3 text-white" />
                               </div>
-                              <div className="flex space-x-1">
-                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                      <div ref={messagesEndRef} />
-                    </div>
-
-                    {/* Specialized Mode Interface */}
-                    <div className="border-t bg-white p-4 flex-shrink-0 max-h-[300px] overflow-y-auto relative">
-                      {selectedMode === 'presentation' && (
-                        <PresentationGenerator
-                          currentRole={currentRole}
-                          inputMessage={inputMessage}
-                          setInputMessage={setInputMessage}
-                          handleSendMessage={handleSendMessage}
-                          isLoading={isLoading}
-                          messages={messages}
-                          copyMessage={copyMessage}
-                          selectedProvider={selectedProvider}
-                        />
-                      )}
-                      
-                      {selectedMode === 'scenario' && (
-                        <ScenarioSimulator
-                          currentRole={currentRole}
-                          inputMessage={inputMessage}
-                          setInputMessage={setInputMessage}
-                          handleSendMessage={handleSendMessage}
-                          isLoading={isLoading}
-                          messages={messages}
-                          copyMessage={copyMessage}
-                          selectedProvider={selectedProvider}
-                        />
-                      )}
-                      
-                      {selectedMode === 'advisor' && (
-                        <RoleBasedAdvisor
-                          currentRole={currentRole}
-                          inputMessage={inputMessage}
-                          setInputMessage={setInputMessage}
-                          handleSendMessage={handleSendMessage}
-                          isLoading={isLoading}
-                          messages={messages}
-                          copyMessage={copyMessage}
-                          selectedProvider={selectedProvider}
-                        />
-                      )}
-                      
-                      {selectedMode === 'chat' && (
-                        <div className="space-y-4">
-                          {/* File Upload Area for Chat Mode */}
-                          {files.length > 0 && (
-                            <div className="flex flex-wrap gap-2">
-                              {files.map((file, index) => (
-                                <div key={index} className="flex items-center bg-gray-100 rounded-lg p-2 border">
-                                  <FileText className="h-4 w-4 text-gray-500 mr-2" />
-                                  <span className="text-sm text-gray-700 truncate max-w-[150px]">
-                                    {file.name}
+                            )}
+                            <div className="flex-1 min-w-0">
+                              {/* Check if message contains presentation JSON */}
+                              {message.type === 'ai' && (message.content.includes('"slides"') || message.content.includes('"title"')) ? (
+                                <div className="space-y-4">
+                                  <p className="text-sm text-green-600 font-medium">
+                                    ✅ Presentation generated successfully!
+                                  </p>
+                                  <PresentationDisplay messageContent={message.content} />
+                                </div>
+                              ) : message.type === 'ai' && message.content.includes("You've reached your session limit") ? (
+                                <SessionLimitDisplay messageContent={message.content} />
+                              ) : (
+                                <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+                                  {message.content}
+                                </p>
+                              )}
+                              <div className="flex items-center justify-between mt-3">
+                                <div className="flex items-center space-x-2">
+                                  <span className={`text-xs ${message.type === 'user' ? 'text-teal-100' : 'text-gray-500'}`}>
+                                    {message.timestamp.toLocaleTimeString()}
                                   </span>
+                                  {message.type === 'ai' && message.provider && (
+                                    <Badge className={AI_PROVIDERS[message.provider].badgeColor}>
+                                      {AI_PROVIDERS[message.provider].badge}
+                                    </Badge>
+                                  )}
+                                </div>
+                                {message.type === 'ai' && (
                                   <Button
                                     variant="ghost"
                                     size="sm"
-                                    onClick={() => removeFile(index)}
-                                    className="h-6 w-6 p-0 ml-2 hover:bg-gray-100"
+                                    onClick={() => copyMessage(message.content)}
+                                    className="h-6 w-6 p-0 hover:bg-gray-100 flex-shrink-0"
                                   >
-                                    <Trash2 className="h-3 w-3" />
+                                    <Copy className="h-3 w-3" />
                                   </Button>
-                                </div>
-                              ))}
+                                )}
+                              </div>
                             </div>
-                          )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    
+                    {isLoading && (
+                      <div className="flex justify-start">
+                        <div className="bg-white border shadow-sm rounded-lg p-4 max-w-[80%]">
+                          <div className="flex items-center space-x-2">
+                            <div className={`w-6 h-6 rounded-full bg-gradient-to-r ${currentRole.color} flex items-center justify-center`}>
+                              <Bot className="h-3 w-3 text-white" />
+                            </div>
+                            <div className="flex space-x-1">
+                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    <div ref={messagesEndRef} />
+                  </div>
+
+                  {/* Specialized Mode Interface */}
+                  <div className="border-t bg-white p-4 flex-shrink-0 max-h-[300px] overflow-y-auto relative">
+                    {selectedMode === 'presentation' && (
+                      <PresentationGenerator
+                        currentRole={currentRole}
+                        inputMessage={inputMessage}
+                        setInputMessage={setInputMessage}
+                        handleSendMessage={handleSendMessage}
+                        isLoading={isLoading}
+                        messages={messages}
+                        copyMessage={copyMessage}
+                        selectedProvider={selectedProvider}
+                      />
+                    )}
+                    
+                    {selectedMode === 'scenario' && (
+                      <ScenarioSimulator
+                        currentRole={currentRole}
+                        inputMessage={inputMessage}
+                        setInputMessage={setInputMessage}
+                        handleSendMessage={handleSendMessage}
+                        isLoading={isLoading}
+                        messages={messages}
+                        copyMessage={copyMessage}
+                        selectedProvider={selectedProvider}
+                      />
+                    )}
+                    
+                    {selectedMode === 'advisor' && (
+                      <RoleBasedAdvisor
+                        currentRole={currentRole}
+                        inputMessage={inputMessage}
+                        setInputMessage={setInputMessage}
+                        handleSendMessage={handleSendMessage}
+                        isLoading={isLoading}
+                        messages={messages}
+                        copyMessage={copyMessage}
+                        selectedProvider={selectedProvider}
+                      />
+                    )}
+                    
+                    {selectedMode === 'chat' && (
+                      <div className="space-y-4">
+                        {/* File Upload Area for Chat Mode */}
+                        {files.length > 0 && (
+                          <div className="flex flex-wrap gap-2">
+                            {files.map((file, index) => (
+                              <div key={index} className="flex items-center bg-gray-100 rounded-lg p-2 border">
+                                <FileText className="h-4 w-4 text-gray-500 mr-2" />
+                                <span className="text-sm text-gray-700 truncate max-w-[150px]">
+                                  {file.name}
+                                </span>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => removeFile(index)}
+                                  className="h-6 w-6 p-0 ml-2 hover:bg-gray-100"
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        
+                        {/* Chat Input */}
+                        <div className="flex space-x-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => fileInputRef.current?.click()}
+                            className="flex-shrink-0 min-h-[44px] min-w-[44px]"
+                            title="Upload file"
+                            disabled={responseCount >= maxResponses}
+                          >
+                            <Upload className="h-4 w-4" />
+                          </Button>
                           
-                          {/* Chat Input */}
-                          <div className="flex space-x-2">
+                          {speechSupported && (
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => fileInputRef.current?.click()}
-                              className="flex-shrink-0 min-h-[44px] min-w-[44px]"
-                              title="Upload file"
+                              onClick={isListening ? stopVoiceInput : startVoiceInput}
+                              className={`flex-shrink-0 min-h-[44px] min-w-[44px] ${
+                                isListening ? 'bg-red-50 border-red-300 text-red-600' : ''
+                              }`}
+                              title={isListening ? "Stop voice input" : "Start voice input"}
                               disabled={responseCount >= maxResponses}
                             >
-                              <Upload className="h-4 w-4" />
+                              {isListening ? <MicOff className="h-4 w-4 animate-pulse" /> : <Mic className="h-4 w-4" />}
                             </Button>
+                          )}
+                          
+                          <div className="flex-1 relative">
+                            <Textarea
+                              key="main-interface-chat-input"
+                              value={inputMessage}
+                              onChange={handleInputChange}
+                              placeholder={responseCount >= maxResponses ? "Session limit reached - Get in touch for unlimited access!" : (isMobile ? "Ask your AI assistant..." : `Ask your ${currentRole.name} assistant anything about Agile...`)}
+                              className={`min-h-[44px] max-h-[120px] resize-none pr-12 text-gray-900 bg-white border-gray-300 placeholder:text-gray-500 ${isMobile ? 'text-base' : ''} ${responseCount >= maxResponses ? 'opacity-50 cursor-not-allowed' : ''}`}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' && !e.shiftKey) {
+                                  e.preventDefault();
+                                  handleSendMessage();
+                                }
+                              }}
+                              rows={isMobile ? 2 : 1}
+                              disabled={responseCount >= maxResponses}
+                            />
                             
-                            {speechSupported && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={isListening ? stopVoiceInput : startVoiceInput}
-                                className={`flex-shrink-0 min-h-[44px] min-w-[44px] ${
-                                  isListening ? 'bg-red-50 border-red-300 text-red-600' : ''
-                                }`}
-                                title={isListening ? "Stop voice input" : "Start voice input"}
-                                disabled={responseCount >= maxResponses}
-                              >
-                                {isListening ? <MicOff className="h-4 w-4 animate-pulse" /> : <Mic className="h-4 w-4" />}
-                              </Button>
+                            {/* Voice feedback indicator */}
+                            {isListening && (
+                              <div className="absolute top-2 right-14 flex items-center space-x-1 text-red-600">
+                                <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
+                                <span className="text-xs">Listening...</span>
+                              </div>
                             )}
-                            
-                            <div className="flex-1 relative">
-                              <Textarea
-                                key="main-interface-chat-input"
-                                value={inputMessage}
-                                onChange={handleInputChange}
-                                placeholder={responseCount >= maxResponses ? "Session limit reached - Get in touch for unlimited access!" : (isMobile ? "Ask your AI assistant..." : `Ask your ${currentRole.name} assistant anything about Agile...`)}
-                                className={`min-h-[44px] max-h-[120px] resize-none pr-12 text-gray-900 bg-white border-gray-300 placeholder:text-gray-500 ${isMobile ? 'text-base' : ''} ${responseCount >= maxResponses ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter' && !e.shiftKey) {
-                                    e.preventDefault();
-                                    handleSendMessage();
-                                  }
-                                }}
-                                rows={isMobile ? 2 : 1}
-                                disabled={responseCount >= maxResponses}
-                              />
-                              
-                              {/* Voice feedback indicator */}
-                              {isListening && (
-                                <div className="absolute top-2 right-14 flex items-center space-x-1 text-red-600">
-                                  <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
-                                  <span className="text-xs">Listening...</span>
-                                </div>
-                              )}
-                            </div>
-                            
-                            <Button
-                              onClick={handleSendMessage}
-                              disabled={isLoading || (!inputMessage.trim() && files.length === 0) || responseCount >= maxResponses}
-                              className={`flex-shrink-0 min-h-[44px] min-w-[44px] bg-gradient-to-r ${currentRole.color} hover:opacity-90 transition-opacity ${responseCount >= maxResponses ? 'opacity-50 cursor-not-allowed' : ''}`}
-                              title="Send message"
-                            >
-                              {isLoading ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                              ) : (
-                                <Send className="h-4 w-4" />
-                              )}
-                            </Button>
                           </div>
                           
-                          {/* Session Limit Message for Main Interface */}
-                          {responseCount >= maxResponses && (
-                            <div className="mt-3 p-4 bg-teal-50 border border-teal-200 rounded-lg">
-                              <div className="flex items-center space-x-3">
-                                <div className="w-8 h-8 bg-gradient-to-r from-teal-600 to-emerald-600 rounded-full flex items-center justify-center flex-shrink-0">
-                                  <span className="text-white font-bold text-sm">S4</span>
-                                </div>
-                                <div className="flex-1">
-                                  <p className="text-sm font-medium text-teal-800">
-                                    Ready for unlimited conversations?
-                                  </p>
-                                  <p className="text-xs text-teal-600 mt-1">
-                                    Upgrade to continue your Agile learning journey
-                                  </p>
-                                </div>
-                                <Button
-                                  size="sm"
-                                  onClick={() => window.open('/contact', '_blank')}
-                                  className="bg-teal-600 hover:bg-teal-700 text-white text-xs px-4 py-2"
-                                >
-                                  Get in Touch
-                                </Button>
-                              </div>
-                            </div>
-                          )}
+                          <Button
+                            onClick={handleSendMessage}
+                            disabled={isLoading || (!inputMessage.trim() && files.length === 0) || responseCount >= maxResponses}
+                            className={`flex-shrink-0 min-h-[44px] min-w-[44px] bg-gradient-to-r ${currentRole.color} hover:opacity-90 transition-opacity ${responseCount >= maxResponses ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            title="Send message"
+                          >
+                            {isLoading ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Send className="h-4 w-4" />
+                            )}
+                          </Button>
                         </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
+                        
+                        {/* Session Limit Message for Main Interface */}
+                        {responseCount >= maxResponses && (
+                          <div className="mt-3 p-4 bg-teal-50 border border-teal-200 rounded-lg">
+                            <div className="flex items-center space-x-3">
+                              <div className="w-8 h-8 bg-gradient-to-r from-teal-600 to-emerald-600 rounded-full flex items-center justify-center flex-shrink-0">
+                                <span className="text-white font-bold text-sm">S4</span>
+                              </div>
+                              <div className="flex-1">
+                                <p className="text-sm font-medium text-teal-800">
+                                  Ready for unlimited conversations?
+                                </p>
+                                <p className="text-xs text-teal-600 mt-1">
+                                  Upgrade to continue your Agile learning journey
+                                </p>
+                              </div>
+                              <Button
+                                size="sm"
+                                onClick={() => window.open('/contact', '_blank')}
+                                className="bg-teal-600 hover:bg-teal-700 text-white text-xs px-4 py-2"
+                              >
+                                Get in Touch
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
             </div>
 
             <input

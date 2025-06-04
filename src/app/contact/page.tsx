@@ -125,7 +125,7 @@ export default function Contact() {
         }}
         secondaryCTA={{
           text: "Get in Touch",
-          href: "#locations",
+          href: "#contact-form",
           icon: <ArrowRight className="w-4 h-4" />
         }}
         backgroundVariant="gradient"
