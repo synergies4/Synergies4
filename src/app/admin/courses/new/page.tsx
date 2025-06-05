@@ -941,13 +941,7 @@ export default function CreateCourse() {
     }
   };
 
-  const steps = [
-    { number: 1, title: 'Basic Info', description: 'Course title, description, and category' },
-    { number: 2, title: 'Details', description: 'Pricing, level, and duration' },
-    { number: 3, title: 'Content', description: 'Modules and course structure' },
-    { number: 4, title: 'Quiz', description: 'Optional course quiz' },
-    { number: 5, title: 'Review', description: 'Review and publish' }
-  ];
+
 
   const getContentIcon = (type: string) => {
     switch (type) {
