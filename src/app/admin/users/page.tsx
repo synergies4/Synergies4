@@ -325,10 +325,10 @@ export default function UserManagement() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-teal-50 to-cyan-50">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
-          <p className="text-gray-600">Loading users...</p>
+          <Loader2 className="h-12 w-12 animate-spin mx-auto mb-4 text-teal-600" />
+          <p className="text-gray-600 text-lg">Loading users...</p>
         </div>
       </div>
     );
@@ -336,17 +336,21 @@ export default function UserManagement() {
 
   if (!user || userProfile?.role !== 'ADMIN') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle className="text-center">Access Denied</CardTitle>
-            <CardDescription className="text-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-teal-50 to-cyan-50">
+        <Card className="w-full max-w-md shadow-xl border-0">
+          <CardHeader className="text-center">
+            <Shield className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <CardTitle className="text-2xl">Access Denied</CardTitle>
+            <CardDescription>
               You need admin privileges to access this page.
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center">
-            <Button asChild>
-              <Link href="/">Go Home</Link>
+            <Button asChild className="bg-teal-600 hover:bg-teal-700">
+              <Link href="/">
+                <Home className="w-4 h-4 mr-2" />
+                Go Home
+              </Link>
             </Button>
           </CardContent>
         </Card>
@@ -356,26 +360,30 @@ export default function UserManagement() {
 
   return (
     <PageLayout>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-teal-50 to-cyan-50">
         {/* Header */}
-        <header className="bg-white shadow-sm border-b">
+        <header className="bg-white/80 backdrop-blur-sm shadow-sm border-b border-teal-100">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center py-6">
-              <div className="flex items-center space-x-3">
-                <Users className="h-8 w-8 text-blue-600" />
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-6 gap-4">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-teal-600 to-emerald-600 rounded-xl flex items-center justify-center">
+                  <Users className="h-6 w-6 text-white" />
+                </div>
                 <div>
-                  <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
-                  <p className="text-gray-600">Manage user accounts and permissions</p>
+                  <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-teal-700 bg-clip-text text-transparent">
+                    User Management
+                  </h1>
+                  <p className="text-gray-600 text-sm sm:text-base">Manage user accounts and permissions</p>
                 </div>
               </div>
-              <div className="flex space-x-3">
-                <Button variant="outline" asChild>
+              <div className="flex flex-wrap gap-2 sm:gap-3">
+                <Button variant="outline" asChild className="bg-white/80 border-teal-200 hover:bg-teal-50 text-sm">
                   <Link href="/admin">
                     <Shield className="w-4 h-4 mr-2" />
                     Admin Dashboard
                   </Link>
                 </Button>
-                <Button variant="outline" asChild>
+                <Button variant="outline" asChild className="bg-white/80 border-teal-200 hover:bg-teal-50 text-sm">
                   <Link href="/">
                     <Home className="w-4 h-4 mr-2" />
                     View Site
@@ -388,98 +396,90 @@ export default function UserManagement() {
         </header>
 
         {/* Main Content */}
-        <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <main className="max-w-7xl mx-auto py-4 sm:py-8 px-4 sm:px-6 lg:px-8">
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div className="flex-1">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-                  <Users className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{users.length}</div>
-                  <p className="text-xs text-muted-foreground">
-                    Registered accounts
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-xs sm:text-sm font-medium text-gray-700">Total Users</CardTitle>
+                <Users className="h-4 w-4 sm:h-5 sm:w-5 text-teal-600" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-xl sm:text-3xl font-bold text-gray-900">{users.length}</div>
+                <p className="text-xs sm:text-sm text-gray-600 mt-1">
+                  Registered accounts
+                </p>
+              </CardContent>
+            </Card>
 
-            <div className="flex-1">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Admins</CardTitle>
-                  <Shield className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {users.filter(u => u.role === 'ADMIN').length}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Admin accounts
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
+            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-xs sm:text-sm font-medium text-gray-700">Admins</CardTitle>
+                <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-xl sm:text-3xl font-bold text-gray-900">
+                  {users.filter(u => u.role === 'ADMIN').length}
+                </div>
+                <p className="text-xs sm:text-sm text-gray-600 mt-1">
+                  Admin accounts
+                </p>
+              </CardContent>
+            </Card>
 
-            <div className="flex-1">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Instructors</CardTitle>
-                  <User className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {users.filter(u => u.role === 'INSTRUCTOR').length}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Instructor accounts
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
+            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-xs sm:text-sm font-medium text-gray-700">Instructors</CardTitle>
+                <User className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-xl sm:text-3xl font-bold text-gray-900">
+                  {users.filter(u => u.role === 'INSTRUCTOR').length}
+                </div>
+                <p className="text-xs sm:text-sm text-gray-600 mt-1">
+                  Instructor accounts
+                </p>
+              </CardContent>
+            </Card>
 
-            <div className="flex-1">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Students</CardTitle>
-                  <Users className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {users.filter(u => u.role === 'USER').length}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Student accounts
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
+            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-xs sm:text-sm font-medium text-gray-700">Students</CardTitle>
+                <Users className="h-4 w-4 sm:h-5 sm:w-5 text-cyan-600" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-xl sm:text-3xl font-bold text-gray-900">
+                  {users.filter(u => u.role === 'USER').length}
+                </div>
+                <p className="text-xs sm:text-sm text-gray-600 mt-1">
+                  Student accounts
+                </p>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Filters and Search */}
           <div className="mb-6">
-            <Card>
+            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
               <CardHeader>
-                <CardTitle>Filters</CardTitle>
+                <CardTitle className="text-gray-900">Filters</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-col md:flex-row gap-4">
                   <div className="flex-1">
                     <div className="relative">
-                      <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                       <Input
                         placeholder="Search users by name or email..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-10"
+                        className="pl-10 bg-white/80 border-teal-200 focus:border-teal-400"
                       />
                     </div>
                   </div>
                   <div className="w-full md:w-48">
                     <Select value={roleFilter} onValueChange={setRoleFilter}>
-                      <SelectTrigger>
+                      <SelectTrigger className="bg-white/80 border-teal-200">
                         <SelectValue placeholder="Filter by role" />
                       </SelectTrigger>
                       <SelectContent>
@@ -495,89 +495,117 @@ export default function UserManagement() {
             </Card>
           </div>
 
-          {/* Users Table */}
-          <Card>
+          {/* Users Grid */}
+          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
             <CardHeader>
-              <CardTitle>Users ({filteredUsers.length})</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-gray-900">Users ({filteredUsers.length})</CardTitle>
+              <CardDescription className="text-gray-600">
                 Manage user accounts and permissions
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="grid gap-4">
                 {filteredUsers.map((userData) => (
-                  <div key={userData.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors bg-white">
-                    <div className="flex items-center space-x-4">
-                      <Avatar>
-                        <AvatarFallback className="bg-blue-100 text-blue-600">
-                          {getInitials(userData.name, userData.email)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <div className="flex items-center space-x-2">
-                          <h4 className="font-medium text-gray-900">
-                            {userData.name || 'No name'}
-                          </h4>
-                          <Badge variant={getRoleBadgeVariant(userData.role)}>
-                            {userData.role}
-                          </Badge>
-                        </div>
-                        <div className="flex items-center space-x-4 text-sm text-gray-500">
-                          <div className="flex items-center space-x-1">
-                            <Mail className="h-3 w-3" />
-                            <span>{userData.email}</span>
+                  <div key={userData.id} className="group bg-white/80 backdrop-blur-sm border border-teal-100 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-all duration-300 hover:scale-105">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                      {/* User Info */}
+                      <div className="flex items-center space-x-4 flex-1 min-w-0">
+                        <Avatar className="h-12 w-12 flex-shrink-0">
+                          <AvatarFallback className="bg-gradient-to-br from-teal-100 to-emerald-100 text-teal-700 font-semibold">
+                            {getInitials(userData.name, userData.email)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+                            <h4 className="font-semibold text-gray-900 truncate">
+                              {userData.name || 'No name'}
+                            </h4>
+                            <Badge className={`w-fit text-xs ${
+                              userData.role === 'ADMIN' 
+                                ? 'bg-red-100 text-red-800 border-red-200' 
+                                : userData.role === 'INSTRUCTOR'
+                                ? 'bg-emerald-100 text-emerald-800 border-emerald-200'
+                                : 'bg-cyan-100 text-cyan-800 border-cyan-200'
+                            }`}>
+                              {userData.role === 'USER' ? 'Student' : userData.role}
+                            </Badge>
                           </div>
-                          <div className="flex items-center space-x-1">
-                            <Calendar className="h-3 w-3" />
-                            <span>Joined {new Date(userData.created_at).toLocaleDateString()}</span>
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs sm:text-sm text-gray-600">
+                            <div className="flex items-center space-x-1">
+                              <Mail className="h-3 w-3 text-gray-400" />
+                              <span className="truncate">{userData.email}</span>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <Calendar className="h-3 w-3 text-gray-400" />
+                              <span>Joined {new Date(userData.created_at).toLocaleDateString()}</span>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <BookOpen className="h-3 w-3 text-gray-400" />
+                              <span>{userData.enrollments_count} enrollments</span>
+                            </div>
                           </div>
-                          <span>{userData.enrollments_count} enrollments</span>
                         </div>
                       </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Select
-                        value={userData.role}
-                        onValueChange={(value) => handleRoleChange(userData.id, value)}
-                      >
-                        <SelectTrigger className="w-32 bg-white border-gray-300 text-gray-900">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white border-gray-300">
-                          <SelectItem value="USER">Student</SelectItem>
-                          <SelectItem value="INSTRUCTOR">Instructor</SelectItem>
-                          <SelectItem value="ADMIN">Admin</SelectItem>
-                        </SelectContent>
-                      </Select>
                       
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700 bg-white border-gray-300 hover:bg-red-50">
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent className="bg-white">
-                          <AlertDialogHeader>
-                            <AlertDialogTitle className="text-gray-900">Delete User</AlertDialogTitle>
-                            <AlertDialogDescription className="text-gray-600">
-                              Are you sure you want to delete {userData.name || userData.email}? 
-                              This action cannot be undone and will remove all their data.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel className="bg-white text-gray-900 border-gray-300 hover:bg-gray-50">Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleDeleteUser(userData.id)}
-                              className="bg-red-600 hover:bg-red-700 text-white"
-                            >
-                              Delete User
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
+                      {/* Actions */}
+                      <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                        <Select
+                          value={userData.role}
+                          onValueChange={(value) => handleRoleChange(userData.id, value)}
+                        >
+                          <SelectTrigger className="w-full sm:w-32 bg-white/80 border-teal-200 text-gray-900 hover:bg-white">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-white border-teal-200">
+                            <SelectItem value="USER">Student</SelectItem>
+                            <SelectItem value="INSTRUCTOR">Instructor</SelectItem>
+                            <SelectItem value="ADMIN">Admin</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700 bg-white/80 border-red-200 hover:bg-red-50 p-2 sm:px-3">
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent className="bg-white/95 backdrop-blur-sm border-teal-200">
+                            <AlertDialogHeader>
+                              <AlertDialogTitle className="text-gray-900">Delete User</AlertDialogTitle>
+                              <AlertDialogDescription className="text-gray-600">
+                                Are you sure you want to delete {userData.name || userData.email}? 
+                                This action cannot be undone and will remove all their data.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel className="bg-white text-gray-900 border-teal-200 hover:bg-gray-50">Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleDeleteUser(userData.id)}
+                                className="bg-red-600 hover:bg-red-700 text-white"
+                              >
+                                Delete User
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
                     </div>
                   </div>
                 ))}
+                
+                {/* Empty State */}
+                {filteredUsers.length === 0 && (
+                  <div className="text-center py-12">
+                    <Users className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No users found</h3>
+                    <p className="text-gray-600">
+                      {searchTerm || roleFilter !== 'all' 
+                        ? 'Try adjusting your search or filters.'
+                        : 'No users have been registered yet.'
+                      }
+                    </p>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
