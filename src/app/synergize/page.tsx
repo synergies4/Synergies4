@@ -1454,9 +1454,6 @@ export default function SynergizeAgile() {
   const inputMessageRef = useRef<HTMLTextAreaElement>(null);
   // Mobile scroll indicator state
   const [showScrollIndicator, setShowScrollIndicator] = useState(false);
-  // Response counter for session limit
-  const [responseCount, setResponseCount] = useState(0);
-  const maxResponses = 3;
 
   // Check for mobile device and speech recognition support
   useEffect(() => {
@@ -1607,67 +1604,66 @@ export default function SynergizeAgile() {
     }
   }, [selectedRole, selectedMode, selectedProvider, hasInitialized]);
 
-  // Simplified mobile UI handling
+  // Simplified mobile UI handling - only lock body scroll for full chat view
   useEffect(() => {
-    // Only handle body scroll lock for mobile chat view and sidebar
-    if (isMobile && (isFullChatView || sidebarOpen)) {
-      // Prevent iOS Safari bounce scrolling on the body
+    if (isMobile && isFullChatView) {
+      // Store current scroll position
+      const scrollY = window.scrollY;
+      
+      // Lock body scroll
       document.body.style.overflow = 'hidden';
       document.body.style.position = 'fixed';
       document.body.style.width = '100%';
-      document.body.style.height = '100%';
-      document.body.style.top = '0';
-    } else {
-      // Restore body scroll
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
-      document.body.style.height = '';
-      document.body.style.top = '';
+      document.body.style.top = `-${scrollY}px`;
+      
+      return () => {
+        // Restore body scroll and position
+        document.body.style.overflow = '';
+        document.body.style.position = '';
+        document.body.style.width = '';
+        document.body.style.top = '';
+        
+        // Restore scroll position
+        window.scrollTo(0, scrollY);
+      };
     }
-    
-    return () => {
-      // Always restore on cleanup
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
-      document.body.style.height = '';
-      document.body.style.top = '';
-    };
-  }, [isFullChatView, isMobile, sidebarOpen]);
+  }, [isFullChatView, isMobile]);
 
-  // Check if there are more messages below (mobile scroll indicator)
+  // Check if there are more messages below (mobile scroll indicator) - with throttling
   useEffect(() => {
     if (!isMobile || !chatContainerRef.current) return;
 
+    let ticking = false;
+    
     const handleScroll = () => {
-      const container = chatContainerRef.current;
-      if (!container) return;
-      
-      const { scrollTop, scrollHeight, clientHeight } = container;
-      const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
-      setShowScrollIndicator(!isNearBottom && messages.length > 2);
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const container = chatContainerRef.current;
+          if (!container) return;
+          
+          const { scrollTop, scrollHeight, clientHeight } = container;
+          const isNearBottom = scrollHeight - scrollTop - clientHeight < 150; // Increased threshold
+          setShowScrollIndicator(!isNearBottom && messages.length > 2);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
 
     const container = chatContainerRef.current;
     if (container) {
-      container.addEventListener('scroll', handleScroll);
+      container.addEventListener('scroll', handleScroll, { passive: true });
       handleScroll(); // Check initial state
       
       return () => {
         container.removeEventListener('scroll', handleScroll);
       };
     }
-  }, [isMobile, messages.length, chatContainerRef.current]);
+  }, [isMobile, messages.length]);
 
   const handleSendMessage = async (messageContent?: string) => {
     const messageToSend = messageContent || inputMessage;
     if (!messageToSend.trim() && files.length === 0) return;
-
-    // Check if we've reached the response limit
-    if (responseCount >= maxResponses) {
-      return; // Don't allow more messages
-    }
 
     // Switch to full chat view after first message
     if (!isFullChatView) {
@@ -1759,28 +1755,6 @@ export default function SynergizeAgile() {
       };
 
       setMessages(prev => [...prev, aiMessage]);
-      
-      // Increment response count
-      const newCount = responseCount + 1;
-      setResponseCount(newCount);
-      
-      // If we've reached the limit, add the "Get in Touch" message
-      if (newCount >= maxResponses) {
-        setTimeout(() => {
-          const limitMessage: Message = {
-            id: (Date.now() + 2).toString(),
-            type: 'ai',
-            content: "🎯 **You've reached your session limit!**\n\nWant to continue your Agile learning journey with unlimited access? Our premium plans offer:\n\n• **Unlimited AI conversations**\n• **Advanced presentation tools**\n• **Priority support**\n• **Custom training scenarios**\n\nReady to unlock your full potential?",
-            timestamp: new Date(),
-            mode: selectedMode,
-            role: selectedRole,
-            provider: selectedProvider
-          };
-          setMessages(prev => [...prev, limitMessage]);
-          // Force scroll to show the limit message
-          setTimeout(() => scrollToBottom(true), 100);
-        }, 800);
-      }
       
     } catch (error) {
       console.error('Chat Error:', error);
@@ -1884,26 +1858,22 @@ export default function SynergizeAgile() {
 
   // Stable placeholder and className to prevent re-renders
   const stablePlaceholder = useMemo(() => {
-    return responseCount >= maxResponses 
-      ? "Session limit reached - Get in touch for unlimited access!" 
-      : (isMobile ? "Ask your AI assistant..." : "Ask your assistant anything...");
-  }, [responseCount, maxResponses, isMobile]);
+    return isMobile ? "Ask your AI assistant..." : "Ask your assistant anything...";
+  }, [isMobile]);
 
   const stableMainPlaceholder = useMemo(() => {
-    return responseCount >= maxResponses 
-      ? "Session limit reached - Get in touch for unlimited access!" 
-      : (isMobile ? "Ask your AI assistant..." : "Ask your assistant anything about Agile...");
-  }, [responseCount, maxResponses, isMobile]);
+    return isMobile ? "Ask your AI assistant..." : "Ask your assistant anything about Agile...";
+  }, [isMobile]);
 
   const stableClassName = useMemo(() => {
-    return `min-h-[50px] max-h-[150px] resize-none pr-12 text-gray-900 bg-white border-gray-300 placeholder:text-gray-500 ${responseCount >= maxResponses ? 'opacity-50 cursor-not-allowed' : ''}`;
-  }, [responseCount, maxResponses]);
+    return `min-h-[50px] max-h-[150px] resize-none pr-12 text-gray-900 bg-white border-gray-300 placeholder:text-gray-500`;
+  }, []);
 
   const stableMainClassName = useMemo(() => {
-    return `min-h-[48px] max-h-[120px] resize-none pr-12 text-gray-900 bg-white border-gray-300 placeholder:text-gray-500 ${isMobile ? 'text-base touch-manipulation' : ''} ${responseCount >= maxResponses ? 'opacity-50 cursor-not-allowed' : ''}`;
-  }, [isMobile, responseCount, maxResponses]);
+    return `min-h-[48px] max-h-[120px] resize-none pr-12 text-gray-900 bg-white border-gray-300 placeholder:text-gray-500 ${isMobile ? 'text-base touch-manipulation' : ''}`;
+  }, [isMobile]);
 
-  const stableDisabled = useMemo(() => responseCount >= maxResponses, [responseCount, maxResponses]);
+  const stableDisabled = useMemo(() => false, []);
 
   const currentRole = AGILE_ROLES[selectedRole as keyof typeof AGILE_ROLES];
   const currentMode = INTERACTION_MODES[selectedMode as keyof typeof INTERACTION_MODES];
@@ -2096,74 +2066,7 @@ export default function SynergizeAgile() {
     );
   };
 
-  // Session Limit Display Component
-  const SessionLimitDisplay = ({ messageContent }: { messageContent: string }) => {
-    return (
-      <div className="space-y-4">
-        <div className="p-6 bg-gradient-to-br from-teal-50 to-emerald-50 border-2 border-teal-200 rounded-xl">
-          <div className="text-center mb-4">
-            <div className="w-16 h-16 bg-gradient-to-r from-teal-600 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-white font-bold text-xl">S4</span>
-            </div>
-            <div className="space-y-2">
-              {messageContent.split('\n').map((line, idx) => {
-                if (line.startsWith('🎯 **')) {
-                  return (
-                    <h3 key={idx} className="text-xl font-bold text-teal-800">
-                      🎯 You've reached your session limit!
-                    </h3>
-                  );
-                } else if (line.startsWith('Want to continue')) {
-                  return (
-                    <p key={idx} className="text-gray-700 text-base">
-                      {line}
-                    </p>
-                  );
-                } else if (line.startsWith('• **')) {
-                  const cleanLine = line.replace(/\*\*/g, '').replace('• ', '');
-                  return (
-                    <div key={idx} className="flex items-center text-sm text-gray-600">
-                      <CheckCircle className="h-4 w-4 text-teal-500 mr-2 flex-shrink-0" />
-                      <span>{cleanLine}</span>
-                    </div>
-                  );
-                } else if (line.startsWith('Ready to unlock')) {
-                  return (
-                    <p key={idx} className="text-teal-700 font-medium text-base">
-                      {line}
-                    </p>
-                  );
-                }
-                return null;
-              })}
-            </div>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Button
-              onClick={() => {
-                window.location.href = '/contact';
-              }}
-              className="flex-1 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-semibold py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-            >
-              <MessageSquare className="h-5 w-5 mr-2" />
-              Get in Touch
-            </Button>
-            <Button
-              onClick={() => {
-                window.location.href = '/contact#plans-pricing';
-              }}
-              variant="outline"
-              className="flex-1 bg-white border-2 border-teal-600 text-teal-600 hover:bg-teal-50 hover:text-teal-700 font-semibold py-3 rounded-lg transition-all duration-300"
-            >
-              <Award className="h-5 w-5 mr-2" />
-              View Plans
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  };
+
 
   // Full Chat View Component
   const FullChatView = () => (
@@ -2462,8 +2365,6 @@ export default function SynergizeAgile() {
                         </p>
                         <PresentationDisplay messageContent={message.content} />
                       </div>
-                    ) : message.type === 'ai' && message.content.includes("You've reached your session limit") ? (
-                      <SessionLimitDisplay messageContent={message.content} />
                     ) : (
                       <p className={`text-sm leading-relaxed whitespace-pre-wrap break-words ${message.type === 'user' ? 'text-white' : 'text-gray-900'}`}>
                         {message.content}
@@ -2757,7 +2658,7 @@ Format as a realistic conversation with clear speaker labels and include decisio
               size="sm"
               onClick={() => fileInputRef.current?.click()}
               className={`flex-shrink-0 bg-white border-gray-300 text-gray-900 hover:bg-gray-50 ${isMobile ? 'min-h-[48px] min-w-[48px] p-0' : ''}`}
-              disabled={responseCount >= maxResponses}
+              disabled={false}
             >
               <Upload className={`${isMobile ? 'h-5 w-5' : 'h-4 w-4'}`} />
             </Button>
@@ -2768,7 +2669,7 @@ Format as a realistic conversation with clear speaker labels and include decisio
                 size="sm"
                 onClick={isListening ? stopVoiceInput : startVoiceInput}
                 className={`flex-shrink-0 ${isListening ? 'bg-red-50 border-red-300 text-red-600' : 'bg-white border-gray-300 text-gray-900 hover:bg-gray-50'} ${isMobile ? 'min-h-[48px] min-w-[48px] p-0' : ''}`}
-                disabled={responseCount >= maxResponses}
+                disabled={false}
               >
                 {isListening ? 
                   <MicOff className={`animate-pulse ${isMobile ? 'h-5 w-5' : 'h-4 w-4'}`} /> : 
@@ -2797,8 +2698,8 @@ Format as a realistic conversation with clear speaker labels and include decisio
                   handleSendMessage('');
                 }
               }}
-              disabled={isLoading || responseCount >= maxResponses}
-              className={`flex-shrink-0 ${isMobile ? 'min-h-[48px] px-4' : 'min-h-[50px] px-6'} bg-gradient-to-r ${currentRole.color} hover:opacity-90 transition-opacity ${responseCount >= maxResponses ? 'opacity-50 cursor-not-allowed' : ''} touch-manipulation`}
+              disabled={isLoading}
+              className={`flex-shrink-0 ${isMobile ? 'min-h-[48px] px-4' : 'min-h-[50px] px-6'} bg-gradient-to-r ${currentRole.color} hover:opacity-90 transition-opacity touch-manipulation`}
             >
               {isLoading ? (
                 <Loader2 className={`animate-spin ${isMobile ? 'h-5 w-5' : 'h-4 w-4'}`} />
@@ -2808,31 +2709,7 @@ Format as a realistic conversation with clear speaker labels and include decisio
             </Button>
           </div>
 
-          {/* Session Limit Message */}
-          {responseCount >= maxResponses && (
-            <div className="mt-3 p-4 bg-teal-50 border border-teal-200 rounded-lg">
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-gradient-to-r from-teal-600 to-emerald-600 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-white font-bold text-sm">S4</span>
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-teal-800">
-                    Ready for unlimited conversations?
-                  </p>
-                  <p className="text-xs text-teal-600 mt-1">
-                    Upgrade to continue your Agile learning journey
-                  </p>
-                </div>
-                <Button
-                  size="sm"
-                  onClick={() => window.location.href = '/contact'}
-                  className="bg-teal-600 hover:bg-teal-700 text-white text-xs px-4 py-2"
-                >
-                  Get in Touch
-                </Button>
-              </div>
-            </div>
-          )}
+
         </div>
       </div>
     </div>
@@ -3240,8 +3117,6 @@ Format as a realistic conversation with clear speaker labels and include decisio
                                   </p>
                                   <PresentationDisplay messageContent={message.content} />
                                 </div>
-                              ) : message.type === 'ai' && message.content.includes("You've reached your session limit") ? (
-                                <SessionLimitDisplay messageContent={message.content} />
                               ) : (
                                 <p className={`text-sm leading-relaxed whitespace-pre-wrap break-words ${message.type === 'user' ? 'text-white' : 'text-gray-900'}`}>
                                   {message.content}
@@ -3368,7 +3243,7 @@ Format as a realistic conversation with clear speaker labels and include decisio
                             onClick={() => fileInputRef.current?.click()}
                             className={`flex-shrink-0 ${isMobile ? 'min-h-[48px] min-w-[48px]' : 'min-h-[44px] min-w-[44px]'} touch-manipulation`}
                             title="Upload file"
-                            disabled={responseCount >= maxResponses}
+                            disabled={false}
                           >
                             <Upload className={`${isMobile ? 'h-5 w-5' : 'h-4 w-4'}`} />
                           </Button>
@@ -3382,7 +3257,7 @@ Format as a realistic conversation with clear speaker labels and include decisio
                                 isListening ? 'bg-red-50 border-red-300 text-red-600' : ''
                               }`}
                               title={isListening ? "Stop voice input" : "Start voice input"}
-                              disabled={responseCount >= maxResponses}
+                              disabled={false}
                             >
                               {isListening ? 
                                 <MicOff className={`animate-pulse ${isMobile ? 'h-5 w-5' : 'h-4 w-4'}`} /> : 
@@ -3419,8 +3294,8 @@ Format as a realistic conversation with clear speaker labels and include decisio
                                 handleSendMessage('');
                               }
                             }}
-                            disabled={isLoading || responseCount >= maxResponses}
-                            className={`flex-shrink-0 ${isMobile ? 'min-h-[48px] px-4' : 'min-h-[50px] px-6'} bg-gradient-to-r ${currentRole.color} hover:opacity-90 transition-opacity ${responseCount >= maxResponses ? 'opacity-50 cursor-not-allowed' : ''} touch-manipulation`}
+                            disabled={isLoading}
+                            className={`flex-shrink-0 ${isMobile ? 'min-h-[48px] px-4' : 'min-h-[50px] px-6'} bg-gradient-to-r ${currentRole.color} hover:opacity-90 transition-opacity touch-manipulation`}
                             title="Send message"
                           >
                             {isLoading ? (
@@ -3431,31 +3306,7 @@ Format as a realistic conversation with clear speaker labels and include decisio
                           </Button>
                         </div>
                         
-                        {/* Session Limit Message for Main Interface */}
-                        {responseCount >= maxResponses && (
-                          <div className="mt-3 p-4 bg-teal-50 border border-teal-200 rounded-lg">
-                            <div className="flex items-center space-x-3">
-                              <div className="w-8 h-8 bg-gradient-to-r from-teal-600 to-emerald-600 rounded-full flex items-center justify-center flex-shrink-0">
-                                <span className="text-white font-bold text-sm">S4</span>
-                              </div>
-                              <div className="flex-1">
-                                <p className="text-sm font-medium text-teal-800">
-                                  Ready for unlimited conversations?
-                                </p>
-                                <p className="text-xs text-teal-600 mt-1">
-                                  Upgrade to continue your Agile learning journey
-                                </p>
-                              </div>
-                              <Button
-                                size="sm"
-                                onClick={() => window.location.href = '/contact'}
-                                className="bg-teal-600 hover:bg-teal-700 text-white text-xs px-4 py-2"
-                              >
-                                Get in Touch
-                              </Button>
-                            </div>
-                          </div>
-                        )}
+
                       </div>
                     )}
                   </div>
