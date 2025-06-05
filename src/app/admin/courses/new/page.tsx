@@ -43,7 +43,9 @@ import {
   Image as ImageIcon,
   Play,
   TrendingUp,
-  Tag
+  Tag,
+  Shield,
+  Home
 } from 'lucide-react';
 
 interface ModuleContent {
@@ -961,10 +963,10 @@ export default function CreateCourse() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-teal-50 to-cyan-50">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
-          <p className="text-gray-600">Loading...</p>
+          <Loader2 className="h-12 w-12 animate-spin mx-auto mb-4 text-teal-600" />
+          <p className="text-gray-600 text-lg">Loading...</p>
         </div>
       </div>
     );
@@ -972,17 +974,21 @@ export default function CreateCourse() {
 
   if (!user || userProfile?.role !== 'ADMIN') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle className="text-center">Access Denied</CardTitle>
-            <CardDescription className="text-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-teal-50 to-cyan-50 p-4">
+        <Card className="w-full max-w-md shadow-xl border-0">
+          <CardHeader className="text-center">
+            <Shield className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <CardTitle className="text-2xl">Access Denied</CardTitle>
+            <CardDescription>
               You need admin privileges to access this page.
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center">
-            <Button asChild>
-              <Link href="/">Go Home</Link>
+            <Button asChild className="bg-teal-600 hover:bg-teal-700">
+              <Link href="/">
+                <Home className="w-4 h-4 mr-2" />
+                Go Home
+              </Link>
             </Button>
           </CardContent>
         </Card>
@@ -992,73 +998,101 @@ export default function CreateCourse() {
 
   return (
     <PageLayout>
-      {/* Main Content */}
-      <main className="max-w-4xl mx-auto py-4 sm:py-6 px-4 sm:px-6 lg:px-8">
-        {/* Mobile-Optimized Progress Steps */}
-        <div className="mb-6 sm:mb-8">
-          {/* Mobile: Horizontal Scrollable Steps */}
-          <div className="block sm:hidden">
-            <div className="flex items-center space-x-4 overflow-x-auto pb-4">
-              {steps.map((step, index) => (
-                <div key={step.number} className="flex items-center flex-shrink-0">
-                  <div className={`flex items-center justify-center w-8 h-8 rounded-full border-2 text-sm ${
-                    currentStep >= step.number 
-                      ? 'bg-blue-600 border-blue-600 text-white' 
-                      : 'border-gray-300 text-gray-500'
-                  }`}>
-                    {currentStep > step.number ? <CheckCircle className="w-4 h-4" /> : step.number}
-                  </div>
-                  <div className="ml-2 min-w-0">
-                    <p className={`text-xs font-medium truncate ${
-                      currentStep >= step.number ? 'text-blue-600' : 'text-gray-500'
-                    }`}>
-                      {step.title}
-                    </p>
-                  </div>
-                  {index < steps.length - 1 && (
-                    <div className={`w-8 h-0.5 mx-3 ${
-                      currentStep > step.number ? 'bg-blue-600' : 'bg-gray-300'
-                    }`} />
-                  )}
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-teal-50 to-cyan-50">
+        {/* Header */}
+        <header className="bg-white/80 backdrop-blur-sm shadow-sm border-b border-teal-100">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between py-6 gap-4">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-teal-600 to-emerald-600 rounded-xl flex items-center justify-center">
+                  <BookOpen className="h-6 w-6 text-white" />
                 </div>
-              ))}
+                <div>
+                  <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-teal-700 bg-clip-text text-transparent">
+                    Create New Course
+                  </h1>
+                  <p className="text-gray-600 text-sm sm:text-base">Build engaging learning experiences</p>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <Button variant="outline" asChild className="bg-white/80 border-teal-200 hover:bg-teal-50 text-sm">
+                  <Link href="/admin/courses">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back to Courses
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Main Content */}
+        <main className="max-w-4xl mx-auto py-4 sm:py-6 px-4 sm:px-6 lg:px-8">
+          {/* Mobile-Optimized Progress Steps */}
+          <div className="mb-6 sm:mb-8">
+            {/* Mobile: Horizontal Scrollable Steps */}
+            <div className="block sm:hidden">
+              <div className="flex items-center space-x-4 overflow-x-auto pb-4">
+                {steps.map((step, index) => (
+                  <div key={step.number} className="flex items-center flex-shrink-0">
+                    <div className={`flex items-center justify-center w-8 h-8 rounded-full border-2 text-sm ${
+                      currentStep >= step.number 
+                        ? 'bg-gradient-to-r from-teal-600 to-emerald-600 border-teal-600 text-white' 
+                        : 'border-gray-300 text-gray-500'
+                    }`}>
+                      {currentStep > step.number ? <CheckCircle className="w-4 h-4" /> : step.number}
+                    </div>
+                    <div className="ml-2 min-w-0">
+                      <p className={`text-xs font-medium truncate ${
+                        currentStep >= step.number ? 'text-teal-600' : 'text-gray-500'
+                      }`}>
+                        {step.title}
+                      </p>
+                    </div>
+                    {index < steps.length - 1 && (
+                      <div className={`w-8 h-0.5 mx-3 ${
+                        currentStep > step.number ? 'bg-gradient-to-r from-teal-600 to-emerald-600' : 'bg-gray-300'
+                      }`} />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Desktop: Full Steps Display */}
+            <div className="hidden sm:block">
+              <div className="flex items-center justify-between">
+                {steps.map((step, index) => (
+                  <div key={step.number} className="flex items-center">
+                    <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
+                      currentStep >= step.number 
+                        ? 'bg-gradient-to-r from-teal-600 to-emerald-600 border-teal-600 text-white' 
+                        : 'border-gray-300 text-gray-500'
+                    }`}>
+                      {currentStep > step.number ? <CheckCircle className="w-5 h-5" /> : step.number}
+                    </div>
+                    <div className="ml-3">
+                      <p className={`text-sm font-medium ${
+                        currentStep >= step.number ? 'text-teal-600' : 'text-gray-500'
+                      }`}>
+                        {step.title}
+                      </p>
+                      <p className="text-xs text-gray-500">{step.description}</p>
+                    </div>
+                    {index < steps.length - 1 && (
+                      <div className={`flex-1 h-0.5 mx-4 ${
+                        currentStep > step.number ? 'bg-gradient-to-r from-teal-600 to-emerald-600' : 'bg-gray-300'
+                      }`} />
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Desktop: Full Steps Display */}
-          <div className="hidden sm:block">
-            <div className="flex items-center justify-between">
-              {steps.map((step, index) => (
-                <div key={step.number} className="flex items-center">
-                  <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
-                    currentStep >= step.number 
-                      ? 'bg-blue-600 border-blue-600 text-white' 
-                      : 'border-gray-300 text-gray-500'
-                  }`}>
-                    {currentStep > step.number ? <CheckCircle className="w-5 h-5" /> : step.number}
-                  </div>
-                  <div className="ml-3">
-                    <p className={`text-sm font-medium ${
-                      currentStep >= step.number ? 'text-blue-600' : 'text-gray-500'
-                    }`}>
-                      {step.title}
-                    </p>
-                    <p className="text-xs text-gray-500">{step.description}</p>
-                  </div>
-                  {index < steps.length - 1 && (
-                    <div className={`flex-1 h-0.5 mx-4 ${
-                      currentStep > step.number ? 'bg-blue-600' : 'bg-gray-300'
-                    }`} />
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Form Steps */}
-        <Card className="mb-6 bg-white border border-gray-200 shadow-sm">
-          <CardContent className="p-4 sm:p-6 bg-white">
+          {/* Form Steps */}
+                    <Card className="mb-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+            <CardContent className="p-4 sm:p-6 bg-white/50 backdrop-blur-sm">
             {/* Step 1: Basic Information */}
             {currentStep === 1 && (
               <div className="space-y-4 sm:space-y-6">
@@ -1085,7 +1119,7 @@ export default function CreateCourse() {
                       value={formData.title}
                       onChange={(e) => handleInputChange('title', e.target.value)}
                       placeholder="Enter course title"
-                      className="mt-2 bg-white border-gray-300 text-gray-900"
+                      className="mt-2 bg-white/80 border-teal-200 focus:border-teal-400 text-gray-900"
                     />
                   </div>
 
