@@ -127,6 +127,15 @@ export default function CreateCourse() {
   const [moduleAiSuggestions, setModuleAiSuggestions] = useState<{[key: string]: any}>({});
   const [showModuleAI, setShowModuleAI] = useState<{[key: string]: boolean}>({});
 
+  // Define steps for the course creation wizard
+  const steps = [
+    { number: 1, title: 'Basic Info', description: 'Course details' },
+    { number: 2, title: 'Details', description: 'Level & pricing' },
+    { number: 3, title: 'Modules', description: 'Course content' },
+    { number: 4, title: 'Quiz', description: 'Assessment' },
+    { number: 5, title: 'Review', description: 'Final review' }
+  ];
+
   // Define AI mode type
   type AiModeType = 'title' | 'description' | 'shortDesc' | 'category' | 'modules' | 'quiz' | 'content' | 'pricing' | 'marketing' | 'imageIdeas';
 
@@ -1091,7 +1100,7 @@ export default function CreateCourse() {
           </div>
 
           {/* Form Steps */}
-                    <Card className="mb-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+          <Card className="mb-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
             <CardContent className="p-4 sm:p-6 bg-white/50 backdrop-blur-sm">
             {/* Step 1: Basic Information */}
             {currentStep === 1 && (
