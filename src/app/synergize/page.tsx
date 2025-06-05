@@ -1454,6 +1454,9 @@ export default function SynergizeAgile() {
   const inputMessageRef = useRef<HTMLTextAreaElement>(null);
   // Mobile scroll indicator state
   const [showScrollIndicator, setShowScrollIndicator] = useState(false);
+  // Response counter for session limit
+  const [responseCount, setResponseCount] = useState(0);
+  const maxResponses = 3;
 
   // Check for mobile device and speech recognition support
   useEffect(() => {
@@ -1665,6 +1668,11 @@ export default function SynergizeAgile() {
     const messageToSend = messageContent || inputMessage;
     if (!messageToSend.trim() && files.length === 0) return;
 
+    // Check if we've reached the response limit
+    if (responseCount >= maxResponses) {
+      return; // Don't allow more messages
+    }
+
     // Switch to full chat view after first message
     if (!isFullChatView) {
       setIsFullChatView(true);
@@ -1755,6 +1763,28 @@ export default function SynergizeAgile() {
       };
 
       setMessages(prev => [...prev, aiMessage]);
+      
+      // Increment response count
+      const newCount = responseCount + 1;
+      setResponseCount(newCount);
+      
+      // If we've reached the limit, add the "Get in Touch" message (without S4 branding)
+      if (newCount >= maxResponses) {
+        setTimeout(() => {
+          const limitMessage: Message = {
+            id: (Date.now() + 2).toString(),
+            type: 'ai',
+            content: "🎯 **You've reached your session limit!**\n\nWant to continue your Agile learning journey with unlimited access? Our premium plans offer:\n\n• **Unlimited AI conversations**\n• **Advanced presentation tools**\n• **Priority support**\n• **Custom training scenarios**\n\nReady to unlock your full potential?",
+            timestamp: new Date(),
+            mode: selectedMode,
+            role: selectedRole,
+            provider: selectedProvider
+          };
+          setMessages(prev => [...prev, limitMessage]);
+          // Force scroll to show the limit message
+          setTimeout(() => scrollToBottom(true), 100);
+        }, 800);
+      }
       
     } catch (error) {
       console.error('Chat Error:', error);
@@ -1873,7 +1903,7 @@ export default function SynergizeAgile() {
     return `min-h-[48px] max-h-[120px] resize-none pr-12 text-gray-900 bg-white border-gray-300 placeholder:text-gray-500 ${isMobile ? 'text-base touch-manipulation' : ''}`;
   }, [isMobile]);
 
-  const stableDisabled = useMemo(() => false, []);
+  const stableDisabled = useMemo(() => responseCount >= maxResponses, [responseCount]);
 
   const currentRole = AGILE_ROLES[selectedRole as keyof typeof AGILE_ROLES];
   const currentMode = INTERACTION_MODES[selectedMode as keyof typeof INTERACTION_MODES];
@@ -2398,6 +2428,29 @@ export default function SynergizeAgile() {
               </div>
             </div>
           ))}
+
+          {/* Session Limit Banner */}
+          {responseCount >= maxResponses && (
+            <div className="mx-auto max-w-md p-6 bg-gradient-to-r from-emerald-500 to-cyan-600 rounded-2xl shadow-lg text-center text-white my-4">
+              <div className="mb-4">
+                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Zap className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="text-lg font-bold mb-2">Session Complete!</h3>
+                <p className="text-sm opacity-90">
+                  Ready to continue your Agile learning journey?
+                </p>
+              </div>
+              <Button 
+                className="w-full bg-white text-emerald-600 hover:bg-gray-100 font-semibold rounded-xl shadow-lg transition-all hover:scale-105"
+                asChild
+              >
+                <a href="/contact" target="_blank" rel="noopener noreferrer">
+                  Get Unlimited Access
+                </a>
+              </Button>
+            </div>
+          )}
 
           {isLoading && (
             <div className="flex justify-start">
@@ -3150,6 +3203,29 @@ Format as a realistic conversation with clear speaker labels and include decisio
                         </div>
                       </div>
                     ))}
+                    
+                    {/* Session Limit Banner */}
+                    {responseCount >= maxResponses && (
+                      <div className="mx-auto max-w-xs p-4 bg-gradient-to-r from-emerald-500 to-cyan-600 rounded-2xl shadow-lg text-center text-white my-4">
+                        <div className="mb-3">
+                          <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-2">
+                            <Zap className="h-5 w-5 text-white" />
+                          </div>
+                          <h3 className="text-base font-bold mb-1">Session Complete!</h3>
+                          <p className="text-xs opacity-90">
+                            Ready to continue learning?
+                          </p>
+                        </div>
+                        <Button 
+                          className="w-full bg-white text-emerald-600 hover:bg-gray-100 font-semibold rounded-lg shadow-lg transition-all hover:scale-105 text-sm py-2"
+                          asChild
+                        >
+                          <a href="/contact" target="_blank" rel="noopener noreferrer">
+                            Get Unlimited Access
+                          </a>
+                        </Button>
+                      </div>
+                    )}
                     
                     {isLoading && (
                       <div className="flex justify-start">
