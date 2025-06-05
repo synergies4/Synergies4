@@ -1371,6 +1371,7 @@ const SelfContainedChatInput = React.memo(React.forwardRef<
 >(({ initialValue = '', onSubmit, placeholder, disabled, className }, ref) => {
   // Internal state - completely isolated from parent
   const [internalValue, setInternalValue] = React.useState(initialValue);
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
   
   // Only update internal value when initialValue changes from parent (like clearing after send)
   React.useEffect(() => {
@@ -1404,15 +1405,17 @@ const SelfContainedChatInput = React.memo(React.forwardRef<
 
   // Expose submit function to parent via ref
   React.useImperativeHandle(ref, () => ({
-    focus: () => {},
-    blur: () => {},
+    focus: () => textareaRef.current?.focus(),
+    blur: () => textareaRef.current?.blur(),
     submit: handleSubmit,
     clear: () => setInternalValue(''),
-    getValue: () => internalValue
+    getValue: () => internalValue,
+    hasValue: () => internalValue.trim().length > 0
   } as any), [handleSubmit, internalValue]);
 
   return (
     <textarea
+      ref={textareaRef}
       value={internalValue}
       onChange={handleChange}
       onKeyDown={handleKeyDown}
@@ -1590,68 +1593,32 @@ export default function SynergizeAgile() {
     }
   }, [selectedRole, selectedMode, selectedProvider, hasInitialized]);
 
-  // Prevent page scroll when dropdowns are interacted with
+  // Simplified mobile UI handling
   useEffect(() => {
-    const preventScroll = (e: Event) => {
-      // Check if the event target is within a dropdown
-      const target = e.target as HTMLElement;
-      if (target && (
-        target.closest('[role="combobox"]') || 
-        target.closest('[data-radix-select-trigger]') ||
-        target.closest('[data-radix-select-content]') ||
-        target.closest('.select-trigger') ||
-        target.closest('.select-content')
-      )) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    };
-
-    // Mobile scroll optimization - prevent page scroll when in chat view
-    const handleTouchMove = (e: TouchEvent) => {
-      if (isFullChatView && isMobile) {
-        const target = e.target as HTMLElement;
-        // Allow scrolling within chat container or sidebar
-        if (!target.closest('[data-chat-container]') && !target.closest('[data-sidebar-container]')) {
-          e.preventDefault();
-        }
-      }
-      // Prevent page scroll when sidebar is open on mobile
-      if (sidebarOpen && isMobile) {
-        const target = e.target as HTMLElement;
-        // Only allow scrolling within the sidebar
-        if (!target.closest('[data-sidebar-container]')) {
-          e.preventDefault();
-        }
-      }
-    };
-
-    // Add event listeners for mobile touch events
-    document.addEventListener('touchstart', preventScroll, { passive: false });
-    document.addEventListener('touchmove', preventScroll, { passive: false });
-    
-    // Add mobile-specific scroll prevention
-    if ((isFullChatView && isMobile) || (sidebarOpen && isMobile)) {
-      document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    // Only handle body scroll lock for mobile chat view and sidebar
+    if (isMobile && (isFullChatView || sidebarOpen)) {
       // Prevent iOS Safari bounce scrolling on the body
       document.body.style.overflow = 'hidden';
       document.body.style.position = 'fixed';
       document.body.style.width = '100%';
       document.body.style.height = '100%';
+      document.body.style.top = '0';
+    } else {
+      // Restore body scroll
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.height = '';
+      document.body.style.top = '';
     }
     
     return () => {
-      document.removeEventListener('touchstart', preventScroll);
-      document.removeEventListener('touchmove', preventScroll);
-      document.removeEventListener('touchmove', handleTouchMove);
-      
-      // Restore body scroll when not in full chat view
-      if (!isFullChatView || !isMobile) {
-        document.body.style.overflow = '';
-        document.body.style.position = '';
-        document.body.style.width = '';
-        document.body.style.height = '';
-      }
+      // Always restore on cleanup
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.height = '';
+      document.body.style.top = '';
     };
   }, [isFullChatView, isMobile, sidebarOpen]);
 
@@ -1704,7 +1671,8 @@ export default function SynergizeAgile() {
     };
 
     setMessages(prev => [...prev, userMessage]);
-    // Don't clear inputMessage here - the self-contained input handles its own clearing
+    // Clear the parent inputMessage state to sync with self-contained input
+    setInputMessage('');
     setIsLoading(true);
 
     try {
@@ -2185,7 +2153,7 @@ export default function SynergizeAgile() {
   const FullChatView = () => (
     <div className="h-screen flex bg-gray-50">
       {/* Sidebar */}
-      <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 fixed lg:relative z-30 w-80 h-full bg-white border-r border-gray-200 shadow-lg transition-transform duration-300`} data-sidebar-container="true">
+      <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 fixed lg:relative z-30 w-80 h-full bg-white border-r border-gray-200 shadow-lg transition-transform duration-300 ease-in-out`} data-sidebar-container="true">
         <div className="flex flex-col h-full">
           {/* Sidebar Header */}
           <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-teal-50 to-emerald-50">
@@ -2210,11 +2178,11 @@ export default function SynergizeAgile() {
 
           {/* Controls */}
           <div 
-            className="flex-1 p-6 space-y-6 overflow-y-auto overscroll-contain touch-pan-y"
+            className="flex-1 p-6 space-y-6 overflow-y-auto overscroll-contain"
             style={{
               WebkitOverflowScrolling: 'touch',
               scrollBehavior: 'smooth',
-              touchAction: 'pan-y'
+              touchAction: 'manipulation'
             }}
           >
             {/* Role Selection */}
@@ -2383,8 +2351,17 @@ export default function SynergizeAgile() {
       {/* Sidebar Overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden touch-manipulation"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setSidebarOpen(false);
+          }}
+          onTouchEnd={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setSidebarOpen(false);
+          }}
         />
       )}
 
@@ -2422,13 +2399,13 @@ export default function SynergizeAgile() {
 
         {/* Messages */}
         <div 
-          className="flex-1 overflow-y-auto p-6 space-y-6 overscroll-contain touch-pan-y" 
+          className="flex-1 overflow-y-auto p-6 space-y-6 overscroll-contain" 
           ref={chatContainerRef}
           data-chat-container="true"
           style={{
             WebkitOverflowScrolling: 'touch',
             scrollBehavior: 'smooth',
-            touchAction: 'pan-y',
+            touchAction: 'manipulation',
             paddingBottom: isMobile ? '140px' : '20px' // Extra padding on mobile for fixed input area
           }}
         >
@@ -2518,10 +2495,11 @@ export default function SynergizeAgile() {
 
         {/* Mobile Scroll Indicator */}
         {isMobile && showScrollIndicator && (
-          <div className="fixed bottom-24 right-4 z-40">
-            <button
-              type="button" 
-              className="bg-teal-600 text-white p-3 rounded-full shadow-lg animate-bounce cursor-pointer hover:bg-teal-700 transition-colors touch-manipulation"
+          <div className="fixed bottom-28 right-4 z-40">
+            <Button
+              variant="default"
+              size="sm"
+              className="bg-teal-600 hover:bg-teal-700 text-white p-3 rounded-full shadow-lg touch-manipulation min-h-[48px] min-w-[48px]"
               onClick={() => {
                 if (chatContainerRef.current) {
                   chatContainerRef.current.scrollTo({
@@ -2530,17 +2508,16 @@ export default function SynergizeAgile() {
                   });
                 }
               }}
-              style={{ minHeight: '48px', minWidth: '48px' }}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
               </svg>
-            </button>
+            </Button>
           </div>
         )}
 
         {/* Input Area */}
-        <div className={`bg-white border-t border-gray-200 p-4 ${isMobile ? 'fixed bottom-0 left-0 right-0 z-50 shadow-lg' : ''}`}>
+        <div className={`bg-white border-t border-gray-200 p-4 ${isMobile ? 'fixed bottom-0 left-0 right-0 z-50 shadow-lg touch-manipulation' : ''}`}>
           {files.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-4">
               {files.map((file, index) => (
@@ -2785,8 +2762,15 @@ Format as a realistic conversation with clear speaker labels and include decisio
             </div>
 
             <Button
-              onClick={() => handleSendMessage()}
-              disabled={isLoading || (!inputMessage.trim() && files.length === 0) || responseCount >= maxResponses}
+              onClick={() => {
+                // Use the input ref to submit if available, otherwise fallback to handleSendMessage
+                if (inputMessageRef.current && (inputMessageRef.current as any).hasValue?.()) {
+                  (inputMessageRef.current as any).submit?.();
+                } else if (files.length > 0) {
+                  handleSendMessage('');
+                }
+              }}
+              disabled={isLoading || responseCount >= maxResponses}
               className={`flex-shrink-0 min-h-[50px] px-6 bg-gradient-to-r ${currentRole.color} hover:opacity-90 transition-opacity ${responseCount >= maxResponses ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               {isLoading ? (
@@ -3178,12 +3162,12 @@ Format as a realistic conversation with clear speaker labels and include decisio
                 <CardContent className="flex-1 flex flex-col p-0 min-h-0 overflow-hidden">
                   {/* Messages */}
                   <div 
-                    className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 min-h-0 overscroll-contain touch-pan-y"
+                    className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 min-h-0 overscroll-contain"
                     data-chat-container="true"
                     style={{
                       WebkitOverflowScrolling: 'touch',
                       scrollBehavior: 'smooth',
-                      touchAction: 'pan-y'
+                      touchAction: 'manipulation'
                     }}
                   >
                     {messages.length === 0 && (
@@ -3396,8 +3380,15 @@ Format as a realistic conversation with clear speaker labels and include decisio
                           </div>
                           
                           <Button
-                            onClick={() => handleSendMessage()}
-                            disabled={isLoading || (!inputMessage.trim() && files.length === 0) || responseCount >= maxResponses}
+                            onClick={() => {
+                              // Use the input ref to submit if available, otherwise fallback to handleSendMessage
+                              if (inputMessageRef.current && (inputMessageRef.current as any).hasValue?.()) {
+                                (inputMessageRef.current as any).submit?.();
+                              } else if (files.length > 0) {
+                                handleSendMessage('');
+                              }
+                            }}
+                            disabled={isLoading || responseCount >= maxResponses}
                             className={`flex-shrink-0 min-h-[50px] px-6 bg-gradient-to-r ${currentRole.color} hover:opacity-90 transition-opacity ${responseCount >= maxResponses ? 'opacity-50 cursor-not-allowed' : ''}`}
                             title="Send message"
                           >
