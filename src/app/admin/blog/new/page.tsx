@@ -10,7 +10,28 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Save, Eye, X, FileText, Tag, Image as ImageIcon, Sparkles, Brain, Lightbulb, Copy, Loader2 } from 'lucide-react';
+import { 
+  ArrowLeft, 
+  Save, 
+  Eye, 
+  X, 
+  FileText, 
+  Tag, 
+  Image as ImageIcon, 
+  Sparkles, 
+  Brain, 
+  Lightbulb, 
+  Copy, 
+  Loader2,
+  CheckCircle,
+  AlertCircle,
+  Home,
+  Shield,
+  Clock,
+  User,
+  Globe,
+  Search
+} from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import PageLayout from '@/components/shared/PageLayout';
@@ -23,9 +44,12 @@ interface BlogCategory {
 
 export default function NewBlogPostPage() {
   const router = useRouter();
-  const { user, userProfile } = useAuth();
+  const { user, userProfile, loading: authLoading } = useAuth();
   const [categories, setCategories] = useState<BlogCategory[]>([]);
   const [loading, setLoading] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  
   const [formData, setFormData] = useState({
     title: '',
     slug: '',
@@ -47,22 +71,68 @@ export default function NewBlogPostPage() {
   const [aiSuggestions, setAiSuggestions] = useState('');
   const [aiMode, setAiMode] = useState<'content' | 'outline' | 'title' | 'seo'>('content');
 
+  const steps = [
+    { number: 1, title: 'Basic Info', description: 'Title and fundamentals', icon: FileText },
+    { number: 2, title: 'Content', description: 'Main post content', icon: Sparkles },
+    { number: 3, title: 'Media & Tags', description: 'Images and categorization', icon: ImageIcon },
+    { number: 4, title: 'SEO & Review', description: 'Optimization and final review', icon: Search }
+  ];
+
+  const defaultCategories = [
+    { name: 'Agile & Scrum', slug: 'agile-scrum', color: 'bg-blue-100 text-blue-800' },
+    { name: 'Leadership', slug: 'leadership', color: 'bg-purple-100 text-purple-800' },
+    { name: 'Product Management', slug: 'product-management', color: 'bg-green-100 text-green-800' },
+    { name: 'Mental Fitness', slug: 'mental-fitness', color: 'bg-pink-100 text-pink-800' },
+    { name: 'Technology', slug: 'technology', color: 'bg-orange-100 text-orange-800' },
+    { name: 'Business Strategy', slug: 'business-strategy', color: 'bg-teal-100 text-teal-800' }
+  ];
+
   useEffect(() => {
-    if (userProfile?.role === 'ADMIN') {
-      fetchCategories();
+    if (authLoading) return;
+    
+    if (!user || userProfile?.role !== 'ADMIN') {
+      router.push('/login');
+      return;
     }
-  }, [userProfile]);
+    
+    fetchCategories();
+  }, [user, userProfile, authLoading, router]);
 
   const fetchCategories = async () => {
     try {
       const response = await fetch('/api/blog/categories');
       if (response.ok) {
         const data = await response.json();
-        setCategories(data.categories);
+        setCategories(data.categories?.length ? data.categories : defaultCategories);
+      } else {
+        setCategories(defaultCategories);
       }
     } catch (error) {
       console.error('Error fetching categories:', error);
+      setCategories(defaultCategories);
     }
+  };
+
+  const validateStep = (step: number): boolean => {
+    const errors: Record<string, string> = {};
+    
+    if (step === 1) {
+      if (!formData.title) errors.title = 'Post title is required';
+      if (!formData.slug) errors.slug = 'URL slug is required';
+      if (!formData.excerpt) errors.excerpt = 'Post excerpt is required';
+    }
+    
+    if (step === 2) {
+      if (!formData.content) errors.content = 'Post content is required';
+      if (formData.content.split(' ').length < 50) errors.content = 'Content should be at least 50 words';
+    }
+    
+    if (step === 3) {
+      if (!formData.category) errors.category = 'Category is required';
+    }
+    
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const generateSlug = (title: string) => {
@@ -78,6 +148,28 @@ export default function NewBlogPostPage() {
       title,
       slug: prev.slug || generateSlug(title)
     }));
+    
+    if (formErrors.title) {
+      setFormErrors(prev => ({ ...prev, title: '' }));
+    }
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    
+    if (formErrors[field]) {
+      setFormErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
+
+  const nextStep = () => {
+    if (validateStep(currentStep)) {
+      setCurrentStep(prev => Math.min(prev + 1, steps.length));
+    }
+  };
+
+  const prevStep = () => {
+    setCurrentStep(prev => Math.max(prev - 1, 1));
   };
 
   const addTag = () => {
@@ -140,12 +232,15 @@ export default function NewBlogPostPage() {
       if (response.ok) {
         const data = await response.json();
         setAiSuggestions(data.content || data.response);
+        setShowAIAssistant(true);
       } else {
         setAiSuggestions('Sorry, I encountered an error generating suggestions. Please try again.');
+        setShowAIAssistant(true);
       }
     } catch (error) {
       console.error('AI suggestion error:', error);
       setAiSuggestions('Sorry, I encountered an error generating suggestions. Please try again.');
+      setShowAIAssistant(true);
     } finally {
       setAiLoading(false);
     }
@@ -155,11 +250,9 @@ export default function NewBlogPostPage() {
     if (field === 'content') {
       setFormData(prev => ({ ...prev, content: aiSuggestions }));
     } else if (field === 'excerpt') {
-      // Extract first paragraph for excerpt
       const excerpt = aiSuggestions.split('\n\n')[0].substring(0, 300) + '...';
       setFormData(prev => ({ ...prev, excerpt }));
     } else if (field === 'title') {
-      // Use first suggested title
       const firstTitle = aiSuggestions.split('\n')[0].replace(/^\d+\.\s*/, '');
       setFormData(prev => ({ ...prev, title: firstTitle, slug: generateSlug(firstTitle) }));
     }
@@ -170,7 +263,9 @@ export default function NewBlogPostPage() {
     navigator.clipboard.writeText(text);
   };
 
-  const savePost = async () => {
+  const savePost = async (status: string = 'draft') => {
+    if (!validateStep(currentStep)) return;
+    
     if (!formData.title || !formData.content || !formData.category) {
       alert('Please fill in all required fields (title, content, category)');
       return;
@@ -179,7 +274,6 @@ export default function NewBlogPostPage() {
     try {
       setLoading(true);
       
-      // Get Supabase session token
       const supabase = createClient();
       const { data: { session } } = await supabase.auth.getSession();
       
@@ -196,6 +290,7 @@ export default function NewBlogPostPage() {
         },
         body: JSON.stringify({
           ...formData,
+          status,
           reading_time: Math.ceil(formData.content.split(' ').length / 200)
         })
       });
@@ -216,22 +311,37 @@ export default function NewBlogPostPage() {
     }
   };
 
-  if (userProfile?.role !== 'ADMIN') {
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-teal-50 to-cyan-50">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-gradient-to-br from-teal-600 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Loader2 className="h-8 w-8 animate-spin text-white" />
+          </div>
+          <p className="text-gray-600 text-lg font-medium">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user || userProfile?.role !== 'ADMIN') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-teal-50 to-cyan-50 p-4">
-        <Card className="w-full max-w-md shadow-xl border-0">
+        <Card className="w-full max-w-md shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
           <CardHeader className="text-center">
-            <FileText className="h-12 w-12 text-red-500 mx-auto mb-4" />
-            <CardTitle className="text-2xl">Access Denied</CardTitle>
-            <CardDescription>
+            <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Shield className="h-8 w-8 text-white" />
+            </div>
+            <CardTitle className="text-2xl font-bold text-gray-900">Access Denied</CardTitle>
+            <CardDescription className="text-gray-600">
               You don't have permission to access this page.
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center">
-            <Button asChild className="bg-teal-600 hover:bg-teal-700">
+            <Button asChild className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-medium w-full">
               <Link href="/">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Go Home
+                <Home className="w-4 h-4 mr-2" />
+                Return Home
               </Link>
             </Button>
           </CardContent>
@@ -240,523 +350,574 @@ export default function NewBlogPostPage() {
     );
   }
 
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="title" className="text-sm font-semibold text-gray-900 flex items-center">
+                <FileText className="w-4 h-4 mr-2 text-teal-600" />
+                Post Title *
+              </Label>
+              <Input
+                id="title"
+                value={formData.title}
+                onChange={(e) => handleTitleChange(e.target.value)}
+                placeholder="e.g., 10 Essential Agile Leadership Principles for 2024"
+                className={`bg-white border-2 ${formErrors.title ? 'border-red-300' : 'border-gray-200'} focus:border-teal-500 text-gray-900 placeholder-gray-500 font-medium`}
+              />
+              {formErrors.title && <p className="text-red-600 text-sm flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{formErrors.title}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="slug" className="text-sm font-semibold text-gray-900 flex items-center">
+                <Globe className="w-4 h-4 mr-2 text-blue-600" />
+                URL Slug *
+              </Label>
+              <Input
+                id="slug"
+                value={formData.slug}
+                onChange={(e) => handleInputChange('slug', e.target.value)}
+                placeholder="url-friendly-slug"
+                className={`bg-white border-2 ${formErrors.slug ? 'border-red-300' : 'border-gray-200'} focus:border-teal-500 text-gray-900 placeholder-gray-500 font-medium`}
+              />
+              <p className="text-xs text-gray-600 bg-gray-50 p-2 rounded border">
+                <strong>Preview URL:</strong> /industry-insight/{formData.slug || 'your-post-slug'}
+              </p>
+              {formErrors.slug && <p className="text-red-600 text-sm flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{formErrors.slug}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="excerpt" className="text-sm font-semibold text-gray-900 flex items-center">
+                <Eye className="w-4 h-4 mr-2 text-purple-600" />
+                Post Excerpt *
+              </Label>
+              <Textarea
+                id="excerpt"
+                value={formData.excerpt}
+                onChange={(e) => handleInputChange('excerpt', e.target.value)}
+                placeholder="Write a compelling summary that will appear in post previews and search results..."
+                className={`bg-white border-2 ${formErrors.excerpt ? 'border-red-300' : 'border-gray-200'} focus:border-teal-500 text-gray-900 placeholder-gray-500 font-medium min-h-[120px]`}
+                rows={4}
+              />
+              <p className="text-xs text-gray-600">{formData.excerpt.length}/300 characters</p>
+              {formErrors.excerpt && <p className="text-red-600 text-sm flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{formErrors.excerpt}</p>}
+            </div>
+          </div>
+        );
+
+      case 2:
+        return (
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="content" className="text-sm font-semibold text-gray-900 flex items-center">
+                  <Sparkles className="w-4 h-4 mr-2 text-teal-600" />
+                  Post Content *
+                </Label>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setAiMode('content');
+                      generateAISuggestions();
+                    }}
+                    disabled={aiLoading}
+                    className="bg-purple-50 border-purple-200 text-purple-700 hover:bg-purple-100"
+                  >
+                    {aiLoading ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Brain className="w-3 h-3 mr-1" />}
+                    AI Content
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setAiMode('outline');
+                      generateAISuggestions();
+                    }}
+                    disabled={aiLoading}
+                    className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
+                  >
+                    <Lightbulb className="w-3 h-3 mr-1" />
+                    AI Outline
+                  </Button>
+                </div>
+              </div>
+              <Textarea
+                id="content"
+                value={formData.content}
+                onChange={(e) => handleInputChange('content', e.target.value)}
+                placeholder="Write your comprehensive blog post content here... 
+
+You can use HTML tags for formatting:
+- <h2>Section Headings</h2>
+- <p>Paragraphs</p>
+- <strong>Bold text</strong>
+- <ul><li>Bullet points</li></ul>
+- <a href='#'>Links</a>"
+                className={`bg-white border-2 ${formErrors.content ? 'border-red-300' : 'border-gray-200'} focus:border-teal-500 text-gray-900 placeholder-gray-500 font-medium min-h-[400px]`}
+                rows={20}
+              />
+              <div className="flex items-center justify-between text-xs text-gray-600">
+                <span>Words: {formData.content.split(' ').filter(w => w.length > 0).length}</span>
+                <span className="flex items-center">
+                  <Clock className="w-3 h-3 mr-1" />
+                  Estimated reading time: {Math.ceil(formData.content.split(' ').length / 200)} minutes
+                </span>
+              </div>
+              {formErrors.content && <p className="text-red-600 text-sm flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{formErrors.content}</p>}
+            </div>
+
+            {/* AI Context for better suggestions */}
+            <Card className="bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-200">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-semibold text-purple-900 flex items-center">
+                  <Brain className="w-4 h-4 mr-2" />
+                  AI Writing Assistant
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="space-y-2">
+                  <Label htmlFor="ai-context" className="text-xs font-medium text-gray-700">
+                    Provide context for better AI suggestions (optional)
+                  </Label>
+                  <Textarea
+                    id="ai-context"
+                    value={aiContext}
+                    onChange={(e) => setAiContext(e.target.value)}
+                    placeholder="e.g., Focus on remote teams, include case studies, target mid-level managers..."
+                    className="bg-white border border-purple-200 text-gray-900 text-sm"
+                    rows={2}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        );
+
+      case 3:
+        return (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="category" className="text-sm font-semibold text-gray-900 flex items-center">
+                  <Tag className="w-4 h-4 mr-2 text-teal-600" />
+                  Category *
+                </Label>
+                <Select 
+                  value={formData.category} 
+                  onValueChange={(value) => handleInputChange('category', value)}
+                >
+                  <SelectTrigger className={`bg-white border-2 ${formErrors.category ? 'border-red-300' : 'border-gray-200'} focus:border-teal-500 text-gray-900`}>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    {categories.map((category) => (
+                      <SelectItem key={category.slug} value={category.name}>
+                        <div className="flex items-center">
+                          <Badge className={`${category.color} mr-2 text-xs`}>
+                            {category.name}
+                          </Badge>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {formErrors.category && <p className="text-red-600 text-sm flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{formErrors.category}</p>}
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold text-gray-900 flex items-center">
+                  <Tag className="w-4 h-4 mr-2 text-blue-600" />
+                  Tags
+                </Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="Add a tag..."
+                    className="bg-white border-2 border-gray-200 focus:border-teal-500 text-gray-900 placeholder-gray-500 font-medium"
+                  />
+                  <Button 
+                    onClick={addTag} 
+                    size="sm" 
+                    className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-medium"
+                  >
+                    Add
+                  </Button>
+                </div>
+                
+                {formData.tags.length > 0 && (
+                  <div className="space-y-2">
+                    <Label className="text-xs font-medium text-gray-700">Current Tags:</Label>
+                    <div className="flex flex-wrap gap-2">
+                      {formData.tags.map((tag, index) => (
+                        <Badge key={index} variant="secondary" className="flex items-center gap-1 text-xs bg-teal-100 text-teal-800">
+                          {tag}
+                          <X 
+                            className="h-3 w-3 cursor-pointer hover:text-red-600" 
+                            onClick={() => removeTag(tag)}
+                          />
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="image" className="text-sm font-semibold text-gray-900 flex items-center">
+                <ImageIcon className="w-4 h-4 mr-2 text-purple-600" />
+                Featured Image URL
+              </Label>
+              <Input
+                id="image"
+                value={formData.image}
+                onChange={(e) => handleInputChange('image', e.target.value)}
+                placeholder="https://example.com/featured-image.jpg"
+                className="bg-white border-2 border-gray-200 focus:border-teal-500 text-gray-900 placeholder-gray-500 font-medium"
+              />
+              {formData.image && (
+                <div className="mt-4 p-4 bg-gray-50 rounded-lg border-2 border-gray-200">
+                  <p className="text-sm font-medium text-gray-700 mb-3">Image Preview:</p>
+                  <img
+                    src={formData.image}
+                    alt="Featured image preview"
+                    className="w-full max-w-lg h-48 object-cover rounded-lg border-2 border-gray-200 shadow-md"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        );
+
+      case 4:
+        const selectedCategory = categories.find(cat => cat.name === formData.category);
+        return (
+          <div className="space-y-6">
+            {/* SEO Section */}
+            <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg font-bold text-blue-900 flex items-center">
+                  <Search className="w-5 h-5 mr-2" />
+                  SEO Optimization
+                </CardTitle>
+                <CardDescription className="text-blue-700">
+                  Optimize your post for search engines and social sharing
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="meta_title" className="text-sm font-semibold text-gray-900">Meta Title</Label>
+                  <Input
+                    id="meta_title"
+                    value={formData.meta_title}
+                    onChange={(e) => handleInputChange('meta_title', e.target.value)}
+                    placeholder="SEO title (defaults to post title if empty)"
+                    className="bg-white border-2 border-gray-200 focus:border-teal-500 text-gray-900 placeholder-gray-500 font-medium"
+                  />
+                  <p className="text-xs text-gray-600">{(formData.meta_title || formData.title).length}/60 characters (recommended)</p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="meta_description" className="text-sm font-semibold text-gray-900">Meta Description</Label>
+                  <Textarea
+                    id="meta_description"
+                    value={formData.meta_description}
+                    onChange={(e) => handleInputChange('meta_description', e.target.value)}
+                    placeholder="SEO description (defaults to excerpt if empty)"
+                    className="bg-white border-2 border-gray-200 focus:border-teal-500 text-gray-900 placeholder-gray-500 font-medium"
+                    rows={3}
+                  />
+                  <p className="text-xs text-gray-600">{(formData.meta_description || formData.excerpt).length}/160 characters (recommended)</p>
+                </div>
+
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setAiMode('seo');
+                    generateAISuggestions();
+                  }}
+                  disabled={aiLoading}
+                  className="bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
+                >
+                  {aiLoading ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Sparkles className="w-3 h-3 mr-1" />}
+                  Generate SEO with AI
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Review Section */}
+            <Card className="bg-gradient-to-r from-teal-50 to-emerald-50 border-2 border-teal-200">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg font-bold text-teal-900 flex items-center">
+                  <CheckCircle className="w-5 h-5 mr-2" />
+                  Post Review
+                </CardTitle>
+                <CardDescription className="text-teal-700">
+                  Review your post before publishing
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-sm font-semibold text-gray-600">Title</p>
+                      <p className="text-lg font-bold text-gray-900">{formData.title || 'Untitled Post'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-600">Category</p>
+                      {selectedCategory && (
+                        <Badge className={`${selectedCategory.color} text-sm`}>
+                          {selectedCategory.name}
+                        </Badge>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-600">Tags</p>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {formData.tags.length > 0 ? (
+                          formData.tags.map((tag, index) => (
+                            <Badge key={index} variant="outline" className="text-xs">
+                              {tag}
+                            </Badge>
+                          ))
+                        ) : (
+                          <p className="text-gray-500 text-sm">No tags added</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-sm font-semibold text-gray-600">Reading Time</p>
+                      <p className="text-gray-900 font-medium flex items-center">
+                        <Clock className="w-4 h-4 mr-1 text-blue-600" />
+                        {Math.ceil(formData.content.split(' ').length / 200)} minutes
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-600">Word Count</p>
+                      <p className="text-gray-900 font-medium">{formData.content.split(' ').filter(w => w.length > 0).length} words</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-600">URL Slug</p>
+                      <p className="text-gray-900 font-medium text-sm break-all">/industry-insight/{formData.slug}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {formData.excerpt && (
+                  <div>
+                    <p className="text-sm font-semibold text-gray-600 mb-2">Excerpt Preview</p>
+                    <div className="bg-white p-4 rounded-lg border max-h-24 overflow-y-auto">
+                      <p className="text-gray-900 text-sm">{formData.excerpt}</p>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
   return (
     <PageLayout>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-teal-50 to-cyan-50">
-        {/* Mobile-Optimized Header */}
-        <header className="bg-white/80 backdrop-blur-sm shadow-sm border-b border-teal-100 sticky top-0 z-40">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 gap-4">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-teal-50 to-cyan-50 py-8">
+        {/* Header */}
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border-0 p-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-teal-600 to-emerald-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <FileText className="h-6 w-6 text-white" />
+                <div className="w-16 h-16 bg-gradient-to-br from-teal-600 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg">
+                  <FileText className="h-8 w-8 text-white" />
                 </div>
-                <div className="min-w-0">
-                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-gray-900 to-teal-700 bg-clip-text text-transparent truncate">Create New Post</h1>
-                  <p className="text-sm sm:text-base text-gray-600 hidden sm:block">Write and publish a new blog post</p>
+                <div>
+                  <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-teal-700 bg-clip-text text-transparent">
+                    Create New Post
+                  </h1>
+                  <p className="text-gray-600 font-medium">Write and publish engaging blog content</p>
                 </div>
               </div>
-              <div className="flex space-x-2 sm:space-x-3">
-                <Button variant="outline" size="sm" asChild className="flex-1 sm:flex-none bg-white/80 border-teal-200 text-gray-900 hover:bg-teal-50 hover:border-teal-400">
+              <div className="flex gap-3">
+                <Button variant="outline" asChild className="bg-white/80 border-2 border-teal-200 hover:bg-teal-50 hover:border-teal-400 text-gray-900 font-medium">
                   <Link href="/admin/blog">
                     <ArrowLeft className="w-4 h-4 mr-2" />
-                    <span className="hidden sm:inline">Back to Blog</span>
-                    <span className="sm:hidden">Back</span>
+                    Back to Blog
                   </Link>
-                </Button>
-                <Button 
-                  size="sm"
-                  onClick={savePost}
-                  disabled={loading}
-                  className="flex-1 sm:flex-none bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700"
-                >
-                  {loading ? (
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  ) : (
-                    <Save className="w-4 h-4 mr-2" />
-                  )}
-                  <span className="hidden sm:inline">{loading ? 'Saving...' : 'Save Post'}</span>
-                  <span className="sm:hidden">{loading ? 'Saving...' : 'Save'}</span>
                 </Button>
               </div>
             </div>
           </div>
-        </header>
+        </div>
 
-        {/* Main Content */}
-        <main className="max-w-7xl mx-auto py-4 sm:py-6 px-4 sm:px-6 lg:px-8">
-          <div className="space-y-6 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-8">
-            {/* Main Content - Mobile First, Desktop 2/3 width */}
-            <div className="lg:col-span-2 space-y-6">
-              {/* Basic Info */}
-              <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-                <CardHeader className="pb-4 bg-white/50 backdrop-blur-sm">
-                  <CardTitle className="text-lg text-gray-900">Basic Information</CardTitle>
-                  <CardDescription className="text-sm text-gray-600">
-                    Enter the main details for your blog post
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4 bg-white/50 backdrop-blur-sm">
-                  <div>
-                    <Label htmlFor="title" className="text-sm font-medium text-gray-900">Title *</Label>
-                    <Input
-                      id="title"
-                      value={formData.title}
-                      onChange={(e) => handleTitleChange(e.target.value)}
-                      placeholder="Enter post title..."
-                      className="mt-2 bg-white/80 border-teal-200 focus:border-teal-400 text-gray-900"
-                    />
+        {/* Progress Steps */}
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border-0 p-6">
+            <div className="flex items-center justify-between">
+              {steps.map((step, index) => (
+                <div key={step.number} className="flex items-center">
+                  <div className={`flex items-center justify-center w-12 h-12 rounded-full font-bold text-sm transition-all duration-300 ${
+                    currentStep === step.number 
+                      ? 'bg-gradient-to-r from-teal-600 to-emerald-600 text-white shadow-lg' 
+                      : currentStep > step.number 
+                      ? 'bg-green-500 text-white shadow-md' 
+                      : 'bg-gray-200 text-gray-500'
+                  }`}>
+                    {currentStep > step.number ? (
+                      <CheckCircle className="w-6 h-6" />
+                    ) : (
+                      <step.icon className="w-6 h-6" />
+                    )}
                   </div>
-
-                  <div>
-                    <Label htmlFor="slug" className="text-sm font-medium text-gray-900">URL Slug</Label>
-                    <Input
-                      id="slug"
-                      value={formData.slug}
-                      onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
-                      placeholder="url-friendly-slug"
-                      className="mt-2 bg-white border-gray-300 text-gray-900"
-                    />
-                    <p className="text-xs text-gray-600 mt-1">
-                      URL: /industry-insight/{formData.slug || 'your-post-slug'}
+                  <div className="ml-3 hidden sm:block">
+                    <p className={`text-sm font-semibold ${currentStep >= step.number ? 'text-gray-900' : 'text-gray-500'}`}>
+                      {step.title}
+                    </p>
+                    <p className={`text-xs ${currentStep >= step.number ? 'text-gray-600' : 'text-gray-400'}`}>
+                      {step.description}
                     </p>
                   </div>
-
-                  <div>
-                    <Label htmlFor="excerpt" className="text-sm font-medium text-gray-900">Excerpt</Label>
-                    <Textarea
-                      id="excerpt"
-                      value={formData.excerpt}
-                      onChange={(e) => setFormData(prev => ({ ...prev, excerpt: e.target.value }))}
-                      placeholder="Brief description of the post..."
-                      className="mt-2 bg-white border-gray-300 text-gray-900"
-                      rows={3}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Content */}
-              <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-                <CardHeader className="pb-4 bg-white/50 backdrop-blur-sm">
-                  <CardTitle className="text-lg flex items-center text-gray-900">
-                    <FileText className="w-5 h-5 mr-2 text-teal-600" />
-                    Content *
-                  </CardTitle>
-                  <CardDescription className="text-sm text-gray-600">
-                    Write your blog post content. You can use HTML tags for formatting.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="bg-white/50 backdrop-blur-sm">
-                  <Textarea
-                    value={formData.content}
-                    onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-                    placeholder="Write your blog post content here... You can use HTML tags like <h2>, <p>, <strong>, <ul>, <li>, etc."
-                    className="min-h-[300px] sm:min-h-[400px] bg-white border-gray-300 text-gray-900"
-                  />
-                  <p className="text-xs text-gray-600 mt-2">
-                    Estimated reading time: {Math.ceil(formData.content.split(' ').length / 200)} minutes
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* SEO - Mobile: Show after content, Desktop: Show after content */}
-              <Card className="bg-white border border-gray-200 shadow-sm">
-                <CardHeader className="pb-4 bg-white">
-                  <CardTitle className="text-lg">SEO Settings</CardTitle>
-                  <CardDescription className="text-sm">
-                    Optimize your post for search engines
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4 bg-white">
-                  <div>
-                    <Label htmlFor="meta_title" className="text-sm font-medium text-gray-900">Meta Title</Label>
-                    <Input
-                      id="meta_title"
-                      value={formData.meta_title}
-                      onChange={(e) => setFormData(prev => ({ ...prev, meta_title: e.target.value }))}
-                      placeholder="SEO title (defaults to post title)"
-                      className="mt-2 bg-white border-gray-300 text-gray-900"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="meta_description" className="text-sm font-medium text-gray-900">Meta Description</Label>
-                    <Textarea
-                      id="meta_description"
-                      value={formData.meta_description}
-                      onChange={(e) => setFormData(prev => ({ ...prev, meta_description: e.target.value }))}
-                      placeholder="SEO description (defaults to excerpt)"
-                      className="mt-2 bg-white border-gray-300 text-gray-900"
-                      rows={2}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Sidebar - Mobile: Stack below content, Desktop: 1/3 width */}
-            <div className="space-y-6">
-              {/* Category */}
-              <Card className="bg-white border border-gray-200 shadow-sm">
-                <CardHeader className="pb-4 bg-white">
-                  <CardTitle className="text-lg flex items-center">
-                    <Tag className="w-5 h-5 mr-2" />
-                    Category *
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="bg-white">
-                  <Select 
-                    value={formData.category} 
-                    onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
-                  >
-                    <SelectTrigger className="bg-white border-gray-300 text-gray-900">
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white border-gray-300">
-                      {categories.map((category) => (
-                        <SelectItem key={category.slug} value={category.name}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </CardContent>
-              </Card>
-
-              {/* Featured Image */}
-              <Card className="bg-white border border-gray-200 shadow-sm">
-                <CardHeader className="pb-4 bg-white">
-                  <CardTitle className="text-lg flex items-center">
-                    <ImageIcon className="w-5 h-5 mr-2" />
-                    Featured Image
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4 bg-white">
-                  <div>
-                    <Label htmlFor="image" className="text-sm font-medium text-gray-900">Image URL</Label>
-                    <Input
-                      id="image"
-                      value={formData.image}
-                      onChange={(e) => setFormData(prev => ({ ...prev, image: e.target.value }))}
-                      placeholder="https://example.com/image.jpg"
-                      className="mt-2 bg-white border-gray-300 text-gray-900"
-                    />
-                  </div>
-                  {formData.image && (
-                    <div className="mt-4">
-                      <img
-                        src={formData.image}
-                        alt="Featured image preview"
-                        className="w-full h-32 object-cover rounded-md border"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                        }}
-                      />
-                    </div>
+                  {index < steps.length - 1 && (
+                    <div className={`w-16 h-1 mx-4 rounded-full transition-all duration-300 ${
+                      currentStep > step.number ? 'bg-green-500' : 'bg-gray-200'
+                    }`} />
                   )}
-                </CardContent>
-              </Card>
-
-              {/* Tags */}
-              <Card className="bg-white border border-gray-200 shadow-sm">
-                <CardHeader className="pb-4 bg-white">
-                  <CardTitle className="text-lg flex items-center">
-                    <Tag className="w-5 h-5 mr-2" />
-                    Tags
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="bg-white">
-                  <div className="space-y-4">
-                    <div className="flex gap-2">
-                      <Input
-                        value={tagInput}
-                        onChange={(e) => setTagInput(e.target.value)}
-                        onKeyPress={handleKeyPress}
-                        placeholder="Add a tag..."
-                        className="flex-1 bg-white border-gray-300 text-gray-900"
-                      />
-                      <Button onClick={addTag} size="sm" variant="outline">
-                        Add
-                      </Button>
-                    </div>
-                    
-                    {formData.tags.length > 0 && (
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium text-gray-900">Current Tags:</Label>
-                        <div className="flex flex-wrap gap-2">
-                          {formData.tags.map((tag, index) => (
-                            <Badge key={index} variant="secondary" className="flex items-center gap-1 text-xs">
-                              {tag}
-                              <X 
-                                className="h-3 w-3 cursor-pointer hover:text-red-600" 
-                                onClick={() => removeTag(tag)}
-                              />
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Publish Actions - Mobile: Show at bottom, Desktop: Show in sidebar */}
-              <Card className="bg-white border border-gray-200 shadow-sm">
-                <CardHeader className="pb-4 bg-white">
-                  <CardTitle className="text-lg">Publish</CardTitle>
-                  <CardDescription className="text-sm">
-                    Ready to publish your post?
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="bg-white">
-                  <div className="space-y-3">
-                    <div>
-                      <Label className="text-sm font-medium text-gray-900">Status</Label>
-                      <Select 
-                        value={formData.status} 
-                        onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}
-                      >
-                        <SelectTrigger className="mt-2 bg-white border-gray-300 text-gray-900">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white border-gray-300">
-                          <SelectItem value="draft">Draft</SelectItem>
-                          <SelectItem value="published">Published</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <Button 
-                      onClick={savePost}
-                      disabled={loading}
-                      className="w-full"
-                      size="lg"
-                    >
-                      {loading ? (
-                        <>
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                          Saving...
-                        </>
-                      ) : (
-                        <>
-                          <Save className="w-4 h-4 mr-2" />
-                          {formData.status === 'published' ? 'Publish Post' : 'Save Draft'}
-                        </>
-                      )}
-                    </Button>
-                    
-                    {formData.title && formData.slug && (
-                      <Button 
-                        variant="outline" 
-                        className="w-full"
-                        asChild
-                      >
-                        <Link href={`/industry-insight/${formData.slug}`} target="_blank">
-                          <Eye className="w-4 h-4 mr-2" />
-                          Preview Post
-                        </Link>
-                      </Button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+                </div>
+              ))}
             </div>
           </div>
-        </main>
+        </div>
 
-        {/* AI Assistant Floating Button */}
-        <div className="fixed bottom-6 right-6 z-50">
-          <Button
-            onClick={() => setShowAIAssistant(true)}
-            className="bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-full w-14 h-14"
-            size="lg"
-          >
-            <Sparkles className="w-6 h-6" />
-          </Button>
+        {/* Main Form */}
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Card className="bg-white/90 backdrop-blur-sm shadow-2xl border-0 rounded-2xl overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-teal-50 to-emerald-50 border-b border-teal-100 p-8">
+              <CardTitle className="text-2xl font-bold text-gray-900">
+                {steps[currentStep - 1]?.title}
+              </CardTitle>
+              <CardDescription className="text-gray-600 text-lg">
+                {steps[currentStep - 1]?.description}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-8">
+              {renderStepContent()}
+              
+              {/* Navigation Buttons */}
+              <div className="flex flex-col sm:flex-row justify-between gap-4 pt-8 mt-8 border-t border-gray-200">
+                <div className="flex gap-3">
+                  {currentStep > 1 && (
+                    <Button
+                      onClick={prevStep}
+                      variant="outline"
+                      className="bg-white border-2 border-gray-300 hover:bg-gray-50 text-gray-900 font-medium"
+                    >
+                      <ArrowLeft className="w-4 h-4 mr-2" />
+                      Previous
+                    </Button>
+                  )}
+                </div>
+                
+                <div className="flex gap-3">
+                  {currentStep < steps.length ? (
+                    <Button
+                      onClick={nextStep}
+                      className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-medium px-8"
+                    >
+                      Next Step
+                      <ArrowLeft className="w-4 h-4 ml-2 rotate-180" />
+                    </Button>
+                  ) : (
+                    <div className="flex gap-3">
+                      <Button
+                        onClick={() => savePost('draft')}
+                        disabled={loading}
+                        variant="outline"
+                        className="bg-white border-2 border-gray-300 hover:bg-gray-50 text-gray-900 font-medium"
+                      >
+                        {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+                        Save as Draft
+                      </Button>
+                      <Button
+                        onClick={() => savePost('published')}
+                        disabled={loading}
+                        className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-medium px-8"
+                      >
+                        {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Eye className="w-4 h-4 mr-2" />}
+                        Publish Post
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* AI Assistant Modal */}
         {showAIAssistant && (
-          <div className="fixed inset-0 bg-gray-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <Card className="w-full max-w-4xl max-h-[90vh] overflow-hidden bg-white border border-gray-200 shadow-xl">
-              <CardHeader className="bg-gradient-to-r from-teal-600 to-blue-600 text-white">
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <Card className="w-full max-w-4xl max-h-[80vh] overflow-hidden bg-white shadow-2xl">
+              <CardHeader className="bg-gradient-to-r from-purple-50 to-blue-50 border-b border-purple-200">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <Brain className="w-6 h-6" />
-                    <div>
-                      <CardTitle>AI Blog Assistant</CardTitle>
-                      <CardDescription className="text-teal-100">
-                        Get AI-powered suggestions for your blog content
-                      </CardDescription>
-                    </div>
-                  </div>
+                  <CardTitle className="flex items-center text-purple-900">
+                    <Brain className="w-5 h-5 mr-2" />
+                    AI Writing Assistant
+                  </CardTitle>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setShowAIAssistant(false)}
-                    className="text-white hover:bg-white/20"
+                    className="text-gray-500 hover:text-gray-700"
                   >
                     <X className="w-4 h-4" />
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent className="p-6 overflow-y-auto max-h-[calc(90vh-120px)] bg-white">
-                <div className="space-y-6">
-                  {/* AI Mode Selection */}
-                  <div>
-                    <Label className="text-sm font-medium">What would you like help with?</Label>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">
-                      <Button
-                        variant={aiMode === 'content' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setAiMode('content')}
-                        className="flex flex-col items-center p-4 h-auto"
-                      >
-                        <FileText className="w-5 h-5 mb-2" />
-                        <span className="text-xs">Full Content</span>
-                      </Button>
-                      <Button
-                        variant={aiMode === 'outline' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setAiMode('outline')}
-                        className="flex flex-col items-center p-4 h-auto"
-                      >
-                        <Lightbulb className="w-5 h-5 mb-2" />
-                        <span className="text-xs">Outline</span>
-                      </Button>
-                      <Button
-                        variant={aiMode === 'title' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setAiMode('title')}
-                        className="flex flex-col items-center p-4 h-auto"
-                      >
-                        <Tag className="w-5 h-5 mb-2" />
-                        <span className="text-xs">Title Ideas</span>
-                      </Button>
-                      <Button
-                        variant={aiMode === 'seo' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setAiMode('seo')}
-                        className="flex flex-col items-center p-4 h-auto"
-                      >
-                        <Eye className="w-5 h-5 mb-2" />
-                        <span className="text-xs">SEO</span>
-                      </Button>
-                    </div>
+              <CardContent className="p-6 overflow-y-auto max-h-[60vh]">
+                <div className="space-y-4">
+                  <div className="bg-gray-50 p-4 rounded-lg border-2 border-gray-200">
+                    <pre className="text-sm text-gray-900 whitespace-pre-wrap font-medium">{aiSuggestions}</pre>
                   </div>
-
-                  {/* Context Input */}
-                  <div>
-                    <Label htmlFor="aiContext" className="text-sm font-medium">
-                      Topic or Additional Context
-                    </Label>
-                    <Textarea
-                      id="aiContext"
-                      value={aiContext}
-                      onChange={(e) => setAiContext(e.target.value)}
-                      placeholder="Describe your blog topic, target audience, key points to cover, etc."
-                      className="mt-2"
-                      rows={3}
-                    />
+                  
+                  <div className="flex gap-3">
+                    <Button
+                      onClick={() => applyAISuggestion('content')}
+                      className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-medium"
+                    >
+                      Apply to Content
+                    </Button>
+                    <Button
+                      onClick={() => applyAISuggestion('excerpt')}
+                      variant="outline"
+                      className="border-2 border-teal-200 text-teal-700 hover:bg-teal-50"
+                    >
+                      Use as Excerpt
+                    </Button>
+                    <Button
+                      onClick={() => copyToClipboard(aiSuggestions)}
+                      variant="outline"
+                      className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50"
+                    >
+                      <Copy className="w-4 h-4 mr-2" />
+                      Copy
+                    </Button>
                   </div>
-
-                  {/* Blog Info Display */}
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <h4 className="font-medium mb-2">Current Blog Info:</h4>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="text-gray-600">Title:</span> {formData.title || 'Not set'}
-                      </div>
-                      <div>
-                        <span className="text-gray-600">Category:</span> {formData.category || 'Not set'}
-                      </div>
-                      <div>
-                        <span className="text-gray-600">Tags:</span> {formData.tags.length}
-                      </div>
-                      <div>
-                        <span className="text-gray-600">Content:</span> {formData.content ? `${formData.content.length} chars` : 'Empty'}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Generate Button */}
-                  <Button
-                    onClick={generateAISuggestions}
-                    disabled={aiLoading || (!formData.title && !aiContext)}
-                    className="w-full bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700"
-                  >
-                    {aiLoading ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Generating Suggestions...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="w-4 h-4 mr-2" />
-                        Generate AI Suggestions
-                      </>
-                    )}
-                  </Button>
-
-                  {/* AI Suggestions */}
-                  {aiSuggestions && (
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <h4 className="font-medium">AI Suggestions:</h4>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => copyToClipboard(aiSuggestions)}
-                        >
-                          <Copy className="w-4 h-4 mr-2" />
-                          Copy
-                        </Button>
-                      </div>
-                      <div className="bg-white border rounded-lg p-4 max-h-60 overflow-y-auto">
-                        <pre className="whitespace-pre-wrap text-sm">{aiSuggestions}</pre>
-                      </div>
-                      
-                      <div className="flex gap-2">
-                        {aiMode === 'content' && (
-                          <>
-                            <Button
-                              onClick={() => applyAISuggestion('content')}
-                              size="sm"
-                              className="flex-1"
-                            >
-                              Apply to Content
-                            </Button>
-                            <Button
-                              onClick={() => applyAISuggestion('excerpt')}
-                              variant="outline"
-                              size="sm"
-                              className="flex-1"
-                            >
-                              Apply to Excerpt
-                            </Button>
-                          </>
-                        )}
-                        {aiMode === 'title' && (
-                          <Button
-                            onClick={() => applyAISuggestion('title')}
-                            size="sm"
-                            className="flex-1"
-                          >
-                            Apply First Title
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {!formData.title && !aiContext && (
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                      <p className="text-sm text-yellow-800">
-                        Please enter a blog title or provide context to get AI suggestions.
-                      </p>
-                    </div>
-                  )}
                 </div>
               </CardContent>
             </Card>

@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import PageLayout from '@/components/shared/PageLayout';
 import { 
@@ -18,7 +19,18 @@ import {
   Loader2,
   Shield,
   Home,
-  Eye
+  Eye,
+  Upload,
+  Users,
+  MapPin,
+  User,
+  FileText,
+  Clock,
+  DollarSign,
+  Star,
+  CheckCircle,
+  AlertCircle,
+  Sparkles
 } from 'lucide-react';
 
 interface CourseFormData {
@@ -44,6 +56,8 @@ export default function CreateCourse() {
   const { user, userProfile, loading: authLoading } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   const [formData, setFormData] = useState<CourseFormData>({
     title: '',
@@ -64,6 +78,22 @@ export default function CreateCourse() {
     prerequisites: '',
   });
 
+  const steps = [
+    { number: 1, title: 'Basic Info', description: 'Course fundamentals', icon: BookOpen },
+    { number: 2, title: 'Details', description: 'Pricing & specifics', icon: FileText },
+    { number: 3, title: 'Content', description: 'Description & media', icon: Sparkles },
+    { number: 4, title: 'Review', description: 'Final review', icon: CheckCircle }
+  ];
+
+  const categories = [
+    { value: 'agile', label: 'Agile & Scrum', color: 'bg-blue-100 text-blue-800' },
+    { value: 'leadership', label: 'Leadership', color: 'bg-purple-100 text-purple-800' },
+    { value: 'product', label: 'Product Management', color: 'bg-green-100 text-green-800' },
+    { value: 'mental-fitness', label: 'Mental Fitness', color: 'bg-pink-100 text-pink-800' },
+    { value: 'technology', label: 'Technology', color: 'bg-orange-100 text-orange-800' },
+    { value: 'business', label: 'Business', color: 'bg-teal-100 text-teal-800' }
+  ];
+
   useEffect(() => {
     if (authLoading) return;
     
@@ -73,14 +103,61 @@ export default function CreateCourse() {
     }
   }, [user, userProfile, authLoading, router]);
 
+  const validateStep = (step: number): boolean => {
+    const errors: Record<string, string> = {};
+    
+    if (step === 1) {
+      if (!formData.title) errors.title = 'Course title is required';
+      if (!formData.category) errors.category = 'Category is required';
+      if (!formData.level) errors.level = 'Level is required';
+      if (!formData.course_type) errors.course_type = 'Course type is required';
+    }
+    
+    if (step === 2) {
+      if (!formData.price) errors.price = 'Price is required';
+      if (!formData.duration) errors.duration = 'Duration is required';
+      if (formData.course_type === 'in_person' && !formData.max_participants) {
+        errors.max_participants = 'Max participants is required for in-person courses';
+      }
+    }
+    
+    if (step === 3) {
+      if (!formData.description) errors.description = 'Course description is required';
+      if (!formData.shortDesc) errors.shortDesc = 'Short description is required';
+    }
+    
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleInputChange = (field: keyof CourseFormData, value: string | boolean) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
+    
+    // Clear error when field is updated
+    if (formErrors[field]) {
+      setFormErrors(prev => ({
+        ...prev,
+        [field]: ''
+      }));
+    }
+  };
+
+  const nextStep = () => {
+    if (validateStep(currentStep)) {
+      setCurrentStep(prev => Math.min(prev + 1, steps.length));
+    }
+  };
+
+  const prevStep = () => {
+    setCurrentStep(prev => Math.max(prev - 1, 1));
   };
 
   const handleSubmit = async (status: string) => {
+    if (!validateStep(currentStep)) return;
+    
     setLoading(true);
     try {
       const { createClient } = await import('@/lib/supabase/client');
@@ -122,7 +199,7 @@ export default function CreateCourse() {
       const course = await response.json();
       console.log('Course created:', course);
       
-      router.push('/admin');
+      router.push('/admin/courses');
     } catch (error) {
       console.error('Error creating course:', error);
       alert(`Error creating course: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -135,8 +212,10 @@ export default function CreateCourse() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-teal-50 to-cyan-50">
         <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin mx-auto mb-4 text-teal-600" />
-          <p className="text-gray-600 text-lg">Loading...</p>
+          <div className="w-16 h-16 bg-gradient-to-br from-teal-600 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Loader2 className="h-8 w-8 animate-spin text-white" />
+          </div>
+          <p className="text-gray-600 text-lg font-medium">Loading...</p>
         </div>
       </div>
     );
@@ -145,19 +224,21 @@ export default function CreateCourse() {
   if (!user || userProfile?.role !== 'ADMIN') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-teal-50 to-cyan-50 p-4">
-        <Card className="w-full max-w-md shadow-xl border-0">
+        <Card className="w-full max-w-md shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
           <CardHeader className="text-center">
-            <Shield className="h-12 w-12 text-red-500 mx-auto mb-4" />
-            <CardTitle className="text-2xl">Access Denied</CardTitle>
-            <CardDescription>
+            <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Shield className="h-8 w-8 text-white" />
+            </div>
+            <CardTitle className="text-2xl font-bold text-gray-900">Access Denied</CardTitle>
+            <CardDescription className="text-gray-600">
               You need admin privileges to access this page.
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center">
-            <Button asChild className="bg-teal-600 hover:bg-teal-700">
+            <Button asChild className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-medium w-full">
               <Link href="/">
                 <Home className="w-4 h-4 mr-2" />
-                Go Home
+                Return Home
               </Link>
             </Button>
           </CardContent>
@@ -166,26 +247,371 @@ export default function CreateCourse() {
     );
   }
 
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="title" className="text-sm font-semibold text-gray-900 flex items-center">
+                  <BookOpen className="w-4 h-4 mr-2 text-teal-600" />
+                  Course Title *
+                </Label>
+                <Input
+                  id="title"
+                  value={formData.title}
+                  onChange={(e) => handleInputChange('title', e.target.value)}
+                  placeholder="e.g., Advanced Agile Leadership"
+                  className={`bg-white border-2 ${formErrors.title ? 'border-red-300' : 'border-gray-200'} focus:border-teal-500 text-gray-900 placeholder-gray-500 font-medium`}
+                />
+                {formErrors.title && <p className="text-red-600 text-sm flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{formErrors.title}</p>}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="course_type" className="text-sm font-semibold text-gray-900">Course Type *</Label>
+                <Select value={formData.course_type} onValueChange={(value) => handleInputChange('course_type', value)}>
+                  <SelectTrigger className={`bg-white border-2 ${formErrors.course_type ? 'border-red-300' : 'border-gray-200'} focus:border-teal-500 text-gray-900`}>
+                    <SelectValue placeholder="Select course type" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    <SelectItem value="digital">🌐 Digital Course (Online)</SelectItem>
+                    <SelectItem value="in_person">🏢 In-Person Course</SelectItem>
+                    <SelectItem value="hybrid">🔄 Hybrid (Digital + In-Person)</SelectItem>
+                  </SelectContent>
+                </Select>
+                {formErrors.course_type && <p className="text-red-600 text-sm flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{formErrors.course_type}</p>}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="category" className="text-sm font-semibold text-gray-900">Category *</Label>
+                <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
+                  <SelectTrigger className={`bg-white border-2 ${formErrors.category ? 'border-red-300' : 'border-gray-200'} focus:border-teal-500 text-gray-900`}>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    {categories.map((cat) => (
+                      <SelectItem key={cat.value} value={cat.value}>
+                        <div className="flex items-center">
+                          <Badge className={`${cat.color} mr-2 text-xs`}>{cat.label}</Badge>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {formErrors.category && <p className="text-red-600 text-sm flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{formErrors.category}</p>}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="level" className="text-sm font-semibold text-gray-900">Level *</Label>
+                <Select value={formData.level} onValueChange={(value) => handleInputChange('level', value)}>
+                  <SelectTrigger className={`bg-white border-2 ${formErrors.level ? 'border-red-300' : 'border-gray-200'} focus:border-teal-500 text-gray-900`}>
+                    <SelectValue placeholder="Select level" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    <SelectItem value="BEGINNER">🌱 Beginner</SelectItem>
+                    <SelectItem value="INTERMEDIATE">🚀 Intermediate</SelectItem>
+                    <SelectItem value="ADVANCED">⭐ Advanced</SelectItem>
+                  </SelectContent>
+                </Select>
+                {formErrors.level && <p className="text-red-600 text-sm flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{formErrors.level}</p>}
+              </div>
+            </div>
+          </div>
+        );
+      
+      case 2:
+        return (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="price" className="text-sm font-semibold text-gray-900 flex items-center">
+                  <DollarSign className="w-4 h-4 mr-2 text-emerald-600" />
+                  Price ($) *
+                </Label>
+                <Input
+                  id="price"
+                  type="number"
+                  value={formData.price}
+                  onChange={(e) => handleInputChange('price', e.target.value)}
+                  placeholder="0.00"
+                  className={`bg-white border-2 ${formErrors.price ? 'border-red-300' : 'border-gray-200'} focus:border-teal-500 text-gray-900 placeholder-gray-500 font-medium`}
+                  min="0"
+                  step="0.01"
+                />
+                {formErrors.price && <p className="text-red-600 text-sm flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{formErrors.price}</p>}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="duration" className="text-sm font-semibold text-gray-900 flex items-center">
+                  <Clock className="w-4 h-4 mr-2 text-blue-600" />
+                  Duration *
+                </Label>
+                <Input
+                  id="duration"
+                  value={formData.duration}
+                  onChange={(e) => handleInputChange('duration', e.target.value)}
+                  placeholder="e.g., 4 weeks, 20 hours"
+                  className={`bg-white border-2 ${formErrors.duration ? 'border-red-300' : 'border-gray-200'} focus:border-teal-500 text-gray-900 placeholder-gray-500 font-medium`}
+                />
+                {formErrors.duration && <p className="text-red-600 text-sm flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{formErrors.duration}</p>}
+              </div>
+            </div>
+
+            {/* In-Person Course Fields */}
+            {(formData.course_type === 'in_person' || formData.course_type === 'hybrid') && (
+              <Card className="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-lg font-bold text-amber-900 flex items-center">
+                    <Users className="w-5 h-5 mr-2" />
+                    In-Person Course Details
+                  </CardTitle>
+                  <CardDescription className="text-amber-700">
+                    Additional information required for in-person courses
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="max_participants" className="text-sm font-semibold text-gray-900 flex items-center">
+                        <Users className="w-4 h-4 mr-2 text-amber-600" />
+                        Max Participants *
+                      </Label>
+                      <Input
+                        id="max_participants"
+                        type="number"
+                        value={formData.max_participants}
+                        onChange={(e) => handleInputChange('max_participants', e.target.value)}
+                        placeholder="20"
+                        className={`bg-white border-2 ${formErrors.max_participants ? 'border-red-300' : 'border-gray-200'} focus:border-teal-500 text-gray-900 placeholder-gray-500 font-medium`}
+                        min="1"
+                        max="100"
+                      />
+                      {formErrors.max_participants && <p className="text-red-600 text-sm flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{formErrors.max_participants}</p>}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="location" className="text-sm font-semibold text-gray-900 flex items-center">
+                        <MapPin className="w-4 h-4 mr-2 text-red-600" />
+                        Location
+                      </Label>
+                      <Input
+                        id="location"
+                        value={formData.location}
+                        onChange={(e) => handleInputChange('location', e.target.value)}
+                        placeholder="Conference Room A, Sydney Office"
+                        className="bg-white border-2 border-gray-200 focus:border-teal-500 text-gray-900 placeholder-gray-500 font-medium"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="instructor_name" className="text-sm font-semibold text-gray-900 flex items-center">
+                      <User className="w-4 h-4 mr-2 text-purple-600" />
+                      Instructor Name
+                    </Label>
+                    <Input
+                      id="instructor_name"
+                      value={formData.instructor_name}
+                      onChange={(e) => handleInputChange('instructor_name', e.target.value)}
+                      placeholder="Dr. Sarah Johnson"
+                      className="bg-white border-2 border-gray-200 focus:border-teal-500 text-gray-900 placeholder-gray-500 font-medium"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="materials_included" className="text-sm font-semibold text-gray-900 flex items-center">
+                      <FileText className="w-4 h-4 mr-2 text-green-600" />
+                      Materials Included
+                    </Label>
+                    <Textarea
+                      id="materials_included"
+                      value={formData.materials_included}
+                      onChange={(e) => handleInputChange('materials_included', e.target.value)}
+                      placeholder="Workbook, certificate, refreshments, course materials..."
+                      className="bg-white border-2 border-gray-200 focus:border-teal-500 text-gray-900 placeholder-gray-500 font-medium"
+                      rows={3}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        );
+      
+      case 3:
+        return (
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="description" className="text-sm font-semibold text-gray-900 flex items-center">
+                <FileText className="w-4 h-4 mr-2 text-teal-600" />
+                Course Description *
+              </Label>
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) => handleInputChange('description', e.target.value)}
+                placeholder="Provide a comprehensive description of what students will learn, the course structure, and key benefits..."
+                className={`bg-white border-2 ${formErrors.description ? 'border-red-300' : 'border-gray-200'} focus:border-teal-500 text-gray-900 placeholder-gray-500 font-medium min-h-[150px]`}
+                rows={6}
+              />
+              {formErrors.description && <p className="text-red-600 text-sm flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{formErrors.description}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="shortDesc" className="text-sm font-semibold text-gray-900">Short Description *</Label>
+              <Textarea
+                id="shortDesc"
+                value={formData.shortDesc}
+                onChange={(e) => handleInputChange('shortDesc', e.target.value)}
+                placeholder="Brief, compelling description for course cards and previews..."
+                className={`bg-white border-2 ${formErrors.shortDesc ? 'border-red-300' : 'border-gray-200'} focus:border-teal-500 text-gray-900 placeholder-gray-500 font-medium`}
+                rows={3}
+              />
+              {formErrors.shortDesc && <p className="text-red-600 text-sm flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{formErrors.shortDesc}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="prerequisites" className="text-sm font-semibold text-gray-900">Prerequisites</Label>
+              <Textarea
+                id="prerequisites"
+                value={formData.prerequisites}
+                onChange={(e) => handleInputChange('prerequisites', e.target.value)}
+                placeholder="List any required knowledge, skills, or experience..."
+                className="bg-white border-2 border-gray-200 focus:border-teal-500 text-gray-900 placeholder-gray-500 font-medium"
+                rows={3}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="image" className="text-sm font-semibold text-gray-900 flex items-center">
+                <Upload className="w-4 h-4 mr-2 text-purple-600" />
+                Course Image URL
+              </Label>
+              <Input
+                id="image"
+                value={formData.image}
+                onChange={(e) => handleInputChange('image', e.target.value)}
+                placeholder="https://example.com/course-image.jpg"
+                className="bg-white border-2 border-gray-200 focus:border-teal-500 text-gray-900 placeholder-gray-500 font-medium"
+              />
+              {formData.image && (
+                <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                  <p className="text-sm font-medium text-gray-700 mb-2">Image Preview:</p>
+                  <img
+                    src={formData.image}
+                    alt="Course preview"
+                    className="w-full max-w-md h-48 object-cover rounded-lg border-2 border-gray-200"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center space-x-3 p-4 bg-yellow-50 rounded-lg border-2 border-yellow-200">
+              <input
+                type="checkbox"
+                id="featured"
+                checked={formData.featured}
+                onChange={(e) => handleInputChange('featured', e.target.checked)}
+                className="w-5 h-5 text-teal-600 border-2 border-gray-300 rounded focus:ring-teal-500"
+              />
+              <Label htmlFor="featured" className="text-sm font-semibold text-gray-900 flex items-center">
+                <Star className="w-4 h-4 mr-2 text-yellow-600" />
+                Featured Course
+              </Label>
+              <p className="text-xs text-gray-600">Featured courses appear prominently on the homepage</p>
+            </div>
+          </div>
+        );
+      
+      case 4:
+        const selectedCategory = categories.find(cat => cat.value === formData.category);
+        return (
+          <div className="space-y-6">
+            <div className="bg-gradient-to-r from-teal-50 to-emerald-50 p-6 rounded-xl border-2 border-teal-200">
+              <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                <CheckCircle className="w-5 h-5 mr-2 text-teal-600" />
+                Course Review
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-sm font-semibold text-gray-600">Title</p>
+                    <p className="text-lg font-bold text-gray-900">{formData.title || 'Untitled Course'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-600">Category</p>
+                    {selectedCategory && (
+                      <Badge className={`${selectedCategory.color} text-sm`}>
+                        {selectedCategory.label}
+                      </Badge>
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-600">Level</p>
+                    <p className="text-gray-900 font-medium">{formData.level}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-600">Type</p>
+                    <p className="text-gray-900 font-medium capitalize">{formData.course_type.replace('_', ' ')}</p>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-sm font-semibold text-gray-600">Price</p>
+                    <p className="text-2xl font-bold text-emerald-600">${formData.price || '0.00'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-600">Duration</p>
+                    <p className="text-gray-900 font-medium">{formData.duration || 'Not specified'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-600">Featured</p>
+                    <p className="text-gray-900 font-medium">{formData.featured ? 'Yes' : 'No'}</p>
+                  </div>
+                </div>
+              </div>
+              
+              {formData.description && (
+                <div className="mt-6">
+                  <p className="text-sm font-semibold text-gray-600 mb-2">Description Preview</p>
+                  <div className="bg-white p-4 rounded-lg border max-h-32 overflow-y-auto">
+                    <p className="text-gray-900 text-sm">{formData.description}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      
+      default:
+        return null;
+    }
+  };
+
   return (
     <PageLayout>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-teal-50 to-cyan-50">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-teal-50 to-cyan-50 py-8">
         {/* Header */}
-        <header className="bg-white/80 backdrop-blur-sm shadow-sm border-b border-teal-100">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between py-6 gap-4">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border-0 p-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-teal-600 to-emerald-600 rounded-xl flex items-center justify-center">
-                  <BookOpen className="h-6 w-6 text-white" />
+                <div className="w-16 h-16 bg-gradient-to-br from-teal-600 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg">
+                  <BookOpen className="h-8 w-8 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-teal-700 bg-clip-text text-transparent">
+                  <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-teal-700 bg-clip-text text-transparent">
                     Create New Course
                   </h1>
-                  <p className="text-gray-600 text-sm sm:text-base">Build engaging learning experiences</p>
+                  <p className="text-gray-600 font-medium">Build engaging learning experiences for your students</p>
                 </div>
               </div>
               <div className="flex gap-3">
-                <Button variant="outline" asChild className="bg-white/80 border-teal-200 hover:bg-teal-50 text-sm">
+                <Button variant="outline" asChild className="bg-white/80 border-2 border-teal-200 hover:bg-teal-50 hover:border-teal-400 text-gray-900 font-medium">
                   <Link href="/admin/courses">
                     <ArrowLeft className="w-4 h-4 mr-2" />
                     Back to Courses
@@ -194,226 +620,110 @@ export default function CreateCourse() {
               </div>
             </div>
           </div>
-        </header>
+        </div>
 
-        {/* Main Content */}
-        <main className="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-            <CardContent className="p-6">
-              <div className="space-y-6">
-                {/* Basic Information */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="title" className="text-sm font-medium text-gray-900">Course Title *</Label>
-                    <Input
-                      id="title"
-                      value={formData.title}
-                      onChange={(e) => handleInputChange('title', e.target.value)}
-                      placeholder="Enter course title"
-                      className="mt-2"
-                    />
+        {/* Progress Steps */}
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border-0 p-6">
+            <div className="flex items-center justify-between">
+              {steps.map((step, index) => (
+                <div key={step.number} className="flex items-center">
+                  <div className={`flex items-center justify-center w-12 h-12 rounded-full font-bold text-sm transition-all duration-300 ${
+                    currentStep === step.number 
+                      ? 'bg-gradient-to-r from-teal-600 to-emerald-600 text-white shadow-lg' 
+                      : currentStep > step.number 
+                      ? 'bg-green-500 text-white shadow-md' 
+                      : 'bg-gray-200 text-gray-500'
+                  }`}>
+                    {currentStep > step.number ? (
+                      <CheckCircle className="w-6 h-6" />
+                    ) : (
+                      <step.icon className="w-6 h-6" />
+                    )}
                   </div>
-
-                  <div>
-                    <Label htmlFor="course_type" className="text-sm font-medium text-gray-900">Course Type *</Label>
-                    <Select value={formData.course_type} onValueChange={(value) => handleInputChange('course_type', value)}>
-                      <SelectTrigger className="mt-2">
-                        <SelectValue placeholder="Select course type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="digital">Digital Course (Online)</SelectItem>
-                        <SelectItem value="in_person">In-Person Course</SelectItem>
-                        <SelectItem value="hybrid">Hybrid (Digital + In-Person)</SelectItem>
-                      </SelectContent>
-                    </Select>
+                  <div className="ml-3 hidden sm:block">
+                    <p className={`text-sm font-semibold ${currentStep >= step.number ? 'text-gray-900' : 'text-gray-500'}`}>
+                      {step.title}
+                    </p>
+                    <p className={`text-xs ${currentStep >= step.number ? 'text-gray-600' : 'text-gray-400'}`}>
+                      {step.description}
+                    </p>
                   </div>
-
-                  <div>
-                    <Label htmlFor="category" className="text-sm font-medium text-gray-900">Category *</Label>
-                    <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
-                      <SelectTrigger className="mt-2">
-                        <SelectValue placeholder="Select category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="agile">Agile & Scrum</SelectItem>
-                        <SelectItem value="leadership">Leadership</SelectItem>
-                        <SelectItem value="product">Product Management</SelectItem>
-                        <SelectItem value="mental-fitness">Mental Fitness</SelectItem>
-                        <SelectItem value="technology">Technology</SelectItem>
-                        <SelectItem value="business">Business</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="level" className="text-sm font-medium text-gray-900">Level *</Label>
-                    <Select value={formData.level} onValueChange={(value) => handleInputChange('level', value)}>
-                      <SelectTrigger className="mt-2">
-                        <SelectValue placeholder="Select level" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="BEGINNER">Beginner</SelectItem>
-                        <SelectItem value="INTERMEDIATE">Intermediate</SelectItem>
-                        <SelectItem value="ADVANCED">Advanced</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  {index < steps.length - 1 && (
+                    <div className={`w-16 h-1 mx-4 rounded-full transition-all duration-300 ${
+                      currentStep > step.number ? 'bg-green-500' : 'bg-gray-200'
+                    }`} />
+                  )}
                 </div>
+              ))}
+            </div>
+          </div>
+        </div>
 
-                <div>
-                  <Label htmlFor="description" className="text-sm font-medium text-gray-900">Course Description *</Label>
-                  <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => handleInputChange('description', e.target.value)}
-                    placeholder="Describe what students will learn in this course"
-                    className="mt-2"
-                    rows={4}
-                  />
+        {/* Main Form */}
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Card className="bg-white/90 backdrop-blur-sm shadow-2xl border-0 rounded-2xl overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-teal-50 to-emerald-50 border-b border-teal-100 p-8">
+              <CardTitle className="text-2xl font-bold text-gray-900">
+                {steps[currentStep - 1]?.title}
+              </CardTitle>
+              <CardDescription className="text-gray-600 text-lg">
+                {steps[currentStep - 1]?.description}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-8">
+              {renderStepContent()}
+              
+              {/* Navigation Buttons */}
+              <div className="flex flex-col sm:flex-row justify-between gap-4 pt-8 mt-8 border-t border-gray-200">
+                <div className="flex gap-3">
+                  {currentStep > 1 && (
+                    <Button
+                      onClick={prevStep}
+                      variant="outline"
+                      className="bg-white border-2 border-gray-300 hover:bg-gray-50 text-gray-900 font-medium"
+                    >
+                      <ArrowLeft className="w-4 h-4 mr-2" />
+                      Previous
+                    </Button>
+                  )}
                 </div>
-
-                <div>
-                  <Label htmlFor="shortDesc" className="text-sm font-medium text-gray-900">Short Description</Label>
-                  <Textarea
-                    id="shortDesc"
-                    value={formData.shortDesc}
-                    onChange={(e) => handleInputChange('shortDesc', e.target.value)}
-                    placeholder="Brief description for course cards"
-                    className="mt-2"
-                    rows={2}
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="price" className="text-sm font-medium text-gray-900">Price ($)</Label>
-                    <Input
-                      id="price"
-                      type="number"
-                      value={formData.price}
-                      onChange={(e) => handleInputChange('price', e.target.value)}
-                      placeholder="0.00"
-                      className="mt-2"
-                      min="0"
-                      step="0.01"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="duration" className="text-sm font-medium text-gray-900">Duration</Label>
-                    <Input
-                      id="duration"
-                      value={formData.duration}
-                      onChange={(e) => handleInputChange('duration', e.target.value)}
-                      placeholder="e.g., 4 weeks, 20 hours"
-                      className="mt-2"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="image" className="text-sm font-medium text-gray-900">Course Image URL</Label>
-                  <Input
-                    id="image"
-                    value={formData.image}
-                    onChange={(e) => handleInputChange('image', e.target.value)}
-                    placeholder="https://example.com/image.jpg"
-                    className="mt-2"
-                  />
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="featured"
-                    checked={formData.featured}
-                    onChange={(e) => handleInputChange('featured', e.target.checked)}
-                    className="rounded border-gray-300"
-                  />
-                  <Label htmlFor="featured" className="text-sm font-medium text-gray-900">Featured Course</Label>
-                </div>
-
-                {/* In-Person Course Fields */}
-                {(formData.course_type === 'in_person' || formData.course_type === 'hybrid') && (
-                  <div className="space-y-4 p-4 bg-amber-50 rounded-lg border border-amber-200">
-                    <h4 className="text-lg font-semibold text-amber-800">In-Person Course Details</h4>
-                    
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="max_participants" className="text-sm font-medium text-gray-900">Max Participants</Label>
-                        <Input
-                          id="max_participants"
-                          type="number"
-                          value={formData.max_participants}
-                          onChange={(e) => handleInputChange('max_participants', e.target.value)}
-                          placeholder="e.g., 20"
-                          className="mt-2"
-                          min="1"
-                          max="100"
-                        />
-                      </div>
-
-                      <div>
-                        <Label htmlFor="location" className="text-sm font-medium text-gray-900">Location</Label>
-                        <Input
-                          id="location"
-                          value={formData.location}
-                          onChange={(e) => handleInputChange('location', e.target.value)}
-                          placeholder="e.g., Conference Room A, Sydney Office"
-                          className="mt-2"
-                        />
-                      </div>
+                
+                <div className="flex gap-3">
+                  {currentStep < steps.length ? (
+                    <Button
+                      onClick={nextStep}
+                      className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-medium px-8"
+                    >
+                      Next Step
+                      <ArrowLeft className="w-4 h-4 ml-2 rotate-180" />
+                    </Button>
+                  ) : (
+                    <div className="flex gap-3">
+                      <Button
+                        onClick={() => handleSubmit('DRAFT')}
+                        disabled={loading}
+                        variant="outline"
+                        className="bg-white border-2 border-gray-300 hover:bg-gray-50 text-gray-900 font-medium"
+                      >
+                        {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+                        Save as Draft
+                      </Button>
+                      <Button
+                        onClick={() => handleSubmit('PUBLISHED')}
+                        disabled={loading}
+                        className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-medium px-8"
+                      >
+                        {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Eye className="w-4 h-4 mr-2" />}
+                        Publish Course
+                      </Button>
                     </div>
-
-                    <div>
-                      <Label htmlFor="instructor_name" className="text-sm font-medium text-gray-900">Instructor Name</Label>
-                      <Input
-                        id="instructor_name"
-                        value={formData.instructor_name}
-                        onChange={(e) => handleInputChange('instructor_name', e.target.value)}
-                        placeholder="e.g., Dr. Sarah Johnson"
-                        className="mt-2"
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="materials_included" className="text-sm font-medium text-gray-900">Materials Included</Label>
-                      <Textarea
-                        id="materials_included"
-                        value={formData.materials_included}
-                        onChange={(e) => handleInputChange('materials_included', e.target.value)}
-                        placeholder="e.g., Workbook, certificate, refreshments"
-                        className="mt-2"
-                        rows={3}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* Action Buttons */}
-                <div className="flex flex-col sm:flex-row gap-3 pt-6">
-                  <Button
-                    onClick={() => handleSubmit('DRAFT')}
-                    disabled={loading}
-                    variant="outline"
-                    className="flex-1"
-                  >
-                    {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
-                    Save as Draft
-                  </Button>
-                  <Button
-                    onClick={() => handleSubmit('PUBLISHED')}
-                    disabled={loading}
-                    className="flex-1"
-                  >
-                    {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Eye className="w-4 h-4 mr-2" />}
-                    Publish Course
-                  </Button>
+                  )}
                 </div>
               </div>
             </CardContent>
           </Card>
-        </main>
+        </div>
       </div>
     </PageLayout>
   );
