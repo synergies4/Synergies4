@@ -218,17 +218,21 @@ export default function NewBlogPostPage() {
 
   if (userProfile?.role !== 'ADMIN') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle className="text-center">Access Denied</CardTitle>
-            <CardDescription className="text-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-teal-50 to-cyan-50 p-4">
+        <Card className="w-full max-w-md shadow-xl border-0">
+          <CardHeader className="text-center">
+            <FileText className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <CardTitle className="text-2xl">Access Denied</CardTitle>
+            <CardDescription>
               You don't have permission to access this page.
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center">
-            <Button asChild>
-              <Link href="/">Go Home</Link>
+            <Button asChild className="bg-teal-600 hover:bg-teal-700">
+              <Link href="/">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Go Home
+              </Link>
             </Button>
           </CardContent>
         </Card>
@@ -238,20 +242,22 @@ export default function NewBlogPostPage() {
 
   return (
     <PageLayout>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-teal-50 to-cyan-50">
         {/* Mobile-Optimized Header */}
-        <header className="bg-white shadow-sm border-b sticky top-0 z-40">
+        <header className="bg-white/80 backdrop-blur-sm shadow-sm border-b border-teal-100 sticky top-0 z-40">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 gap-4">
-              <div className="flex items-center space-x-3">
-                <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 flex-shrink-0" />
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-teal-600 to-emerald-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <FileText className="h-6 w-6 text-white" />
+                </div>
                 <div className="min-w-0">
-                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 truncate">Create New Post</h1>
+                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-gray-900 to-teal-700 bg-clip-text text-transparent truncate">Create New Post</h1>
                   <p className="text-sm sm:text-base text-gray-600 hidden sm:block">Write and publish a new blog post</p>
                 </div>
               </div>
               <div className="flex space-x-2 sm:space-x-3">
-                <Button variant="outline" size="sm" asChild className="flex-1 sm:flex-none border-gray-300 text-gray-900 hover:bg-gray-50 hover:border-gray-400 bg-white">
+                <Button variant="outline" size="sm" asChild className="flex-1 sm:flex-none bg-white/80 border-teal-200 text-gray-900 hover:bg-teal-50 hover:border-teal-400">
                   <Link href="/admin/blog">
                     <ArrowLeft className="w-4 h-4 mr-2" />
                     <span className="hidden sm:inline">Back to Blog</span>
@@ -262,11 +268,15 @@ export default function NewBlogPostPage() {
                   size="sm"
                   onClick={savePost}
                   disabled={loading}
-                  className="flex-1 sm:flex-none"
+                  className="flex-1 sm:flex-none bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700"
                 >
-                  <Save className="w-4 h-4 mr-2" />
-                  <span className="hidden sm:inline">Save Post</span>
-                  <span className="sm:hidden">Save</span>
+                  {loading ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <Save className="w-4 h-4 mr-2" />
+                  )}
+                  <span className="hidden sm:inline">{loading ? 'Saving...' : 'Save Post'}</span>
+                  <span className="sm:hidden">{loading ? 'Saving...' : 'Save'}</span>
                 </Button>
               </div>
             </div>
@@ -279,14 +289,14 @@ export default function NewBlogPostPage() {
             {/* Main Content - Mobile First, Desktop 2/3 width */}
             <div className="lg:col-span-2 space-y-6">
               {/* Basic Info */}
-              <Card className="bg-white border border-gray-200 shadow-sm">
-                <CardHeader className="pb-4 bg-white">
-                  <CardTitle className="text-lg">Basic Information</CardTitle>
-                  <CardDescription className="text-sm">
+              <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+                <CardHeader className="pb-4 bg-white/50 backdrop-blur-sm">
+                  <CardTitle className="text-lg text-gray-900">Basic Information</CardTitle>
+                  <CardDescription className="text-sm text-gray-600">
                     Enter the main details for your blog post
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4 bg-white">
+                <CardContent className="space-y-4 bg-white/50 backdrop-blur-sm">
                   <div>
                     <Label htmlFor="title" className="text-sm font-medium text-gray-900">Title *</Label>
                     <Input
@@ -294,7 +304,7 @@ export default function NewBlogPostPage() {
                       value={formData.title}
                       onChange={(e) => handleTitleChange(e.target.value)}
                       placeholder="Enter post title..."
-                      className="mt-2 bg-white border-gray-300 text-gray-900"
+                      className="mt-2 bg-white/80 border-teal-200 focus:border-teal-400 text-gray-900"
                     />
                   </div>
 
@@ -327,17 +337,17 @@ export default function NewBlogPostPage() {
               </Card>
 
               {/* Content */}
-              <Card className="bg-white border border-gray-200 shadow-sm">
-                <CardHeader className="pb-4 bg-white">
-                  <CardTitle className="text-lg flex items-center">
-                    <FileText className="w-5 h-5 mr-2" />
+              <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+                <CardHeader className="pb-4 bg-white/50 backdrop-blur-sm">
+                  <CardTitle className="text-lg flex items-center text-gray-900">
+                    <FileText className="w-5 h-5 mr-2 text-teal-600" />
                     Content *
                   </CardTitle>
-                  <CardDescription className="text-sm">
+                  <CardDescription className="text-sm text-gray-600">
                     Write your blog post content. You can use HTML tags for formatting.
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="bg-white">
+                <CardContent className="bg-white/50 backdrop-blur-sm">
                   <Textarea
                     value={formData.content}
                     onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
