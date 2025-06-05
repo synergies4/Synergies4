@@ -1421,7 +1421,7 @@ const SelfContainedChatInput = React.memo(React.forwardRef<
       onKeyDown={handleKeyDown}
       placeholder={placeholder}
       disabled={disabled}
-      className="w-full resize-none outline-none border border-gray-300 rounded-md p-3 text-sm leading-5 bg-white text-gray-900 min-h-[50px] max-h-[150px] font-sans transition-colors focus:border-green-500 focus:ring-2 focus:ring-green-500/20"
+      className="w-full resize-none outline-none border border-gray-300 rounded-md p-3 text-sm leading-5 bg-white text-gray-900 min-h-[50px] max-h-[150px] font-sans transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 touch-manipulation"
       autoComplete="off"
       spellCheck="false"
       autoCorrect="off"
@@ -1518,35 +1518,49 @@ export default function SynergizeAgile() {
     }
   };
 
-  const scrollToBottom = () => {
-    // Only scroll within the chat container, not the entire page
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTo({
-        top: chatContainerRef.current.scrollHeight,
+  const scrollToBottom = (force = false) => {
+    // Only scroll if user is near the bottom or force is true
+    const container = chatContainerRef.current;
+    if (!container) {
+      // Fallback for main interface
+      const scrollContainer = messagesEndRef.current?.closest('.overflow-y-auto');
+      if (scrollContainer) {
+        const { scrollTop, scrollHeight, clientHeight } = scrollContainer;
+        const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
+        if (force || isNearBottom) {
+          scrollContainer.scrollTo({
+            top: scrollContainer.scrollHeight,
+            behavior: 'smooth'
+          });
+        }
+      }
+      return;
+    }
+
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
+    
+    // Only auto-scroll if user is near bottom, unless forced
+    if (force || isNearBottom) {
+      container.scrollTo({
+        top: container.scrollHeight,
         behavior: 'smooth'
       });
-    } else if (messagesEndRef.current) {
-      // Fallback for main interface - only scroll the container, not the page
-      const scrollContainer = messagesEndRef.current.closest('.overflow-y-auto');
-      if (scrollContainer) {
-        scrollContainer.scrollTo({
-          top: scrollContainer.scrollHeight,
-          behavior: 'smooth'
-        });
-      }
     }
   };
 
-  // Only scroll to bottom when new AI messages are added (not user messages or config changes)
+  // Smart auto-scroll: only scroll when user sends message or when they're near bottom
   useEffect(() => {
     if (messages.length > 0 && hasInitialized) {
       const lastMessage = messages[messages.length - 1];
-      // Only scroll for new AI messages, not for config changes or welcome messages
-      if (lastMessage.type === 'ai' && lastMessage.id !== 'welcome' && !lastMessage.content.includes('"slides"')) {
-        // Add a small delay to ensure the message is rendered before scrolling
-        setTimeout(() => {
-          scrollToBottom();
-        }, 100);
+      
+      // Always scroll when user sends a message
+      if (lastMessage.type === 'user') {
+        setTimeout(() => scrollToBottom(true), 50);
+      }
+      // Only scroll for AI messages if user is near bottom (to avoid interrupting reading)
+      else if (lastMessage.type === 'ai' && lastMessage.id !== 'welcome' && !lastMessage.content.includes('"slides"')) {
+        setTimeout(() => scrollToBottom(false), 100);
       }
     }
   }, [messages, hasInitialized]);
@@ -1763,7 +1777,9 @@ export default function SynergizeAgile() {
             provider: selectedProvider
           };
           setMessages(prev => [...prev, limitMessage]);
-        }, 1000);
+          // Force scroll to show the limit message
+          setTimeout(() => scrollToBottom(true), 100);
+        }, 800);
       }
       
     } catch (error) {
@@ -1884,7 +1900,7 @@ export default function SynergizeAgile() {
   }, [responseCount, maxResponses]);
 
   const stableMainClassName = useMemo(() => {
-    return `min-h-[44px] max-h-[120px] resize-none pr-12 text-gray-900 bg-white border-gray-300 placeholder:text-gray-500 ${isMobile ? 'text-base' : ''} ${responseCount >= maxResponses ? 'opacity-50 cursor-not-allowed' : ''}`;
+    return `min-h-[48px] max-h-[120px] resize-none pr-12 text-gray-900 bg-white border-gray-300 placeholder:text-gray-500 ${isMobile ? 'text-base touch-manipulation' : ''} ${responseCount >= maxResponses ? 'opacity-50 cursor-not-allowed' : ''}`;
   }, [isMobile, responseCount, maxResponses]);
 
   const stableDisabled = useMemo(() => responseCount >= maxResponses, [responseCount, maxResponses]);
@@ -2406,7 +2422,7 @@ export default function SynergizeAgile() {
             WebkitOverflowScrolling: 'touch',
             scrollBehavior: 'smooth',
             touchAction: 'manipulation',
-            paddingBottom: isMobile ? '140px' : '20px' // Extra padding on mobile for fixed input area
+            paddingBottom: isMobile ? '160px' : '20px' // Extra padding on mobile for fixed input area
           }}
         >
           {messages.length === 0 && (
@@ -2449,14 +2465,22 @@ export default function SynergizeAgile() {
                     ) : message.type === 'ai' && message.content.includes("You've reached your session limit") ? (
                       <SessionLimitDisplay messageContent={message.content} />
                     ) : (
-                      <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+                      <p className={`text-sm leading-relaxed whitespace-pre-wrap break-words ${message.type === 'user' ? 'text-white' : 'text-gray-900'}`}>
                         {message.content}
                       </p>
                     )}
                     <div className="flex items-center justify-between mt-3">
-                      <span className={`text-xs ${message.type === 'user' ? 'text-teal-100' : 'text-gray-500'}`}>
-                        {message.timestamp.toLocaleTimeString()}
-                      </span>
+                      <div className="flex items-center space-x-2">
+                        <span className={`text-xs ${message.type === 'user' ? 'text-teal-100' : 'text-gray-500'}`}>
+                          {message.timestamp.toLocaleTimeString()}
+                        </span>
+                        {message.type === 'ai' && message.provider && (
+                          <Badge className={`text-xs ${AI_PROVIDERS[message.provider].badgeColor} border-0`}>
+                            {AI_PROVIDERS[message.provider].icon}
+                            <span className="ml-1">{AI_PROVIDERS[message.provider].badge}</span>
+                          </Badge>
+                        )}
+                      </div>
                       {message.type === 'ai' && (
                         <Button
                           variant="ghost"
@@ -2517,7 +2541,7 @@ export default function SynergizeAgile() {
         )}
 
         {/* Input Area */}
-        <div className={`bg-white border-t border-gray-200 p-4 ${isMobile ? 'fixed bottom-0 left-0 right-0 z-50 shadow-lg touch-manipulation' : ''}`}>
+        <div className={`bg-white border-t border-gray-200 ${isMobile ? 'fixed bottom-0 left-0 right-0 z-50 shadow-lg touch-manipulation p-3' : 'p-4'}`}>
           {files.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-4">
               {files.map((file, index) => (
@@ -2727,15 +2751,15 @@ Format as a realistic conversation with clear speaker labels and include decisio
             </div>
           )}
 
-          <div className="flex items-end space-x-3">
+          <div className={`flex items-end space-x-2 ${isMobile ? 'space-x-2' : 'space-x-3'}`}>
             <Button
               variant="outline"
               size="sm"
               onClick={() => fileInputRef.current?.click()}
-              className="flex-shrink-0 bg-white border-gray-300 text-gray-900 hover:bg-gray-50"
+              className={`flex-shrink-0 bg-white border-gray-300 text-gray-900 hover:bg-gray-50 ${isMobile ? 'min-h-[48px] min-w-[48px] p-0' : ''}`}
               disabled={responseCount >= maxResponses}
             >
-              <Upload className="h-4 w-4" />
+              <Upload className={`${isMobile ? 'h-5 w-5' : 'h-4 w-4'}`} />
             </Button>
 
             {speechSupported && (
@@ -2743,10 +2767,13 @@ Format as a realistic conversation with clear speaker labels and include decisio
                 variant="outline"
                 size="sm"
                 onClick={isListening ? stopVoiceInput : startVoiceInput}
-                className={`flex-shrink-0 ${isListening ? 'bg-red-50 border-red-300 text-red-600' : 'bg-white border-gray-300 text-gray-900 hover:bg-gray-50'}`}
+                className={`flex-shrink-0 ${isListening ? 'bg-red-50 border-red-300 text-red-600' : 'bg-white border-gray-300 text-gray-900 hover:bg-gray-50'} ${isMobile ? 'min-h-[48px] min-w-[48px] p-0' : ''}`}
                 disabled={responseCount >= maxResponses}
               >
-                {isListening ? <MicOff className="h-4 w-4 animate-pulse" /> : <Mic className="h-4 w-4" />}
+                {isListening ? 
+                  <MicOff className={`animate-pulse ${isMobile ? 'h-5 w-5' : 'h-4 w-4'}`} /> : 
+                  <Mic className={`${isMobile ? 'h-5 w-5' : 'h-4 w-4'}`} />
+                }
               </Button>
             )}
 
@@ -2771,12 +2798,12 @@ Format as a realistic conversation with clear speaker labels and include decisio
                 }
               }}
               disabled={isLoading || responseCount >= maxResponses}
-              className={`flex-shrink-0 min-h-[50px] px-6 bg-gradient-to-r ${currentRole.color} hover:opacity-90 transition-opacity ${responseCount >= maxResponses ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`flex-shrink-0 ${isMobile ? 'min-h-[48px] px-4' : 'min-h-[50px] px-6'} bg-gradient-to-r ${currentRole.color} hover:opacity-90 transition-opacity ${responseCount >= maxResponses ? 'opacity-50 cursor-not-allowed' : ''} touch-manipulation`}
             >
               {isLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className={`animate-spin ${isMobile ? 'h-5 w-5' : 'h-4 w-4'}`} />
               ) : (
-                <Send className="h-4 w-4" />
+                <Send className={`${isMobile ? 'h-5 w-5' : 'h-4 w-4'}`} />
               )}
             </Button>
           </div>
@@ -3216,7 +3243,7 @@ Format as a realistic conversation with clear speaker labels and include decisio
                               ) : message.type === 'ai' && message.content.includes("You've reached your session limit") ? (
                                 <SessionLimitDisplay messageContent={message.content} />
                               ) : (
-                                <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+                                <p className={`text-sm leading-relaxed whitespace-pre-wrap break-words ${message.type === 'user' ? 'text-white' : 'text-gray-900'}`}>
                                   {message.content}
                                 </p>
                               )}
@@ -3226,8 +3253,9 @@ Format as a realistic conversation with clear speaker labels and include decisio
                                     {message.timestamp.toLocaleTimeString()}
                                   </span>
                                   {message.type === 'ai' && message.provider && (
-                                    <Badge className={AI_PROVIDERS[message.provider].badgeColor}>
-                                      {AI_PROVIDERS[message.provider].badge}
+                                    <Badge className={`text-xs ${AI_PROVIDERS[message.provider].badgeColor} border-0`}>
+                                      {AI_PROVIDERS[message.provider].icon}
+                                      <span className="ml-1">{AI_PROVIDERS[message.provider].badge}</span>
                                     </Badge>
                                   )}
                                 </div>
@@ -3338,11 +3366,11 @@ Format as a realistic conversation with clear speaker labels and include decisio
                             variant="outline"
                             size="sm"
                             onClick={() => fileInputRef.current?.click()}
-                            className="flex-shrink-0 min-h-[44px] min-w-[44px]"
+                            className={`flex-shrink-0 ${isMobile ? 'min-h-[48px] min-w-[48px]' : 'min-h-[44px] min-w-[44px]'} touch-manipulation`}
                             title="Upload file"
                             disabled={responseCount >= maxResponses}
                           >
-                            <Upload className="h-4 w-4" />
+                            <Upload className={`${isMobile ? 'h-5 w-5' : 'h-4 w-4'}`} />
                           </Button>
                           
                           {speechSupported && (
@@ -3350,13 +3378,16 @@ Format as a realistic conversation with clear speaker labels and include decisio
                               variant="outline"
                               size="sm"
                               onClick={isListening ? stopVoiceInput : startVoiceInput}
-                              className={`flex-shrink-0 min-h-[44px] min-w-[44px] ${
+                              className={`flex-shrink-0 ${isMobile ? 'min-h-[48px] min-w-[48px]' : 'min-h-[44px] min-w-[44px]'} touch-manipulation ${
                                 isListening ? 'bg-red-50 border-red-300 text-red-600' : ''
                               }`}
                               title={isListening ? "Stop voice input" : "Start voice input"}
                               disabled={responseCount >= maxResponses}
                             >
-                              {isListening ? <MicOff className="h-4 w-4 animate-pulse" /> : <Mic className="h-4 w-4" />}
+                              {isListening ? 
+                                <MicOff className={`animate-pulse ${isMobile ? 'h-5 w-5' : 'h-4 w-4'}`} /> : 
+                                <Mic className={`${isMobile ? 'h-5 w-5' : 'h-4 w-4'}`} />
+                              }
                             </Button>
                           )}
                           
@@ -3372,7 +3403,7 @@ Format as a realistic conversation with clear speaker labels and include decisio
                             
                             {/* Voice feedback indicator */}
                             {isListening && (
-                              <div className="absolute top-2 right-14 flex items-center space-x-1 text-red-600">
+                              <div className={`absolute ${isMobile ? 'top-3 right-16' : 'top-2 right-14'} flex items-center space-x-1 text-red-600`}>
                                 <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
                                 <span className="text-xs">Listening...</span>
                               </div>
@@ -3389,13 +3420,13 @@ Format as a realistic conversation with clear speaker labels and include decisio
                               }
                             }}
                             disabled={isLoading || responseCount >= maxResponses}
-                            className={`flex-shrink-0 min-h-[50px] px-6 bg-gradient-to-r ${currentRole.color} hover:opacity-90 transition-opacity ${responseCount >= maxResponses ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`flex-shrink-0 ${isMobile ? 'min-h-[48px] px-4' : 'min-h-[50px] px-6'} bg-gradient-to-r ${currentRole.color} hover:opacity-90 transition-opacity ${responseCount >= maxResponses ? 'opacity-50 cursor-not-allowed' : ''} touch-manipulation`}
                             title="Send message"
                           >
                             {isLoading ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
+                              <Loader2 className={`animate-spin ${isMobile ? 'h-5 w-5' : 'h-4 w-4'}`} />
                             ) : (
-                              <Send className="h-4 w-4" />
+                              <Send className={`${isMobile ? 'h-5 w-5' : 'h-4 w-4'}`} />
                             )}
                           </Button>
                         </div>
