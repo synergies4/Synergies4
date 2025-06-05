@@ -24,7 +24,8 @@ import {
   Loader2,
   Home,
   User,
-  Trash2
+  Trash2,
+  BookOpen
 } from 'lucide-react';
 import { UserAvatar } from '@/components/UserAvatar';
 import {
