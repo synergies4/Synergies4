@@ -135,10 +135,12 @@ export default function AdminDashboard() {
   if (authLoading || loading || !userProfile) {
     return (
       <PageLayout>
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-blue-50">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-teal-50 to-cyan-50">
           <div className="text-center">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
-            <p className="text-gray-600">
+            <div className="w-16 h-16 bg-gradient-to-br from-teal-600 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Loader2 className="h-8 w-8 animate-spin text-white" />
+            </div>
+            <p className="text-gray-600 font-medium">
               {authLoading ? 'Loading authentication...' : 
                !userProfile ? 'Loading user profile...' : 
                'Loading admin dashboard...'}
@@ -152,17 +154,23 @@ export default function AdminDashboard() {
   if (!user || userProfile?.role !== 'ADMIN') {
     return (
       <PageLayout>
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-blue-50">
-          <Card className="w-full max-w-md">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-teal-50 to-cyan-50">
+          <Card className="w-full max-w-md shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
             <CardHeader>
-              <CardTitle className="text-center">Access Denied</CardTitle>
-              <CardDescription className="text-center">
+              <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Shield className="h-8 w-8 text-white" />
+              </div>
+              <CardTitle className="text-center text-2xl font-bold text-gray-900">Access Denied</CardTitle>
+              <CardDescription className="text-center text-gray-600">
                 You need admin privileges to access this page.
               </CardDescription>
             </CardHeader>
             <CardContent className="text-center">
-              <Button asChild>
-                <Link href="/">Go Home</Link>
+              <Button asChild className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-medium w-full">
+                <Link href="/">
+                  <Home className="w-4 h-4 mr-2" />
+                  Return Home
+                </Link>
               </Button>
             </CardContent>
           </Card>
@@ -173,28 +181,32 @@ export default function AdminDashboard() {
 
   return (
     <PageLayout>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-teal-50 to-cyan-50">
         {/* Header */}
-        <header className="bg-white/80 backdrop-blur-sm shadow-sm border-b border-gray-200">
+        <header className="bg-white/90 backdrop-blur-sm shadow-lg border-b border-teal-100">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 md:py-6">
-              <div className="flex items-center space-x-3 mb-4 sm:mb-0">
-                <Shield className="h-6 w-6 md:h-8 md:w-8 text-blue-600" />
+              <div className="flex items-center space-x-4 mb-4 sm:mb-0">
+                <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-teal-600 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg">
+                  <Shield className="h-6 w-6 md:h-8 md:w-8 text-white" />
+                </div>
                 <div>
-                  <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-                  <p className="text-sm md:text-base text-gray-600">
+                  <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-900 to-teal-700 bg-clip-text text-transparent">
+                    Admin Dashboard
+                  </h1>
+                  <p className="text-sm md:text-base text-gray-600 font-medium">
                     Welcome back, {userProfile?.name || user.user_metadata?.name || user.email}
                   </p>
                 </div>
               </div>
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
-                <Button variant="outline" size="sm" className="w-full sm:w-auto" asChild>
+                <Button variant="outline" size="sm" className="w-full sm:w-auto bg-white/80 border-2 border-teal-200 hover:bg-teal-50 hover:border-teal-400 text-gray-900 font-medium" asChild>
                   <Link href="/">
                     <Home className="w-4 h-4 mr-2" />
                     View Site
                   </Link>
                 </Button>
-                <Button variant="outline" size="sm" className="w-full sm:w-auto" asChild>
+                <Button variant="outline" size="sm" className="w-full sm:w-auto bg-white/80 border-2 border-teal-200 hover:bg-teal-50 hover:border-teal-400 text-gray-900 font-medium" asChild>
                   <Link href="/admin/settings">
                     <Settings className="w-4 h-4 mr-2" />
                     Settings
@@ -210,14 +222,14 @@ export default function AdminDashboard() {
           {/* Stats */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
             <div>
-              <Card className="bg-white border border-gray-200 shadow-sm">
+              <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-xs md:text-sm font-medium text-gray-700">Total Courses</CardTitle>
-                  <BookOpen className="h-3 w-3 md:h-4 md:w-4 text-blue-600" />
+                  <CardTitle className="text-xs md:text-sm font-semibold text-gray-700">Total Courses</CardTitle>
+                  <BookOpen className="h-3 w-3 md:h-4 md:w-4 text-teal-600" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-xl md:text-2xl font-bold text-gray-900">{stats.totalCourses}</div>
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs text-gray-600 font-medium">
                     {stats.publishedCourses} published
                   </p>
                 </CardContent>
@@ -225,14 +237,14 @@ export default function AdminDashboard() {
             </div>
 
             <div>
-              <Card className="bg-white border border-gray-200 shadow-sm">
+              <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-xs md:text-sm font-medium text-gray-700">Total Students</CardTitle>
-                  <Users className="h-3 w-3 md:h-4 md:w-4 text-green-600" />
+                  <CardTitle className="text-xs md:text-sm font-semibold text-gray-700">Total Students</CardTitle>
+                  <Users className="h-3 w-3 md:h-4 md:w-4 text-emerald-600" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-xl md:text-2xl font-bold text-gray-900">{stats.totalStudents}</div>
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs text-gray-600 font-medium">
                     {stats.totalEnrollments} enrollments
                   </p>
                 </CardContent>
@@ -240,14 +252,14 @@ export default function AdminDashboard() {
             </div>
 
             <div>
-              <Card className="bg-white border border-gray-200 shadow-sm">
+              <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-xs md:text-sm font-medium text-gray-700">Revenue</CardTitle>
-                  <DollarSign className="h-3 w-3 md:h-4 md:w-4 text-purple-600" />
+                  <CardTitle className="text-xs md:text-sm font-semibold text-gray-700">Revenue</CardTitle>
+                  <DollarSign className="h-3 w-3 md:h-4 md:w-4 text-green-600" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-xl md:text-2xl font-bold text-gray-900">${stats.totalRevenue.toFixed(2)}</div>
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs text-gray-600 font-medium">
                     Total earnings
                   </p>
                 </CardContent>
@@ -255,14 +267,14 @@ export default function AdminDashboard() {
             </div>
 
             <div>
-              <Card className="bg-white border border-gray-200 shadow-sm">
+              <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-xs md:text-sm font-medium text-gray-700">Completion Rate</CardTitle>
+                  <CardTitle className="text-xs md:text-sm font-semibold text-gray-700">Completion Rate</CardTitle>
                   <TrendingUp className="h-3 w-3 md:h-4 md:w-4 text-orange-600" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-xl md:text-2xl font-bold text-gray-900">{stats.completionRate}%</div>
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs text-gray-600 font-medium">
                     Avg quiz score: {stats.averageQuizScore}%
                   </p>
                 </CardContent>
@@ -273,10 +285,10 @@ export default function AdminDashboard() {
           {/* Quick Actions */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
             <div>
-              <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-lg transition-shadow cursor-pointer">
+              <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group">
                 <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center text-base md:text-lg text-gray-900">
-                    <Plus className="h-4 w-4 md:h-5 md:w-5 mr-2 text-blue-600" />
+                  <CardTitle className="flex items-center text-base md:text-lg text-gray-900 group-hover:text-teal-700 transition-colors">
+                    <Plus className="h-4 w-4 md:h-5 md:w-5 mr-2 text-teal-600 group-hover:text-teal-700" />
                     Create Course
                   </CardTitle>
                   <CardDescription className="text-sm text-gray-600">
@@ -284,7 +296,7 @@ export default function AdminDashboard() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button className="w-full text-sm bg-blue-600 hover:bg-blue-700 text-white" asChild>
+                  <Button className="w-full text-sm bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-300" asChild>
                     <Link href="/admin/courses/new">
                       Create New Course
                     </Link>
@@ -294,10 +306,10 @@ export default function AdminDashboard() {
             </div>
 
             <div>
-              <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-lg transition-shadow cursor-pointer">
+              <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group">
                 <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center text-base md:text-lg text-gray-900">
-                    <Users className="h-4 w-4 md:h-5 md:w-5 mr-2 text-green-600" />
+                  <CardTitle className="flex items-center text-base md:text-lg text-gray-900 group-hover:text-teal-700 transition-colors">
+                    <Users className="h-4 w-4 md:h-5 md:w-5 mr-2 text-emerald-600 group-hover:text-emerald-700" />
                     Manage Users
                   </CardTitle>
                   <CardDescription className="text-sm text-gray-600">
@@ -305,7 +317,7 @@ export default function AdminDashboard() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button variant="outline" className="w-full text-sm border-gray-300 text-gray-900 hover:bg-gray-50 hover:border-gray-400 bg-white" asChild>
+                  <Button variant="outline" className="w-full text-sm bg-white/80 border-2 border-teal-200 text-teal-700 hover:bg-teal-50 hover:border-teal-400 hover:text-teal-800 font-medium" asChild>
                     <Link href="/admin/users">
                       View Users
                     </Link>
@@ -315,10 +327,10 @@ export default function AdminDashboard() {
             </div>
 
             <div>
-              <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-lg transition-shadow cursor-pointer">
+              <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group">
                 <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center text-base md:text-lg text-gray-900">
-                    <BarChart3 className="h-4 w-4 md:h-5 md:w-5 mr-2 text-purple-600" />
+                  <CardTitle className="flex items-center text-base md:text-lg text-gray-900 group-hover:text-teal-700 transition-colors">
+                    <BarChart3 className="h-4 w-4 md:h-5 md:w-5 mr-2 text-purple-600 group-hover:text-purple-700" />
                     Analytics
                   </CardTitle>
                   <CardDescription className="text-sm text-gray-600">
@@ -326,7 +338,7 @@ export default function AdminDashboard() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button variant="outline" className="w-full text-sm border-gray-300 text-gray-900 hover:bg-gray-50 hover:border-gray-400 bg-white" asChild>
+                  <Button variant="outline" className="w-full text-sm bg-white/80 border-2 border-teal-200 text-teal-700 hover:bg-teal-50 hover:border-teal-400 hover:text-teal-800 font-medium" asChild>
                     <Link href="/admin/analytics">
                       View Analytics
                     </Link>
@@ -339,10 +351,10 @@ export default function AdminDashboard() {
           {/* Additional Actions */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
             <div>
-              <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-lg transition-shadow cursor-pointer">
+              <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group">
                 <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center text-base md:text-lg text-gray-900">
-                    <FileText className="h-4 w-4 md:h-5 md:w-5 mr-2 text-orange-600" />
+                  <CardTitle className="flex items-center text-base md:text-lg text-gray-900 group-hover:text-teal-700 transition-colors">
+                    <FileText className="h-4 w-4 md:h-5 md:w-5 mr-2 text-orange-600 group-hover:text-orange-700" />
                     Blog Management
                   </CardTitle>
                   <CardDescription className="text-sm text-gray-600">
@@ -351,12 +363,12 @@ export default function AdminDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-col sm:flex-row gap-2">
-                    <Button variant="outline" className="flex-1 text-sm border-gray-300 text-gray-900 hover:bg-gray-50 hover:border-gray-400 hover:text-gray-900 bg-white" asChild>
+                    <Button variant="outline" className="flex-1 text-sm bg-white/80 border-2 border-teal-200 text-teal-700 hover:bg-teal-50 hover:border-teal-400 hover:text-teal-800 font-medium" asChild>
                       <Link href="/admin/blog">
                         Manage Posts
                       </Link>
                     </Button>
-                    <Button className="flex-1 text-sm bg-blue-600 hover:bg-blue-700 text-white" asChild>
+                    <Button className="flex-1 text-sm bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-medium shadow-md hover:shadow-lg transition-all duration-300" asChild>
                       <Link href="/admin/blog/new">
                         <Plus className="h-4 w-4 mr-2" />
                         New Post
@@ -368,10 +380,10 @@ export default function AdminDashboard() {
             </div>
 
             <div>
-              <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-lg transition-shadow cursor-pointer">
+              <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group">
                 <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center text-base md:text-lg text-gray-900">
-                    <Settings className="h-4 w-4 md:h-5 md:w-5 mr-2 text-gray-600" />
+                  <CardTitle className="flex items-center text-base md:text-lg text-gray-900 group-hover:text-teal-700 transition-colors">
+                    <Settings className="h-4 w-4 md:h-5 md:w-5 mr-2 text-gray-600 group-hover:text-gray-700" />
                     System Settings
                   </CardTitle>
                   <CardDescription className="text-sm text-gray-600">
@@ -379,7 +391,7 @@ export default function AdminDashboard() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button variant="outline" className="w-full text-sm border-gray-300 text-gray-900 hover:bg-gray-50 hover:border-gray-400 bg-white" asChild>
+                  <Button variant="outline" className="w-full text-sm bg-white/80 border-2 border-teal-200 text-teal-700 hover:bg-teal-50 hover:border-teal-400 hover:text-teal-800 font-medium" asChild>
                     <Link href="/admin/settings">
                       Open Settings
                     </Link>
@@ -391,45 +403,50 @@ export default function AdminDashboard() {
 
           {/* Recent Courses */}
           <div>
-            <Card className="bg-white border border-gray-200 shadow-sm">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="text-lg md:text-xl text-gray-900">Recent Courses</CardTitle>
-                <Button variant="outline" size="sm" className="border-gray-300 text-gray-900 hover:bg-gray-50 hover:border-gray-400 bg-white" asChild>
+            <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-lg">
+              <CardHeader className="flex flex-row items-center justify-between bg-gradient-to-r from-teal-50 to-emerald-50 border-b border-teal-100">
+                <CardTitle className="text-lg md:text-xl text-gray-900 font-bold">Recent Courses</CardTitle>
+                <Button variant="outline" size="sm" className="bg-white/80 border-2 border-teal-200 text-teal-700 hover:bg-teal-50 hover:border-teal-400 hover:text-teal-800 font-medium" asChild>
                   <Link href="/admin/courses">View All</Link>
                 </Button>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-6">
                 {courses.length === 0 ? (
-                  <div className="text-center py-8">
-                    <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600 mb-4">No courses created yet</p>
-                    <Button className="bg-blue-600 hover:bg-blue-700 text-white" asChild>
+                  <div className="text-center py-12">
+                    <div className="w-16 h-16 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <BookOpen className="h-8 w-8 text-gray-500" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No courses created yet</h3>
+                    <p className="text-gray-600 mb-6">Get started by creating your first course</p>
+                    <Button className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-300" asChild>
                       <Link href="/admin/courses/new">Create Your First Course</Link>
                     </Button>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     {courses.slice(0, 5).map((course) => (
-                      <div key={course.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
+                      <div key={course.id} className="flex items-center justify-between p-4 border-2 border-gray-200 rounded-xl bg-gradient-to-r from-gray-50 to-teal-50 hover:from-teal-50 hover:to-emerald-50 hover:border-teal-200 transition-all duration-300 group">
                         <div className="flex-1">
-                          <h3 className="font-medium text-gray-900">{course.title}</h3>
-                          <div className="flex items-center gap-2 mt-1">
-                            <Badge variant="outline" className="text-xs border-gray-300 text-gray-700 bg-white">
+                          <h3 className="font-semibold text-gray-900 group-hover:text-teal-800 transition-colors">{course.title}</h3>
+                          <div className="flex items-center gap-2 mt-2">
+                            <Badge variant="outline" className="text-xs border-teal-200 text-teal-700 bg-white/80 font-medium">
                               {course.category}
                             </Badge>
                             <Badge 
                               variant={course.status === 'PUBLISHED' ? 'default' : 'secondary'}
-                              className={`text-xs ${course.status === 'PUBLISHED' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700'}`}
+                              className={`text-xs font-medium ${course.status === 'PUBLISHED' 
+                                ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white shadow-sm' 
+                                : 'bg-gray-200 text-gray-700'}`}
                             >
                               {course.status}
                             </Badge>
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="font-medium text-gray-900">
+                          <p className="font-bold text-gray-900">
                             {course.price ? `$${course.price}` : 'Free'}
                           </p>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm text-gray-600 font-medium">
                             {course.enrollments || 0} enrolled
                           </p>
                         </div>
