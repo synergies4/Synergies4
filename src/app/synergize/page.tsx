@@ -208,7 +208,19 @@ const SlidePresentation = ({
   const slide = slides[currentSlide];
 
   return (
-    <div className={`${isFullscreen ? 'fixed inset-0 z-50 bg-slate-900' : 'fixed inset-0 z-50 bg-white'}`}>
+    <div 
+      className={`${isFullscreen ? 'fixed inset-0 z-50 bg-slate-900' : 'fixed inset-0 z-50 bg-white'}`}
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: '100vw',
+        height: '100vh',
+        zIndex: 9999
+      }}
+    >
       {/* Enhanced Presentation Header - Mobile Optimized */}
       {!isFullscreen && (
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 bg-gradient-to-r from-teal-600 to-emerald-600 text-white shadow-lg space-y-2 sm:space-y-0">
@@ -1561,24 +1573,15 @@ export default function SynergizeAgile() {
       return;
     }
 
-    // For mobile in full chat view, always scroll to bottom like ChatGPT
-    if (isMobile || force) {
-      container.scrollTo({
-        top: container.scrollHeight,
-        behavior: 'smooth'
-      });
-    } else {
-      const { scrollTop, scrollHeight, clientHeight } = container;
-      const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
-      
-      // Only auto-scroll if user is near bottom, unless forced
-      if (isNearBottom) {
+    // Always scroll to bottom - fix the issue with scrolling to top
+    requestAnimationFrame(() => {
+      if (container) {
         container.scrollTo({
           top: container.scrollHeight,
-          behavior: 'smooth'
+          behavior: isMobile || force ? 'smooth' : 'auto'
         });
       }
-    }
+    });
   };
 
   // ChatGPT-style auto-scroll: always scroll to bottom on mobile, smart scroll on desktop
@@ -1588,20 +1591,19 @@ export default function SynergizeAgile() {
       
       // Always scroll when user sends a message
       if (lastMessage.type === 'user') {
+        // Multiple timeouts to ensure DOM updates
         setTimeout(() => scrollToBottom(true), 50);
+        setTimeout(() => scrollToBottom(true), 200);
       }
-      // For AI messages: always scroll on mobile, smart scroll on desktop
+      // For AI messages: always scroll to bottom for consistency
       else if (lastMessage.type === 'ai' && lastMessage.id !== 'welcome') {
-        if (isMobile) {
-          // Mobile: always scroll to bottom like ChatGPT
-          setTimeout(() => scrollToBottom(true), 100);
-        } else {
-          // Desktop: only scroll if near bottom
-          setTimeout(() => scrollToBottom(false), 100);
-        }
+        // Always scroll to bottom for both mobile and desktop for consistency
+        setTimeout(() => scrollToBottom(true), 100);
+        setTimeout(() => scrollToBottom(true), 300);
+        setTimeout(() => scrollToBottom(true), 600); // Extra timeout for presentations
       }
     }
-  }, [messages, hasInitialized, isMobile]);
+  }, [messages, hasInitialized]);
 
   // Initialize with a single welcome message only once
   useEffect(() => {
@@ -2481,10 +2483,23 @@ Please structure this as a ready-to-deliver training course that someone could u
                 <select
                   value={selectedRole}
                   onChange={(e) => handleRoleChange(e.target.value)}
-                  className="w-full min-h-[44px] text-base px-4 py-3 bg-teal-600 border border-teal-500 text-white rounded-lg focus:ring-2 focus:ring-teal-400 focus:border-teal-400 appearance-none pr-10"
+                  className="w-full min-h-[44px] text-base px-4 py-3 bg-teal-600 border border-teal-500 text-white rounded-lg focus:ring-2 focus:ring-teal-400 focus:border-teal-400 appearance-none pr-10 font-medium"
+                  style={{
+                    color: 'white',
+                    backgroundColor: '#0d9488',
+                    borderColor: '#14b8a6'
+                  }}
                 >
                   {Object.entries(AGILE_ROLES).map(([key, role]) => (
-                    <option key={key} value={key} className="bg-teal-600 text-white">
+                    <option 
+                      key={key} 
+                      value={key} 
+                      className="bg-teal-600 text-black font-medium"
+                      style={{ 
+                        backgroundColor: '#0d9488', 
+                        color: '#000000'
+                      }}
+                    >
                       {role.name}
                     </option>
                   ))}
@@ -2527,10 +2542,23 @@ Please structure this as a ready-to-deliver training course that someone could u
                 <select
                   value={selectedMode}
                   onChange={(e) => handleModeChange(e.target.value)}
-                  className="w-full min-h-[44px] text-base px-4 py-3 bg-emerald-600 border border-emerald-500 text-white rounded-lg focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 appearance-none pr-10"
+                  className="w-full min-h-[44px] text-base px-4 py-3 bg-emerald-600 border border-emerald-500 text-white rounded-lg focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 appearance-none pr-10 font-medium"
+                  style={{
+                    color: 'white',
+                    backgroundColor: '#059669',
+                    borderColor: '#10b981'
+                  }}
                 >
                   {Object.entries(INTERACTION_MODES).map(([key, mode]) => (
-                    <option key={key} value={key} className="bg-emerald-600 text-white">
+                    <option 
+                      key={key} 
+                      value={key} 
+                      className="bg-emerald-600 text-black font-medium"
+                      style={{ 
+                        backgroundColor: '#059669', 
+                        color: '#000000'
+                      }}
+                    >
                       {mode.name}
                     </option>
                   ))}
@@ -2571,10 +2599,23 @@ Please structure this as a ready-to-deliver training course that someone could u
                 <select
                   value={selectedProvider}
                   onChange={(e) => handleProviderChange(e.target.value)}
-                  className="w-full min-h-[44px] text-base px-4 py-3 bg-teal-600 border border-teal-500 text-white rounded-lg focus:ring-2 focus:ring-teal-400 focus:border-teal-400 appearance-none pr-10"
+                  className="w-full min-h-[44px] text-base px-4 py-3 bg-teal-600 border border-teal-500 text-white rounded-lg focus:ring-2 focus:ring-teal-400 focus:border-teal-400 appearance-none pr-10 font-medium"
+                  style={{
+                    color: 'white',
+                    backgroundColor: '#0d9488',
+                    borderColor: '#14b8a6'
+                  }}
                 >
                   {Object.entries(AI_PROVIDERS).map(([key, provider]) => (
-                    <option key={key} value={key} className="bg-teal-600 text-white">
+                    <option 
+                      key={key} 
+                      value={key} 
+                      className="bg-teal-600 text-black font-medium"
+                      style={{ 
+                        backgroundColor: '#0d9488', 
+                        color: '#000000'
+                      }}
+                    >
                       {provider.name} ({provider.badge})
                     </option>
                   ))}
@@ -2726,9 +2767,11 @@ Please structure this as a ready-to-deliver training course that someone could u
                   <div className="flex-1 min-w-0">
                     {/* Check if message contains presentation JSON */}
                     {message.type === 'ai' && (
-                      message.content.includes('"slides"') && 
-                      message.content.includes('"slideNumber"') && 
-                      (message.content.includes('"title"') || message.content.includes('"layout"'))
+                      (message.content.includes('"slides"') && message.content.includes('"slideNumber"')) ||
+                      (message.content.includes('"slides"') && message.content.includes('"title"')) ||
+                      (message.content.includes('{') && message.content.includes('"slides":') && message.content.includes('[')) ||
+                      (message.content.includes('slideNumber') && message.content.includes('content')) ||
+                      (message.content.match(/\{\s*"title"[\s\S]*"slides"[\s\S]*\[/))
                     ) ? (
                       <div className="space-y-4">
                         <p className="text-sm text-green-600 font-medium">
