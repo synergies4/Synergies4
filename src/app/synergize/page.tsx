@@ -1526,37 +1526,52 @@ export default function SynergizeAgile() {
   };
 
   const scrollToBottom = (force = false) => {
-    // Only scroll if user is near the bottom or force is true
     const container = chatContainerRef.current;
     if (!container) {
       // Fallback for main interface
       const scrollContainer = messagesEndRef.current?.closest('.overflow-y-auto');
       if (scrollContainer) {
-        const { scrollTop, scrollHeight, clientHeight } = scrollContainer;
-        const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
-        if (force || isNearBottom) {
+        // For mobile, always scroll to bottom to mimic ChatGPT behavior
+        if (isMobile || force) {
           scrollContainer.scrollTo({
             top: scrollContainer.scrollHeight,
             behavior: 'smooth'
           });
+        } else {
+          const { scrollTop, scrollHeight, clientHeight } = scrollContainer;
+          const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
+          if (isNearBottom) {
+            scrollContainer.scrollTo({
+              top: scrollContainer.scrollHeight,
+              behavior: 'smooth'
+            });
+          }
         }
       }
       return;
     }
 
-    const { scrollTop, scrollHeight, clientHeight } = container;
-    const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
-    
-    // Only auto-scroll if user is near bottom, unless forced
-    if (force || isNearBottom) {
+    // For mobile in full chat view, always scroll to bottom like ChatGPT
+    if (isMobile || force) {
       container.scrollTo({
         top: container.scrollHeight,
         behavior: 'smooth'
       });
+    } else {
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
+      
+      // Only auto-scroll if user is near bottom, unless forced
+      if (isNearBottom) {
+        container.scrollTo({
+          top: container.scrollHeight,
+          behavior: 'smooth'
+        });
+      }
     }
   };
 
-  // Smart auto-scroll: only scroll when user sends message or when they're near bottom
+  // ChatGPT-style auto-scroll: always scroll to bottom on mobile, smart scroll on desktop
   useEffect(() => {
     if (messages.length > 0 && hasInitialized) {
       const lastMessage = messages[messages.length - 1];
@@ -1565,12 +1580,18 @@ export default function SynergizeAgile() {
       if (lastMessage.type === 'user') {
         setTimeout(() => scrollToBottom(true), 50);
       }
-      // Only scroll for AI messages if user is near bottom (to avoid interrupting reading)
-      else if (lastMessage.type === 'ai' && lastMessage.id !== 'welcome' && !lastMessage.content.includes('"slides"')) {
-        setTimeout(() => scrollToBottom(false), 100);
+      // For AI messages: always scroll on mobile, smart scroll on desktop
+      else if (lastMessage.type === 'ai' && lastMessage.id !== 'welcome') {
+        if (isMobile) {
+          // Mobile: always scroll to bottom like ChatGPT
+          setTimeout(() => scrollToBottom(true), 100);
+        } else {
+          // Desktop: only scroll if near bottom
+          setTimeout(() => scrollToBottom(false), 100);
+        }
       }
     }
-  }, [messages, hasInitialized]);
+  }, [messages, hasInitialized, isMobile]);
 
   // Initialize with a single welcome message only once
   useEffect(() => {
@@ -1856,16 +1877,58 @@ export default function SynergizeAgile() {
       const transcript = urlParams.get('transcript');
       const title = urlParams.get('title');
       const type = urlParams.get('type');
+      const mode = urlParams.get('mode') || 'advisor'; // Default to advisor if no mode specified
       
       if (transcript) {
-        console.log('Transcript URL parameters detected:', { transcript: transcript.length, title, type });
+        console.log('Transcript URL parameters detected:', { transcript: transcript.length, title, type, mode });
         
-        // Auto-switch to full chat view and create course from transcript
+        // Auto-switch to full chat view and set the appropriate mode
         setIsFullChatView(true);
-        setSelectedMode('advisor'); // Switch to advisor mode for course creation
+        setSelectedMode(mode === 'presentation' ? 'presentation' : 'advisor');
         
-        // Create course creation prompt
-        const coursePrompt = `🎯 **COURSE CREATION REQUEST**
+        let prompt = '';
+        
+        if (mode === 'presentation') {
+          // Create presentation generation prompt
+          prompt = `🎯 **PRESENTATION CREATION REQUEST**
+
+Please create a professional presentation from this meeting transcript. Generate slides with clear structure and engaging content.
+
+**Meeting Details:**
+- Title: ${title || 'Meeting Recording'}
+- Type: ${type || 'team-meeting'}
+
+**Meeting Transcript:**
+${transcript}
+
+**Please create a presentation in JSON format with the following structure:**
+
+\`\`\`json
+{
+  "title": "Presentation Title",
+  "subtitle": "Brief description",
+  "slides": [
+    {
+      "slideNumber": 1,
+      "title": "Slide Title",
+      "layout": "title-slide",
+      "content": ["Main content points"]
+    }
+  ]
+}
+\`\`\`
+
+**Include these slide types:**
+1. **Title Slide** - Meeting overview and key participants
+2. **Agenda Slide** - Main topics covered
+3. **Content Slides** - Key decisions, discussions, and outcomes
+4. **Action Items** - Follow-up tasks and responsibilities
+5. **Summary** - Key takeaways and next steps
+
+Make sure the content is engaging, well-structured, and captures the essential information from the meeting. Focus on the most important decisions, insights, and action items that would be valuable to share with stakeholders or team members.`;
+        } else {
+          // Create course creation prompt
+          prompt = `🎯 **COURSE CREATION REQUEST**
 
 I need you to create a comprehensive training course from this meeting transcript. Please analyze the content and create structured learning materials.
 
@@ -1906,14 +1969,15 @@ Create hands-on activities based on the decisions made and problems solved in th
 - Reference materials
 
 Please structure this as a ready-to-deliver training course that someone could use to teach others about the topics, methodologies, and decisions covered in this meeting.`;
+        }
 
         // Clear messages first to start fresh
         setMessages([]);
         
-        // Automatically send the course creation request with a slight delay to ensure everything is loaded
+        // Automatically send the request with a slight delay to ensure everything is loaded
         const timer = setTimeout(() => {
-          console.log('Sending course creation prompt...');
-          handleSendMessage(coursePrompt);
+          console.log(`Sending ${mode} creation prompt...`);
+          handleSendMessage(prompt);
         }, 1500);
         
         // Clear the URL parameters
@@ -2397,7 +2461,7 @@ Please structure this as a ready-to-deliver training course that someone could u
       )}
 
       {/* Main Chat Area */}
-      <div className={`flex-1 flex flex-col min-h-0 relative ${isMobile ? 'pb-20' : ''}`}>
+      <div className={`flex-1 flex flex-col min-h-0 relative`}>
         {/* Chat Header */}
         <div className="bg-white border-b border-gray-200 p-4">
           <div className="flex items-center justify-between">
@@ -2430,14 +2494,13 @@ Please structure this as a ready-to-deliver training course that someone could u
 
         {/* Messages */}
         <div 
-          className="flex-1 overflow-y-auto p-6 space-y-6 overscroll-contain" 
+          className={`flex-1 overflow-y-auto p-6 space-y-6 overscroll-contain ${isMobile ? 'pb-32' : ''}`}
           ref={chatContainerRef}
           data-chat-container="true"
           style={{
             WebkitOverflowScrolling: 'touch',
             scrollBehavior: 'smooth',
-            touchAction: 'manipulation',
-            paddingBottom: isMobile ? '160px' : '20px' // Extra padding on mobile for fixed input area
+            touchAction: 'manipulation'
           }}
         >
           {messages.length === 0 && (
@@ -2577,7 +2640,7 @@ Please structure this as a ready-to-deliver training course that someone could u
         )}
 
         {/* Input Area */}
-        <div className={`bg-white border-t border-gray-200 ${isMobile ? 'fixed bottom-0 left-0 right-0 z-50 shadow-lg touch-manipulation p-3' : 'p-4'}`}>
+        <div className={`bg-white border-t border-gray-200 ${isMobile ? 'fixed bottom-0 left-0 right-0 z-50 shadow-lg touch-manipulation p-4 safe-area-inset-bottom' : 'p-4'}`}>
           {files.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-4">
               {files.map((file, index) => (

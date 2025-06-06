@@ -625,27 +625,43 @@ export default function RecordMeetingPage() {
                 <CardContent className="p-6">
                   <div className="text-center space-y-4">
                     <div>
-                      <h3 className="text-xl font-bold mb-2">Ready to Create Your Course?</h3>
+                      <h3 className="text-xl font-bold mb-2">Transform Your Meeting</h3>
                       <p className="text-teal-100">
-                        Transform this meeting transcript into a comprehensive training course with AI
+                        Turn this meeting transcript into professional training content with AI
                       </p>
                     </div>
                     
-                    <Link 
-                      href={`/synergize?transcript=${encodeURIComponent(transcription)}&title=${encodeURIComponent(meetingData.title || 'Meeting Recording')}&type=${meetingData.type}`}
-                      className="inline-block"
-                    >
-                      <Button 
-                        size="lg"
-                        className="bg-white text-teal-600 hover:bg-gray-50 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 px-8 py-3"
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                      <Link 
+                        href={`/synergize?transcript=${encodeURIComponent(transcription)}&title=${encodeURIComponent(meetingData.title || 'Meeting Recording')}&type=${meetingData.type}&mode=presentation`}
+                        className="inline-block"
                       >
-                        <Sparkles className="h-5 w-5 mr-2" />
-                        Create Course Content
-                      </Button>
-                    </Link>
+                        <Button 
+                          size="lg"
+                          className="bg-white text-teal-600 hover:bg-gray-50 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 px-6 py-3 w-full sm:w-auto"
+                        >
+                          <Sparkles className="h-5 w-5 mr-2" />
+                          Create Presentation
+                        </Button>
+                      </Link>
+                      
+                      <Link 
+                        href={`/synergize?transcript=${encodeURIComponent(transcription)}&title=${encodeURIComponent(meetingData.title || 'Meeting Recording')}&type=${meetingData.type}&mode=advisor`}
+                        className="inline-block"
+                      >
+                        <Button 
+                          size="lg"
+                          variant="outline"
+                          className="border-2 border-white text-white hover:bg-white hover:text-teal-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 px-6 py-3 w-full sm:w-auto"
+                        >
+                          <FileText className="h-5 w-5 mr-2" />
+                          Create Course
+                        </Button>
+                      </Link>
+                    </div>
                     
                     <p className="text-xs text-teal-100 mt-2">
-                      This will open the AI assistant to generate your course
+                      Choose presentation for slides or course for comprehensive training materials
                     </p>
                   </div>
                 </CardContent>
