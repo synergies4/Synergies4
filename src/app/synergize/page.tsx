@@ -208,29 +208,30 @@ const SlidePresentation = ({
   const slide = slides[currentSlide];
 
   return (
-    <div className={`${isFullscreen ? 'fixed inset-0 z-50 bg-slate-900' : 'relative'}`}>
+    <div className={`${isFullscreen ? 'fixed inset-0 z-50 bg-slate-900' : 'fixed inset-0 z-50 bg-white'}`}>
       {/* Enhanced Presentation Header - Mobile Optimized */}
       {!isFullscreen && (
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 bg-slate-900 text-white space-y-2 sm:space-y-0">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 bg-gradient-to-r from-teal-600 to-emerald-600 text-white shadow-lg space-y-2 sm:space-y-0">
           <div className="flex items-center space-x-3 w-full sm:w-auto">
             <Button
               variant="ghost"
               size="sm"
               onClick={onClose}
-              className="text-white hover:bg-slate-700 flex-shrink-0"
+              className="text-white hover:bg-white/20 flex-shrink-0 font-medium"
             >
               <ArrowRight className="h-4 w-4 rotate-180 mr-1 sm:mr-2" />
               <span className="hidden sm:inline">Back to Generator</span>
               <span className="sm:hidden">Back</span>
             </Button>
-            <h2 className="text-base sm:text-lg font-semibold truncate">{presentationTitle}</h2>
+            <div className="h-6 w-px bg-white/30 hidden sm:block"></div>
+            <h2 className="text-base sm:text-lg font-semibold truncate text-white">{presentationTitle}</h2>
           </div>
           <div className="flex items-center space-x-1 sm:space-x-2 w-full sm:w-auto overflow-x-auto">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setShowNotes(!showNotes)}
-              className="text-white hover:bg-slate-700 flex-shrink-0 text-xs sm:text-sm"
+              className="text-white hover:bg-white/20 flex-shrink-0 text-xs sm:text-sm font-medium"
             >
               <FileText className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
               <span className="hidden sm:inline">{showNotes ? 'Hide' : 'Show'} Notes</span>
@@ -240,7 +241,7 @@ const SlidePresentation = ({
               variant="ghost"
               size="sm"
               onClick={toggleFullscreen}
-              className="text-white hover:bg-slate-700 flex-shrink-0 text-xs sm:text-sm"
+              className="text-white hover:bg-white/20 flex-shrink-0 text-xs sm:text-sm font-medium"
             >
               <Presentation className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
               <span className="hidden sm:inline">Present</span>
@@ -250,7 +251,7 @@ const SlidePresentation = ({
               variant="ghost"
               size="sm"
               onClick={onExportPDF}
-              className="text-white hover:bg-slate-700 flex-shrink-0 text-xs sm:text-sm"
+              className="text-white hover:bg-white/20 flex-shrink-0 text-xs sm:text-sm font-medium"
             >
               <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
               <span className="hidden sm:inline">Export PDF</span>
@@ -260,32 +261,33 @@ const SlidePresentation = ({
         </div>
       )}
 
-      <div className={`flex flex-col lg:flex-row ${isFullscreen ? 'h-screen' : 'h-[500px] sm:h-[600px]'}`}>
+      <div className={`flex flex-col lg:flex-row ${isFullscreen ? 'h-screen' : 'h-full pt-16'}`}>
         {/* Mobile-First Slide Thumbnails */}
         {!isFullscreen && (
-          <div className="w-full lg:w-64 bg-gray-100 border-b lg:border-r lg:border-b-0 max-h-32 lg:max-h-none overflow-y-auto">
-            <div className="p-2 lg:p-4">
-              <h3 className="text-xs lg:text-sm font-semibold text-gray-700 mb-2 lg:mb-3">
+          <div className="w-full lg:w-72 bg-gradient-to-b from-teal-50 to-emerald-50 border-b lg:border-r lg:border-b-0 border-teal-200 max-h-40 lg:max-h-none overflow-y-auto">
+            <div className="p-3 lg:p-4">
+              <h3 className="text-xs lg:text-sm font-bold text-teal-800 mb-2 lg:mb-3 flex items-center">
+                <div className="w-2 h-2 bg-teal-500 rounded-full mr-2"></div>
                 Slides ({slides.length})
               </h3>
-              <div className="flex lg:flex-col space-x-2 lg:space-x-0 lg:space-y-2 overflow-x-auto lg:overflow-x-visible">
+              <div className="flex lg:flex-col space-x-2 lg:space-x-0 lg:space-y-3 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0">
                 {slides.map((slideItem, index) => (
                   <div
                     key={index}
                     onClick={() => goToSlide(index)}
-                    className={`flex-shrink-0 lg:flex-shrink p-2 lg:p-3 rounded cursor-pointer transition-all ${
+                    className={`flex-shrink-0 lg:flex-shrink p-3 lg:p-4 rounded-lg cursor-pointer transition-all duration-200 ${
                       currentSlide === index 
-                        ? 'bg-teal-100 border-2 border-teal-500' 
-                        : 'bg-white border border-gray-200 hover:bg-gray-50'
-                    } min-w-[120px] lg:min-w-0`}
+                        ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-lg transform scale-105' 
+                        : 'bg-white border border-teal-200 hover:bg-teal-50 hover:border-teal-300 shadow-sm hover:shadow-md'
+                    } min-w-[140px] lg:min-w-0`}
                   >
-                    <div className="text-xs font-medium text-gray-600 mb-1">
+                    <div className={`text-xs font-bold mb-1 ${currentSlide === index ? 'text-teal-100' : 'text-teal-600'}`}>
                       Slide {slideItem.slideNumber}
                     </div>
-                    <div className="text-xs lg:text-sm font-semibold text-gray-900 truncate">
+                    <div className={`text-xs lg:text-sm font-semibold truncate ${currentSlide === index ? 'text-white' : 'text-gray-900'}`}>
                       {slideItem.title}
                     </div>
-                    <div className="text-xs text-gray-500 mt-1 hidden lg:block">
+                    <div className={`text-xs mt-1 hidden lg:block ${currentSlide === index ? 'text-teal-100' : 'text-gray-500'}`}>
                       {slideItem.layout}
                     </div>
                   </div>
@@ -345,68 +347,76 @@ const SlidePresentation = ({
           </div>
 
           {/* Enhanced Navigation Controls - Mobile Optimized */}
-          <div className={`flex items-center justify-between p-3 sm:p-4 ${isFullscreen ? 'bg-slate-800 text-white' : 'bg-gray-50 border-t'}`}>
+          <div className={`flex items-center justify-between p-4 sm:p-6 ${isFullscreen ? 'bg-slate-800 text-white' : 'bg-gradient-to-r from-teal-600 to-emerald-600 text-white shadow-lg'}`}>
             <Button
-              variant={isFullscreen ? "ghost" : "outline"}
+              variant="ghost"
               size="sm"
               onClick={prevSlide}
               disabled={currentSlide === 0}
-              className={`${isFullscreen ? "text-white hover:bg-slate-700" : ""} flex-shrink-0`}
+              className={`${isFullscreen ? "text-white hover:bg-slate-700" : "text-white hover:bg-white/20"} flex-shrink-0 font-medium disabled:opacity-50 disabled:cursor-not-allowed min-w-[80px] sm:min-w-[100px]`}
             >
-              <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 rotate-180 mr-1 sm:mr-2" />
-              <span className="text-xs sm:text-sm">Prev</span>
+              <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 rotate-180 mr-2" />
+              <span className="text-sm sm:text-base">Prev</span>
             </Button>
 
-            <div className="flex items-center space-x-2 sm:space-x-4 mx-2 sm:mx-4">
-              <span className={`text-xs sm:text-sm ${isFullscreen ? 'text-gray-300' : 'text-gray-600'} whitespace-nowrap`}>
+            <div className="flex items-center space-x-3 sm:space-x-6 mx-4">
+              <span className={`text-sm sm:text-base font-medium whitespace-nowrap ${isFullscreen ? 'text-gray-300' : 'text-white'}`}>
                 {currentSlide + 1} of {slides.length}
               </span>
-              <div className="flex space-x-1 max-w-[120px] sm:max-w-none overflow-hidden">
+              <div className="flex space-x-1.5 sm:space-x-2 max-w-[120px] sm:max-w-none overflow-hidden">
                 {slides.slice(0, 8).map((_, index) => (
                   <button
                     key={index}
                     onClick={() => goToSlide(index)}
-                    className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition-all flex-shrink-0 ${
+                    className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full transition-all duration-200 flex-shrink-0 hover:scale-125 ${
                       currentSlide === index 
-                        ? (isFullscreen ? 'bg-teal-400' : 'bg-teal-500')
-                        : (isFullscreen ? 'bg-slate-600' : 'bg-gray-300')
+                        ? (isFullscreen ? 'bg-teal-400 shadow-lg' : 'bg-white shadow-lg')
+                        : (isFullscreen ? 'bg-slate-600 hover:bg-slate-500' : 'bg-white/40 hover:bg-white/60')
                     }`}
                   />
                 ))}
                 {slides.length > 8 && (
-                  <span className={`text-xs ${isFullscreen ? 'text-gray-400' : 'text-gray-500'}`}>...</span>
+                  <span className={`text-xs ${isFullscreen ? 'text-gray-400' : 'text-white/80'}`}>...</span>
                 )}
               </div>
             </div>
 
             <Button
-              variant={isFullscreen ? "ghost" : "outline"}
+              variant="ghost"
               size="sm"
               onClick={nextSlide}
               disabled={currentSlide === slides.length - 1}
-              className={`${isFullscreen ? "text-white hover:bg-slate-700" : ""} flex-shrink-0`}
+              className={`${isFullscreen ? "text-white hover:bg-slate-700" : "text-white hover:bg-white/20"} flex-shrink-0 font-medium disabled:opacity-50 disabled:cursor-not-allowed min-w-[80px] sm:min-w-[100px]`}
             >
-              <span className="text-xs sm:text-sm">Next</span>
-              <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
+              <span className="text-sm sm:text-base">Next</span>
+              <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 ml-2" />
             </Button>
           </div>
         </div>
 
         {/* Enhanced Speaker Notes Panel - Mobile Optimized */}
         {showNotes && !isFullscreen && slide.speakerNotes && (
-          <div className="w-full lg:w-80 bg-amber-50 border-t lg:border-l lg:border-t-0 p-3 sm:p-4 max-h-48 lg:max-h-none overflow-y-auto">
-            <h3 className="text-sm font-semibold text-gray-700 mb-2 sm:mb-3">Speaker Notes</h3>
-            <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-              {slide.speakerNotes}
-            </p>
+          <div className="w-full lg:w-80 bg-gradient-to-b from-emerald-50 to-teal-50 border-t lg:border-l lg:border-t-0 border-emerald-200 p-4 sm:p-6 max-h-48 lg:max-h-none overflow-y-auto">
+            <h3 className="text-sm font-bold text-emerald-800 mb-3 sm:mb-4 flex items-center">
+              <div className="w-2 h-2 bg-emerald-500 rounded-full mr-2"></div>
+              Speaker Notes
+            </h3>
+            <div className="bg-white rounded-lg border border-emerald-200 p-3 sm:p-4">
+              <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
+                {slide.speakerNotes}
+              </p>
+            </div>
           </div>
         )}
       </div>
 
       {/* Fullscreen Exit Hint */}
       {isFullscreen && (
-        <div className="absolute top-2 sm:top-4 right-2 sm:right-4 bg-gray-900/80 text-white px-2 sm:px-3 py-1 rounded text-xs sm:text-sm">
-          Press ESC to exit fullscreen
+        <div className="absolute top-4 sm:top-6 right-4 sm:right-6 bg-black/80 backdrop-blur-sm text-white px-3 sm:px-4 py-2 sm:py-3 rounded-lg text-sm sm:text-base font-medium shadow-lg border border-white/20">
+          <div className="flex items-center space-x-2">
+            <div className="w-1.5 h-1.5 bg-teal-400 rounded-full animate-pulse"></div>
+            <span>Press ESC to exit fullscreen</span>
+          </div>
         </div>
       )}
     </div>
@@ -2290,67 +2300,97 @@ Please structure this as a ready-to-deliver training course that someone could u
     }
 
     return (
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h4 className="font-semibold text-gray-900">
-            {parsedPresentation.title}
-          </h4>
-          <Badge variant="outline" className="text-xs">
-            {slides.length} slides
-          </Badge>
+      <div className="bg-white rounded-xl border-2 border-teal-200 shadow-xl overflow-hidden">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-teal-600 to-emerald-600 text-white p-4 sm:p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="text-lg sm:text-xl font-bold text-white mb-1">
+                {parsedPresentation.title}
+              </h4>
+              <p className="text-teal-100 text-sm">
+                Interactive presentation with {slides.length} slides
+              </p>
+            </div>
+            <Badge className="bg-white/20 text-white border-white/30 text-sm px-3 py-1">
+              {slides.length} slides
+            </Badge>
+          </div>
         </div>
 
         {/* Slide Preview */}
         {currentSlideData && (
-          <div className="bg-gray-50 border rounded-lg p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h5 className="font-medium text-gray-900">
-                Slide {currentSlideData.slideNumber}: {currentSlideData.title}
-              </h5>
-              <Badge variant="outline" className="text-xs">
-                {currentSlideData.layout}
-              </Badge>
-            </div>
-            
-            <div className="space-y-2">
-              {currentSlideData.content?.slice(0, 3).map((item: string, idx: number) => (
-                <div key={idx} className="flex items-start">
-                  <span className="w-2 h-2 bg-teal-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                  <span className="text-sm text-gray-700">{item}</span>
-                </div>
-              ))}
-              {currentSlideData.content?.length > 3 && (
-                <p className="text-xs text-gray-500 ml-5">
-                  ...and {currentSlideData.content.length - 3} more points
-                </p>
-              )}
+          <div className="p-4 sm:p-6">
+            <div className="bg-gradient-to-br from-gray-50 to-teal-50 rounded-lg border border-teal-100 p-4 sm:p-6 mb-4">
+              <div className="flex items-center justify-between mb-4">
+                <h5 className="text-base sm:text-lg font-bold text-gray-900">
+                  Slide {currentSlideData.slideNumber}: {currentSlideData.title}
+                </h5>
+                <Badge variant="outline" className="text-xs border-teal-300 text-teal-700 bg-teal-50">
+                  {currentSlideData.layout}
+                </Badge>
+              </div>
+              
+              <div className="space-y-3">
+                {currentSlideData.content?.slice(0, 4).map((item: string, idx: number) => (
+                  <div key={idx} className="flex items-start">
+                    <div className="w-2 h-2 bg-teal-500 rounded-full mt-2.5 mr-4 flex-shrink-0"></div>
+                    <span className="text-sm sm:text-base text-gray-700 leading-relaxed">{item}</span>
+                  </div>
+                ))}
+                {currentSlideData.content?.length > 4 && (
+                  <p className="text-sm text-teal-600 ml-6 font-medium">
+                    +{currentSlideData.content.length - 4} more points...
+                  </p>
+                )}
+              </div>
             </div>
 
             {/* Navigation */}
-            <div className="flex items-center justify-between mt-4">
-              <div className="flex items-center space-x-2">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
+              <div className="flex items-center space-x-3">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setCurrentSlide(Math.max(0, currentSlide - 1))}
                   disabled={currentSlide === 0}
-                  className="text-xs"
+                  className="border-teal-300 text-teal-700 hover:bg-teal-50 disabled:opacity-50"
                 >
-                  <ArrowRight className="h-3 w-3 rotate-180 mr-1" />
-                  Prev
+                  <ArrowRight className="h-4 w-4 rotate-180 mr-2" />
+                  Previous
                 </Button>
-                <span className="text-xs text-gray-500">
-                  {currentSlide + 1} of {slides.length}
-                </span>
+                
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm font-medium text-gray-600">
+                    {currentSlide + 1} of {slides.length}
+                  </span>
+                  <div className="flex space-x-1">
+                    {slides.slice(0, 6).map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setCurrentSlide(index)}
+                        className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                          currentSlide === index 
+                            ? 'bg-teal-500 scale-125' 
+                            : 'bg-gray-300 hover:bg-teal-300'
+                        }`}
+                      />
+                    ))}
+                    {slides.length > 6 && (
+                      <span className="text-xs text-gray-400 ml-1">...</span>
+                    )}
+                  </div>
+                </div>
+                
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setCurrentSlide(Math.min(slides.length - 1, currentSlide + 1))}
                   disabled={currentSlide === slides.length - 1}
-                  className="text-xs"
+                  className="border-teal-300 text-teal-700 hover:bg-teal-50 disabled:opacity-50"
                 >
                   Next
-                  <ArrowRight className="h-3 w-3 ml-1" />
+                  <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
               </div>
               
@@ -2358,38 +2398,38 @@ Please structure this as a ready-to-deliver training course that someone could u
                 variant="outline"
                 size="sm"
                 onClick={() => setShowFullPresentation(true)}
-                className="text-xs"
+                className="border-teal-300 text-teal-700 hover:bg-teal-50 font-medium"
               >
-                <Presentation className="h-3 w-3 mr-1" />
-                View Full
+                <Presentation className="h-4 w-4 mr-2" />
+                View Full Screen
+              </Button>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+              <Button
+                size="sm"
+                onClick={() => setShowFullPresentation(true)}
+                className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+              >
+                <Presentation className="h-4 w-4 mr-2" />
+                Present Slides
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  const jsonStr = JSON.stringify(parsedPresentation, null, 2);
+                  navigator.clipboard.writeText(jsonStr);
+                }}
+                className="border-teal-300 text-teal-700 hover:bg-teal-50 font-medium"
+              >
+                <Copy className="h-4 w-4 mr-2" />
+                Copy JSON
               </Button>
             </div>
           </div>
         )}
-
-        {/* Quick Actions */}
-        <div className="flex space-x-2">
-          <Button
-            size="sm"
-            onClick={() => setShowFullPresentation(true)}
-            className="bg-teal-600 hover:bg-teal-700 text-white text-xs"
-          >
-            <Presentation className="h-3 w-3 mr-1" />
-            Present Slides
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => {
-              const jsonStr = JSON.stringify(parsedPresentation, null, 2);
-              navigator.clipboard.writeText(jsonStr);
-            }}
-            className="text-xs"
-          >
-            <Copy className="h-3 w-3 mr-1" />
-            Copy JSON
-          </Button>
-        </div>
       </div>
     );
   };
