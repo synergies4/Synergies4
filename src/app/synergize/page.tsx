@@ -1460,7 +1460,8 @@ const MeetingRecorder = ({
   const [meetingTitle, setMeetingTitle] = useState('');
   const [meetingType, setMeetingType] = useState('sprint-planning');
   const [participants, setParticipants] = useState('');
-  const [recordingState, setRecordingState] = useState<'idle' | 'recording' | 'paused' | 'completed' | 'transcribing' | 'transcribed'>('idle');
+  const [recordingState, setRecordingState] = useState<'idle' | 'recording' | 'paused' | 'completed' | 'transcribing' | 'transcribed' | 'permission-denied'>('idle');
+  const [permissionError, setPermissionError] = useState<string | null>(null);
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -1495,6 +1496,10 @@ const MeetingRecorder = ({
 
   const startRecording = async () => {
     try {
+      // Clear any previous permission errors
+      setPermissionError(null);
+      setRecordingState('idle');
+
       const stream = await navigator.mediaDevices.getUserMedia({ 
         audio: {
           echoCancellation: true,
@@ -1535,10 +1540,33 @@ const MeetingRecorder = ({
       setRecordingState('recording');
       setRecordingTime(0);
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error starting recording:', error);
-      alert('Unable to access microphone. Please check your permissions.');
+      
+      let errorMessage = '';
+      
+      if (error.name === 'NotAllowedError') {
+        errorMessage = 'Microphone access denied. Please allow microphone permissions and try again.';
+        setRecordingState('permission-denied');
+      } else if (error.name === 'NotFoundError') {
+        errorMessage = 'No microphone found. Please check that your device has a microphone.';
+      } else if (error.name === 'NotSupportedError') {
+        errorMessage = 'Your browser does not support audio recording. Please try a different browser.';
+      } else if (error.name === 'OverconstrainedError') {
+        errorMessage = 'Microphone constraints could not be satisfied. Please try again.';
+      } else {
+        errorMessage = 'Unable to access microphone. Please check your permissions and try again.';
+      }
+      
+      setPermissionError(errorMessage);
     }
+  };
+
+  const retryPermissions = async () => {
+    // Clear error state and try again
+    setPermissionError(null);
+    setRecordingState('idle');
+    await startRecording();
   };
 
   const pauseRecording = () => {
@@ -1684,6 +1712,14 @@ Focus on extracting actionable learning content that can be used to train others
           icon: <CheckCircle className="w-4 h-4" />,
           text: 'Transcription Complete'
         };
+      case 'permission-denied':
+        return {
+          color: 'text-red-600',
+          bgColor: 'bg-red-50',
+          borderColor: 'border-red-200',
+          icon: <MicOff className="w-4 h-4" />,
+          text: 'Permission Denied'
+        };
       default:
         return {
           color: 'text-gray-600',
@@ -1761,7 +1797,7 @@ Focus on extracting actionable learning content that can be used to train others
             </div>
           </div>
           
-          {recordingState !== 'idle' && recordingState !== 'transcribing' && (
+          {recordingState !== 'idle' && recordingState !== 'transcribing' && recordingState !== 'permission-denied' && (
             <Button
               variant="outline"
               size="sm"
@@ -1775,9 +1811,52 @@ Focus on extracting actionable learning content that can be used to train others
         </div>
       </div>
 
+      {/* Permission Error Display */}
+      {permissionError && (
+        <div className="p-4 rounded-lg border-2 border-red-200 bg-red-50">
+          <div className="flex items-start space-x-3">
+            <MicOff className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
+            <div className="flex-1">
+              <h4 className="font-medium text-red-800 mb-2">Microphone Access Required</h4>
+              <p className="text-sm text-red-700 mb-3">{permissionError}</p>
+              
+              <div className="text-xs text-red-600 space-y-1 mb-4">
+                <p><strong>How to fix this:</strong></p>
+                <p>• Look for the microphone icon 🎤 in your browser's address bar</p>
+                <p>• Click it and select "Allow" to grant microphone permissions</p>
+                <p>• On Safari mobile: Tap the "aA" icon, then Website Settings → Microphone → Allow</p>
+                <p>• Refresh the page if needed after granting permissions</p>
+              </div>
+              
+              <div className="flex space-x-3">
+                <Button
+                  onClick={retryPermissions}
+                  size="sm"
+                  className="bg-red-600 hover:bg-red-700 text-white"
+                >
+                  <Mic className="w-4 h-4 mr-1" />
+                  Try Again
+                </Button>
+                <Button
+                  onClick={() => {
+                    setPermissionError(null);
+                    setRecordingState('idle');
+                  }}
+                  variant="outline"
+                  size="sm"
+                  className="border-red-300 text-red-600 hover:bg-red-50"
+                >
+                  Dismiss
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Recording Controls */}
       <div className="flex items-center justify-center space-x-4">
-        {!isRecording && recordingState === 'idle' && (
+        {!isRecording && recordingState === 'idle' && !permissionError && (
           <Button
             onClick={startRecording}
             className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all"
