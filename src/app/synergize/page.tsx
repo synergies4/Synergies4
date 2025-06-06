@@ -1858,38 +1858,68 @@ export default function SynergizeAgile() {
       const type = urlParams.get('type');
       
       if (transcript) {
+        console.log('Transcript URL parameters detected:', { transcript: transcript.length, title, type });
+        
         // Auto-switch to full chat view and create course from transcript
         setIsFullChatView(true);
         setSelectedMode('advisor'); // Switch to advisor mode for course creation
         
         // Create course creation prompt
-        const coursePrompt = `Create a comprehensive training course from this meeting transcript:
+        const coursePrompt = `🎯 **COURSE CREATION REQUEST**
 
-Meeting Details:
+I need you to create a comprehensive training course from this meeting transcript. Please analyze the content and create structured learning materials.
+
+**Meeting Details:**
 - Title: ${title || 'Meeting Recording'}
 - Type: ${type || 'team-meeting'}
 
-Transcript:
+**Meeting Transcript:**
 ${transcript}
 
-Please analyze this transcript and create a structured course that includes:
+**Please create a complete training course that includes:**
 
-1. **Course Title & Objectives**
-2. **Key Learning Modules** (based on main topics discussed)
-3. **Practical Exercises** (derived from decisions made or problems solved)
-4. **Assessment Questions** (to test understanding of the concepts)
-5. **Implementation Guide** (actionable steps for applying what was learned)
-6. **Templates/Checklists** (based on processes mentioned)
+## 1. Course Overview
+- Course title and description
+- Learning objectives
+- Target audience
+- Duration estimate
 
-Focus on extracting actionable learning content that can be used to train others on the topics, decisions, and methodologies discussed in this meeting. Structure it as a complete, ready-to-deliver training course.`;
+## 2. Learning Modules
+Break down the content into clear modules based on the main topics discussed
 
-        // Automatically send the course creation request
-        setTimeout(() => {
+## 3. Practical Exercises
+Create hands-on activities based on the decisions made and problems solved in the meeting
+
+## 4. Assessment Materials
+- Knowledge check questions
+- Practical assessments
+- Success criteria
+
+## 5. Implementation Guide
+- Step-by-step action items
+- Best practices identified
+- Common pitfalls to avoid
+
+## 6. Supporting Materials
+- Templates mentioned or discussed
+- Checklists for key processes
+- Reference materials
+
+Please structure this as a ready-to-deliver training course that someone could use to teach others about the topics, methodologies, and decisions covered in this meeting.`;
+
+        // Clear messages first to start fresh
+        setMessages([]);
+        
+        // Automatically send the course creation request with a slight delay to ensure everything is loaded
+        const timer = setTimeout(() => {
+          console.log('Sending course creation prompt...');
           handleSendMessage(coursePrompt);
-        }, 1000);
+        }, 1500);
         
         // Clear the URL parameters
         window.history.replaceState({}, document.title, window.location.pathname);
+        
+        return () => clearTimeout(timer);
       }
     }
   }, [handleSendMessage]);

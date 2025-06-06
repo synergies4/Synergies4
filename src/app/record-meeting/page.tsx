@@ -315,7 +315,7 @@ export default function RecordMeetingPage() {
   const selectedMeetingType = MEETING_TYPES[meetingData.type];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-teal-50/30 to-emerald-50/30">
+    <div className="min-h-screen bg-gradient-to-br from-teal-50 via-emerald-50 to-cyan-50">
       {/* Header */}
       <div className="bg-white border-b shadow-sm">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -344,7 +344,7 @@ export default function RecordMeetingPage() {
           {/* Left Column - Recording Controls */}
           <div className="space-y-6">
             {/* Recording Status Card */}
-            <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+            <Card className="border border-gray-200 shadow-lg bg-white">
               <CardHeader className="text-center pb-4">
                 <CardTitle className="text-2xl font-bold bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent">
                   Recording Center
@@ -380,7 +380,7 @@ export default function RecordMeetingPage() {
                       ? isPaused 
                         ? 'text-yellow-600' 
                         : 'text-red-600' 
-                      : 'text-gray-500'
+                      : 'text-gray-600'
                   }`}>
                     {isRecording 
                       ? isPaused 
@@ -448,7 +448,7 @@ export default function RecordMeetingPage() {
                   <Button 
                     onClick={resetMeeting} 
                     variant="outline"
-                    className="hover:bg-gray-50 transition-colors"
+                    className="border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
                   >
                     <RotateCcw className="h-4 w-4 mr-2" />
                     Reset
@@ -458,16 +458,16 @@ export default function RecordMeetingPage() {
             </Card>
 
             {/* Meeting Details Card */}
-            <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+            <Card className="border border-gray-200 shadow-lg bg-white">
               <CardHeader>
-                <CardTitle className="flex items-center text-lg">
+                <CardTitle className="flex items-center text-lg text-gray-900">
                   <Info className="h-5 w-5 mr-2 text-teal-600" />
                   Meeting Details
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="title" className="text-sm font-medium text-gray-700">
+                  <Label htmlFor="title" className="text-sm font-medium text-gray-800">
                     Meeting Title (Optional)
                   </Label>
                   <Input
@@ -475,24 +475,24 @@ export default function RecordMeetingPage() {
                     value={meetingData.title}
                     onChange={(e) => setMeetingData(prev => ({ ...prev, title: e.target.value }))}
                     placeholder="Auto-generated if empty"
-                    className="mt-1 bg-white/70 border-gray-200 focus:border-teal-500 focus:ring-teal-500"
+                    className="mt-1 bg-white border-gray-300 focus:border-teal-500 focus:ring-teal-500 text-gray-900"
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="type" className="text-sm font-medium text-gray-700">
+                  <Label htmlFor="type" className="text-sm font-medium text-gray-800">
                     Meeting Type
                   </Label>
                   <Select 
                     value={meetingData.type} 
                     onValueChange={(value) => setMeetingData(prev => ({ ...prev, type: value as MeetingType }))}
                   >
-                    <SelectTrigger className="mt-1 bg-white/70 border-gray-200 focus:border-teal-500 focus:ring-teal-500">
+                    <SelectTrigger className="mt-1 bg-white border-gray-300 focus:border-teal-500 focus:ring-teal-500 text-gray-900">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-white border border-gray-200 shadow-xl">
                       {Object.entries(MEETING_TYPES).map(([key, type]) => (
-                        <SelectItem key={key} value={key} className="hover:bg-teal-50 focus:bg-teal-50">
+                        <SelectItem key={key} value={key} className="hover:bg-teal-50 focus:bg-teal-50 text-gray-900">
                           <div className="flex items-center">
                             <span className="mr-2">{type.icon}</span>
                             <span>{type.label}</span>
@@ -504,7 +504,7 @@ export default function RecordMeetingPage() {
                 </div>
 
                 <div>
-                  <Label htmlFor="participants" className="text-sm font-medium text-gray-700">
+                  <Label htmlFor="participants" className="text-sm font-medium text-gray-800">
                     Participants
                   </Label>
                   <Input
@@ -512,12 +512,12 @@ export default function RecordMeetingPage() {
                     value={meetingData.participants}
                     onChange={(e) => setMeetingData(prev => ({ ...prev, participants: e.target.value }))}
                     placeholder="Enter participant names"
-                    className="mt-1 bg-white/70 border-gray-200 focus:border-teal-500 focus:ring-teal-500"
+                    className="mt-1 bg-white border-gray-300 focus:border-teal-500 focus:ring-teal-500 text-gray-900"
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="duration" className="text-sm font-medium text-gray-700">
+                  <Label htmlFor="duration" className="text-sm font-medium text-gray-800">
                     Duration
                   </Label>
                   <Input
@@ -525,7 +525,7 @@ export default function RecordMeetingPage() {
                     value={meetingData.duration}
                     onChange={(e) => setMeetingData(prev => ({ ...prev, duration: e.target.value }))}
                     placeholder="e.g., 30 minutes"
-                    className="mt-1 bg-white/70 border-gray-200 focus:border-teal-500 focus:ring-teal-500"
+                    className="mt-1 bg-white border-gray-300 focus:border-teal-500 focus:ring-teal-500 text-gray-900"
                   />
                 </div>
 
@@ -542,10 +542,10 @@ export default function RecordMeetingPage() {
           {/* Right Column - Transcript & Actions */}
           <div className="space-y-6">
             {/* Transcript Card */}
-            <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+            <Card className="border border-gray-200 shadow-lg bg-white">
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center text-lg">
+                  <CardTitle className="flex items-center text-lg text-gray-900">
                     <FileText className="h-5 w-5 mr-2 text-teal-600" />
                     AI Transcript
                   </CardTitle>
@@ -555,14 +555,14 @@ export default function RecordMeetingPage() {
                         onClick={copyTranscript} 
                         variant="outline" 
                         size="sm"
-                        className="hover:bg-teal-50 hover:border-teal-300"
+                        className="border-gray-300 text-gray-700 hover:bg-teal-50 hover:border-teal-300 hover:text-teal-700"
                       >
                         <Copy className="h-4 w-4" />
                       </Button>
                       <Button 
                         variant="outline" 
                         size="sm"
-                        className="hover:bg-teal-50 hover:border-teal-300"
+                        className="border-gray-300 text-gray-700 hover:bg-teal-50 hover:border-teal-300 hover:text-teal-700"
                       >
                         <Download className="h-4 w-4" />
                       </Button>
@@ -603,7 +603,7 @@ export default function RecordMeetingPage() {
                     <Textarea
                       value={transcription}
                       onChange={(e) => setTranscription(e.target.value)}
-                      className="min-h-[400px] bg-white/70 border-gray-200 focus:border-teal-500 focus:ring-teal-500 text-sm leading-relaxed resize-none"
+                      className="min-h-[400px] bg-white border-gray-300 focus:border-teal-500 focus:ring-teal-500 text-sm leading-relaxed resize-none text-gray-900"
                       placeholder="AI-generated transcript will appear here..."
                     />
                     
