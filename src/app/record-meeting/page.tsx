@@ -219,6 +219,72 @@ const MeetingRecorder = () => {
     navigator.clipboard.writeText(transcription);
   };
 
+  // Demo mode functionality for testing
+  const loadDemoMeeting = () => {
+    const demoTranscript = `Meeting started at 2:15 PM
+
+**Sarah (Scrum Master):** Alright everyone, let's start our sprint planning meeting. We have John from the development team, Lisa from QA, and Mike our Product Owner. Today we're planning Sprint 23 which starts Monday.
+
+**Mike (Product Owner):** Thanks Sarah. I want to walk through our top priorities for this sprint. We have three main user stories we need to tackle. First is the user authentication improvement - we've been getting feedback that the login process is too complex.
+
+**John (Developer):** Can you elaborate on what specific improvements we're looking for? Are we talking about single sign-on integration or just UI improvements?
+
+**Mike:** Good question. Based on user feedback, we want to implement social login options like Google and GitHub, and streamline the current form by reducing required fields. The acceptance criteria include OAuth integration and reducing login steps from 4 to 2.
+
+**Lisa (QA):** What's our testing strategy for the OAuth integration? We'll need to test with different providers and edge cases like when external services are down.
+
+**Sarah:** Great point Lisa. John, what's your estimate for the OAuth story?
+
+**John:** Given the complexity of integrating multiple providers and ensuring security standards, I'd estimate this at 8 story points. We'll need to research OAuth libraries, implement the integration, and add fallback mechanisms.
+
+**Mike:** That seems reasonable. The second priority is improving our API response times. We've noticed some endpoints are taking over 3 seconds to respond, especially the user dashboard data fetch.
+
+**John:** I've been looking into this. The main bottleneck is our database queries. We're doing N+1 queries in several places and missing some indexes. I estimate this optimization work at 5 story points.
+
+**Lisa:** For this one, I'll need to create performance test scenarios to validate the improvements. We should establish baseline metrics before we start.
+
+**Sarah:** Excellent. Mike, what's the third priority?
+
+**Mike:** The mobile responsive design updates for our dashboard. Users are reporting that the charts and tables don't display well on mobile devices. This affects about 40% of our user base.
+
+**John:** This is mostly CSS and layout work. I think we can break this down into smaller components. The dashboard has 5 main sections - header, navigation, charts, data tables, and footer. I'd estimate 3 story points total.
+
+**Lisa:** I'll need to test across different devices and screen sizes. We should include tablet testing too, not just mobile phones.
+
+**Sarah:** So we have 8 + 5 + 3 = 16 story points total. Based on our velocity from the last 3 sprints averaging 14 points, this might be slightly ambitious. Should we consider moving something to the next sprint?
+
+**Mike:** The mobile responsive work is important but could be deferred if needed. Let's commit to the OAuth and performance improvements as must-haves.
+
+**John:** Actually, I think we can handle all three if we start with some research spikes early in the sprint. The OAuth research could happen in parallel with performance profiling.
+
+**Lisa:** I agree. If we plan the testing approach upfront, we can work more efficiently.
+
+**Sarah:** Alright, let's commit to all three stories but with the understanding that mobile responsive is our flex item if we run into issues. 
+
+**Action Items:**
+- John: Research OAuth libraries and create implementation plan by Wednesday
+- Lisa: Set up performance baseline metrics and mobile testing matrix
+- Mike: Review and approve OAuth provider list with security team
+- Sarah: Schedule mid-sprint check-in for Thursday
+
+**Sprint Goal:** Improve user experience through faster authentication, better performance, and mobile accessibility.
+
+Meeting ended at 3:00 PM`;
+
+    // Simulate the recording flow
+    setMeetingTitle("Sprint 23 Planning Meeting");
+    setMeetingType("sprint-planning");
+    setParticipants("Sarah (Scrum Master), John (Developer), Lisa (QA), Mike (Product Owner)");
+    setRecordingTime(2700); // 45 minutes
+    setTranscription(demoTranscript);
+    setRecordingState('transcribed');
+    
+    // Create a fake audio blob for completeness
+    const fakeAudioData = new Uint8Array(1024);
+    const fakeBlob = new Blob([fakeAudioData], { type: 'audio/webm' });
+    setAudioBlob(fakeBlob);
+  };
+
   const getRecordingStateDisplay = () => {
     switch (recordingState) {
       case 'recording':
@@ -401,49 +467,68 @@ const MeetingRecorder = () => {
         </div>
       )}
 
-      {/* Recording Controls */}
-      <div className="flex items-center justify-center space-x-6 py-8">
-        {!isRecording && recordingState === 'idle' && !permissionError && (
-          <Button
-            onClick={startRecording}
-            className="bg-red-600 hover:bg-red-700 text-white px-12 py-6 rounded-2xl shadow-2xl hover:shadow-red-500/25 transition-all hover:scale-105 text-xl font-semibold"
-          >
-            <Mic className="w-8 h-8 mr-3" />
-            Start Recording
-          </Button>
-        )}
+                    {/* Recording Controls */}
+              <div className="flex flex-col items-center space-y-6 py-8">
+                <div className="flex items-center justify-center space-x-6">
+                  {!isRecording && recordingState === 'idle' && !permissionError && (
+                    <Button
+                      onClick={startRecording}
+                      className="bg-red-600 hover:bg-red-700 text-white px-12 py-6 rounded-2xl shadow-2xl hover:shadow-red-500/25 transition-all hover:scale-105 text-xl font-semibold"
+                    >
+                      <Mic className="w-8 h-8 mr-3" />
+                      Start Recording
+                    </Button>
+                  )}
 
-        {isRecording && (
-          <>
-            {!isPaused ? (
-              <Button
-                onClick={pauseRecording}
-                variant="outline"
-                className="border-orange-500 text-orange-600 hover:bg-orange-50 px-8 py-4 text-lg"
-              >
-                <Pause className="w-6 h-6 mr-2" />
-                Pause
-              </Button>
-            ) : (
-              <Button
-                onClick={resumeRecording}
-                className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 text-lg"
-              >
-                <PlayCircle className="w-6 h-6 mr-2" />
-                Resume
-              </Button>
-            )}
-            
-            <Button
-              onClick={stopRecording}
-              className="bg-gray-800 hover:bg-gray-900 text-white px-8 py-4 text-lg"
-            >
-              <Square className="w-6 h-6 mr-2" />
-              Stop Recording
-            </Button>
-          </>
-        )}
-      </div>
+                                  {isRecording && (
+                  <>
+                    {!isPaused ? (
+                      <Button
+                        onClick={pauseRecording}
+                        variant="outline"
+                        className="border-orange-500 text-orange-600 hover:bg-orange-50 px-8 py-4 text-lg"
+                      >
+                        <Pause className="w-6 h-6 mr-2" />
+                        Pause
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={resumeRecording}
+                        className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 text-lg"
+                      >
+                        <PlayCircle className="w-6 h-6 mr-2" />
+                        Resume
+                      </Button>
+                    )}
+                    
+                    <Button
+                      onClick={stopRecording}
+                      className="bg-gray-800 hover:bg-gray-900 text-white px-8 py-4 text-lg"
+                    >
+                      <Square className="w-6 h-6 mr-2" />
+                      Stop Recording
+                    </Button>
+                  </>
+                )}
+              </div>
+              
+              {/* Demo Mode - Only show when idle and no recording in progress */}
+              {recordingState === 'idle' && !isRecording && !permissionError && (
+                <div className="flex flex-col items-center space-y-3">
+                  <div className="text-sm text-gray-500 text-center">
+                    For testing purposes:
+                  </div>
+                  <Button
+                    onClick={loadDemoMeeting}
+                    variant="outline"
+                    className="border-blue-300 text-blue-600 hover:bg-blue-50 px-6 py-3 text-sm bg-blue-25"
+                  >
+                    <FileText className="w-4 h-4 mr-2" />
+                    Load Demo Meeting (45min Sprint Planning)
+                  </Button>
+                </div>
+              )}
+            </div>
 
       {/* Transcription Section */}
       {recordingState === 'completed' && (
@@ -691,6 +776,72 @@ export default function RecordMeetingPage() {
 
   const copyTranscript = () => {
     navigator.clipboard.writeText(transcription);
+  };
+
+  // Demo mode functionality for testing
+  const loadDemoMeeting = () => {
+    const demoTranscript = `Meeting started at 2:15 PM
+
+**Sarah (Scrum Master):** Alright everyone, let's start our sprint planning meeting. We have John from the development team, Lisa from QA, and Mike our Product Owner. Today we're planning Sprint 23 which starts Monday.
+
+**Mike (Product Owner):** Thanks Sarah. I want to walk through our top priorities for this sprint. We have three main user stories we need to tackle. First is the user authentication improvement - we've been getting feedback that the login process is too complex.
+
+**John (Developer):** Can you elaborate on what specific improvements we're looking for? Are we talking about single sign-on integration or just UI improvements?
+
+**Mike:** Good question. Based on user feedback, we want to implement social login options like Google and GitHub, and streamline the current form by reducing required fields. The acceptance criteria include OAuth integration and reducing login steps from 4 to 2.
+
+**Lisa (QA):** What's our testing strategy for the OAuth integration? We'll need to test with different providers and edge cases like when external services are down.
+
+**Sarah:** Great point Lisa. John, what's your estimate for the OAuth story?
+
+**John:** Given the complexity of integrating multiple providers and ensuring security standards, I'd estimate this at 8 story points. We'll need to research OAuth libraries, implement the integration, and add fallback mechanisms.
+
+**Mike:** That seems reasonable. The second priority is improving our API response times. We've noticed some endpoints are taking over 3 seconds to respond, especially the user dashboard data fetch.
+
+**John:** I've been looking into this. The main bottleneck is our database queries. We're doing N+1 queries in several places and missing some indexes. I estimate this optimization work at 5 story points.
+
+**Lisa:** For this one, I'll need to create performance test scenarios to validate the improvements. We should establish baseline metrics before we start.
+
+**Sarah:** Excellent. Mike, what's the third priority?
+
+**Mike:** The mobile responsive design updates for our dashboard. Users are reporting that the charts and tables don't display well on mobile devices. This affects about 40% of our user base.
+
+**John:** This is mostly CSS and layout work. I think we can break this down into smaller components. The dashboard has 5 main sections - header, navigation, charts, data tables, and footer. I'd estimate 3 story points total.
+
+**Lisa:** I'll need to test across different devices and screen sizes. We should include tablet testing too, not just mobile phones.
+
+**Sarah:** So we have 8 + 5 + 3 = 16 story points total. Based on our velocity from the last 3 sprints averaging 14 points, this might be slightly ambitious. Should we consider moving something to the next sprint?
+
+**Mike:** The mobile responsive work is important but could be deferred if needed. Let's commit to the OAuth and performance improvements as must-haves.
+
+**John:** Actually, I think we can handle all three if we start with some research spikes early in the sprint. The OAuth research could happen in parallel with performance profiling.
+
+**Lisa:** I agree. If we plan the testing approach upfront, we can work more efficiently.
+
+**Sarah:** Alright, let's commit to all three stories but with the understanding that mobile responsive is our flex item if we run into issues. 
+
+**Action Items:**
+- John: Research OAuth libraries and create implementation plan by Wednesday
+- Lisa: Set up performance baseline metrics and mobile testing matrix
+- Mike: Review and approve OAuth provider list with security team
+- Sarah: Schedule mid-sprint check-in for Thursday
+
+**Sprint Goal:** Improve user experience through faster authentication, better performance, and mobile accessibility.
+
+Meeting ended at 3:00 PM`;
+
+    // Simulate the recording flow
+    setMeetingTitle("Sprint 23 Planning Meeting");
+    setMeetingType("sprint-planning");
+    setParticipants("Sarah (Scrum Master), John (Developer), Lisa (QA), Mike (Product Owner)");
+    setRecordingTime(2700); // 45 minutes
+    setTranscription(demoTranscript);
+    setRecordingState('transcribed');
+    
+    // Create a fake audio blob for completeness
+    const fakeAudioData = new Uint8Array(1024);
+    const fakeBlob = new Blob([fakeAudioData], { type: 'audio/webm' });
+    setAudioBlob(fakeBlob);
   };
 
   const getRecordingStateDisplay = () => {
