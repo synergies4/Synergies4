@@ -206,6 +206,11 @@ const MeetingRecorder = () => {
       setTranscription(data.transcription);
       setRecordingState('transcribed');
       
+      // Auto-generate title and type if needed
+      const { title, type } = generateTitleAndType(data.transcription);
+      setMeetingTitle(title);
+      setMeetingType(type);
+      
     } catch (error) {
       console.error('Transcription error:', error);
       alert('Failed to transcribe audio. Please try again.');
@@ -213,6 +218,59 @@ const MeetingRecorder = () => {
     } finally {
       setIsTranscribing(false);
     }
+  };
+
+  // Auto-generate title and type based on transcript content
+  const generateTitleAndType = (transcript: string) => {
+    const content = transcript.toLowerCase();
+    
+    // Auto-detect meeting type based on content
+    let detectedType = meetingType;
+    if (content.includes('sprint planning') || content.includes('sprint plan')) {
+      detectedType = 'sprint-planning';
+    } else if (content.includes('retrospective') || content.includes('retro')) {
+      detectedType = 'retrospective';
+    } else if (content.includes('daily standup') || content.includes('daily scrum') || content.includes('standup')) {
+      detectedType = 'daily-standup';
+    } else if (content.includes('sprint review') || content.includes('demo')) {
+      detectedType = 'sprint-review';
+    } else if (content.includes('backlog') || content.includes('grooming') || content.includes('refinement')) {
+      detectedType = 'backlog-grooming';
+    } else if (content.includes('stakeholder')) {
+      detectedType = 'stakeholder-meeting';
+    } else if (content.includes('training') || content.includes('workshop')) {
+      detectedType = 'training-session';
+    }
+    
+    // Auto-generate title if none provided
+    let generatedTitle = meetingTitle;
+    if (!meetingTitle.trim()) {
+      const today = new Date();
+      const dateStr = today.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric',
+        year: 'numeric'
+      });
+      
+      const typeMap: { [key: string]: string } = {
+        'sprint-planning': 'Sprint Planning',
+        'retrospective': 'Sprint Retrospective',
+        'daily-standup': 'Daily Standup',
+        'sprint-review': 'Sprint Review',
+        'backlog-grooming': 'Backlog Grooming',
+        'team-meeting': 'Team Meeting',
+        'stakeholder-meeting': 'Stakeholder Meeting',
+        'training-session': 'Training Session'
+      };
+      
+      // Try to extract sprint number or other identifiers from content
+      const sprintMatch = content.match(/sprint\s+(\d+|[a-z]+)/i);
+      const sprintInfo = sprintMatch ? ` ${sprintMatch[1]}` : '';
+      
+      generatedTitle = `${typeMap[detectedType] || 'Team Meeting'}${sprintInfo} - ${dateStr}`;
+    }
+    
+    return { title: generatedTitle, type: detectedType };
   };
 
   const copyTranscript = () => {
@@ -574,7 +632,7 @@ Meeting ended at 3:00 PM`;
             <Button
               variant="outline"
               onClick={copyTranscript}
-              className="border-gray-300 text-gray-700 hover:bg-gray-50 px-6 py-4 text-lg"
+              className="border-teal-300 text-teal-600 hover:bg-teal-50 hover:text-teal-700 px-6 py-4 text-lg"
             >
               <Copy className="w-5 h-5 mr-2" />
               Copy Transcript
@@ -765,6 +823,11 @@ export default function RecordMeetingPage() {
       setTranscription(data.transcription);
       setRecordingState('transcribed');
       
+      // Auto-generate title and type if needed
+      const { title, type } = generateTitleAndType(data.transcription);
+      setMeetingTitle(title);
+      setMeetingType(type);
+      
     } catch (error) {
       console.error('Transcription error:', error);
       alert('Failed to transcribe audio. Please try again.');
@@ -772,6 +835,59 @@ export default function RecordMeetingPage() {
     } finally {
       setIsTranscribing(false);
     }
+  };
+
+  // Auto-generate title and type based on transcript content
+  const generateTitleAndType = (transcript: string) => {
+    const content = transcript.toLowerCase();
+    
+    // Auto-detect meeting type based on content
+    let detectedType = meetingType;
+    if (content.includes('sprint planning') || content.includes('sprint plan')) {
+      detectedType = 'sprint-planning';
+    } else if (content.includes('retrospective') || content.includes('retro')) {
+      detectedType = 'retrospective';
+    } else if (content.includes('daily standup') || content.includes('daily scrum') || content.includes('standup')) {
+      detectedType = 'daily-standup';
+    } else if (content.includes('sprint review') || content.includes('demo')) {
+      detectedType = 'sprint-review';
+    } else if (content.includes('backlog') || content.includes('grooming') || content.includes('refinement')) {
+      detectedType = 'backlog-grooming';
+    } else if (content.includes('stakeholder')) {
+      detectedType = 'stakeholder-meeting';
+    } else if (content.includes('training') || content.includes('workshop')) {
+      detectedType = 'training-session';
+    }
+    
+    // Auto-generate title if none provided
+    let generatedTitle = meetingTitle;
+    if (!meetingTitle.trim()) {
+      const today = new Date();
+      const dateStr = today.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric',
+        year: 'numeric'
+      });
+      
+      const typeMap: { [key: string]: string } = {
+        'sprint-planning': 'Sprint Planning',
+        'retrospective': 'Sprint Retrospective',
+        'daily-standup': 'Daily Standup',
+        'sprint-review': 'Sprint Review',
+        'backlog-grooming': 'Backlog Grooming',
+        'team-meeting': 'Team Meeting',
+        'stakeholder-meeting': 'Stakeholder Meeting',
+        'training-session': 'Training Session'
+      };
+      
+      // Try to extract sprint number or other identifiers from content
+      const sprintMatch = content.match(/sprint\s+(\d+|[a-z]+)/i);
+      const sprintInfo = sprintMatch ? ` ${sprintMatch[1]}` : '';
+      
+      generatedTitle = `${typeMap[detectedType] || 'Team Meeting'}${sprintInfo} - ${dateStr}`;
+    }
+    
+    return { title: generatedTitle, type: detectedType };
   };
 
   const copyTranscript = () => {
@@ -910,7 +1026,7 @@ Meeting ended at 3:00 PM`;
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-amber-50">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-red-200/50 sticky top-0 z-10">
+      <header className="bg-gradient-to-r from-teal-600 to-emerald-600 border-b border-teal-700 sticky top-0 z-10 shadow-lg">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -918,21 +1034,21 @@ Meeting ended at 3:00 PM`;
                 variant="ghost"
                 size="sm"
                 asChild
-                className="text-gray-600 hover:text-gray-800"
+                className="text-white hover:text-teal-200 hover:bg-white/10"
               >
                 <Link href="/synergize">
                   <ArrowLeft className="w-5 h-5 mr-2" />
                   Back to Synergize AI
                 </Link>
               </Button>
-              <div className="h-6 w-px bg-gray-300" />
+              <div className="h-6 w-px bg-white/30" />
               <div>
-                <h1 className="text-xl font-bold text-gray-900">Record Meeting</h1>
-                <p className="text-sm text-gray-600">Professional meeting capture & AI transcription</p>
+                <h1 className="text-xl font-bold text-white">Record Meeting</h1>
+                <p className="text-sm text-white/80">Professional meeting capture & AI transcription</p>
               </div>
             </div>
             
-            <Badge className="bg-red-100 text-red-700 border-red-200">
+            <Badge className="bg-white/20 text-white border-white/30">
               <Mic className="w-4 h-4 mr-2" />
               Live Recording
             </Badge>
@@ -956,11 +1072,11 @@ Meeting ended at 3:00 PM`;
               {/* Meeting Setup */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <Label className="text-sm font-medium text-gray-700">Meeting Title</Label>
+                  <Label className="text-sm font-medium text-gray-700">Meeting Title (optional)</Label>
                   <Input
                     value={meetingTitle}
                     onChange={(e) => setMeetingTitle(e.target.value)}
-                    placeholder="Enter meeting title..."
+                    placeholder="Auto-generated from transcript if left empty"
                     className="mt-2 bg-white border-gray-300 text-gray-900"
                     disabled={isRecording}
                   />
@@ -971,15 +1087,15 @@ Meeting ended at 3:00 PM`;
                     <SelectTrigger className="mt-2 bg-white border-gray-300 text-gray-900">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="sprint-planning">Sprint Planning</SelectItem>
-                      <SelectItem value="retrospective">Retrospective</SelectItem>
-                      <SelectItem value="daily-standup">Daily Standup</SelectItem>
-                      <SelectItem value="sprint-review">Sprint Review</SelectItem>
-                      <SelectItem value="backlog-grooming">Backlog Grooming</SelectItem>
-                      <SelectItem value="team-meeting">Team Meeting</SelectItem>
-                      <SelectItem value="stakeholder-meeting">Stakeholder Meeting</SelectItem>
-                      <SelectItem value="training-session">Training Session</SelectItem>
+                    <SelectContent className="bg-white">
+                      <SelectItem value="sprint-planning" className="text-gray-900 hover:bg-teal-50 focus:bg-teal-50">Sprint Planning</SelectItem>
+                      <SelectItem value="retrospective" className="text-gray-900 hover:bg-teal-50 focus:bg-teal-50">Retrospective</SelectItem>
+                      <SelectItem value="daily-standup" className="text-gray-900 hover:bg-teal-50 focus:bg-teal-50">Daily Standup</SelectItem>
+                      <SelectItem value="sprint-review" className="text-gray-900 hover:bg-teal-50 focus:bg-teal-50">Sprint Review</SelectItem>
+                      <SelectItem value="backlog-grooming" className="text-gray-900 hover:bg-teal-50 focus:bg-teal-50">Backlog Grooming</SelectItem>
+                      <SelectItem value="team-meeting" className="text-gray-900 hover:bg-teal-50 focus:bg-teal-50">Team Meeting</SelectItem>
+                      <SelectItem value="stakeholder-meeting" className="text-gray-900 hover:bg-teal-50 focus:bg-teal-50">Stakeholder Meeting</SelectItem>
+                      <SelectItem value="training-session" className="text-gray-900 hover:bg-teal-50 focus:bg-teal-50">Training Session</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -1020,7 +1136,7 @@ Meeting ended at 3:00 PM`;
                       variant="outline"
                       size="sm"
                       onClick={resetRecording}
-                      className="text-gray-600 hover:text-gray-800"
+                      className="text-teal-600 hover:text-white hover:bg-teal-600 border-teal-600"
                     >
                       <RotateCcw className="w-4 h-4 mr-1" />
                       Reset
@@ -1071,46 +1187,65 @@ Meeting ended at 3:00 PM`;
               )}
 
               {/* Recording Controls */}
-              <div className="flex items-center justify-center space-x-6 py-8">
-                {!isRecording && recordingState === 'idle' && !permissionError && (
-                  <Button
-                    onClick={startRecording}
-                    className="bg-red-600 hover:bg-red-700 text-white px-12 py-6 rounded-2xl shadow-2xl hover:shadow-red-500/25 transition-all hover:scale-105 text-xl font-semibold"
-                  >
-                    <Mic className="w-8 h-8 mr-3" />
-                    Start Recording
-                  </Button>
-                )}
-
-                {isRecording && (
-                  <>
-                    {!isPaused ? (
-                      <Button
-                        onClick={pauseRecording}
-                        variant="outline"
-                        className="border-orange-500 text-orange-600 hover:bg-orange-50 px-8 py-4 text-lg"
-                      >
-                        <Pause className="w-6 h-6 mr-2" />
-                        Pause
-                      </Button>
-                    ) : (
-                      <Button
-                        onClick={resumeRecording}
-                        className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 text-lg"
-                      >
-                        <PlayCircle className="w-6 h-6 mr-2" />
-                        Resume
-                      </Button>
-                    )}
-                    
+              <div className="flex flex-col items-center space-y-6 py-8">
+                <div className="flex items-center justify-center space-x-6">
+                  {!isRecording && recordingState === 'idle' && !permissionError && (
                     <Button
-                      onClick={stopRecording}
-                      className="bg-gray-800 hover:bg-gray-900 text-white px-8 py-4 text-lg"
+                      onClick={startRecording}
+                      className="bg-red-600 hover:bg-red-700 text-white px-12 py-6 rounded-2xl shadow-2xl hover:shadow-red-500/25 transition-all hover:scale-105 text-xl font-semibold"
                     >
-                      <Square className="w-6 h-6 mr-2" />
-                      Stop Recording
+                      <Mic className="w-8 h-8 mr-3" />
+                      Start Recording
                     </Button>
-                  </>
+                  )}
+
+                  {isRecording && (
+                    <>
+                      {!isPaused ? (
+                        <Button
+                          onClick={pauseRecording}
+                          variant="outline"
+                          className="border-orange-500 text-orange-600 hover:bg-orange-50 px-8 py-4 text-lg"
+                        >
+                          <Pause className="w-6 h-6 mr-2" />
+                          Pause
+                        </Button>
+                      ) : (
+                        <Button
+                          onClick={resumeRecording}
+                          className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 text-lg"
+                        >
+                          <PlayCircle className="w-6 h-6 mr-2" />
+                          Resume
+                        </Button>
+                      )}
+                      
+                      <Button
+                        onClick={stopRecording}
+                        className="bg-gray-800 hover:bg-gray-900 text-white px-8 py-4 text-lg"
+                      >
+                        <Square className="w-6 h-6 mr-2" />
+                        Stop Recording
+                      </Button>
+                    </>
+                  )}
+                </div>
+                
+                {/* Demo Mode - Only show when idle and no recording in progress */}
+                {recordingState === 'idle' && !isRecording && !permissionError && (
+                  <div className="flex flex-col items-center space-y-3">
+                    <div className="text-sm text-gray-500 text-center">
+                      For testing purposes:
+                    </div>
+                    <Button
+                      onClick={loadDemoMeeting}
+                      variant="outline"
+                      className="border-blue-300 text-blue-600 hover:bg-blue-50 px-6 py-3 text-sm"
+                    >
+                      <FileText className="w-4 h-4 mr-2" />
+                      Load Demo Meeting (45min Sprint Planning)
+                    </Button>
+                  </div>
                 )}
               </div>
 
@@ -1158,7 +1293,7 @@ Meeting ended at 3:00 PM`;
                     <Button
                       variant="outline"
                       onClick={copyTranscript}
-                      className="border-gray-300 text-gray-700 hover:bg-gray-50 px-6 py-4 text-lg"
+                      className="border-teal-300 text-teal-600 hover:bg-teal-50 hover:text-teal-700 px-6 py-4 text-lg"
                     >
                       <Copy className="w-5 h-5 mr-2" />
                       Copy Transcript
