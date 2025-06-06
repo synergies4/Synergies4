@@ -448,7 +448,7 @@ export default function RecordMeetingPage() {
                   <Button 
                     onClick={resetMeeting} 
                     variant="outline"
-                    className="border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
+                    className="border-gray-600 bg-gray-600 text-white hover:bg-green-600 hover:border-green-600 hover:text-white transition-colors"
                   >
                     <RotateCcw className="h-4 w-4 mr-2" />
                     Reset

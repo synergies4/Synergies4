@@ -1892,7 +1892,7 @@ export default function SynergizeAgile() {
           // Create presentation generation prompt
           prompt = `🎯 **PRESENTATION CREATION REQUEST**
 
-Please create a professional presentation from this meeting transcript. Generate slides with clear structure and engaging content.
+I need you to create a professional presentation from this meeting transcript. You MUST respond with a valid JSON object that can be parsed and displayed as slides.
 
 **Meeting Details:**
 - Title: ${title || 'Meeting Recording'}
@@ -1901,31 +1901,54 @@ Please create a professional presentation from this meeting transcript. Generate
 **Meeting Transcript:**
 ${transcript}
 
-**Please create a presentation in JSON format with the following structure:**
+**IMPORTANT: Please respond with ONLY the JSON object in this exact format:**
 
-\`\`\`json
 {
-  "title": "Presentation Title",
-  "subtitle": "Brief description",
+  "title": "Presentation Title Based on Meeting",
+  "subtitle": "Brief description of the meeting outcome",
   "slides": [
     {
       "slideNumber": 1,
-      "title": "Slide Title",
+      "title": "Meeting Overview",
       "layout": "title-slide",
-      "content": ["Main content points"]
+      "content": ["Meeting title", "Date and participants", "Key objectives"]
+    },
+    {
+      "slideNumber": 2,
+      "title": "Agenda",
+      "layout": "content",
+      "content": ["Topic 1", "Topic 2", "Topic 3"]
+    },
+    {
+      "slideNumber": 3,
+      "title": "Key Discussion Points",
+      "layout": "content", 
+      "content": ["Main discussion point 1", "Main discussion point 2", "Main discussion point 3"]
+    },
+    {
+      "slideNumber": 4,
+      "title": "Decisions Made",
+      "layout": "content",
+      "content": ["Decision 1", "Decision 2", "Decision 3"]
+    },
+    {
+      "slideNumber": 5,
+      "title": "Action Items",
+      "layout": "content",
+      "content": ["Action item 1 - Owner", "Action item 2 - Owner", "Action item 3 - Owner"]
+    },
+    {
+      "slideNumber": 6,
+      "title": "Next Steps",
+      "layout": "content",
+      "content": ["Next step 1", "Next step 2", "Follow-up meeting date"]
     }
   ]
 }
-\`\`\`
 
-**Include these slide types:**
-1. **Title Slide** - Meeting overview and key participants
-2. **Agenda Slide** - Main topics covered
-3. **Content Slides** - Key decisions, discussions, and outcomes
-4. **Action Items** - Follow-up tasks and responsibilities
-5. **Summary** - Key takeaways and next steps
+Create 6-8 slides total based on the meeting content. Focus on the most important information that would be valuable for stakeholders. Make sure all content is professional and well-structured.
 
-Make sure the content is engaging, well-structured, and captures the essential information from the meeting. Focus on the most important decisions, insights, and action items that would be valuable to share with stakeholders or team members.`;
+DO NOT include any additional text, explanations, or markdown formatting - respond with ONLY the JSON object.`;
         } else {
           // Create course creation prompt
           prompt = `🎯 **COURSE CREATION REQUEST**
@@ -1977,6 +2000,9 @@ Please structure this as a ready-to-deliver training course that someone could u
         // Automatically send the request with a slight delay to ensure everything is loaded
         const timer = setTimeout(() => {
           console.log(`Sending ${mode} creation prompt...`);
+          console.log('Selected mode set to:', mode === 'presentation' ? 'presentation' : 'advisor');
+          console.log('Prompt preview:', prompt.substring(0, 200) + '...');
+          console.log('Full chat view active:', isFullChatView);
           handleSendMessage(prompt);
         }, 1500);
         
@@ -2063,16 +2089,20 @@ Please structure this as a ready-to-deliver training course that someone could u
 
     useEffect(() => {
       try {
+        console.log('PresentationDisplay: Attempting to parse message content');
+        console.log('Content preview:', messageContent.substring(0, 200));
+        
         // Try multiple approaches to extract JSON
         let presentationData = null;
         
-        // Method 1: Look for complete JSON object with proper braces
-        const jsonMatch = messageContent.match(/\{(?:[^{}]|{[^{}]*})*\}/);
+        // Method 1: Look for complete JSON object with proper braces (improved regex)
+        const jsonMatch = messageContent.match(/\{[\s\S]*?\}/);
         if (jsonMatch) {
           try {
             presentationData = JSON.parse(jsonMatch[0]);
+            console.log('Method 1 succeeded - found JSON object');
           } catch (e) {
-            console.log('Method 1 failed, trying method 2');
+            console.log('Method 1 failed, trying method 2', e);
           }
         }
         
@@ -2082,13 +2112,14 @@ Please structure this as a ready-to-deliver training course that someone could u
           if (codeBlockMatch) {
             try {
               presentationData = JSON.parse(codeBlockMatch[1]);
+              console.log('Method 2 succeeded - found JSON in code block');
             } catch (e) {
-              console.log('Method 2 failed, trying method 3');
+              console.log('Method 2 failed, trying method 3', e);
             }
           }
         }
         
-        // Method 3: Extract everything between first { and last }
+        // Method 3: Extract everything between first { and last } (more robust)
         if (!presentationData) {
           const firstBrace = messageContent.indexOf('{');
           const lastBrace = messageContent.lastIndexOf('}');
@@ -2096,14 +2127,41 @@ Please structure this as a ready-to-deliver training course that someone could u
             try {
               const jsonStr = messageContent.substring(firstBrace, lastBrace + 1);
               presentationData = JSON.parse(jsonStr);
+              console.log('Method 3 succeeded - extracted JSON from braces');
             } catch (e) {
-              console.log('Method 3 failed');
+              console.log('Method 3 failed', e);
             }
           }
         }
         
+        // Method 4: Try to clean up the content and parse again
+        if (!presentationData) {
+          try {
+            // Remove any markdown formatting and try again
+            const cleaned = messageContent
+              .replace(/```json\s*/g, '')
+              .replace(/```\s*/g, '')
+              .replace(/^\s*\*\*[^*]+\*\*\s*/gm, '') // Remove markdown headers
+              .trim();
+            
+            const cleanedMatch = cleaned.match(/\{[\s\S]*\}/);
+            if (cleanedMatch) {
+              presentationData = JSON.parse(cleanedMatch[0]);
+              console.log('Method 4 succeeded - cleaned and parsed JSON');
+            }
+          } catch (e) {
+            console.log('Method 4 failed', e);
+          }
+        }
+        
         if (presentationData && presentationData.slides && Array.isArray(presentationData.slides)) {
+          console.log('Successfully parsed presentation with', presentationData.slides.length, 'slides');
           setParsedPresentation(presentationData);
+        } else {
+          console.log('No valid presentation data found or missing slides array');
+          if (presentationData) {
+            console.log('Presentation data structure:', Object.keys(presentationData));
+          }
         }
       } catch (error) {
         console.error('Failed to parse presentation:', error);
@@ -2533,7 +2591,11 @@ Please structure this as a ready-to-deliver training course that someone could u
                   )}
                   <div className="flex-1 min-w-0">
                     {/* Check if message contains presentation JSON */}
-                    {message.type === 'ai' && (message.content.includes('"slides"') || message.content.includes('"title"')) ? (
+                    {message.type === 'ai' && (
+                      message.content.includes('"slides"') && 
+                      message.content.includes('"slideNumber"') && 
+                      (message.content.includes('"title"') || message.content.includes('"layout"'))
+                    ) ? (
                       <div className="space-y-4">
                         <p className="text-sm text-green-600 font-medium">
                           ✅ Presentation generated successfully!
@@ -3370,19 +3432,23 @@ Format as a realistic conversation with clear speaker labels and include decisio
                               </div>
                             )}
                             <div className="flex-1 min-w-0">
-                              {/* Check if message contains presentation JSON */}
-                              {message.type === 'ai' && (message.content.includes('"slides"') || message.content.includes('"title"')) ? (
-                                <div className="space-y-4">
-                                  <p className="text-sm text-green-600 font-medium">
-                                    ✅ Presentation generated successfully!
-                                  </p>
-                                  <PresentationDisplay messageContent={message.content} />
-                                </div>
-                              ) : (
-                                <p className={`text-sm leading-relaxed whitespace-pre-wrap break-words ${message.type === 'user' ? 'text-white' : 'text-gray-900'}`}>
-                                  {message.content}
+                                                          {/* Check if message contains presentation JSON */}
+                            {message.type === 'ai' && (
+                              message.content.includes('"slides"') && 
+                              message.content.includes('"slideNumber"') && 
+                              (message.content.includes('"title"') || message.content.includes('"layout"'))
+                            ) ? (
+                              <div className="space-y-4">
+                                <p className="text-sm text-green-600 font-medium">
+                                  ✅ Presentation generated successfully!
                                 </p>
-                              )}
+                                <PresentationDisplay messageContent={message.content} />
+                              </div>
+                            ) : (
+                              <p className={`text-sm leading-relaxed whitespace-pre-wrap break-words ${message.type === 'user' ? 'text-white' : 'text-gray-900'}`}>
+                                {message.content}
+                              </p>
+                            )}
                               <div className="flex items-center justify-between mt-3">
                                 <div className="flex items-center space-x-2">
                                   <span className={`text-xs ${message.type === 'user' ? 'text-teal-100' : 'text-gray-500'}`}>
