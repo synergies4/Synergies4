@@ -1997,14 +1997,108 @@ Please structure this as a ready-to-deliver training course that someone could u
         // Clear messages first to start fresh
         setMessages([]);
         
-        // Automatically send the request with a slight delay to ensure everything is loaded
-        const timer = setTimeout(() => {
+        // Store the prompt to send after component is fully loaded
+        const sendPrompt = async () => {
           console.log(`Sending ${mode} creation prompt...`);
           console.log('Selected mode set to:', mode === 'presentation' ? 'presentation' : 'advisor');
           console.log('Prompt preview:', prompt.substring(0, 200) + '...');
           console.log('Full chat view active:', isFullChatView);
-          handleSendMessage(prompt);
-        }, 1500);
+          
+          // Call handleSendMessage directly with the prompt
+          const messageToSend = prompt;
+          if (!messageToSend.trim()) return;
+
+          // Create user message
+          const userMessage = {
+            id: Date.now().toString(),
+            type: 'user' as const,
+            content: messageToSend,
+            timestamp: new Date(),
+            mode: mode === 'presentation' ? 'presentation' : 'advisor',
+            role: selectedRole,
+            provider: selectedProvider
+          };
+
+          setMessages(prev => [...prev, userMessage]);
+          setIsLoading(true);
+
+          try {
+            const role = AGILE_ROLES[selectedRole as keyof typeof AGILE_ROLES];
+            const currentMode = INTERACTION_MODES[mode === 'presentation' ? 'presentation' : 'advisor' as keyof typeof INTERACTION_MODES];
+            const provider = AI_PROVIDERS[selectedProvider];
+
+            // Enhanced prompt based on role and mode
+            let systemPrompt = `You are an expert Agile AI assistant specialized in ${role.name} responsibilities. 
+            Current mode: ${currentMode.name} - ${currentMode.description}
+            
+            Role context: ${role.description}
+            Key capabilities: ${role.capabilities.join(', ')}
+            
+            Based on the user's role as ${role.name} and the current mode (${currentMode.name}), provide specific, actionable advice.
+            
+            Important guidelines:
+            - Keep responses clear and actionable
+            - Use bullet points for complex information
+            - Provide practical examples when helpful
+            - If asked about technical topics outside your expertise, politely redirect to your core areas
+            - Be encouraging and supportive while maintaining professionalism`;
+
+            if (mode === 'presentation') {
+              systemPrompt += ` Generate presentation content with clear slides, talking points, and visual suggestions.`;
+            } else {
+              systemPrompt += ` Provide personalized advice with specific actions, best practices, and potential pitfalls to avoid.`;
+            }
+
+            const response = await fetch('/api/chat', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                messages: [
+                  { role: 'system', content: systemPrompt },
+                  { role: 'user', content: messageToSend }
+                ],
+                provider: selectedProvider
+              }),
+            });
+
+            if (!response.ok) {
+              throw new Error(`API request failed with status ${response.status}`);
+            }
+
+            const data = await response.json();
+            
+            const aiMessage = {
+              id: (Date.now() + 1).toString(),
+              type: 'ai' as const,
+              content: data.content || data.response,
+              timestamp: new Date(),
+              mode: mode === 'presentation' ? 'presentation' : 'advisor',
+              role: selectedRole,
+              provider: selectedProvider
+            };
+
+            setMessages(prev => [...prev, aiMessage]);
+            
+          } catch (error) {
+            console.error('Chat Error:', error);
+            
+            const errorMessage = {
+              id: (Date.now() + 1).toString(),
+              type: 'ai' as const,
+              content: 'I apologize, but I encountered an issue processing your meeting transcript. Please try again.',
+              timestamp: new Date(),
+              mode: mode === 'presentation' ? 'presentation' : 'advisor',
+              role: selectedRole,
+              provider: selectedProvider
+            };
+            setMessages(prev => [...prev, errorMessage]);
+          } finally {
+            setIsLoading(false);
+          }
+        };
+        
+        // Automatically send the request with a delay to ensure everything is loaded
+        const timer = setTimeout(sendPrompt, 2000);
         
         // Clear the URL parameters
         window.history.replaceState({}, document.title, window.location.pathname);
@@ -2012,7 +2106,7 @@ Please structure this as a ready-to-deliver training course that someone could u
         return () => clearTimeout(timer);
       }
     }
-  }, [handleSendMessage]);
+  }, []); // Remove handleSendMessage dependency
 
   // Type-safe handler for provider selection with scroll prevention
   const handleProviderChange = useCallback((value: string) => {
