@@ -1,1341 +1,659 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 import { 
-  ArrowLeft,
-  Mic,
-  MicOff,
-  Square,
-  Pause,
-  PlayCircle,
-  RotateCcw,
-  FileText,
-  BookOpen,
+  Mic, 
+  MicOff, 
+  Square, 
+  Play, 
+  Pause, 
+  ArrowLeft, 
+  FileText, 
+  Users, 
+  Calendar, 
+  Clock, 
+  Download,
   Copy,
-  CheckCircle,
-  Loader2
+  RotateCcw,
+  Sparkles,
+  CheckCircle2,
+  Info,
+  Zap
 } from 'lucide-react';
+import Link from 'next/link';
 
-// Meeting Recording Component (moved from synergize page)
-const MeetingRecorder = () => {
-  const [isRecording, setIsRecording] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
-  const [recordingTime, setRecordingTime] = useState(0);
-  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
-  const [transcription, setTranscription] = useState('');
-  const [isTranscribing, setIsTranscribing] = useState(false);
-  const [meetingTitle, setMeetingTitle] = useState('');
-  const [meetingType, setMeetingType] = useState('sprint-planning');
-  const [participants, setParticipants] = useState('');
-  const [recordingState, setRecordingState] = useState<'idle' | 'recording' | 'paused' | 'completed' | 'transcribing' | 'transcribed' | 'permission-denied'>('idle');
-  const [permissionError, setPermissionError] = useState<string | null>(null);
-  
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
+// Mock demo data
+const DEMO_TRANSCRIPT = `Sarah (Scrum Master): Alright everyone, let's start our Sprint 15 planning meeting. We've got about 90 minutes scheduled, and I want to make sure we cover everything properly.
 
-  // Recording timer
-  useEffect(() => {
-    if (isRecording && !isPaused) {
-      intervalRef.current = setInterval(() => {
-        setRecordingTime(prev => prev + 1);
-      }, 1000);
-    } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    }
+Mike (Product Owner): Perfect. So we're looking at the stories in our backlog for the next two weeks. The main priorities are the user authentication system and the reporting dashboard improvements.
 
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, [isRecording, isPaused]);
+Jessica (Developer): I've been looking at the authentication stories, and I think the OAuth integration might be more complex than initially estimated. We should probably break that down further.
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
+David (Designer): I agree with Jessica. From a UX perspective, we also need to consider the onboarding flow for new users. That's going to require some additional design work.
 
-  const startRecording = async () => {
-    try {
-      // Clear any previous permission errors
-      setPermissionError(null);
-      setRecordingState('idle');
+Sarah: Good points. Let's start with story estimation. Mike, can you walk us through the top priority items?
 
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          sampleRate: 44100
-        } 
-      });
-      
-      streamRef.current = stream;
-      audioChunksRef.current = [];
-      
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: 'audio/webm;codecs=opus'
-      });
-      
-      mediaRecorderRef.current = mediaRecorder;
-      
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
-        }
-      };
-      
-      mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        setAudioBlob(audioBlob);
-        setRecordingState('completed');
-        
-        // Clean up stream
-        if (streamRef.current) {
-          streamRef.current.getTracks().forEach(track => track.stop());
-          streamRef.current = null;
-        }
-      };
-      
-      mediaRecorder.start(1000); // Collect data every second
-      setIsRecording(true);
-      setRecordingState('recording');
-      setRecordingTime(0);
-      
-    } catch (error: any) {
-      console.error('Error starting recording:', error);
-      
-      let errorMessage = '';
-      
-      if (error.name === 'NotAllowedError') {
-        errorMessage = 'Microphone access denied. Please allow microphone permissions and try again.';
-        setRecordingState('permission-denied');
-      } else if (error.name === 'NotFoundError') {
-        errorMessage = 'No microphone found. Please check that your device has a microphone.';
-      } else if (error.name === 'NotSupportedError') {
-        errorMessage = 'Your browser does not support audio recording. Please try a different browser.';
-      } else if (error.name === 'OverconstrainedError') {
-        errorMessage = 'Microphone constraints could not be satisfied. Please try again.';
-      } else {
-        errorMessage = 'Unable to access microphone. Please check your permissions and try again.';
-      }
-      
-      setPermissionError(errorMessage);
-    }
-  };
+Mike: Sure. First item is "As a user, I want to sign in with Google so that I can access the platform quickly." This was initially estimated at 8 points, but given Jessica's concerns, maybe we should re-evaluate.
 
-  const retryPermissions = async () => {
-    // Clear error state and try again
-    setPermissionError(null);
-    setRecordingState('idle');
-    await startRecording();
-  };
+Jessica: I'd say it's more like 13 points. We need to handle the OAuth flow, user provisioning, error handling, and security considerations. Plus integration testing.
 
-  const pauseRecording = () => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-      mediaRecorderRef.current.pause();
-      setIsPaused(true);
-      setRecordingState('paused');
-    }
-  };
+David: And we'll need design mockups for the sign-in flow. That's probably another 3 points for design work.
 
-  const resumeRecording = () => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'paused') {
-      mediaRecorderRef.current.resume();
-      setIsPaused(false);
-      setRecordingState('recording');
-    }
-  };
+Sarah: So we're looking at 13 for development plus 3 for design. Let's also consider the testing effort. Tom, what's your take on QA for this?
 
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
-      mediaRecorderRef.current.stop();
-    }
-    setIsRecording(false);
-    setIsPaused(false);
-  };
+Tom (QA Engineer): For OAuth integration, I'd want to do comprehensive testing across different browsers and devices. Plus security testing. I'd estimate about 5 points for QA.
 
-  const resetRecording = () => {
-    setIsRecording(false);
-    setIsPaused(false);
-    setRecordingTime(0);
-    setAudioBlob(null);
-    setTranscription('');
-    setRecordingState('idle');
-    audioChunksRef.current = [];
-    
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
-    }
-  };
+Mike: Okay, so total is 21 points for the OAuth story. That's quite a bit. Should we break it down further?
 
-  const transcribeAudio = async () => {
-    if (!audioBlob) return;
-    
-    setIsTranscribing(true);
-    setRecordingState('transcribing');
-    
-    try {
-      const formData = new FormData();
-      formData.append('audio', audioBlob, 'recording.webm');
-      formData.append('provider', 'openai');
-      
-      const response = await fetch('/api/transcribe', {
-        method: 'POST',
-        body: formData,
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Transcription failed: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      setTranscription(data.transcription);
-      setRecordingState('transcribed');
-      
-      // Auto-generate title and type if needed
-      const { title, type } = generateTitleAndType(data.transcription);
-      setMeetingTitle(title);
-      setMeetingType(type);
-      
-    } catch (error) {
-      console.error('Transcription error:', error);
-      alert('Failed to transcribe audio. Please try again.');
-      setRecordingState('completed');
-    } finally {
-      setIsTranscribing(false);
-    }
-  };
+Jessica: We could split it into "Set up OAuth provider configuration" and "Implement user sign-in flow" and "Handle user provisioning".
 
-  // Auto-generate title and type based on transcript content
-  const generateTitleAndType = (transcript: string) => {
-    const content = transcript.toLowerCase();
-    
-    // Auto-detect meeting type based on content
-    let detectedType = meetingType;
-    if (content.includes('sprint planning') || content.includes('sprint plan')) {
-      detectedType = 'sprint-planning';
-    } else if (content.includes('retrospective') || content.includes('retro')) {
-      detectedType = 'retrospective';
-    } else if (content.includes('daily standup') || content.includes('daily scrum') || content.includes('standup')) {
-      detectedType = 'daily-standup';
-    } else if (content.includes('sprint review') || content.includes('demo')) {
-      detectedType = 'sprint-review';
-    } else if (content.includes('backlog') || content.includes('grooming') || content.includes('refinement')) {
-      detectedType = 'backlog-grooming';
-    } else if (content.includes('stakeholder')) {
-      detectedType = 'stakeholder-meeting';
-    } else if (content.includes('training') || content.includes('workshop')) {
-      detectedType = 'training-session';
-    }
-    
-    // Auto-generate title if none provided
-    let generatedTitle = meetingTitle;
-    if (!meetingTitle.trim()) {
-      const today = new Date();
-      const dateStr = today.toLocaleDateString('en-US', { 
-        month: 'short', 
-        day: 'numeric',
-        year: 'numeric'
-      });
-      
-      const typeMap: { [key: string]: string } = {
-        'sprint-planning': 'Sprint Planning',
-        'retrospective': 'Sprint Retrospective',
-        'daily-standup': 'Daily Standup',
-        'sprint-review': 'Sprint Review',
-        'backlog-grooming': 'Backlog Grooming',
-        'team-meeting': 'Team Meeting',
-        'stakeholder-meeting': 'Stakeholder Meeting',
-        'training-session': 'Training Session'
-      };
-      
-      // Try to extract sprint number or other identifiers from content
-      const sprintMatch = content.match(/sprint\s+(\d+|[a-z]+)/i);
-      const sprintInfo = sprintMatch ? ` ${sprintMatch[1]}` : '';
-      
-      generatedTitle = `${typeMap[detectedType] || 'Team Meeting'}${sprintInfo} - ${dateStr}`;
-    }
-    
-    return { title: generatedTitle, type: detectedType };
-  };
+Sarah: That makes sense. Let's do that breakdown. Moving on to the reporting dashboard - what's the current state there?
 
-  const copyTranscript = () => {
-    navigator.clipboard.writeText(transcription);
-  };
+David: I've completed the wireframes, and the stakeholders approved them last week. The main changes are adding filters by date range and export functionality.
 
-  // Demo mode functionality for testing
-  const loadDemoMeeting = () => {
-    const demoTranscript = `Meeting started at 2:15 PM
+Mike: Right, and the stories are "As a manager, I want to filter reports by date range" and "As a manager, I want to export reports to PDF".
 
-**Sarah (Scrum Master):** Alright everyone, let's start our sprint planning meeting. We have John from the development team, Lisa from QA, and Mike our Product Owner. Today we're planning Sprint 23 which starts Monday.
+Jessica: The filtering should be straightforward - probably 5 points. The PDF export might be trickier depending on the complexity of the reports.
 
-**Mike (Product Owner):** Thanks Sarah. I want to walk through our top priorities for this sprint. We have three main user stories we need to tackle. First is the user authentication improvement - we've been getting feedback that the login process is too complex.
+Tom: For testing the export functionality, I'll need to verify different report types and ensure PDF formatting is correct across various data sets.
 
-**John (Developer):** Can you elaborate on what specific improvements we're looking for? Are we talking about single sign-on integration or just UI improvements?
+Sarah: Let's estimate the PDF export at 8 points including testing. Now, let's talk about capacity. What's everyone's availability for this sprint?
 
-**Mike:** Good question. Based on user feedback, we want to implement social login options like Google and GitHub, and streamline the current form by reducing required fields. The acceptance criteria include OAuth integration and reducing login steps from 4 to 2.
+Jessica: I've got that conference next Thursday and Friday, so I'm probably at about 70% capacity.
 
-**Lisa (QA):** What's our testing strategy for the OAuth integration? We'll need to test with different providers and edge cases like when external services are down.
+David: I'm fully available, but I'm also supporting the marketing team with some landing page updates.
 
-**Sarah:** Great point Lisa. John, what's your estimate for the OAuth story?
+Tom: Full capacity for me, but I want to finish up the automation testing from last sprint first.
 
-**John:** Given the complexity of integrating multiple providers and ensuring security standards, I'd estimate this at 8 story points. We'll need to research OAuth libraries, implement the integration, and add fallback mechanisms.
+Sarah: Okay, so realistic capacity is probably around 80 points total for the team. We've got 34 points identified so far. What else should we consider?
 
-**Mike:** That seems reasonable. The second priority is improving our API response times. We've noticed some endpoints are taking over 3 seconds to respond, especially the user dashboard data fetch.
+Mike: There's also the bug fixes from last sprint. We had that data synchronization issue that needs investigation.
 
-**John:** I've been looking into this. The main bottleneck is our database queries. We're doing N+1 queries in several places and missing some indexes. I estimate this optimization work at 5 story points.
+Jessica: Oh right, that's been bothering me. I think it might be related to the caching layer. Could be a quick fix or could be complex.
 
-**Lisa:** For this one, I'll need to create performance test scenarios to validate the improvements. We should establish baseline metrics before we start.
+Sarah: Let's estimate that at 8 points to be safe. We can always adjust if we find the root cause quickly.
 
-**Sarah:** Excellent. Mike, what's the third priority?
+Tom: We should also allocate time for regression testing after the bug fix.
 
-**Mike:** The mobile responsive design updates for our dashboard. Users are reporting that the charts and tables don't display well on mobile devices. This affects about 40% of our user base.
+Sarah: Good point. So we're at 42 points now. That leaves us with some buffer for unexpected issues.
 
-**John:** This is mostly CSS and layout work. I think we can break this down into smaller components. The dashboard has 5 main sections - header, navigation, charts, data tables, and footer. I'd estimate 3 story points total.
+Mike: Should we consider any technical debt items?
 
-**Lisa:** I'll need to test across different devices and screen sizes. We should include tablet testing too, not just mobile phones.
+Jessica: Actually, yes. We've been putting off updating the API documentation, and it's getting out of sync with our actual implementation.
 
-**Sarah:** So we have 8 + 5 + 3 = 16 story points total. Based on our velocity from the last 3 sprints averaging 14 points, this might be slightly ambitious. Should we consider moving something to the next sprint?
+David: That's important for our external partners too. They've been asking about updated documentation.
 
-**Mike:** The mobile responsive work is important but could be deferred if needed. Let's commit to the OAuth and performance improvements as must-haves.
+Sarah: How much effort for documentation updates?
 
-**John:** Actually, I think we can handle all three if we start with some research spikes early in the sprint. The OAuth research could happen in parallel with performance profiling.
+Jessica: If we focus on the core endpoints that changed recently, probably 13 points.
 
-**Lisa:** I agree. If we plan the testing approach upfront, we can work more efficiently.
+Sarah: That brings us to 55 points, which is well within our capacity. Let's also think about sprint goals. What would success look like?
 
-**Sarah:** Alright, let's commit to all three stories but with the understanding that mobile responsive is our flex item if we run into issues. 
+Mike: For me, success is having the OAuth integration working end-to-end, even if it's not fully polished.
 
-**Action Items:**
-- John: Research OAuth libraries and create implementation plan by Wednesday
-- Lisa: Set up performance baseline metrics and mobile testing matrix
-- Mike: Review and approve OAuth provider list with security team
-- Sarah: Schedule mid-sprint check-in for Thursday
+Jessica: And fixing that synchronization bug. Our users have been reporting issues.
 
-**Sprint Goal:** Improve user experience through faster authentication, better performance, and mobile accessibility.
+David: Getting the reporting improvements live would be great for the upcoming board presentation.
 
-Meeting ended at 3:00 PM`;
+Sarah: Perfect. So our sprint goals are: 1) Complete OAuth integration MVP, 2) Fix data synchronization issue, 3) Deliver reporting dashboard improvements, and 4) Update API documentation.
 
-    // Simulate the recording flow
-    setMeetingTitle("Sprint 23 Planning Meeting");
-    setMeetingType("sprint-planning");
-    setParticipants("Sarah (Scrum Master), John (Developer), Lisa (QA), Mike (Product Owner)");
-    setRecordingTime(2700); // 45 minutes
-    setTranscription(demoTranscript);
-    setRecordingState('transcribed');
-    
-    // Create a fake audio blob for completeness
-    const fakeAudioData = new Uint8Array(1024);
-    const fakeBlob = new Blob([fakeAudioData], { type: 'audio/webm' });
-    setAudioBlob(fakeBlob);
-  };
+Tom: That sounds achievable. Should we also plan our demo for the stakeholders?
 
-  const getRecordingStateDisplay = () => {
-    switch (recordingState) {
-      case 'recording':
-        return {
-          color: 'text-red-600',
-          bgColor: 'bg-red-50',
-          borderColor: 'border-red-200',
-          icon: <div className="w-4 h-4 bg-red-600 rounded-full animate-pulse" />,
-          text: 'Recording...'
-        };
-      case 'paused':
-        return {
-          color: 'text-orange-600',
-          bgColor: 'bg-orange-50',
-          borderColor: 'border-orange-200',
-          icon: <Pause className="w-5 h-5" />,
-          text: 'Paused'
-        };
-      case 'completed':
-        return {
-          color: 'text-green-600',
-          bgColor: 'bg-green-50',
-          borderColor: 'border-green-200',
-          icon: <CheckCircle className="w-5 h-5" />,
-          text: 'Recording Complete'
-        };
-      case 'transcribing':
-        return {
-          color: 'text-blue-600',
-          bgColor: 'bg-blue-50',
-          borderColor: 'border-blue-200',
-          icon: <Loader2 className="w-5 h-5 animate-spin" />,
-          text: 'Transcribing...'
-        };
-      case 'transcribed':
-        return {
-          color: 'text-emerald-600',
-          bgColor: 'bg-emerald-50',
-          borderColor: 'border-emerald-200',
-          icon: <CheckCircle className="w-5 h-5" />,
-          text: 'Transcription Complete'
-        };
-      case 'permission-denied':
-        return {
-          color: 'text-red-600',
-          bgColor: 'bg-red-50',
-          borderColor: 'border-red-200',
-          icon: <MicOff className="w-5 h-5" />,
-          text: 'Permission Denied'
-        };
-      default:
-        return {
-          color: 'text-gray-600',
-          bgColor: 'bg-gray-50',
-          borderColor: 'border-gray-200',
-          icon: <Mic className="w-5 h-5" />,
-          text: 'Ready to Record'
-        };
-    }
-  };
+Mike: Yes, let's schedule that for the second Thursday of the sprint. I'll make sure the key stakeholders can attend.
 
-  const stateDisplay = getRecordingStateDisplay();
+Sarah: Great. I'll send out calendar invites after this meeting. Any other concerns or questions before we finalize the sprint backlog?
 
-  return (
-    <div className="space-y-6">
-      {/* Meeting Setup */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <Label className="text-sm font-medium text-gray-700">Meeting Title</Label>
-          <Input
-            value={meetingTitle}
-            onChange={(e) => setMeetingTitle(e.target.value)}
-            placeholder="Enter meeting title..."
-            className="mt-1 bg-white border-gray-300 text-gray-900"
-            disabled={isRecording}
-          />
-        </div>
-        <div>
-          <Label className="text-sm font-medium text-gray-700">Meeting Type</Label>
-          <Select value={meetingType} onValueChange={setMeetingType} disabled={isRecording}>
-            <SelectTrigger className="mt-1 bg-white border-gray-300 text-gray-900">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="sprint-planning">Sprint Planning</SelectItem>
-              <SelectItem value="retrospective">Retrospective</SelectItem>
-              <SelectItem value="daily-standup">Daily Standup</SelectItem>
-              <SelectItem value="sprint-review">Sprint Review</SelectItem>
-              <SelectItem value="backlog-grooming">Backlog Grooming</SelectItem>
-              <SelectItem value="team-meeting">Team Meeting</SelectItem>
-              <SelectItem value="stakeholder-meeting">Stakeholder Meeting</SelectItem>
-              <SelectItem value="training-session">Training Session</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+Jessica: Just want to confirm - if we run into issues with the OAuth complexity, we can always push some of the edge cases to the next sprint?
 
-      <div>
-        <Label className="text-sm font-medium text-gray-700">Participants (optional)</Label>
-        <Input
-          value={participants}
-          onChange={(e) => setParticipants(e.target.value)}
-          placeholder="List meeting participants..."
-          className="mt-1 bg-white border-gray-300 text-gray-900"
-          disabled={isRecording}
-        />
-      </div>
+Mike: Absolutely. Better to have a working core feature than a partially implemented complex one.
 
-      {/* Recording Status */}
-      <div className={`p-6 rounded-xl border-2 ${stateDisplay.bgColor} ${stateDisplay.borderColor} transition-all`}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className={stateDisplay.color}>
-              {stateDisplay.icon}
-            </div>
-            <div>
-              <div className={`font-semibold text-lg ${stateDisplay.color}`}>
-                {stateDisplay.text}
-              </div>
-              {(isRecording || recordingTime > 0) && (
-                <div className="text-sm text-gray-600 mt-1">
-                  Duration: {formatTime(recordingTime)}
-                </div>
-              )}
-            </div>
-          </div>
-          
-          {recordingState !== 'idle' && recordingState !== 'transcribing' && recordingState !== 'permission-denied' && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={resetRecording}
-              className="text-gray-600 hover:text-gray-800"
-            >
-              <RotateCcw className="w-4 h-4 mr-1" />
-              Reset
-            </Button>
-          )}
-        </div>
-      </div>
+Sarah: Agreed. Alright team, I think we have a solid plan. Let's update the sprint backlog and start the work. Thanks everyone for a productive planning session!`;
 
-      {/* Permission Error Display */}
-      {permissionError && (
-        <div className="p-6 rounded-xl border-2 border-red-200 bg-red-50">
-          <div className="flex items-start space-x-4">
-            <MicOff className="w-6 h-6 text-red-600 mt-1 flex-shrink-0" />
-            <div className="flex-1">
-              <h4 className="font-semibold text-red-800 mb-3 text-lg">Microphone Access Required</h4>
-              <p className="text-red-700 mb-4">{permissionError}</p>
-              
-              <div className="text-sm text-red-600 space-y-2 mb-6">
-                <p><strong>How to fix this:</strong></p>
-                <p>• Look for the microphone icon 🎤 in your browser's address bar</p>
-                <p>• Click it and select "Allow" to grant microphone permissions</p>
-                <p>• On Safari mobile: Tap the "aA" icon, then Website Settings → Microphone → Allow</p>
-                <p>• Refresh the page if needed after granting permissions</p>
-              </div>
-              
-              <div className="flex space-x-3">
-                <Button
-                  onClick={retryPermissions}
-                  className="bg-red-600 hover:bg-red-700 text-white"
-                >
-                  <Mic className="w-4 h-4 mr-2" />
-                  Try Again
-                </Button>
-                <Button
-                  onClick={() => {
-                    setPermissionError(null);
-                    setRecordingState('idle');
-                  }}
-                  variant="outline"
-                  className="border-red-300 text-red-600 hover:bg-red-50"
-                >
-                  Dismiss
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+type MeetingType = 'sprint-planning' | 'daily-standup' | 'retrospective' | 'demo' | 'backlog-grooming' | 'team-meeting' | 'one-on-one' | 'all-hands';
 
-                    {/* Recording Controls */}
-              <div className="flex flex-col items-center space-y-6 py-8">
-                <div className="flex items-center justify-center space-x-6">
-                  {!isRecording && recordingState === 'idle' && !permissionError && (
-                    <Button
-                      onClick={startRecording}
-                      className="bg-red-600 hover:bg-red-700 text-white px-12 py-6 rounded-2xl shadow-2xl hover:shadow-red-500/25 transition-all hover:scale-105 text-xl font-semibold"
-                    >
-                      <Mic className="w-8 h-8 mr-3" />
-                      Start Recording
-                    </Button>
-                  )}
+interface MeetingData {
+  title: string;
+  type: MeetingType;
+  participants: string;
+  duration: string;
+}
 
-                                  {isRecording && (
-                  <>
-                    {!isPaused ? (
-                      <Button
-                        onClick={pauseRecording}
-                        variant="outline"
-                        className="border-orange-500 text-orange-600 hover:bg-orange-50 px-8 py-4 text-lg"
-                      >
-                        <Pause className="w-6 h-6 mr-2" />
-                        Pause
-                      </Button>
-                    ) : (
-                      <Button
-                        onClick={resumeRecording}
-                        className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 text-lg"
-                      >
-                        <PlayCircle className="w-6 h-6 mr-2" />
-                        Resume
-                      </Button>
-                    )}
-                    
-                    <Button
-                      onClick={stopRecording}
-                      className="bg-gray-800 hover:bg-gray-900 text-white px-8 py-4 text-lg"
-                    >
-                      <Square className="w-6 h-6 mr-2" />
-                      Stop Recording
-                    </Button>
-                  </>
-                )}
-              </div>
-              
-              {/* Demo Mode - Only show when idle and no recording in progress */}
-              {recordingState === 'idle' && !isRecording && !permissionError && (
-                <div className="flex flex-col items-center space-y-3">
-                  <div className="text-sm text-gray-500 text-center">
-                    For testing purposes:
-                  </div>
-                  <Button
-                    onClick={loadDemoMeeting}
-                    variant="outline"
-                    className="border-blue-300 text-blue-600 hover:bg-blue-50 px-6 py-3 text-sm bg-blue-25"
-                  >
-                    <FileText className="w-4 h-4 mr-2" />
-                    Load Demo Meeting (45min Sprint Planning)
-                  </Button>
-                </div>
-              )}
-            </div>
-
-      {/* Transcription Section */}
-      {recordingState === 'completed' && (
-        <div className="text-center py-6">
-          <Button
-            onClick={transcribeAudio}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 rounded-xl shadow-xl hover:shadow-blue-500/25 transition-all hover:scale-105 text-lg"
-            disabled={isTranscribing}
-          >
-            {isTranscribing ? (
-              <Loader2 className="w-6 h-6 mr-3 animate-spin" />
-            ) : (
-              <FileText className="w-6 h-6 mr-3" />
-            )}
-            Generate Transcript
-          </Button>
-        </div>
-      )}
-
-      {/* Display Transcription */}
-      {transcription && (
-        <div className="space-y-6">
-          <div>
-            <Label className="text-lg font-semibold text-gray-700">Meeting Transcript</Label>
-            <div className="mt-3 p-6 bg-gray-50 border border-gray-200 rounded-xl max-h-80 overflow-y-auto">
-              <p className="text-gray-800 whitespace-pre-wrap leading-relaxed">
-                {transcription}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-center space-x-4">
-            <Button
-              asChild
-              className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white px-8 py-4 rounded-xl shadow-xl hover:shadow-teal-500/25 transition-all hover:scale-105 text-lg"
-            >
-              <Link href={`/synergize?transcript=${encodeURIComponent(transcription)}&title=${encodeURIComponent(meetingTitle)}&type=${meetingType}`}>
-                <BookOpen className="w-6 h-6 mr-3" />
-                Create Course Content
-              </Link>
-            </Button>
-            
-            <Button
-              variant="outline"
-              onClick={copyTranscript}
-              className="border-teal-300 text-teal-600 hover:bg-teal-50 hover:text-teal-700 px-6 py-4 text-lg"
-            >
-              <Copy className="w-5 h-5 mr-2" />
-              Copy Transcript
-            </Button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+const MEETING_TYPES: Record<MeetingType, { label: string; icon: string; color: string }> = {
+  'sprint-planning': { label: 'Sprint Planning', icon: '📋', color: 'bg-blue-50 text-blue-700 border-blue-200' },
+  'daily-standup': { label: 'Daily Standup', icon: '☀️', color: 'bg-yellow-50 text-yellow-700 border-yellow-200' },
+  'retrospective': { label: 'Retrospective', icon: '🔄', color: 'bg-purple-50 text-purple-700 border-purple-200' },
+  'demo': { label: 'Sprint Demo', icon: '🎯', color: 'bg-green-50 text-green-700 border-green-200' },
+  'backlog-grooming': { label: 'Backlog Grooming', icon: '🌱', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+  'team-meeting': { label: 'Team Meeting', icon: '👥', color: 'bg-indigo-50 text-indigo-700 border-indigo-200' },
+  'one-on-one': { label: 'One-on-One', icon: '🗣️', color: 'bg-pink-50 text-pink-700 border-pink-200' },
+  'all-hands': { label: 'All Hands', icon: '🙌', color: 'bg-gray-50 text-gray-700 border-gray-200' }
 };
 
 export default function RecordMeetingPage() {
   const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
-  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
-  const [transcription, setTranscription] = useState('');
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
   const [isTranscribing, setIsTranscribing] = useState(false);
-  const [meetingTitle, setMeetingTitle] = useState('');
-  const [meetingType, setMeetingType] = useState('sprint-planning');
-  const [participants, setParticipants] = useState('');
-  const [recordingState, setRecordingState] = useState<'idle' | 'recording' | 'paused' | 'completed' | 'transcribing' | 'transcribed' | 'permission-denied'>('idle');
-  const [permissionError, setPermissionError] = useState<string | null>(null);
-  
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
+  const [transcription, setTranscription] = useState('');
+  const [meetingData, setMeetingData] = useState<MeetingData>({
+    title: '',
+    type: 'team-meeting',
+    participants: '',
+    duration: ''
+  });
+  const [hasRecordingData, setHasRecordingData] = useState(false);
+  const [showCopiedMessage, setShowCopiedMessage] = useState(false);
 
-  // Recording timer
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
+
+  // Timer effect
   useEffect(() => {
     if (isRecording && !isPaused) {
-      intervalRef.current = setInterval(() => {
+      timerRef.current = setInterval(() => {
         setRecordingTime(prev => prev + 1);
       }, 1000);
     } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
       }
     }
 
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
       }
     };
   }, [isRecording, isPaused]);
 
+  // Format time for display
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // Start recording
   const startRecording = async () => {
     try {
-      setPermissionError(null);
-      setRecordingState('idle');
-
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          sampleRate: 44100
-        } 
-      });
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaStreamRef.current = stream;
       
-      streamRef.current = stream;
-      audioChunksRef.current = [];
+      const recorder = new MediaRecorder(stream);
+      setMediaRecorder(recorder);
       
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: 'audio/webm;codecs=opus'
-      });
-      
-      mediaRecorderRef.current = mediaRecorder;
-      
-      mediaRecorder.ondataavailable = (event) => {
+      const chunks: Blob[] = [];
+      recorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
+          chunks.push(event.data);
         }
       };
       
-      mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        setAudioBlob(audioBlob);
-        setRecordingState('completed');
-        
-        if (streamRef.current) {
-          streamRef.current.getTracks().forEach(track => track.stop());
-          streamRef.current = null;
-        }
+      recorder.onstop = () => {
+        setAudioChunks(chunks);
+        setHasRecordingData(true);
+        stream.getTracks().forEach(track => track.stop());
       };
       
-      mediaRecorder.start(1000);
+      recorder.start();
       setIsRecording(true);
-      setRecordingState('recording');
       setRecordingTime(0);
-      
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error starting recording:', error);
-      
-      let errorMessage = '';
-      
-      if (error.name === 'NotAllowedError') {
-        errorMessage = 'Microphone access denied. Please allow microphone permissions and try again.';
-        setRecordingState('permission-denied');
-      } else if (error.name === 'NotFoundError') {
-        errorMessage = 'No microphone found. Please check that your device has a microphone.';
-      } else if (error.name === 'NotSupportedError') {
-        errorMessage = 'Your browser does not support audio recording. Please try a different browser.';
-      } else if (error.name === 'OverconstrainedError') {
-        errorMessage = 'Microphone constraints could not be satisfied. Please try again.';
+      alert('Unable to access microphone. Please check permissions.');
+    }
+  };
+
+  // Pause/Resume recording
+  const togglePause = () => {
+    if (mediaRecorder) {
+      if (isPaused) {
+        mediaRecorder.resume();
       } else {
-        errorMessage = 'Unable to access microphone. Please check your permissions and try again.';
+        mediaRecorder.pause();
       }
-      
-      setPermissionError(errorMessage);
+      setIsPaused(!isPaused);
     }
   };
 
-  const retryPermissions = async () => {
-    setPermissionError(null);
-    setRecordingState('idle');
-    await startRecording();
-  };
-
-  const pauseRecording = () => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-      mediaRecorderRef.current.pause();
-      setIsPaused(true);
-      setRecordingState('paused');
-    }
-  };
-
-  const resumeRecording = () => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'paused') {
-      mediaRecorderRef.current.resume();
-      setIsPaused(false);
-      setRecordingState('recording');
-    }
-  };
-
+  // Stop recording
   const stopRecording = () => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
-      mediaRecorderRef.current.stop();
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+      mediaRecorder.stop();
     }
     setIsRecording(false);
     setIsPaused(false);
-  };
-
-  const resetRecording = () => {
-    setIsRecording(false);
-    setIsPaused(false);
-    setRecordingTime(0);
-    setAudioBlob(null);
-    setTranscription('');
-    setRecordingState('idle');
-    audioChunksRef.current = [];
-    
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
+    if (mediaStreamRef.current) {
+      mediaStreamRef.current.getTracks().forEach(track => track.stop());
     }
   };
 
-  const transcribeAudio = async () => {
-    if (!audioBlob) return;
-    
+  // Generate transcript
+  const generateTranscript = async () => {
+    if (!hasRecordingData && !transcription) {
+      alert('No recording available to transcribe.');
+      return;
+    }
+
     setIsTranscribing(true);
-    setRecordingState('transcribing');
-    
+
     try {
-      const formData = new FormData();
-      formData.append('audio', audioBlob, 'recording.webm');
-      formData.append('provider', 'openai');
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
-      const response = await fetch('/api/transcribe', {
-        method: 'POST',
-        body: formData,
-      });
+      // Set demo transcript
+      setTranscription(DEMO_TRANSCRIPT);
       
-      if (!response.ok) {
-        throw new Error(`Transcription failed: ${response.status}`);
+      // Auto-update meeting data based on transcript content
+      if (!meetingData.title || meetingData.title === '') {
+        setMeetingData(prev => ({
+          ...prev,
+          title: 'Sprint 15 Planning Meeting',
+          participants: 'Sarah, Mike, Jessica, David, Tom',
+          duration: '45 minutes'
+        }));
       }
-      
-      const data = await response.json();
-      setTranscription(data.transcription);
-      setRecordingState('transcribed');
-      
-      // Auto-generate title and type if needed
-      const { title, type } = generateTitleAndType(data.transcription);
-      setMeetingTitle(title);
-      setMeetingType(type);
-      
     } catch (error) {
       console.error('Transcription error:', error);
-      alert('Failed to transcribe audio. Please try again.');
-      setRecordingState('completed');
+      alert('Error generating transcript. Please try again.');
     } finally {
       setIsTranscribing(false);
     }
   };
 
-  // Auto-generate title and type based on transcript content
-  const generateTitleAndType = (transcript: string) => {
-    const content = transcript.toLowerCase();
-    
-    // Auto-detect meeting type based on content
-    let detectedType = meetingType;
-    if (content.includes('sprint planning') || content.includes('sprint plan')) {
-      detectedType = 'sprint-planning';
-    } else if (content.includes('retrospective') || content.includes('retro')) {
-      detectedType = 'retrospective';
-    } else if (content.includes('daily standup') || content.includes('daily scrum') || content.includes('standup')) {
-      detectedType = 'daily-standup';
-    } else if (content.includes('sprint review') || content.includes('demo')) {
-      detectedType = 'sprint-review';
-    } else if (content.includes('backlog') || content.includes('grooming') || content.includes('refinement')) {
-      detectedType = 'backlog-grooming';
-    } else if (content.includes('stakeholder')) {
-      detectedType = 'stakeholder-meeting';
-    } else if (content.includes('training') || content.includes('workshop')) {
-      detectedType = 'training-session';
-    }
-    
-    // Auto-generate title if none provided
-    let generatedTitle = meetingTitle;
-    if (!meetingTitle.trim()) {
-      const today = new Date();
-      const dateStr = today.toLocaleDateString('en-US', { 
-        month: 'short', 
-        day: 'numeric',
-        year: 'numeric'
-      });
-      
-      const typeMap: { [key: string]: string } = {
-        'sprint-planning': 'Sprint Planning',
-        'retrospective': 'Sprint Retrospective',
-        'daily-standup': 'Daily Standup',
-        'sprint-review': 'Sprint Review',
-        'backlog-grooming': 'Backlog Grooming',
-        'team-meeting': 'Team Meeting',
-        'stakeholder-meeting': 'Stakeholder Meeting',
-        'training-session': 'Training Session'
-      };
-      
-      // Try to extract sprint number or other identifiers from content
-      const sprintMatch = content.match(/sprint\s+(\d+|[a-z]+)/i);
-      const sprintInfo = sprintMatch ? ` ${sprintMatch[1]}` : '';
-      
-      generatedTitle = `${typeMap[detectedType] || 'Team Meeting'}${sprintInfo} - ${dateStr}`;
-    }
-    
-    return { title: generatedTitle, type: detectedType };
+  // Load demo meeting
+  const loadDemoMeeting = () => {
+    setTranscription(DEMO_TRANSCRIPT);
+    setMeetingData({
+      title: 'Sprint 15 Planning Meeting',
+      type: 'sprint-planning',
+      participants: 'Sarah (Scrum Master), Mike (Product Owner), Jessica (Developer), David (Designer), Tom (QA Engineer)',
+      duration: '45 minutes'
+    });
+    setHasRecordingData(true);
   };
 
+  // Reset everything
+  const resetMeeting = () => {
+    setIsRecording(false);
+    setIsPaused(false);
+    setRecordingTime(0);
+    setTranscription('');
+    setMeetingData({
+      title: '',
+      type: 'team-meeting',
+      participants: '',
+      duration: ''
+    });
+    setHasRecordingData(false);
+    setAudioChunks([]);
+    setMediaRecorder(null);
+    
+    if (mediaStreamRef.current) {
+      mediaStreamRef.current.getTracks().forEach(track => track.stop());
+      mediaStreamRef.current = null;
+    }
+  };
+
+  // Copy transcript
   const copyTranscript = () => {
     navigator.clipboard.writeText(transcription);
+    setShowCopiedMessage(true);
+    setTimeout(() => setShowCopiedMessage(false), 2000);
   };
 
-  // Demo mode functionality for testing
-  const loadDemoMeeting = () => {
-    const demoTranscript = `Meeting started at 2:15 PM
-
-**Sarah (Scrum Master):** Alright everyone, let's start our sprint planning meeting. We have John from the development team, Lisa from QA, and Mike our Product Owner. Today we're planning Sprint 23 which starts Monday.
-
-**Mike (Product Owner):** Thanks Sarah. I want to walk through our top priorities for this sprint. We have three main user stories we need to tackle. First is the user authentication improvement - we've been getting feedback that the login process is too complex.
-
-**John (Developer):** Can you elaborate on what specific improvements we're looking for? Are we talking about single sign-on integration or just UI improvements?
-
-**Mike:** Good question. Based on user feedback, we want to implement social login options like Google and GitHub, and streamline the current form by reducing required fields. The acceptance criteria include OAuth integration and reducing login steps from 4 to 2.
-
-**Lisa (QA):** What's our testing strategy for the OAuth integration? We'll need to test with different providers and edge cases like when external services are down.
-
-**Sarah:** Great point Lisa. John, what's your estimate for the OAuth story?
-
-**John:** Given the complexity of integrating multiple providers and ensuring security standards, I'd estimate this at 8 story points. We'll need to research OAuth libraries, implement the integration, and add fallback mechanisms.
-
-**Mike:** That seems reasonable. The second priority is improving our API response times. We've noticed some endpoints are taking over 3 seconds to respond, especially the user dashboard data fetch.
-
-**John:** I've been looking into this. The main bottleneck is our database queries. We're doing N+1 queries in several places and missing some indexes. I estimate this optimization work at 5 story points.
-
-**Lisa:** For this one, I'll need to create performance test scenarios to validate the improvements. We should establish baseline metrics before we start.
-
-**Sarah:** Excellent. Mike, what's the third priority?
-
-**Mike:** The mobile responsive design updates for our dashboard. Users are reporting that the charts and tables don't display well on mobile devices. This affects about 40% of our user base.
-
-**John:** This is mostly CSS and layout work. I think we can break this down into smaller components. The dashboard has 5 main sections - header, navigation, charts, data tables, and footer. I'd estimate 3 story points total.
-
-**Lisa:** I'll need to test across different devices and screen sizes. We should include tablet testing too, not just mobile phones.
-
-**Sarah:** So we have 8 + 5 + 3 = 16 story points total. Based on our velocity from the last 3 sprints averaging 14 points, this might be slightly ambitious. Should we consider moving something to the next sprint?
-
-**Mike:** The mobile responsive work is important but could be deferred if needed. Let's commit to the OAuth and performance improvements as must-haves.
-
-**John:** Actually, I think we can handle all three if we start with some research spikes early in the sprint. The OAuth research could happen in parallel with performance profiling.
-
-**Lisa:** I agree. If we plan the testing approach upfront, we can work more efficiently.
-
-**Sarah:** Alright, let's commit to all three stories but with the understanding that mobile responsive is our flex item if we run into issues. 
-
-**Action Items:**
-- John: Research OAuth libraries and create implementation plan by Wednesday
-- Lisa: Set up performance baseline metrics and mobile testing matrix
-- Mike: Review and approve OAuth provider list with security team
-- Sarah: Schedule mid-sprint check-in for Thursday
-
-**Sprint Goal:** Improve user experience through faster authentication, better performance, and mobile accessibility.
-
-Meeting ended at 3:00 PM`;
-
-    // Simulate the recording flow
-    setMeetingTitle("Sprint 23 Planning Meeting");
-    setMeetingType("sprint-planning");
-    setParticipants("Sarah (Scrum Master), John (Developer), Lisa (QA), Mike (Product Owner)");
-    setRecordingTime(2700); // 45 minutes
-    setTranscription(demoTranscript);
-    setRecordingState('transcribed');
-    
-    // Create a fake audio blob for completeness
-    const fakeAudioData = new Uint8Array(1024);
-    const fakeBlob = new Blob([fakeAudioData], { type: 'audio/webm' });
-    setAudioBlob(fakeBlob);
-  };
-
-  const getRecordingStateDisplay = () => {
-    switch (recordingState) {
-      case 'recording':
-        return {
-          color: 'text-red-600',
-          bgColor: 'bg-red-50',
-          borderColor: 'border-red-200',
-          icon: <div className="w-4 h-4 bg-red-600 rounded-full animate-pulse" />,
-          text: 'Recording...'
-        };
-      case 'paused':
-        return {
-          color: 'text-orange-600',
-          bgColor: 'bg-orange-50',
-          borderColor: 'border-orange-200',
-          icon: <Pause className="w-5 h-5" />,
-          text: 'Paused'
-        };
-      case 'completed':
-        return {
-          color: 'text-green-600',
-          bgColor: 'bg-green-50',
-          borderColor: 'border-green-200',
-          icon: <CheckCircle className="w-5 h-5" />,
-          text: 'Recording Complete'
-        };
-      case 'transcribing':
-        return {
-          color: 'text-blue-600',
-          bgColor: 'bg-blue-50',
-          borderColor: 'border-blue-200',
-          icon: <Loader2 className="w-5 h-5 animate-spin" />,
-          text: 'Transcribing...'
-        };
-      case 'transcribed':
-        return {
-          color: 'text-emerald-600',
-          bgColor: 'bg-emerald-50',
-          borderColor: 'border-emerald-200',
-          icon: <CheckCircle className="w-5 h-5" />,
-          text: 'Transcription Complete'
-        };
-      case 'permission-denied':
-        return {
-          color: 'text-red-600',
-          bgColor: 'bg-red-50',
-          borderColor: 'border-red-200',
-          icon: <MicOff className="w-5 h-5" />,
-          text: 'Permission Denied'
-        };
-      default:
-        return {
-          color: 'text-gray-600',
-          bgColor: 'bg-gray-50',
-          borderColor: 'border-gray-200',
-          icon: <Mic className="w-5 h-5" />,
-          text: 'Ready to Record'
-        };
-    }
-  };
-
-  const stateDisplay = getRecordingStateDisplay();
+  const selectedMeetingType = MEETING_TYPES[meetingData.type];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-amber-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-teal-50/30 to-emerald-50/30">
       {/* Header */}
-      <header className="bg-gradient-to-r from-teal-600 to-emerald-600 border-b border-teal-700 sticky top-0 z-10 shadow-lg">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
+      <div className="bg-white border-b shadow-sm">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                asChild
-                className="text-white hover:text-teal-200 hover:bg-white/10"
+              <Link 
+                href="/" 
+                className="flex items-center space-x-2 text-gray-600 hover:text-teal-600 transition-colors group"
               >
-                <Link href="/synergize">
-                  <ArrowLeft className="w-5 h-5 mr-2" />
-                  Back to Synergize AI
-                </Link>
-              </Button>
-              <div className="h-6 w-px bg-white/30" />
-              <div>
-                <h1 className="text-xl font-bold text-white">Record Meeting</h1>
-                <p className="text-sm text-white/80">Professional meeting capture & AI transcription</p>
-              </div>
+                <ArrowLeft className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
+                <span className="font-medium">Back to Home</span>
+              </Link>
+              <Separator orientation="vertical" className="h-6" />
+              <h1 className="text-xl font-bold text-gray-900">Meeting Recording Studio</h1>
             </div>
-            
-            <Badge className="bg-white/20 text-white border-white/30">
-              <Mic className="w-4 h-4 mr-2" />
-              Live Recording
+            <Badge variant="outline" className="bg-teal-50 text-teal-700 border-teal-200">
+              <Zap className="h-3 w-3 mr-1" />
+              AI-Powered
             </Badge>
           </div>
         </div>
-      </header>
+      </div>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-2xl">
-            <CardHeader className="text-center border-b border-gray-100">
-              <CardTitle className="text-2xl text-gray-900 mb-2">
-                Meeting Recording Studio
-              </CardTitle>
-              <p className="text-gray-600">
-                Capture your Agile meetings and transform them into training content
-              </p>
-            </CardHeader>
-            <CardContent className="p-8 space-y-8">
-              {/* Meeting Setup */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Meeting Title (optional)</Label>
-                  <Input
-                    value={meetingTitle}
-                    onChange={(e) => setMeetingTitle(e.target.value)}
-                    placeholder="Auto-generated from transcript if left empty"
-                    className="mt-2 bg-white border-gray-300 text-gray-900"
-                    disabled={isRecording}
-                  />
-                </div>
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Meeting Type</Label>
-                  <Select value={meetingType} onValueChange={setMeetingType} disabled={isRecording}>
-                    <SelectTrigger className="mt-2 bg-white border-gray-300 text-gray-900">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white">
-                      <SelectItem value="sprint-planning" className="text-gray-900 hover:bg-teal-50 focus:bg-teal-50">Sprint Planning</SelectItem>
-                      <SelectItem value="retrospective" className="text-gray-900 hover:bg-teal-50 focus:bg-teal-50">Retrospective</SelectItem>
-                      <SelectItem value="daily-standup" className="text-gray-900 hover:bg-teal-50 focus:bg-teal-50">Daily Standup</SelectItem>
-                      <SelectItem value="sprint-review" className="text-gray-900 hover:bg-teal-50 focus:bg-teal-50">Sprint Review</SelectItem>
-                      <SelectItem value="backlog-grooming" className="text-gray-900 hover:bg-teal-50 focus:bg-teal-50">Backlog Grooming</SelectItem>
-                      <SelectItem value="team-meeting" className="text-gray-900 hover:bg-teal-50 focus:bg-teal-50">Team Meeting</SelectItem>
-                      <SelectItem value="stakeholder-meeting" className="text-gray-900 hover:bg-teal-50 focus:bg-teal-50">Stakeholder Meeting</SelectItem>
-                      <SelectItem value="training-session" className="text-gray-900 hover:bg-teal-50 focus:bg-teal-50">Training Session</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div>
-                <Label className="text-sm font-medium text-gray-700">Participants (optional)</Label>
-                <Input
-                  value={participants}
-                  onChange={(e) => setParticipants(e.target.value)}
-                  placeholder="List meeting participants..."
-                  className="mt-2 bg-white border-gray-300 text-gray-900"
-                  disabled={isRecording}
-                />
-              </div>
-
-              {/* Recording Status */}
-              <div className={`p-6 rounded-xl border-2 ${stateDisplay.bgColor} ${stateDisplay.borderColor} transition-all`}>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <div className={stateDisplay.color}>
-                      {stateDisplay.icon}
-                    </div>
-                    <div>
-                      <div className={`font-semibold text-lg ${stateDisplay.color}`}>
-                        {stateDisplay.text}
-                      </div>
-                      {(isRecording || recordingTime > 0) && (
-                        <div className="text-sm text-gray-600 mt-1">
-                          Duration: {formatTime(recordingTime)}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* Left Column - Recording Controls */}
+          <div className="space-y-6">
+            {/* Recording Status Card */}
+            <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+              <CardHeader className="text-center pb-4">
+                <CardTitle className="text-2xl font-bold bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent">
+                  Recording Center
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Recording Status Display */}
+                <div className="text-center">
+                  <div className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-4 transition-all duration-300 ${
+                    isRecording 
+                      ? 'bg-gradient-to-r from-red-500 to-red-600 shadow-lg shadow-red-200' 
+                      : 'bg-gradient-to-r from-gray-400 to-gray-500'
+                  }`}>
+                    {isRecording ? (
+                      isPaused ? (
+                        <Pause className="h-10 w-10 text-white" />
+                      ) : (
+                        <div className="flex items-center justify-center">
+                          <div className="w-4 h-4 bg-white rounded-full animate-pulse"></div>
                         </div>
-                      )}
-                    </div>
+                      )
+                    ) : (
+                      <Mic className="h-10 w-10 text-white" />
+                    )}
                   </div>
                   
-                  {recordingState !== 'idle' && recordingState !== 'transcribing' && recordingState !== 'permission-denied' && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={resetRecording}
-                      className="text-teal-600 hover:text-white hover:bg-teal-600 border-teal-600"
-                    >
-                      <RotateCcw className="w-4 h-4 mr-1" />
-                      Reset
-                    </Button>
-                  )}
-                </div>
-              </div>
-
-              {/* Permission Error Display */}
-              {permissionError && (
-                <div className="p-6 rounded-xl border-2 border-red-200 bg-red-50">
-                  <div className="flex items-start space-x-4">
-                    <MicOff className="w-6 h-6 text-red-600 mt-1 flex-shrink-0" />
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-red-800 mb-3 text-lg">Microphone Access Required</h4>
-                      <p className="text-red-700 mb-4">{permissionError}</p>
-                      
-                      <div className="text-sm text-red-600 space-y-2 mb-6">
-                        <p><strong>How to fix this:</strong></p>
-                        <p>• Look for the microphone icon 🎤 in your browser's address bar</p>
-                        <p>• Click it and select "Allow" to grant microphone permissions</p>
-                        <p>• On Safari mobile: Tap the "aA" icon, then Website Settings → Microphone → Allow</p>
-                        <p>• Refresh the page if needed after granting permissions</p>
-                      </div>
-                      
-                      <div className="flex space-x-3">
-                        <Button
-                          onClick={retryPermissions}
-                          className="bg-red-600 hover:bg-red-700 text-white"
-                        >
-                          <Mic className="w-4 h-4 mr-2" />
-                          Try Again
-                        </Button>
-                        <Button
-                          onClick={() => {
-                            setPermissionError(null);
-                            setRecordingState('idle');
-                          }}
-                          variant="outline"
-                          className="border-red-300 text-red-600 hover:bg-red-50"
-                        >
-                          Dismiss
-                        </Button>
-                      </div>
-                    </div>
+                  <div className="text-3xl font-mono font-bold text-gray-900 mb-2">
+                    {formatTime(recordingTime)}
+                  </div>
+                  
+                  <div className={`text-sm font-medium ${
+                    isRecording 
+                      ? isPaused 
+                        ? 'text-yellow-600' 
+                        : 'text-red-600' 
+                      : 'text-gray-500'
+                  }`}>
+                    {isRecording 
+                      ? isPaused 
+                        ? 'Recording Paused' 
+                        : 'Recording in Progress...' 
+                      : 'Ready to Record'
+                    }
                   </div>
                 </div>
-              )}
 
-              {/* Recording Controls */}
-              <div className="flex flex-col items-center space-y-6 py-8">
-                <div className="flex items-center justify-center space-x-6">
-                  {!isRecording && recordingState === 'idle' && !permissionError && (
-                    <Button
-                      onClick={startRecording}
-                      className="bg-red-600 hover:bg-red-700 text-white px-12 py-6 rounded-2xl shadow-2xl hover:shadow-red-500/25 transition-all hover:scale-105 text-xl font-semibold"
+                {/* Recording Controls */}
+                <div className="flex justify-center space-x-4">
+                  {!isRecording ? (
+                    <Button 
+                      onClick={startRecording} 
+                      size="lg"
+                      className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                     >
-                      <Mic className="w-8 h-8 mr-3" />
+                      <Mic className="h-5 w-5 mr-2" />
                       Start Recording
                     </Button>
-                  )}
-
-                  {isRecording && (
+                  ) : (
                     <>
-                      {!isPaused ? (
-                        <Button
-                          onClick={pauseRecording}
-                          variant="outline"
-                          className="border-orange-500 text-orange-600 hover:bg-orange-50 px-8 py-4 text-lg"
-                        >
-                          <Pause className="w-6 h-6 mr-2" />
-                          Pause
-                        </Button>
-                      ) : (
-                        <Button
-                          onClick={resumeRecording}
-                          className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 text-lg"
-                        >
-                          <PlayCircle className="w-6 h-6 mr-2" />
-                          Resume
-                        </Button>
-                      )}
-                      
-                      <Button
-                        onClick={stopRecording}
-                        className="bg-gray-800 hover:bg-gray-900 text-white px-8 py-4 text-lg"
+                      <Button 
+                        onClick={togglePause} 
+                        variant="outline"
+                        size="lg"
+                        className="border-2 border-yellow-500 text-yellow-600 hover:bg-yellow-50 px-6 py-3 rounded-full transition-all duration-300"
                       >
-                        <Square className="w-6 h-6 mr-2" />
-                        Stop Recording
+                        {isPaused ? (
+                          <>
+                            <Play className="h-5 w-5 mr-2" />
+                            Resume
+                          </>
+                        ) : (
+                          <>
+                            <Pause className="h-5 w-5 mr-2" />
+                            Pause
+                          </>
+                        )}
+                      </Button>
+                      <Button 
+                        onClick={stopRecording} 
+                        variant="outline"
+                        size="lg"
+                        className="border-2 border-red-500 text-red-600 hover:bg-red-50 px-6 py-3 rounded-full transition-all duration-300"
+                      >
+                        <Square className="h-4 w-4 mr-2" />
+                        Stop
                       </Button>
                     </>
                   )}
                 </div>
-                
-                {/* Demo Mode - Only show when idle and no recording in progress */}
-                {recordingState === 'idle' && !isRecording && !permissionError && (
-                  <div className="flex flex-col items-center space-y-3">
-                    <div className="text-sm text-gray-500 text-center">
-                      For testing purposes:
-                    </div>
-                    <Button
-                      onClick={loadDemoMeeting}
-                      variant="outline"
-                      className="border-blue-300 text-blue-600 hover:bg-blue-50 px-6 py-3 text-sm"
-                    >
-                      <FileText className="w-4 h-4 mr-2" />
-                      Load Demo Meeting (45min Sprint Planning)
-                    </Button>
-                  </div>
-                )}
-              </div>
 
-              {/* Transcription Section */}
-              {recordingState === 'completed' && (
-                <div className="text-center py-6">
-                  <Button
-                    onClick={transcribeAudio}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 rounded-xl shadow-xl hover:shadow-blue-500/25 transition-all hover:scale-105 text-lg"
-                    disabled={isTranscribing}
+                {/* Quick Actions */}
+                <div className="flex justify-center space-x-3 pt-4 border-t">
+                  <Button 
+                    onClick={loadDemoMeeting} 
+                    variant="outline"
+                    className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white border-0 hover:from-emerald-600 hover:to-teal-700 transition-all duration-300"
                   >
-                    {isTranscribing ? (
-                      <Loader2 className="w-6 h-6 mr-3 animate-spin" />
-                    ) : (
-                      <FileText className="w-6 h-6 mr-3" />
-                    )}
-                    Generate Transcript
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Load Demo Meeting
+                  </Button>
+                  <Button 
+                    onClick={resetMeeting} 
+                    variant="outline"
+                    className="hover:bg-gray-50 transition-colors"
+                  >
+                    <RotateCcw className="h-4 w-4 mr-2" />
+                    Reset
                   </Button>
                 </div>
-              )}
+              </CardContent>
+            </Card>
 
-              {/* Display Transcription */}
-              {transcription && (
-                <div className="space-y-6">
-                  <div>
-                    <Label className="text-lg font-semibold text-gray-700">Meeting Transcript</Label>
-                    <div className="mt-3 p-6 bg-gray-50 border border-gray-200 rounded-xl max-h-80 overflow-y-auto">
-                      <p className="text-gray-800 whitespace-pre-wrap leading-relaxed">
-                        {transcription}
+            {/* Meeting Details Card */}
+            <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="flex items-center text-lg">
+                  <Info className="h-5 w-5 mr-2 text-teal-600" />
+                  Meeting Details
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label htmlFor="title" className="text-sm font-medium text-gray-700">
+                    Meeting Title (Optional)
+                  </Label>
+                  <Input
+                    id="title"
+                    value={meetingData.title}
+                    onChange={(e) => setMeetingData(prev => ({ ...prev, title: e.target.value }))}
+                    placeholder="Auto-generated if empty"
+                    className="mt-1 bg-white/70 border-gray-200 focus:border-teal-500 focus:ring-teal-500"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="type" className="text-sm font-medium text-gray-700">
+                    Meeting Type
+                  </Label>
+                  <Select 
+                    value={meetingData.type} 
+                    onValueChange={(value) => setMeetingData(prev => ({ ...prev, type: value as MeetingType }))}
+                  >
+                    <SelectTrigger className="mt-1 bg-white/70 border-gray-200 focus:border-teal-500 focus:ring-teal-500">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white border border-gray-200 shadow-xl">
+                      {Object.entries(MEETING_TYPES).map(([key, type]) => (
+                        <SelectItem key={key} value={key} className="hover:bg-teal-50 focus:bg-teal-50">
+                          <div className="flex items-center">
+                            <span className="mr-2">{type.icon}</span>
+                            <span>{type.label}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="participants" className="text-sm font-medium text-gray-700">
+                    Participants
+                  </Label>
+                  <Input
+                    id="participants"
+                    value={meetingData.participants}
+                    onChange={(e) => setMeetingData(prev => ({ ...prev, participants: e.target.value }))}
+                    placeholder="Enter participant names"
+                    className="mt-1 bg-white/70 border-gray-200 focus:border-teal-500 focus:ring-teal-500"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="duration" className="text-sm font-medium text-gray-700">
+                    Duration
+                  </Label>
+                  <Input
+                    id="duration"
+                    value={meetingData.duration}
+                    onChange={(e) => setMeetingData(prev => ({ ...prev, duration: e.target.value }))}
+                    placeholder="e.g., 30 minutes"
+                    className="mt-1 bg-white/70 border-gray-200 focus:border-teal-500 focus:ring-teal-500"
+                  />
+                </div>
+
+                {/* Meeting Type Badge */}
+                <div className="pt-2">
+                  <Badge className={`${selectedMeetingType.color} text-sm px-3 py-1 border`}>
+                    {selectedMeetingType.icon} {selectedMeetingType.label}
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Column - Transcript & Actions */}
+          <div className="space-y-6">
+            {/* Transcript Card */}
+            <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center text-lg">
+                    <FileText className="h-5 w-5 mr-2 text-teal-600" />
+                    AI Transcript
+                  </CardTitle>
+                  {transcription && (
+                    <div className="flex space-x-2">
+                      <Button 
+                        onClick={copyTranscript} 
+                        variant="outline" 
+                        size="sm"
+                        className="hover:bg-teal-50 hover:border-teal-300"
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="hover:bg-teal-50 hover:border-teal-300"
+                      >
+                        <Download className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent>
+                {!transcription ? (
+                  <div className="text-center py-12">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <FileText className="h-8 w-8 text-gray-400" />
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No Transcript Yet</h3>
+                    <p className="text-gray-600 mb-6">
+                      Record a meeting or load a demo to generate an AI transcript.
+                    </p>
+                    <Button 
+                      onClick={generateTranscript} 
+                      disabled={!hasRecordingData || isTranscribing}
+                      className="bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 text-white shadow-md transition-all duration-300"
+                    >
+                      {isTranscribing ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                          Generating...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="h-4 w-4 mr-2" />
+                          Generate Transcript
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="relative">
+                    <Textarea
+                      value={transcription}
+                      onChange={(e) => setTranscription(e.target.value)}
+                      className="min-h-[400px] bg-white/70 border-gray-200 focus:border-teal-500 focus:ring-teal-500 text-sm leading-relaxed resize-none"
+                      placeholder="AI-generated transcript will appear here..."
+                    />
+                    
+                    {/* Copy Success Message */}
+                    {showCopiedMessage && (
+                      <div className="absolute top-2 right-2 bg-green-500 text-white px-3 py-1 rounded-md text-sm flex items-center animate-fade-in-out">
+                        <CheckCircle2 className="h-4 w-4 mr-1" />
+                        Copied!
+                      </div>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Action Buttons */}
+            {transcription && (
+              <Card className="border-0 shadow-lg bg-gradient-to-r from-teal-500 to-emerald-600 text-white">
+                <CardContent className="p-6">
+                  <div className="text-center space-y-4">
+                    <div>
+                      <h3 className="text-xl font-bold mb-2">Ready to Create Your Course?</h3>
+                      <p className="text-teal-100">
+                        Transform this meeting transcript into a comprehensive training course with AI
                       </p>
                     </div>
-                  </div>
-
-                  <div className="flex items-center justify-center space-x-4">
-                    <Button
-                      asChild
-                      className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white px-8 py-4 rounded-xl shadow-xl hover:shadow-teal-500/25 transition-all hover:scale-105 text-lg"
-                    >
-                      <Link href={`/synergize?transcript=${encodeURIComponent(transcription)}&title=${encodeURIComponent(meetingTitle)}&type=${meetingType}`}>
-                        <BookOpen className="w-6 h-6 mr-3" />
-                        Create Course Content
-                      </Link>
-                    </Button>
                     
-                    <Button
-                      variant="outline"
-                      onClick={copyTranscript}
-                      className="border-teal-300 text-teal-600 hover:bg-teal-50 hover:text-teal-700 px-6 py-4 text-lg"
+                    <Link 
+                      href={`/synergize?transcript=${encodeURIComponent(transcription)}&title=${encodeURIComponent(meetingData.title || 'Meeting Recording')}&type=${meetingData.type}`}
+                      className="inline-block"
                     >
-                      <Copy className="w-5 h-5 mr-2" />
-                      Copy Transcript
-                    </Button>
+                      <Button 
+                        size="lg"
+                        className="bg-white text-teal-600 hover:bg-gray-50 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 px-8 py-3"
+                      >
+                        <Sparkles className="h-5 w-5 mr-2" />
+                        Create Course Content
+                      </Button>
+                    </Link>
+                    
+                    <p className="text-xs text-teal-100 mt-2">
+                      This will open the AI assistant to generate your course
+                    </p>
                   </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Help Section */}
-          <div className="mt-8 bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-orange-200/50">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">How it works</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
-              <div className="flex items-start space-x-3">
-                <div className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-red-600 font-semibold text-xs">1</span>
-                </div>
-                <div>
-                  <p><strong>Setup & Record:</strong> Configure your meeting details and start recording with professional-grade audio capture.</p>
-                </div>
-              </div>
-              <div className="flex items-start space-x-3">
-                <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-blue-600 font-semibold text-xs">2</span>
-                </div>
-                <div>
-                  <p><strong>AI Transcription:</strong> Generate accurate transcripts with speaker identification and formatting.</p>
-                </div>
-              </div>
-              <div className="flex items-start space-x-3">
-                <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-emerald-600 font-semibold text-xs">3</span>
-                </div>
-                <div>
-                  <p><strong>Course Creation:</strong> Transform insights into structured training content and learning modules.</p>
-                </div>
-              </div>
-            </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 } 

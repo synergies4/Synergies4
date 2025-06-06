@@ -1463,6 +1463,8 @@ export default function SynergizeAgile() {
   const [responseCount, setResponseCount] = useState(0);
   const maxResponses = 3;
 
+
+
   // Check for mobile device and speech recognition support
   useEffect(() => {
     const checkMobile = () => {
@@ -1846,6 +1848,51 @@ export default function SynergizeAgile() {
     setFiles([]);
     setHasInitialized(false);
   };
+
+  // Handle URL parameters for transcript data from record meeting
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const transcript = urlParams.get('transcript');
+      const title = urlParams.get('title');
+      const type = urlParams.get('type');
+      
+      if (transcript) {
+        // Auto-switch to full chat view and create course from transcript
+        setIsFullChatView(true);
+        setSelectedMode('advisor'); // Switch to advisor mode for course creation
+        
+        // Create course creation prompt
+        const coursePrompt = `Create a comprehensive training course from this meeting transcript:
+
+Meeting Details:
+- Title: ${title || 'Meeting Recording'}
+- Type: ${type || 'team-meeting'}
+
+Transcript:
+${transcript}
+
+Please analyze this transcript and create a structured course that includes:
+
+1. **Course Title & Objectives**
+2. **Key Learning Modules** (based on main topics discussed)
+3. **Practical Exercises** (derived from decisions made or problems solved)
+4. **Assessment Questions** (to test understanding of the concepts)
+5. **Implementation Guide** (actionable steps for applying what was learned)
+6. **Templates/Checklists** (based on processes mentioned)
+
+Focus on extracting actionable learning content that can be used to train others on the topics, decisions, and methodologies discussed in this meeting. Structure it as a complete, ready-to-deliver training course.`;
+
+        // Automatically send the course creation request
+        setTimeout(() => {
+          handleSendMessage(coursePrompt);
+        }, 1000);
+        
+        // Clear the URL parameters
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+  }, [handleSendMessage]);
 
   // Type-safe handler for provider selection with scroll prevention
   const handleProviderChange = useCallback((value: string) => {
