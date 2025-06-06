@@ -2365,7 +2365,7 @@ Please structure this as a ready-to-deliver training course that someone could u
                     {currentSlide + 1} of {slides.length}
                   </span>
                   <div className="flex space-x-1">
-                    {slides.slice(0, 6).map((_, index) => (
+                    {slides.slice(0, 6).map((_slide: any, index: number) => (
                       <button
                         key={index}
                         onClick={() => setCurrentSlide(index)}
