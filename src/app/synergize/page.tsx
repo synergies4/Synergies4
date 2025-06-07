@@ -734,10 +734,15 @@ const DraggableText = React.memo(({
   const handleSelect = useCallback(() => {
     onSelect(id);
     if (!isEditing) {
-      setShowFormatPanel(true);
+      // Show format panel after a short delay if there's text
+      setTimeout(() => {
+        if (text && text.trim()) {
+          setShowFormatPanel(true);
+        }
+      }, 300);
       setShowContextMenu(false);
     }
-  }, [onSelect, id, isEditing]);
+  }, [onSelect, id, isEditing, text]);
 
   const handleCopy = useCallback(() => {
     navigator.clipboard.writeText(text);
@@ -973,19 +978,35 @@ const DraggableText = React.memo(({
                 transition={ANIMATION_CONFIG}
               >
                 {text && (
-                  <Button 
-                    size="sm" 
-                    variant="secondary"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDoubleClick();
-                    }}
-                    className={`${isMobile ? 'h-8 w-8' : 'h-6 w-6'} p-0 bg-blue-500 hover:bg-blue-600 text-white shadow-lg touch-manipulation`}
-                    aria-label="Edit text"
-                    title="Edit text"
-                  >
-                    <Edit className={`${isMobile ? 'h-4 w-4' : 'h-3 w-3'}`} />
-                  </Button>
+                  <>
+                    <Button 
+                      size="sm" 
+                      variant="secondary"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDoubleClick();
+                      }}
+                      className={`${isMobile ? 'h-8 w-8' : 'h-6 w-6'} p-0 bg-blue-500 hover:bg-blue-600 text-white shadow-lg touch-manipulation ${isMobile ? 'mb-1' : 'mr-1'}`}
+                      aria-label="Edit text"
+                      title="Edit text"
+                    >
+                      <Edit className={`${isMobile ? 'h-4 w-4' : 'h-3 w-3'}`} />
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="secondary"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowFormatPanel(true);
+                        setShowContextMenu(false);
+                      }}
+                      className={`${isMobile ? 'h-8 w-8' : 'h-6 w-6'} p-0 bg-purple-500 hover:bg-purple-600 text-white shadow-lg touch-manipulation ${isMobile ? 'mb-1' : 'mr-1'}`}
+                      aria-label="Format text"
+                      title="Format text"
+                    >
+                      <Type className={`${isMobile ? 'h-4 w-4' : 'h-3 w-3'}`} />
+                    </Button>
+                  </>
                 )}
                 <Button 
                   size="sm" 
@@ -1001,6 +1022,106 @@ const DraggableText = React.memo(({
                   <Trash className={`${isMobile ? 'h-4 w-4' : 'h-3 w-3'}`} />
                 </Button>
               </motion.div>
+            )}
+            
+            {/* Resize handles */}
+            {isSelected && !isEditing && !isMobile && (
+              <>
+                {/* Bottom-right resize handle */}
+                <div 
+                  className="absolute -bottom-2 -right-2 w-4 h-4 bg-blue-500 rounded cursor-nw-resize hover:bg-blue-600 border-2 border-white shadow-md"
+                  onMouseDown={(e) => {
+                    e.stopPropagation();
+                    const startX = e.clientX;
+                    const startY = e.clientY;
+                    const startWidth = parseInt(style.width || '200');
+                    const startHeight = parseInt(style.height || '100');
+                    
+                    const handleMouseMove = (e: MouseEvent) => {
+                      const deltaX = e.clientX - startX;
+                      const deltaY = e.clientY - startY;
+                      const newWidth = Math.max(100, startWidth + deltaX);
+                      const newHeight = Math.max(50, startHeight + deltaY);
+                      
+                      onUpdate(id, {
+                        style: {
+                          ...style,
+                          width: `${newWidth}px`,
+                          height: `${newHeight}px`
+                        }
+                      });
+                    };
+                    
+                    const handleMouseUp = () => {
+                      document.removeEventListener('mousemove', handleMouseMove);
+                      document.removeEventListener('mouseup', handleMouseUp);
+                    };
+                    
+                    document.addEventListener('mousemove', handleMouseMove);
+                    document.addEventListener('mouseup', handleMouseUp);
+                  }}
+                />
+                
+                {/* Right resize handle */}
+                <div 
+                  className="absolute top-1/2 -right-2 w-2 h-6 bg-blue-500 rounded cursor-ew-resize hover:bg-blue-600 border-2 border-white shadow-md transform -translate-y-1/2"
+                  onMouseDown={(e) => {
+                    e.stopPropagation();
+                    const startX = e.clientX;
+                    const startWidth = parseInt(style.width || '200');
+                    
+                    const handleMouseMove = (e: MouseEvent) => {
+                      const deltaX = e.clientX - startX;
+                      const newWidth = Math.max(100, startWidth + deltaX);
+                      
+                      onUpdate(id, {
+                        style: {
+                          ...style,
+                          width: `${newWidth}px`
+                        }
+                      });
+                    };
+                    
+                    const handleMouseUp = () => {
+                      document.removeEventListener('mousemove', handleMouseMove);
+                      document.removeEventListener('mouseup', handleMouseUp);
+                    };
+                    
+                    document.addEventListener('mousemove', handleMouseMove);
+                    document.addEventListener('mouseup', handleMouseUp);
+                  }}
+                />
+                
+                {/* Bottom resize handle */}
+                <div 
+                  className="absolute -bottom-2 left-1/2 w-6 h-2 bg-blue-500 rounded cursor-ns-resize hover:bg-blue-600 border-2 border-white shadow-md transform -translate-x-1/2"
+                  onMouseDown={(e) => {
+                    e.stopPropagation();
+                    const startY = e.clientY;
+                    const startHeight = parseInt(style.height || '100');
+                    
+                    const handleMouseMove = (e: MouseEvent) => {
+                      const deltaY = e.clientY - startY;
+                      const newHeight = Math.max(50, startHeight + deltaY);
+                      
+                      onUpdate(id, {
+                        style: {
+                          ...style,
+                          height: `${newHeight}px`
+                        }
+                      });
+                    };
+                    
+                    const handleMouseUp = () => {
+                      document.removeEventListener('mousemove', handleMouseMove);
+                      document.removeEventListener('mouseup', handleMouseUp);
+                    };
+                    
+                    document.addEventListener('mousemove', handleMouseMove);
+                    document.addEventListener('mouseup', handleMouseUp);
+                  }}
+                />
+              </>
             )}
           </div>
         )}
@@ -1151,7 +1272,10 @@ const DraggableText = React.memo(({
               <span>Edit</span>
             </button>
             <button
-              onClick={() => setShowFormatPanel(true)}
+              onClick={() => {
+                setShowFormatPanel(true);
+                setShowContextMenu(false);
+              }}
               className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 flex items-center space-x-2"
             >
               <Type className="h-3 w-3" />
@@ -1436,6 +1560,106 @@ const DraggableImage = React.memo(({
                 <Trash className="h-3 w-3" />
               </Button>
             </motion.div>
+          )}
+          
+          {/* Resize handles for images */}
+          {isSelected && !isMobile && (
+            <>
+              {/* Bottom-right resize handle */}
+              <div 
+                className="absolute -bottom-2 -right-2 w-4 h-4 bg-blue-500 rounded cursor-nw-resize hover:bg-blue-600 border-2 border-white shadow-md"
+                onMouseDown={(e) => {
+                  e.stopPropagation();
+                  const startX = e.clientX;
+                  const startY = e.clientY;
+                  const startWidth = parseInt(style.width || '200');
+                  const startHeight = parseInt(style.height || '150');
+                  
+                  const handleMouseMove = (e: MouseEvent) => {
+                    const deltaX = e.clientX - startX;
+                    const deltaY = e.clientY - startY;
+                    const newWidth = Math.max(50, startWidth + deltaX);
+                    const newHeight = Math.max(50, startHeight + deltaY);
+                    
+                    onUpdate(id, {
+                      style: {
+                        ...style,
+                        width: `${newWidth}px`,
+                        height: `${newHeight}px`
+                      }
+                    });
+                  };
+                  
+                  const handleMouseUp = () => {
+                    document.removeEventListener('mousemove', handleMouseMove);
+                    document.removeEventListener('mouseup', handleMouseUp);
+                  };
+                  
+                  document.addEventListener('mousemove', handleMouseMove);
+                  document.addEventListener('mouseup', handleMouseUp);
+                }}
+              />
+              
+              {/* Right resize handle */}
+              <div 
+                className="absolute top-1/2 -right-2 w-2 h-6 bg-blue-500 rounded cursor-ew-resize hover:bg-blue-600 border-2 border-white shadow-md transform -translate-y-1/2"
+                onMouseDown={(e) => {
+                  e.stopPropagation();
+                  const startX = e.clientX;
+                  const startWidth = parseInt(style.width || '200');
+                  
+                  const handleMouseMove = (e: MouseEvent) => {
+                    const deltaX = e.clientX - startX;
+                    const newWidth = Math.max(50, startWidth + deltaX);
+                    
+                    onUpdate(id, {
+                      style: {
+                        ...style,
+                        width: `${newWidth}px`
+                      }
+                    });
+                  };
+                  
+                  const handleMouseUp = () => {
+                    document.removeEventListener('mousemove', handleMouseMove);
+                    document.removeEventListener('mouseup', handleMouseUp);
+                  };
+                  
+                  document.addEventListener('mousemove', handleMouseMove);
+                  document.addEventListener('mouseup', handleMouseUp);
+                }}
+              />
+              
+              {/* Bottom resize handle */}
+              <div 
+                className="absolute -bottom-2 left-1/2 w-6 h-2 bg-blue-500 rounded cursor-ns-resize hover:bg-blue-600 border-2 border-white shadow-md transform -translate-x-1/2"
+                onMouseDown={(e) => {
+                  e.stopPropagation();
+                  const startY = e.clientY;
+                  const startHeight = parseInt(style.height || '150');
+                  
+                  const handleMouseMove = (e: MouseEvent) => {
+                    const deltaY = e.clientY - startY;
+                    const newHeight = Math.max(50, startHeight + deltaY);
+                    
+                    onUpdate(id, {
+                      style: {
+                        ...style,
+                        height: `${newHeight}px`
+                      }
+                    });
+                  };
+                  
+                  const handleMouseUp = () => {
+                    document.removeEventListener('mousemove', handleMouseMove);
+                    document.removeEventListener('mouseup', handleMouseUp);
+                  };
+                  
+                  document.addEventListener('mousemove', handleMouseMove);
+                  document.addEventListener('mouseup', handleMouseUp);
+                }}
+              />
+            </>
           )}
         </div>
       </motion.div>
@@ -1752,12 +1976,23 @@ const EditableSlidePresentation = ({
             // Paste element (future feature)
             break;
         }
+      } else {
+        // Handle non-modifier keys
+        switch (e.key) {
+          case 'Delete':
+          case 'Backspace':
+            if (selectedElement && !document.activeElement?.tagName.toLowerCase().match(/input|textarea/)) {
+              e.preventDefault();
+              deleteElement(selectedElement);
+            }
+            break;
+        }
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [selectedElement, undo, redo]);
+  }, [selectedElement, undo, redo, deleteElement]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -2133,6 +2368,28 @@ const EditableSlidePresentation = ({
                       >
                         <MousePointer className="h-5 w-5" />
                       </Button>
+                      
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          if (window.confirm('Clear all elements from this slide?')) {
+                            const updatedSlides = [...editableSlides];
+                            updatedSlides[currentSlide] = {
+                              ...updatedSlides[currentSlide],
+                              elements: updatedSlides[currentSlide].elements.filter(
+                                (el: any) => el.id.startsWith('title-') || el.id.startsWith('content-')
+                              )
+                            };
+                            setEditableSlides(updatedSlides);
+                            setSelectedElement(null);
+                            addToast('All custom elements cleared', 'success');
+                          }
+                        }}
+                        className="bg-red-600 hover:bg-red-700 text-white min-h-[44px] min-w-[44px] touch-manipulation"
+                        title="Clear all elements"
+                      >
+                        <Trash className="h-5 w-5" />
+                      </Button>
                     </div>
                     
                     {/* Slide navigation */}
@@ -2259,6 +2516,29 @@ const EditableSlidePresentation = ({
                     >
                       <Target className="h-4 w-4 mr-2" />
                       Snap
+                    </Button>
+                    
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        if (window.confirm('Are you sure you want to clear all elements from this slide?')) {
+                          const updatedSlides = [...editableSlides];
+                          updatedSlides[currentSlide] = {
+                            ...updatedSlides[currentSlide],
+                            elements: updatedSlides[currentSlide].elements.filter(
+                              (el: any) => el.id.startsWith('title-') || el.id.startsWith('content-')
+                            )
+                          };
+                          setEditableSlides(updatedSlides);
+                          setSelectedElement(null);
+                          addToast('All custom elements cleared from slide', 'success');
+                        }
+                      }}
+                      className="bg-red-600 hover:bg-red-700 text-white"
+                      title="Clear all custom elements"
+                    >
+                      <Trash className="h-4 w-4 mr-2" />
+                      Clear All
                     </Button>
                     
                     <div className="h-6 w-px bg-gray-300"></div>
