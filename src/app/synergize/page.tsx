@@ -1234,192 +1234,77 @@ const EditableSlidePresentation = ({
       };
     }
     
-    // Initialize elements for new slides with modern design
+    // Initialize elements for new slides with clean, simple layout
     const baseElements = [];
     
-    // Create modern slide layouts based on slide type
     if (slide.layout === 'title-slide') {
-      // Title slide with modern hero layout
+      // Clean title slide - just title and content points
       baseElements.push(
-        // Main title with gradient background
-        {
-          id: `title-bg-${slide.slideNumber}`,
-          type: 'text',
-          text: '',
-          style: {
-            top: 60,
-            left: 40,
-            width: '720px',
-            height: '120px',
-            background: 'linear-gradient(135deg, #0f766e 0%, #059669 50%, #10b981 100%)',
-            borderRadius: '16px',
-            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-            zIndex: 1
-          }
-        },
-        // Title text overlay
+        // Main title
         {
           id: `title-${slide.slideNumber}`,
           type: 'text',
           text: slide.title,
           style: {
-            top: 90,
-            left: 80,
+            top: 100,
+            left: 100,
             fontSize: '48px',
-            fontWeight: '800',
-            color: '#ffffff',
-            textShadow: '0 2px 4px rgba(0,0,0,0.3)',
-            zIndex: 2,
-            maxWidth: '640px'
+            fontWeight: '700',
+            color: '#0f766e',
+            maxWidth: '600px'
           }
         },
-        // Subtitle container
-        {
-          id: `subtitle-bg-${slide.slideNumber}`,
-          type: 'text',
-          text: '',
-          style: {
-            top: 220,
-            left: 60,
-            width: '680px',
-            height: '200px',
-            background: 'rgba(255, 255, 255, 0.95)',
-            borderRadius: '12px',
-            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-            border: '1px solid rgba(16, 185, 129, 0.2)',
-            zIndex: 1
-          }
-        },
-        // Content points with modern styling
+        // Content points with good spacing
         ...slide.content.map((content: string, idx: number) => ({
           id: `content-${slide.slideNumber}-${idx}`,
           type: 'text',
           text: content,
           style: {
-            top: 250 + (idx * 40),
-            left: 100,
-            fontSize: '22px',
-            fontWeight: '500',
-            color: '#1f2937',
-            zIndex: 2,
-            maxWidth: '600px'
+            top: 220 + (idx * 60),
+            left: 120,
+            fontSize: '24px',
+            fontWeight: '400',
+            color: '#374151',
+            maxWidth: '550px'
           }
-        })),
-        // Decorative accent
-        {
-          id: `accent-${slide.slideNumber}`,
-          type: 'text',
-          text: '✨',
-          style: {
-            top: 30,
-            left: 680,
-            fontSize: '32px',
-            zIndex: 3
-          }
-        }
+        }))
       );
     } else {
-      // Content slides with modern card-based layout
+      // Clean content slide - title and bullet points
       baseElements.push(
-        // Header section with gradient
-        {
-          id: `header-bg-${slide.slideNumber}`,
-          type: 'text',
-          text: '',
-          style: {
-            top: 40,
-            left: 40,
-            width: '720px',
-            height: '80px',
-            background: 'linear-gradient(90deg, #0f766e 0%, #059669 100%)',
-            borderRadius: '12px 12px 0 0',
-            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-            zIndex: 1
-          }
-        },
-        // Title with modern typography
+        // Slide title
         {
           id: `title-${slide.slideNumber}`,
           type: 'text',
           text: slide.title,
           style: {
-            top: 60,
-            left: 70,
+            top: 80,
+            left: 100,
             fontSize: '36px',
-            fontWeight: '700',
-            color: '#ffffff',
-            zIndex: 2,
-            maxWidth: '660px'
+            fontWeight: '600',
+            color: '#0f766e',
+            maxWidth: '600px'
           }
         },
-        // Content container
-        {
-          id: `content-bg-${slide.slideNumber}`,
+        // Content items with clean spacing
+        ...slide.content.map((content: string, idx: number) => ({
+          id: `content-${slide.slideNumber}-${idx}`,
           type: 'text',
-          text: '',
+          text: `• ${content}`,
           style: {
-            top: 120,
-            left: 40,
-            width: '720px',
-            height: slide.content.length * 70 + 60,
-            background: 'rgba(255, 255, 255, 0.98)',
-            borderRadius: '0 0 12px 12px',
-            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-            border: '1px solid rgba(229, 231, 235, 0.6)',
-            zIndex: 1
+            top: 160 + (idx * 50),
+            left: 120,
+            fontSize: '20px',
+            fontWeight: '400',
+            color: '#374151',
+            lineHeight: '1.5',
+            maxWidth: '600px'
           }
-        },
-        // Content items with modern bullet points
-        ...slide.content.map((content: string, idx: number) => [
-          // Bullet point icon
-          {
-            id: `bullet-${slide.slideNumber}-${idx}`,
-            type: 'text',
-            text: '▶',
-            style: {
-              top: 150 + (idx * 70),
-              left: 80,
-              fontSize: '16px',
-              color: '#059669',
-              zIndex: 2
-            }
-          },
-          // Content text
-          {
-            id: `content-${slide.slideNumber}-${idx}`,
-            type: 'text',
-            text: content,
-            style: {
-              top: 145 + (idx * 70),
-              left: 110,
-              fontSize: '20px',
-              fontWeight: '500',
-              color: '#374151',
-              lineHeight: '1.6',
-              zIndex: 2,
-              maxWidth: '600px'
-            }
-          }
-        ]).flat(),
-        // Side accent bar
-        {
-          id: `accent-bar-${slide.slideNumber}`,
-          type: 'text',
-          text: '',
-          style: {
-            top: 40,
-            left: 30,
-            width: '6px',
-            height: slide.content.length * 70 + 140,
-            background: 'linear-gradient(180deg, #10b981 0%, #059669 100%)',
-            borderRadius: '3px',
-            zIndex: 3
-          }
-        }
+        }))
       );
     }
     
-    console.log(`Created modern design elements for slide ${slide.slideNumber}:`, {
+    console.log(`Created clean slide elements for slide ${slide.slideNumber}:`, {
       layout: slide.layout,
       elementsCreated: baseElements.length
     });
@@ -1430,8 +1315,8 @@ const EditableSlidePresentation = ({
       type: 'image',
       id: img.id || `image-${Date.now()}-${Math.random()}`,
       style: img.style || {
-        top: 150,
-        left: 300,
+        top: 200,
+        left: 500,
         width: '200px',
         height: 'auto'
       }
@@ -1444,8 +1329,8 @@ const EditableSlidePresentation = ({
         type: 'image',
         src: slide.imageUrl,
         style: {
-          top: 200,
-          left: 400,
+          top: 250,
+          left: 480,
           width: '250px',
           height: 'auto'
         }
@@ -1676,13 +1561,18 @@ const EditableSlidePresentation = ({
   }, [currentSlide, addToHistory, addToast]);
 
   const addTextElement = useCallback(() => {
+    // Find a good position for the new element
+    const existingElements = currentSlideData?.elements || [];
+    const baseTop = 400;
+    const baseLeft = 400;
+    
     const newElement = {
       id: `text-${Date.now()}`,
       type: 'text',
-      text: 'New text element',
+      text: 'Click to edit text',
       style: {
-        top: snapToGridPosition(200),
-        left: snapToGridPosition(100),
+        top: snapToGridPosition(baseTop),
+        left: snapToGridPosition(baseLeft),
         fontSize: '18px',
         fontWeight: 'normal',
         color: '#374151'
@@ -1707,7 +1597,7 @@ const EditableSlidePresentation = ({
     });
     
     setSelectedElement(newElement.id);
-  }, [currentSlide, snapToGridPosition, addToHistory, addToast]);
+  }, [currentSlide, snapToGridPosition, addToHistory, addToast, currentSlideData]);
 
   const handleImageUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -1733,8 +1623,8 @@ const EditableSlidePresentation = ({
           type: 'image',
           src: e.target?.result as string,
           style: {
-            top: snapToGridPosition(150),
-            left: snapToGridPosition(300),
+            top: snapToGridPosition(200),
+            left: snapToGridPosition(500),
             width: '200px',
             height: 'auto'
           }
@@ -2028,13 +1918,13 @@ const EditableSlidePresentation = ({
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <div className="aspect-video bg-gradient-to-br from-gray-50 to-gray-100 rounded border mb-2 relative overflow-hidden">
+                  <div className="aspect-video bg-white border rounded border-gray-200 mb-2 relative overflow-hidden">
                     <div className="absolute inset-2 text-xs">
-                      <div className="font-semibold text-gray-800 truncate">
+                      <div className="font-semibold text-gray-800 truncate text-[10px] leading-tight">
                         {slide.elements.find((el: any) => el.id.startsWith('title-'))?.text || slide.title}
                       </div>
-                      <div className="text-gray-600 mt-1">
-                        {slide.elements.filter((el: any) => el.type === 'text').length} text elements
+                      <div className="text-gray-500 mt-1 text-[8px]">
+                        {slide.elements.filter((el: any) => el.type === 'text' && el.text && el.text.trim()).length} elements
                       </div>
                     </div>
                   </div>
@@ -2057,25 +1947,20 @@ const EditableSlidePresentation = ({
             >
                               <div 
                   ref={canvasRef}
-                  className="w-full h-full relative overflow-hidden rounded-lg shadow-xl"
+                  className="w-full h-full relative overflow-hidden rounded-lg shadow-xl bg-white"
                   style={{
-                    background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%)',
-                    backgroundImage: `
-                      radial-gradient(circle at 25% 25%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
-                      radial-gradient(circle at 75% 75%, rgba(59, 130, 246, 0.1) 0%, transparent 50%)
-                    `,
-                    border: '1px solid rgba(226, 232, 240, 0.8)'
+                    border: '1px solid #e5e7eb'
                   }}
                   onClick={() => setSelectedElement(null)}
                 >
                   {/* Grid Overlay */}
                   {showGrid && (
                     <div 
-                      className="absolute inset-0 pointer-events-none opacity-30"
+                      className="absolute inset-0 pointer-events-none opacity-10"
                       style={{
                         backgroundImage: `
-                          linear-gradient(to right, #e5e7eb 1px, transparent 1px),
-                          linear-gradient(to bottom, #e5e7eb 1px, transparent 1px)
+                          linear-gradient(to right, #9ca3af 1px, transparent 1px),
+                          linear-gradient(to bottom, #9ca3af 1px, transparent 1px)
                         `,
                         backgroundSize: `${gridSize}px ${gridSize}px`
                       }}
