@@ -52,6 +52,7 @@ import { SortableContext } from '@dnd-kit/sortable';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { motion, AnimatePresence } from 'framer-motion';
+import CleanSlideEditor from '@/components/CleanSlideEditor';
 
 // Enhanced Canva-like performance optimizations and ultra-smooth animations
 const ANIMATION_CONFIG = {
@@ -1994,7 +1995,7 @@ const EditableSlidePresentation = ({
         elements: slide.elements
       };
     }
-    
+
     // Initialize elements for new slides with clean, simple layout
     const baseElements = [];
     
@@ -5372,7 +5373,7 @@ Please structure this as a ready-to-deliver training course that someone could u
     if (showEditablePresentation) {
       return (
         <PresentationErrorBoundary>
-          <EditableSlidePresentation
+          <CleanSlideEditor
             slides={slides}
             onClose={() => setShowEditablePresentation(false)}
             presentationTitle={parsedPresentation.title}
