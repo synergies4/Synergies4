@@ -651,7 +651,7 @@ const DraggableText = React.memo(({
   const applyFormatting = useCallback((formatting: any) => {
     const updatedStyle = { ...style, ...formatting };
     onUpdate(id, { style: updatedStyle });
-    setShowFormatPanel(false);
+    // Don't auto-hide the format panel so users can make multiple changes
   }, [style, onUpdate, id]);
 
   const toggleBold = useCallback(() => {
@@ -750,14 +750,17 @@ const DraggableText = React.memo(({
   }, [text]);
 
   const handleDuplicate = useCallback(() => {
-    onUpdate(`${id}-copy-${Date.now()}`, { 
+    // Create a new element with a new ID
+    const newId = `text-${Date.now()}`;
+    const newElement = {
       text: text + ' (Copy)',
       style: {
         ...style,
         top: style.top + 20,
         left: style.left + 20
       }
-    });
+    };
+    onUpdate(newId, newElement);
     setShowContextMenu(false);
   }, [id, text, style, onUpdate]);
 
@@ -1024,30 +1027,34 @@ const DraggableText = React.memo(({
               </motion.div>
             )}
             
-            {/* Resize handles */}
+            {/* PowerPoint/Canva style resize handles */}
             {isSelected && !isEditing && !isMobile && (
               <>
-                {/* Bottom-right resize handle */}
+                {/* Corner resize handles - like PowerPoint */}
                 <div 
-                  className="absolute -bottom-2 -right-2 w-4 h-4 bg-blue-500 rounded cursor-nw-resize hover:bg-blue-600 border-2 border-white shadow-md"
+                  className="absolute -top-1 -left-1 w-2 h-2 bg-blue-500 border border-white rounded-sm cursor-nw-resize hover:bg-blue-600 shadow-sm"
                   onMouseDown={(e) => {
                     e.stopPropagation();
                     const startX = e.clientX;
                     const startY = e.clientY;
                     const startWidth = parseInt(style.width || '200');
                     const startHeight = parseInt(style.height || '100');
+                    const startLeft = style.left;
+                    const startTop = style.top;
                     
                     const handleMouseMove = (e: MouseEvent) => {
                       const deltaX = e.clientX - startX;
                       const deltaY = e.clientY - startY;
-                      const newWidth = Math.max(100, startWidth + deltaX);
-                      const newHeight = Math.max(50, startHeight + deltaY);
+                      const newWidth = Math.max(50, startWidth - deltaX);
+                      const newHeight = Math.max(30, startHeight - deltaY);
                       
                       onUpdate(id, {
                         style: {
                           ...style,
                           width: `${newWidth}px`,
-                          height: `${newHeight}px`
+                          height: `${newHeight}px`,
+                          left: startLeft + (startWidth - newWidth),
+                          top: startTop + (startHeight - newHeight)
                         }
                       });
                     };
@@ -1062,22 +1069,28 @@ const DraggableText = React.memo(({
                   }}
                 />
                 
-                {/* Right resize handle */}
                 <div 
-                  className="absolute top-1/2 -right-2 w-2 h-6 bg-blue-500 rounded cursor-ew-resize hover:bg-blue-600 border-2 border-white shadow-md transform -translate-y-1/2"
+                  className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 border border-white rounded-sm cursor-ne-resize hover:bg-blue-600 shadow-sm"
                   onMouseDown={(e) => {
                     e.stopPropagation();
                     const startX = e.clientX;
+                    const startY = e.clientY;
                     const startWidth = parseInt(style.width || '200');
+                    const startHeight = parseInt(style.height || '100');
+                    const startTop = style.top;
                     
                     const handleMouseMove = (e: MouseEvent) => {
                       const deltaX = e.clientX - startX;
-                      const newWidth = Math.max(100, startWidth + deltaX);
+                      const deltaY = e.clientY - startY;
+                      const newWidth = Math.max(50, startWidth + deltaX);
+                      const newHeight = Math.max(30, startHeight - deltaY);
                       
                       onUpdate(id, {
                         style: {
                           ...style,
-                          width: `${newWidth}px`
+                          width: `${newWidth}px`,
+                          height: `${newHeight}px`,
+                          top: startTop + (startHeight - newHeight)
                         }
                       });
                     };
@@ -1092,21 +1105,61 @@ const DraggableText = React.memo(({
                   }}
                 />
                 
-                {/* Bottom resize handle */}
                 <div 
-                  className="absolute -bottom-2 left-1/2 w-6 h-2 bg-blue-500 rounded cursor-ns-resize hover:bg-blue-600 border-2 border-white shadow-md transform -translate-x-1/2"
+                  className="absolute -bottom-1 -left-1 w-2 h-2 bg-blue-500 border border-white rounded-sm cursor-sw-resize hover:bg-blue-600 shadow-sm"
                   onMouseDown={(e) => {
                     e.stopPropagation();
+                    const startX = e.clientX;
                     const startY = e.clientY;
+                    const startWidth = parseInt(style.width || '200');
                     const startHeight = parseInt(style.height || '100');
+                    const startLeft = style.left;
                     
                     const handleMouseMove = (e: MouseEvent) => {
+                      const deltaX = e.clientX - startX;
                       const deltaY = e.clientY - startY;
-                      const newHeight = Math.max(50, startHeight + deltaY);
+                      const newWidth = Math.max(50, startWidth - deltaX);
+                      const newHeight = Math.max(30, startHeight + deltaY);
                       
                       onUpdate(id, {
                         style: {
                           ...style,
+                          width: `${newWidth}px`,
+                          height: `${newHeight}px`,
+                          left: startLeft + (startWidth - newWidth)
+                        }
+                      });
+                    };
+                    
+                    const handleMouseUp = () => {
+                      document.removeEventListener('mousemove', handleMouseMove);
+                      document.removeEventListener('mouseup', handleMouseUp);
+                    };
+                    
+                    document.addEventListener('mousemove', handleMouseMove);
+                    document.addEventListener('mouseup', handleMouseUp);
+                  }}
+                />
+                
+                <div 
+                  className="absolute -bottom-1 -right-1 w-2 h-2 bg-blue-500 border border-white rounded-sm cursor-se-resize hover:bg-blue-600 shadow-sm"
+                  onMouseDown={(e) => {
+                    e.stopPropagation();
+                    const startX = e.clientX;
+                    const startY = e.clientY;
+                    const startWidth = parseInt(style.width || '200');
+                    const startHeight = parseInt(style.height || '100');
+                    
+                    const handleMouseMove = (e: MouseEvent) => {
+                      const deltaX = e.clientX - startX;
+                      const deltaY = e.clientY - startY;
+                      const newWidth = Math.max(50, startWidth + deltaX);
+                      const newHeight = Math.max(30, startHeight + deltaY);
+                      
+                      onUpdate(id, {
+                        style: {
+                          ...style,
+                          width: `${newWidth}px`,
                           height: `${newHeight}px`
                         }
                       });
@@ -1374,14 +1427,17 @@ const DraggableImage = React.memo(({
   }, [onSelect, id]);
 
   const handleDuplicate = useCallback(() => {
-    onUpdate(`${id}-copy-${Date.now()}`, { 
+    // Create a new element with a new ID
+    const newId = `image-${Date.now()}`;
+    const newElement = {
       src,
       style: {
         ...style,
         top: style.top + 20,
         left: style.left + 20
       }
-    });
+    };
+    onUpdate(newId, newElement);
     setShowContextMenu(false);
   }, [id, src, style, onUpdate]);
 
@@ -1562,12 +1618,122 @@ const DraggableImage = React.memo(({
             </motion.div>
           )}
           
-          {/* Resize handles for images */}
+          {/* PowerPoint/Canva style resize handles for images */}
           {isSelected && !isMobile && (
             <>
-              {/* Bottom-right resize handle */}
+              {/* Corner resize handles - like PowerPoint */}
               <div 
-                className="absolute -bottom-2 -right-2 w-4 h-4 bg-blue-500 rounded cursor-nw-resize hover:bg-blue-600 border-2 border-white shadow-md"
+                className="absolute -top-1 -left-1 w-2 h-2 bg-blue-500 border border-white rounded-sm cursor-nw-resize hover:bg-blue-600 shadow-sm"
+                onMouseDown={(e) => {
+                  e.stopPropagation();
+                  const startX = e.clientX;
+                  const startY = e.clientY;
+                  const startWidth = parseInt(style.width || '200');
+                  const startHeight = parseInt(style.height || '150');
+                  const startLeft = style.left;
+                  const startTop = style.top;
+                  
+                  const handleMouseMove = (e: MouseEvent) => {
+                    const deltaX = e.clientX - startX;
+                    const deltaY = e.clientY - startY;
+                    const newWidth = Math.max(50, startWidth - deltaX);
+                    const newHeight = Math.max(50, startHeight - deltaY);
+                    
+                    onUpdate(id, {
+                      style: {
+                        ...style,
+                        width: `${newWidth}px`,
+                        height: `${newHeight}px`,
+                        left: startLeft + (startWidth - newWidth),
+                        top: startTop + (startHeight - newHeight)
+                      }
+                    });
+                  };
+                  
+                  const handleMouseUp = () => {
+                    document.removeEventListener('mousemove', handleMouseMove);
+                    document.removeEventListener('mouseup', handleMouseUp);
+                  };
+                  
+                  document.addEventListener('mousemove', handleMouseMove);
+                  document.addEventListener('mouseup', handleMouseUp);
+                }}
+              />
+              
+              <div 
+                className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 border border-white rounded-sm cursor-ne-resize hover:bg-blue-600 shadow-sm"
+                onMouseDown={(e) => {
+                  e.stopPropagation();
+                  const startX = e.clientX;
+                  const startY = e.clientY;
+                  const startWidth = parseInt(style.width || '200');
+                  const startHeight = parseInt(style.height || '150');
+                  const startTop = style.top;
+                  
+                  const handleMouseMove = (e: MouseEvent) => {
+                    const deltaX = e.clientX - startX;
+                    const deltaY = e.clientY - startY;
+                    const newWidth = Math.max(50, startWidth + deltaX);
+                    const newHeight = Math.max(50, startHeight - deltaY);
+                    
+                    onUpdate(id, {
+                      style: {
+                        ...style,
+                        width: `${newWidth}px`,
+                        height: `${newHeight}px`,
+                        top: startTop + (startHeight - newHeight)
+                      }
+                    });
+                  };
+                  
+                  const handleMouseUp = () => {
+                    document.removeEventListener('mousemove', handleMouseMove);
+                    document.removeEventListener('mouseup', handleMouseUp);
+                  };
+                  
+                  document.addEventListener('mousemove', handleMouseMove);
+                  document.addEventListener('mouseup', handleMouseUp);
+                }}
+              />
+              
+              <div 
+                className="absolute -bottom-1 -left-1 w-2 h-2 bg-blue-500 border border-white rounded-sm cursor-sw-resize hover:bg-blue-600 shadow-sm"
+                onMouseDown={(e) => {
+                  e.stopPropagation();
+                  const startX = e.clientX;
+                  const startY = e.clientY;
+                  const startWidth = parseInt(style.width || '200');
+                  const startHeight = parseInt(style.height || '150');
+                  const startLeft = style.left;
+                  
+                  const handleMouseMove = (e: MouseEvent) => {
+                    const deltaX = e.clientX - startX;
+                    const deltaY = e.clientY - startY;
+                    const newWidth = Math.max(50, startWidth - deltaX);
+                    const newHeight = Math.max(50, startHeight + deltaY);
+                    
+                    onUpdate(id, {
+                      style: {
+                        ...style,
+                        width: `${newWidth}px`,
+                        height: `${newHeight}px`,
+                        left: startLeft + (startWidth - newWidth)
+                      }
+                    });
+                  };
+                  
+                  const handleMouseUp = () => {
+                    document.removeEventListener('mousemove', handleMouseMove);
+                    document.removeEventListener('mouseup', handleMouseUp);
+                  };
+                  
+                  document.addEventListener('mousemove', handleMouseMove);
+                  document.addEventListener('mouseup', handleMouseUp);
+                }}
+              />
+              
+              <div 
+                className="absolute -bottom-1 -right-1 w-2 h-2 bg-blue-500 border border-white rounded-sm cursor-se-resize hover:bg-blue-600 shadow-sm"
                 onMouseDown={(e) => {
                   e.stopPropagation();
                   const startX = e.clientX;
@@ -1585,66 +1751,6 @@ const DraggableImage = React.memo(({
                       style: {
                         ...style,
                         width: `${newWidth}px`,
-                        height: `${newHeight}px`
-                      }
-                    });
-                  };
-                  
-                  const handleMouseUp = () => {
-                    document.removeEventListener('mousemove', handleMouseMove);
-                    document.removeEventListener('mouseup', handleMouseUp);
-                  };
-                  
-                  document.addEventListener('mousemove', handleMouseMove);
-                  document.addEventListener('mouseup', handleMouseUp);
-                }}
-              />
-              
-              {/* Right resize handle */}
-              <div 
-                className="absolute top-1/2 -right-2 w-2 h-6 bg-blue-500 rounded cursor-ew-resize hover:bg-blue-600 border-2 border-white shadow-md transform -translate-y-1/2"
-                onMouseDown={(e) => {
-                  e.stopPropagation();
-                  const startX = e.clientX;
-                  const startWidth = parseInt(style.width || '200');
-                  
-                  const handleMouseMove = (e: MouseEvent) => {
-                    const deltaX = e.clientX - startX;
-                    const newWidth = Math.max(50, startWidth + deltaX);
-                    
-                    onUpdate(id, {
-                      style: {
-                        ...style,
-                        width: `${newWidth}px`
-                      }
-                    });
-                  };
-                  
-                  const handleMouseUp = () => {
-                    document.removeEventListener('mousemove', handleMouseMove);
-                    document.removeEventListener('mouseup', handleMouseUp);
-                  };
-                  
-                  document.addEventListener('mousemove', handleMouseMove);
-                  document.addEventListener('mouseup', handleMouseUp);
-                }}
-              />
-              
-              {/* Bottom resize handle */}
-              <div 
-                className="absolute -bottom-2 left-1/2 w-6 h-2 bg-blue-500 rounded cursor-ns-resize hover:bg-blue-600 border-2 border-white shadow-md transform -translate-x-1/2"
-                onMouseDown={(e) => {
-                  e.stopPropagation();
-                  const startY = e.clientY;
-                  const startHeight = parseInt(style.height || '150');
-                  
-                  const handleMouseMove = (e: MouseEvent) => {
-                    const deltaY = e.clientY - startY;
-                    const newHeight = Math.max(50, startHeight + deltaY);
-                    
-                    onUpdate(id, {
-                      style: {
-                        ...style,
                         height: `${newHeight}px`
                       }
                     });
