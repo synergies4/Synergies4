@@ -685,6 +685,21 @@ const DraggableText = React.memo(({
     applyFormatting({ backgroundColor, padding: '8px', borderRadius: '4px' });
   }, [applyFormatting]);
 
+  const toggleBulletPoints = useCallback(() => {
+    const lines = text.split('\n');
+    const hasBullets = lines.some(line => line.trim().startsWith('•'));
+    
+    if (hasBullets) {
+      // Remove bullets
+      const newText = lines.map(line => line.replace(/^[\s]*•[\s]*/, '')).join('\n');
+      onUpdate(id, { text: newText });
+    } else {
+      // Add bullets
+      const newText = lines.map(line => line.trim() ? `• ${line.trim()}` : line).join('\n');
+      onUpdate(id, { text: newText });
+    }
+  }, [text, id, onUpdate]);
+
   // Memoized handlers for performance
   const handleDoubleClick = useCallback(() => {
     setIsEditing(true);
@@ -824,19 +839,23 @@ const DraggableText = React.memo(({
             break;
           case 'ArrowUp':
             e.preventDefault();
-            onUpdate(id, { style: { ...style, top: Math.max(0, style.top - 10) } });
+            const upStep = e.shiftKey ? 20 : (e.ctrlKey || e.metaKey) ? 1 : 5;
+            onUpdate(id, { style: { ...style, top: Math.max(0, style.top - upStep) } });
             break;
           case 'ArrowDown':
             e.preventDefault();
-            onUpdate(id, { style: { ...style, top: style.top + 10 } });
+            const downStep = e.shiftKey ? 20 : (e.ctrlKey || e.metaKey) ? 1 : 5;
+            onUpdate(id, { style: { ...style, top: style.top + downStep } });
             break;
           case 'ArrowLeft':
             e.preventDefault();
-            onUpdate(id, { style: { ...style, left: Math.max(0, style.left - 10) } });
+            const leftStep = e.shiftKey ? 20 : (e.ctrlKey || e.metaKey) ? 1 : 5;
+            onUpdate(id, { style: { ...style, left: Math.max(0, style.left - leftStep) } });
             break;
           case 'ArrowRight':
             e.preventDefault();
-            onUpdate(id, { style: { ...style, left: style.left + 10 } });
+            const rightStep = e.shiftKey ? 20 : (e.ctrlKey || e.metaKey) ? 1 : 5;
+            onUpdate(id, { style: { ...style, left: style.left + rightStep } });
             break;
         }
       };
@@ -1027,12 +1046,13 @@ const DraggableText = React.memo(({
               </motion.div>
             )}
             
-            {/* PowerPoint/Canva style resize handles */}
+            {/* PowerPoint/Canva style resize handles - Made bigger and more obvious */}
             {isSelected && !isEditing && !isMobile && (
               <>
                 {/* Corner resize handles - like PowerPoint */}
                 <div 
-                  className="absolute -top-1 -left-1 w-2 h-2 bg-blue-500 border border-white rounded-sm cursor-nw-resize hover:bg-blue-600 shadow-sm"
+                  className="absolute -top-2 -left-2 w-4 h-4 bg-blue-500 border-2 border-white rounded cursor-nw-resize hover:bg-blue-600 shadow-lg transform hover:scale-110 transition-all duration-200"
+                  title="Drag to resize from top-left corner"
                   onMouseDown={(e) => {
                     e.stopPropagation();
                     const startX = e.clientX;
@@ -1070,7 +1090,8 @@ const DraggableText = React.memo(({
                 />
                 
                 <div 
-                  className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 border border-white rounded-sm cursor-ne-resize hover:bg-blue-600 shadow-sm"
+                  className="absolute -top-2 -right-2 w-4 h-4 bg-blue-500 border-2 border-white rounded cursor-ne-resize hover:bg-blue-600 shadow-lg transform hover:scale-110 transition-all duration-200"
+                  title="Drag to resize from top-right corner"
                   onMouseDown={(e) => {
                     e.stopPropagation();
                     const startX = e.clientX;
@@ -1106,7 +1127,8 @@ const DraggableText = React.memo(({
                 />
                 
                 <div 
-                  className="absolute -bottom-1 -left-1 w-2 h-2 bg-blue-500 border border-white rounded-sm cursor-sw-resize hover:bg-blue-600 shadow-sm"
+                  className="absolute -bottom-2 -left-2 w-4 h-4 bg-blue-500 border-2 border-white rounded cursor-sw-resize hover:bg-blue-600 shadow-lg transform hover:scale-110 transition-all duration-200"
+                  title="Drag to resize from bottom-left corner"
                   onMouseDown={(e) => {
                     e.stopPropagation();
                     const startX = e.clientX;
@@ -1142,7 +1164,8 @@ const DraggableText = React.memo(({
                 />
                 
                 <div 
-                  className="absolute -bottom-1 -right-1 w-2 h-2 bg-blue-500 border border-white rounded-sm cursor-se-resize hover:bg-blue-600 shadow-sm"
+                  className="absolute -bottom-2 -right-2 w-4 h-4 bg-blue-500 border-2 border-white rounded cursor-se-resize hover:bg-blue-600 shadow-lg transform hover:scale-110 transition-all duration-200"
+                  title="Drag to resize from bottom-right corner"
                   onMouseDown={(e) => {
                     e.stopPropagation();
                     const startX = e.clientX;
@@ -1222,6 +1245,14 @@ const DraggableText = React.memo(({
                     title="Underline (Ctrl+U)"
                   >
                     <span className="underline text-sm">U</span>
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={toggleBulletPoints}
+                    className={`h-8 w-8 p-0 ml-1 ${text.includes('•') ? 'bg-blue-500 text-white' : 'bg-transparent text-gray-700 hover:bg-gray-200'}`}
+                    title="Toggle bullet points"
+                  >
+                    <span className="text-sm">•</span>
                   </Button>
                 </div>
 
@@ -1478,19 +1509,23 @@ const DraggableImage = React.memo(({
             break;
           case 'ArrowUp':
             e.preventDefault();
-            onUpdate(id, { style: { ...style, top: Math.max(0, style.top - 10) } });
+            const upStep = e.shiftKey ? 20 : (e.ctrlKey || e.metaKey) ? 1 : 5;
+            onUpdate(id, { style: { ...style, top: Math.max(0, style.top - upStep) } });
             break;
           case 'ArrowDown':
             e.preventDefault();
-            onUpdate(id, { style: { ...style, top: style.top + 10 } });
+            const downStep = e.shiftKey ? 20 : (e.ctrlKey || e.metaKey) ? 1 : 5;
+            onUpdate(id, { style: { ...style, top: style.top + downStep } });
             break;
           case 'ArrowLeft':
             e.preventDefault();
-            onUpdate(id, { style: { ...style, left: Math.max(0, style.left - 10) } });
+            const leftStep = e.shiftKey ? 20 : (e.ctrlKey || e.metaKey) ? 1 : 5;
+            onUpdate(id, { style: { ...style, left: Math.max(0, style.left - leftStep) } });
             break;
           case 'ArrowRight':
             e.preventDefault();
-            onUpdate(id, { style: { ...style, left: style.left + 10 } });
+            const rightStep = e.shiftKey ? 20 : (e.ctrlKey || e.metaKey) ? 1 : 5;
+            onUpdate(id, { style: { ...style, left: style.left + rightStep } });
             break;
         }
       };
@@ -1618,12 +1653,13 @@ const DraggableImage = React.memo(({
             </motion.div>
           )}
           
-          {/* PowerPoint/Canva style resize handles for images */}
+          {/* PowerPoint/Canva style resize handles for images - Made bigger and more obvious */}
           {isSelected && !isMobile && (
             <>
               {/* Corner resize handles - like PowerPoint */}
               <div 
-                className="absolute -top-1 -left-1 w-2 h-2 bg-blue-500 border border-white rounded-sm cursor-nw-resize hover:bg-blue-600 shadow-sm"
+                className="absolute -top-2 -left-2 w-4 h-4 bg-blue-500 border-2 border-white rounded cursor-nw-resize hover:bg-blue-600 shadow-lg transform hover:scale-110 transition-all duration-200"
+                title="Drag to resize from top-left corner"
                 onMouseDown={(e) => {
                   e.stopPropagation();
                   const startX = e.clientX;
@@ -1661,7 +1697,8 @@ const DraggableImage = React.memo(({
               />
               
               <div 
-                className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 border border-white rounded-sm cursor-ne-resize hover:bg-blue-600 shadow-sm"
+                className="absolute -top-2 -right-2 w-4 h-4 bg-blue-500 border-2 border-white rounded cursor-ne-resize hover:bg-blue-600 shadow-lg transform hover:scale-110 transition-all duration-200"
+                title="Drag to resize from top-right corner"
                 onMouseDown={(e) => {
                   e.stopPropagation();
                   const startX = e.clientX;
@@ -1697,7 +1734,8 @@ const DraggableImage = React.memo(({
               />
               
               <div 
-                className="absolute -bottom-1 -left-1 w-2 h-2 bg-blue-500 border border-white rounded-sm cursor-sw-resize hover:bg-blue-600 shadow-sm"
+                className="absolute -bottom-2 -left-2 w-4 h-4 bg-blue-500 border-2 border-white rounded cursor-sw-resize hover:bg-blue-600 shadow-lg transform hover:scale-110 transition-all duration-200"
+                title="Drag to resize from bottom-left corner"
                 onMouseDown={(e) => {
                   e.stopPropagation();
                   const startX = e.clientX;
@@ -1733,7 +1771,8 @@ const DraggableImage = React.memo(({
               />
               
               <div 
-                className="absolute -bottom-1 -right-1 w-2 h-2 bg-blue-500 border border-white rounded-sm cursor-se-resize hover:bg-blue-600 shadow-sm"
+                className="absolute -bottom-2 -right-2 w-4 h-4 bg-blue-500 border-2 border-white rounded cursor-se-resize hover:bg-blue-600 shadow-lg transform hover:scale-110 transition-all duration-200"
+                title="Drag to resize from bottom-right corner"
                 onMouseDown={(e) => {
                   e.stopPropagation();
                   const startX = e.clientX;
@@ -2364,6 +2403,140 @@ const EditableSlidePresentation = ({
     }
   }, [editableSlides, onSave, addToast]);
 
+  const addNewSlide = useCallback(() => {
+    const newSlideNumber = editableSlides.length + 1;
+    const newSlide = {
+      slideNumber: newSlideNumber,
+      title: `New Slide ${newSlideNumber}`,
+      content: ['Click to edit this content'],
+      layout: 'content-slide',
+      elements: [
+        {
+          id: `title-${newSlideNumber}`,
+          type: 'text',
+          text: `New Slide ${newSlideNumber}`,
+          style: {
+            top: 80,
+            left: 100,
+            fontSize: '36px',
+            fontWeight: '600',
+            color: '#0f766e',
+            maxWidth: '600px'
+          }
+        },
+        {
+          id: `content-${newSlideNumber}-0`,
+          type: 'text',
+          text: '• Click to edit this content',
+          style: {
+            top: 160,
+            left: 120,
+            fontSize: '20px',
+            fontWeight: '400',
+            color: '#374151',
+            lineHeight: '1.5',
+            maxWidth: '600px'
+          }
+        }
+      ]
+    };
+
+    setEditableSlides(prev => {
+      const newSlides = [...prev, newSlide];
+      addToHistory(newSlides);
+      return newSlides;
+    });
+    
+    setCurrentSlide(editableSlides.length);
+    addToast('New slide added!', 'success');
+  }, [editableSlides, addToHistory, addToast]);
+
+  const generateAIContent = useCallback(async () => {
+    if (!currentSlideData) return;
+    
+    addToast('Generating AI content...', 'info');
+    
+    try {
+      // Get current slide context
+      const currentTitle = currentSlideData.elements.find((el: any) => el.id.startsWith('title-'))?.text || 'Untitled Slide';
+      const currentContent = currentSlideData.elements
+        .filter((el: any) => el.type === 'text' && !el.id.startsWith('title-'))
+        .map((el: any) => el.text)
+        .join('\n');
+
+      // Create AI prompt for content generation
+      const prompt = `Generate 3-4 bullet points for a presentation slide with the title "${currentTitle}". 
+      Current content: "${currentContent}"
+      
+      Please provide concise, professional bullet points that expand on this topic. 
+      Each bullet point should be 1-2 lines maximum.
+      Return only the bullet points, one per line, without bullet symbols (I'll add them).`;
+
+      // Use the existing AI infrastructure
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: prompt,
+          provider: 'openai' // Use OpenAI for content generation
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate AI content');
+      }
+
+      const data = await response.json();
+      const aiContent = data.response;
+
+      // Parse the AI response into bullet points
+      const bulletPoints = aiContent
+        .split('\n')
+        .filter((line: string) => line.trim())
+        .map((line: string) => `• ${line.trim().replace(/^[•\-\*]\s*/, '')}`)
+        .slice(0, 4); // Limit to 4 bullet points
+
+      // Add the AI-generated content as new text elements
+      const newElements = bulletPoints.map((point: string, index: number) => ({
+        id: `ai-content-${Date.now()}-${index}`,
+        type: 'text',
+        text: point,
+        style: {
+          top: 250 + (index * 50),
+          left: 120,
+          fontSize: '18px',
+          fontWeight: '400',
+          color: '#374151',
+          lineHeight: '1.5',
+          maxWidth: '600px'
+        }
+      }));
+
+      // Update the slide with new AI content
+      setEditableSlides(prev => {
+        const newSlides = prev.map((slide, idx) => {
+          if (idx === currentSlide) {
+            return {
+              ...slide,
+              elements: [...slide.elements, ...newElements]
+            };
+          }
+          return slide;
+        });
+        
+        addToHistory(newSlides);
+        return newSlides;
+      });
+
+      addToast(`Added ${bulletPoints.length} AI-generated bullet points!`, 'success');
+    } catch (error) {
+      console.error('AI generation error:', error);
+      addToast('Failed to generate AI content. Please try again.', 'error');
+    }
+  }, [currentSlideData, currentSlide, addToHistory, addToast]);
+
   return (
     <div className="fixed inset-0 z-50 bg-gray-100 flex flex-col">
       {/* Mobile-Optimized Editor Header */}
@@ -2685,6 +2858,28 @@ const EditableSlidePresentation = ({
                       disabled={currentSlide === editableSlides.length - 1}
                     >
                       <ArrowRight className="h-4 w-4" />
+                    </Button>
+                    
+                    <div className="h-6 w-px bg-gray-300 mx-2"></div>
+                    
+                    <Button
+                      size="sm"
+                      onClick={addNewSlide}
+                      className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                      title="Add new slide"
+                    >
+                      <Plus className="h-4 w-4 mr-1" />
+                      New Slide
+                    </Button>
+                    
+                    <Button
+                      size="sm"
+                      onClick={generateAIContent}
+                      className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                      title="Generate AI content for current slide"
+                    >
+                      <Zap className="h-4 w-4 mr-1" />
+                      AI Generate
                     </Button>
                   </div>
                 </div>
