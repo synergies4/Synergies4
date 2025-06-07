@@ -44,8 +44,23 @@ import {
   Menu,
   Square,
   Pause,
-  RotateCcw
+  RotateCcw,
+  Edit,
+  Save,
+  Type,
+  MousePointer,
+  Move,
+  Trash,
+  Plus,
+  Maximize,
+  Minimize
 } from 'lucide-react';
+
+import { DndContext, closestCenter, useSensor, useSensors, PointerSensor, TouchSensor } from '@dnd-kit/core';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Agile roles and their specific capabilities - Updated with professional color scheme
 const AGILE_ROLES = {
@@ -431,6 +446,618 @@ const SlidePresentation = ({
           </div>
         </div>
       )}
+    </div>
+  );
+};
+
+// Draggable Text Component for Editable Slides
+const DraggableText = ({ 
+  id, 
+  text, 
+  style, 
+  onUpdate, 
+  onDelete, 
+  isSelected, 
+  onSelect 
+}: {
+  id: string;
+  text: string;
+  style: any;
+  onUpdate: (id: string, updates: any) => void;
+  onDelete: (id: string) => void;
+  isSelected: boolean;
+  onSelect: (id: string) => void;
+}) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editText, setEditText] = useState(text);
+  const textRef = useRef<HTMLDivElement>(null);
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const transformStyle = CSS.Transform.toString(transform);
+
+  const handleDoubleClick = () => {
+    setIsEditing(true);
+    setEditText(text);
+  };
+
+  const handleSave = () => {
+    onUpdate(id, { text: editText });
+    setIsEditing(false);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSave();
+    }
+    if (e.key === 'Escape') {
+      setIsEditing(false);
+      setEditText(text);
+    }
+  };
+
+  return (
+    <motion.div
+      ref={setNodeRef}
+      style={{
+        transform: transformStyle,
+        transition,
+        ...style,
+        position: 'absolute',
+        cursor: isDragging ? 'grabbing' : 'grab',
+        zIndex: isDragging ? 1000 : isSelected ? 100 : 1,
+      }}
+      className={`
+        p-3 rounded-lg transition-all duration-200 
+        ${isSelected ? 'ring-2 ring-blue-500 shadow-lg' : 'hover:shadow-md'}
+        ${isDragging ? 'opacity-75' : 'opacity-100'}
+        bg-white/90 backdrop-blur-sm border border-gray-200
+      `}
+      onClick={() => onSelect(id)}
+      onDoubleClick={handleDoubleClick}
+      {...attributes}
+      {...listeners}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+    >
+      {isEditing ? (
+        <div className="min-w-[200px]">
+          <textarea
+            value={editText}
+            onChange={(e) => setEditText(e.target.value)}
+            onKeyDown={handleKeyPress}
+            onBlur={handleSave}
+            className="w-full p-2 border border-blue-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+            style={{ fontSize: style.fontSize || '16px', fontWeight: style.fontWeight || 'normal' }}
+            autoFocus
+            rows={Math.max(1, editText.split('\n').length)}
+          />
+          <div className="flex justify-end space-x-2 mt-2">
+            <Button size="sm" onClick={handleSave} className="h-6 px-2 text-xs">
+              <Save className="h-3 w-3" />
+            </Button>
+            <Button size="sm" variant="outline" onClick={() => setIsEditing(false)} className="h-6 px-2 text-xs">
+              <X className="h-3 w-3" />
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <div className="relative group">
+          <div 
+            style={{ 
+              fontSize: style.fontSize || '16px', 
+              fontWeight: style.fontWeight || 'normal',
+              color: style.color || '#000000'
+            }}
+            className="whitespace-pre-wrap break-words"
+          >
+            {text}
+          </div>
+          
+          {isSelected && (
+            <div className="absolute -top-2 -right-2 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <Button 
+                size="sm" 
+                variant="destructive" 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(id);
+                }}
+                className="h-6 w-6 p-0"
+              >
+                <Trash className="h-3 w-3" />
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
+    </motion.div>
+  );
+};
+
+// Draggable Image Component
+const DraggableImage = ({ 
+  id, 
+  src, 
+  style, 
+  onUpdate, 
+  onDelete, 
+  isSelected, 
+  onSelect 
+}: {
+  id: string;
+  src: string;
+  style: any;
+  onUpdate: (id: string, updates: any) => void;
+  onDelete: (id: string) => void;
+  isSelected: boolean;
+  onSelect: (id: string) => void;
+}) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const transformStyle = CSS.Transform.toString(transform);
+
+  return (
+    <motion.div
+      ref={setNodeRef}
+      style={{
+        transform: transformStyle,
+        transition,
+        ...style,
+        position: 'absolute',
+        cursor: isDragging ? 'grabbing' : 'grab',
+        zIndex: isDragging ? 1000 : isSelected ? 100 : 1,
+      }}
+      className={`
+        rounded-lg transition-all duration-200 
+        ${isSelected ? 'ring-2 ring-blue-500 shadow-lg' : 'hover:shadow-md'}
+        ${isDragging ? 'opacity-75' : 'opacity-100'}
+      `}
+      onClick={() => onSelect(id)}
+      {...attributes}
+      {...listeners}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+    >
+      <div className="relative group">
+        <img 
+          src={src} 
+          alt="Slide element"
+          className="rounded-lg shadow-sm max-w-full h-auto"
+          style={{ 
+            width: style.width || 'auto', 
+            height: style.height || 'auto',
+            maxWidth: '300px',
+            maxHeight: '200px'
+          }}
+        />
+        
+        {isSelected && (
+          <div className="absolute -top-2 -right-2 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Button 
+              size="sm" 
+              variant="destructive" 
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(id);
+              }}
+              className="h-6 w-6 p-0"
+            >
+              <Trash className="h-3 w-3" />
+            </Button>
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
+};
+
+// Main Editable Slide Presentation Component
+const EditableSlidePresentation = ({ 
+  slides, 
+  onClose, 
+  presentationTitle,
+  onSave 
+}: {
+  slides: any[];
+  onClose: () => void;
+  presentationTitle: string;
+  onSave: (updatedSlides: any[]) => void;
+}) => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [editableSlides, setEditableSlides] = useState(slides.map(slide => ({
+    ...slide,
+    elements: [
+      {
+        id: `title-${slide.slideNumber}`,
+        type: 'text',
+        text: slide.title,
+        style: {
+          top: 50,
+          left: 50,
+          fontSize: '32px',
+          fontWeight: 'bold',
+          color: '#1f2937'
+        }
+      },
+      ...slide.content.map((content: string, idx: number) => ({
+        id: `content-${slide.slideNumber}-${idx}`,
+        type: 'text',
+        text: `• ${content}`,
+        style: {
+          top: 120 + (idx * 50),
+          left: 70,
+          fontSize: '18px',
+          fontWeight: 'normal',
+          color: '#374151'
+        }
+      }))
+    ]
+  })));
+  
+  const [selectedElement, setSelectedElement] = useState<string | null>(null);
+  const [showToolbar, setShowToolbar] = useState(true);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250,
+        tolerance: 5,
+      },
+    })
+  );
+
+  const currentSlideData = editableSlides[currentSlide];
+
+  const handleDragEnd = (event: any) => {
+    const { active, delta } = event;
+    
+    setEditableSlides(prev => prev.map((slide, idx) => {
+      if (idx === currentSlide) {
+        return {
+          ...slide,
+          elements: slide.elements.map((element: any) => 
+            element.id === active.id 
+              ? {
+                  ...element,
+                  style: {
+                    ...element.style,
+                    top: element.style.top + delta.y,
+                    left: element.style.left + delta.x,
+                  }
+                }
+              : element
+          )
+        };
+      }
+      return slide;
+    }));
+  };
+
+  const updateElement = (id: string, updates: any) => {
+    setEditableSlides(prev => prev.map((slide, idx) => {
+      if (idx === currentSlide) {
+        return {
+          ...slide,
+          elements: slide.elements.map((element: any) => 
+            element.id === id ? { ...element, ...updates } : element
+          )
+        };
+      }
+      return slide;
+    }));
+  };
+
+  const deleteElement = (id: string) => {
+    setEditableSlides(prev => prev.map((slide, idx) => {
+      if (idx === currentSlide) {
+        return {
+          ...slide,
+          elements: slide.elements.filter((element: any) => element.id !== id)
+        };
+      }
+      return slide;
+    }));
+    setSelectedElement(null);
+  };
+
+  const addTextElement = () => {
+    const newElement = {
+      id: `text-${Date.now()}`,
+      type: 'text',
+      text: 'New text element',
+      style: {
+        top: 200,
+        left: 100,
+        fontSize: '18px',
+        fontWeight: 'normal',
+        color: '#374151'
+      }
+    };
+
+    setEditableSlides(prev => prev.map((slide, idx) => {
+      if (idx === currentSlide) {
+        return {
+          ...slide,
+          elements: [...slide.elements, newElement]
+        };
+      }
+      return slide;
+    }));
+    
+    setSelectedElement(newElement.id);
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const newElement = {
+          id: `image-${Date.now()}`,
+          type: 'image',
+          src: e.target?.result as string,
+          style: {
+            top: 150,
+            left: 300,
+            width: '200px',
+            height: 'auto'
+          }
+        };
+
+        setEditableSlides(prev => prev.map((slide, idx) => {
+          if (idx === currentSlide) {
+            return {
+              ...slide,
+              elements: [...slide.elements, newElement]
+            };
+          }
+          return slide;
+        }));
+        
+        setSelectedElement(newElement.id);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSave = () => {
+    // Convert back to original slide format
+    const updatedSlides = editableSlides.map(slide => ({
+      ...slide,
+      title: slide.elements.find((el: any) => el.id.startsWith('title-'))?.text || slide.title,
+      content: slide.elements
+        .filter((el: any) => el.id.startsWith('content-') && el.type === 'text')
+        .map((el: any) => el.text.replace(/^• /, ''))
+    }));
+    
+    onSave(updatedSlides);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 bg-gray-100 flex flex-col">
+      {/* Enhanced Editor Header */}
+      <div className="bg-white border-b border-gray-200 shadow-sm">
+        <div className="flex items-center justify-between p-4">
+          <div className="flex items-center space-x-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+              className="text-gray-600 hover:text-gray-800"
+            >
+              <ArrowRight className="h-4 w-4 rotate-180 mr-2" />
+              Back
+            </Button>
+            <div className="h-6 w-px bg-gray-300"></div>
+            <h1 className="text-lg font-semibold text-gray-900">{presentationTitle}</h1>
+            <Badge className="bg-purple-100 text-purple-800">Editor Mode</Badge>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowToolbar(!showToolbar)}
+              className="text-gray-600"
+            >
+              {showToolbar ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
+            </Button>
+            <Button
+              size="sm"
+              onClick={handleSave}
+              className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white"
+            >
+              <Save className="h-4 w-4 mr-2" />
+              Save Changes
+            </Button>
+          </div>
+        </div>
+
+        {/* Floating Toolbar */}
+        <AnimatePresence>
+          {showToolbar && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="border-t border-gray-200 p-3 bg-gray-50"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <Button
+                    size="sm"
+                    onClick={addTextElement}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    <Type className="h-4 w-4 mr-2" />
+                    Add Text
+                  </Button>
+                  
+                  <Button
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    <ImageIcon className="h-4 w-4 mr-2" />
+                    Add Image
+                  </Button>
+                  
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                  
+                  <div className="h-6 w-px bg-gray-300"></div>
+                  
+                  <span className="text-sm text-gray-600">
+                    Double-click to edit text • Drag to move elements
+                  </span>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm font-medium text-gray-700">
+                    Slide {currentSlide + 1} of {editableSlides.length}
+                  </span>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentSlide(Math.max(0, currentSlide - 1))}
+                    disabled={currentSlide === 0}
+                  >
+                    <ArrowRight className="h-4 w-4 rotate-180" />
+                  </Button>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentSlide(Math.min(editableSlides.length - 1, currentSlide + 1))}
+                    disabled={currentSlide === editableSlides.length - 1}
+                  >
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Main Editor Area */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Slide Thumbnails */}
+        <div className="w-64 bg-white border-r border-gray-200 overflow-y-auto">
+          <div className="p-4">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">Slides</h3>
+            <div className="space-y-3">
+              {editableSlides.map((slide, index) => (
+                <motion.div
+                  key={index}
+                  onClick={() => setCurrentSlide(index)}
+                  className={`
+                    p-3 rounded-lg border-2 cursor-pointer transition-all duration-200
+                    ${currentSlide === index 
+                      ? 'border-purple-500 bg-purple-50 shadow-md' 
+                      : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
+                    }
+                  `}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="aspect-video bg-gradient-to-br from-gray-50 to-gray-100 rounded border mb-2 relative overflow-hidden">
+                    <div className="absolute inset-2 text-xs">
+                      <div className="font-semibold text-gray-800 truncate">
+                        {slide.elements.find((el: any) => el.id.startsWith('title-'))?.text || slide.title}
+                      </div>
+                      <div className="text-gray-600 mt-1">
+                        {slide.elements.filter((el: any) => el.type === 'text').length} text elements
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-xs font-medium text-gray-700">
+                    Slide {slide.slideNumber}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Slide Canvas */}
+        <div className="flex-1 bg-gray-200 p-8 overflow-auto">
+          <div className="mx-auto" style={{ width: '800px', height: '600px' }}>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <div 
+                className="w-full h-full bg-white rounded-lg shadow-xl relative overflow-hidden"
+                onClick={() => setSelectedElement(null)}
+              >
+                <SortableContext items={currentSlideData?.elements?.map((el: any) => el.id) || []}>
+                  {currentSlideData?.elements?.map((element: any) => (
+                    element.type === 'text' ? (
+                      <DraggableText
+                        key={element.id}
+                        id={element.id}
+                        text={element.text}
+                        style={element.style}
+                        onUpdate={updateElement}
+                        onDelete={deleteElement}
+                        isSelected={selectedElement === element.id}
+                        onSelect={setSelectedElement}
+                      />
+                    ) : (
+                      <DraggableImage
+                        key={element.id}
+                        id={element.id}
+                        src={element.src}
+                        style={element.style}
+                        onUpdate={updateElement}
+                        onDelete={deleteElement}
+                        isSelected={selectedElement === element.id}
+                        onSelect={setSelectedElement}
+                      />
+                    )
+                  ))}
+                </SortableContext>
+
+                {/* Canvas Guidelines */}
+                <div className="absolute inset-0 pointer-events-none">
+                  <div className="absolute top-1/2 left-0 right-0 h-px bg-blue-200 opacity-20"></div>
+                  <div className="absolute left-1/2 top-0 bottom-0 w-px bg-blue-200 opacity-20"></div>
+                </div>
+              </div>
+            </DndContext>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
@@ -2187,11 +2814,13 @@ Please structure this as a ready-to-deliver training course that someone could u
   const currentMode = INTERACTION_MODES[selectedMode as keyof typeof INTERACTION_MODES];
   const currentProvider = AI_PROVIDERS[selectedProvider];
 
-  // Presentation Display Component for Chat Messages
+  // Enhanced Presentation Display Component for Chat Messages
   const PresentationDisplay = ({ messageContent }: { messageContent: string }) => {
     const [parsedPresentation, setParsedPresentation] = useState<any>(null);
     const [currentSlide, setCurrentSlide] = useState(0);
     const [showFullPresentation, setShowFullPresentation] = useState(false);
+    const [showEditablePresentation, setShowEditablePresentation] = useState(false);
+    const [isAnimating, setIsAnimating] = useState(false);
 
     useEffect(() => {
       try {
@@ -2274,18 +2903,59 @@ Please structure this as a ready-to-deliver training course that someone could u
       }
     }, [messageContent]);
 
+    const handleSlideChange = (direction: 'next' | 'prev') => {
+      if (isAnimating) return;
+      setIsAnimating(true);
+      
+      if (direction === 'next' && currentSlide < slides.length - 1) {
+        setCurrentSlide(currentSlide + 1);
+      } else if (direction === 'prev' && currentSlide > 0) {
+        setCurrentSlide(currentSlide - 1);
+      }
+      
+      setTimeout(() => setIsAnimating(false), 300);
+    };
+
     if (!parsedPresentation) {
       return (
-        <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
-          <p className="text-sm text-orange-700">
-            Presentation generated but couldn't be parsed. Please try again.
-          </p>
+        <div className="p-6 bg-gradient-to-br from-orange-50 to-red-50 border-2 border-orange-200 rounded-xl shadow-lg">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-orange-200 rounded-full flex items-center justify-center">
+              <Presentation className="h-4 w-4 text-orange-600" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-orange-800">
+                Presentation Processing...
+              </p>
+              <p className="text-xs text-orange-600">
+                Generated content couldn't be parsed. Please try again.
+              </p>
+            </div>
+          </div>
         </div>
       );
     }
 
     const slides = parsedPresentation.slides || [];
     const currentSlideData = slides[currentSlide];
+
+    if (showEditablePresentation) {
+      return (
+        <EditableSlidePresentation
+          slides={slides}
+          onClose={() => setShowEditablePresentation(false)}
+          presentationTitle={parsedPresentation.title}
+          onSave={(updatedSlides) => {
+            // Update the presentation data
+            setParsedPresentation({
+              ...parsedPresentation,
+              slides: updatedSlides
+            });
+            setShowEditablePresentation(false);
+          }}
+        />
+      );
+    }
 
     if (showFullPresentation) {
       return (
@@ -2302,84 +2972,152 @@ Please structure this as a ready-to-deliver training course that someone could u
     }
 
     return (
-      <div className="bg-white rounded-xl border-2 border-teal-200 shadow-xl overflow-hidden">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-teal-600 to-emerald-600 text-white p-4 sm:p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h4 className="text-lg sm:text-xl font-bold text-white mb-1">
-                {parsedPresentation.title}
-              </h4>
-              <p className="text-teal-100 text-sm">
-                Interactive presentation with {slides.length} slides
-              </p>
+      <div className="bg-white rounded-2xl border-2 border-teal-200 shadow-2xl overflow-hidden transform transition-all duration-300 hover:shadow-3xl hover:scale-[1.01]">
+        {/* Enhanced Header with Animation */}
+        <div className="bg-gradient-to-br from-teal-600 via-emerald-600 to-cyan-600 text-white p-6 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent pointer-events-none"></div>
+          <div className="relative z-10">
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex-1">
+                <div className="flex items-center space-x-3 mb-2">
+                  <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                    <Presentation className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-bold text-white leading-tight">
+                      {parsedPresentation.title}
+                    </h4>
+                    <p className="text-teal-100 text-sm font-medium">
+                      Professional Presentation
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-4 text-sm">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-emerald-300 rounded-full animate-pulse"></div>
+                    <span className="text-teal-100">{slides.length} slides</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-cyan-300 rounded-full animate-pulse delay-100"></div>
+                    <span className="text-teal-100">Interactive</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Badge className="bg-white/20 backdrop-blur-sm text-white border-white/30 px-3 py-1 font-medium">
+                  Slide {currentSlide + 1}
+                </Badge>
+              </div>
             </div>
-            <Badge className="bg-white/20 text-white border-white/30 text-sm px-3 py-1">
-              {slides.length} slides
-            </Badge>
+
+            {/* Progress Bar */}
+            <div className="w-full bg-white/20 rounded-full h-2 overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-white to-emerald-200 rounded-full transition-all duration-500 ease-out"
+                style={{ width: `${((currentSlide + 1) / slides.length) * 100}%` }}
+              ></div>
+            </div>
           </div>
         </div>
 
-        {/* Slide Preview */}
+        {/* Enhanced Slide Preview with Animation */}
         {currentSlideData && (
-          <div className="p-4 sm:p-6">
-            <div className="bg-gradient-to-br from-gray-50 to-teal-50 rounded-lg border border-teal-100 p-4 sm:p-6 mb-4">
-              <div className="flex items-center justify-between mb-4">
-                <h5 className="text-base sm:text-lg font-bold text-gray-900">
-                  Slide {currentSlideData.slideNumber}: {currentSlideData.title}
-                </h5>
-                <Badge variant="outline" className="text-xs border-teal-300 text-teal-700 bg-teal-50">
-                  {currentSlideData.layout}
-                </Badge>
-              </div>
+          <div className="p-6">
+            {/* Slide Content Area */}
+            <div className={`bg-gradient-to-br from-gray-50 via-white to-teal-50 rounded-xl border-2 border-gray-100 p-6 mb-6 min-h-[280px] relative overflow-hidden transition-all duration-300 ${isAnimating ? 'opacity-50 transform translate-x-2' : 'opacity-100 transform translate-x-0'}`}>
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-teal-100 to-transparent rounded-full transform translate-x-16 -translate-y-16 opacity-50"></div>
               
-              <div className="space-y-3">
-                {currentSlideData.content?.slice(0, 4).map((item: string, idx: number) => (
-                  <div key={idx} className="flex items-start">
-                    <div className="w-2 h-2 bg-teal-500 rounded-full mt-2.5 mr-4 flex-shrink-0"></div>
-                    <span className="text-sm sm:text-base text-gray-700 leading-relaxed">{item}</span>
+              <div className="relative z-10">
+                {/* Slide Header */}
+                <div className="flex items-start justify-between mb-6">
+                  <div className="flex-1">
+                    <h5 className="text-2xl font-bold text-gray-900 leading-tight mb-2">
+                      {currentSlideData.title}
+                    </h5>
+                    <div className="flex items-center space-x-3">
+                      <Badge variant="outline" className="border-teal-300 text-teal-700 bg-teal-50 px-3 py-1">
+                        {currentSlideData.layout || 'Standard'}
+                      </Badge>
+                      <span className="text-sm text-gray-500">
+                        Slide {currentSlideData.slideNumber}
+                      </span>
+                    </div>
                   </div>
-                ))}
-                {currentSlideData.content?.length > 4 && (
-                  <p className="text-sm text-teal-600 ml-6 font-medium">
-                    +{currentSlideData.content.length - 4} more points...
-                  </p>
+                </div>
+                
+                {/* Content with better typography */}
+                <div className="space-y-4">
+                  {currentSlideData.content?.map((item: string, idx: number) => (
+                    <div key={idx} className="flex items-start group">
+                      <div className="w-3 h-3 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-full mt-2 mr-4 flex-shrink-0 shadow-sm group-hover:scale-110 transition-transform duration-200"></div>
+                      <span className="text-base text-gray-800 leading-relaxed font-medium">
+                        {item}
+                      </span>
+                    </div>
+                  ))}
+                  
+                  {currentSlideData.content?.length > 5 && (
+                    <div className="ml-7 mt-4">
+                      <p className="text-sm text-teal-600 font-medium bg-teal-50 px-3 py-2 rounded-lg inline-block">
+                        +{currentSlideData.content.length - 5} more points in full view
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Speaker Notes Preview */}
+                {currentSlideData.speakerNotes && (
+                  <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+                    <h6 className="text-sm font-semibold text-blue-800 mb-2 flex items-center">
+                      <FileText className="h-4 w-4 mr-2" />
+                      Speaker Notes
+                    </h6>
+                    <p className="text-sm text-blue-700 leading-relaxed">
+                      {currentSlideData.speakerNotes.substring(0, 120)}
+                      {currentSlideData.speakerNotes.length > 120 && '...'}
+                    </p>
+                  </div>
                 )}
               </div>
             </div>
 
-            {/* Navigation */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
-              <div className="flex items-center space-x-3">
+            {/* Enhanced Navigation */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-6 mb-6">
+              {/* Navigation Controls */}
+              <div className="flex items-center space-x-4">
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setCurrentSlide(Math.max(0, currentSlide - 1))}
-                  disabled={currentSlide === 0}
-                  className="border-teal-300 text-teal-700 hover:bg-teal-50 disabled:opacity-50"
+                  onClick={() => handleSlideChange('prev')}
+                  disabled={currentSlide === 0 || isAnimating}
+                  className="border-2 border-teal-300 text-teal-700 hover:bg-teal-50 disabled:opacity-50 transition-all duration-200 hover:scale-105 px-4 py-2"
                 >
                   <ArrowRight className="h-4 w-4 rotate-180 mr-2" />
                   Previous
                 </Button>
                 
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm font-medium text-gray-600">
-                    {currentSlide + 1} of {slides.length}
+                {/* Slide Indicators */}
+                <div className="flex items-center space-x-3 px-4 py-2 bg-gray-100 rounded-xl">
+                  <span className="text-sm font-bold text-gray-700">
+                    {currentSlide + 1} / {slides.length}
                   </span>
-                  <div className="flex space-x-1">
-                    {slides.slice(0, 6).map((_slide: any, index: number) => (
+                  <div className="flex space-x-1.5">
+                    {slides.slice(0, 8).map((_slide: any, index: number) => (
                       <button
                         key={index}
-                        onClick={() => setCurrentSlide(index)}
-                        className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                        onClick={() => !isAnimating && setCurrentSlide(index)}
+                        disabled={isAnimating}
+                        className={`w-3 h-3 rounded-full transition-all duration-200 hover:scale-125 ${
                           currentSlide === index 
-                            ? 'bg-teal-500 scale-125' 
+                            ? 'bg-gradient-to-r from-teal-500 to-emerald-500 shadow-lg scale-125' 
                             : 'bg-gray-300 hover:bg-teal-300'
                         }`}
                       />
                     ))}
-                    {slides.length > 6 && (
-                      <span className="text-xs text-gray-400 ml-1">...</span>
+                    {slides.length > 8 && (
+                      <span className="text-xs text-gray-400 ml-2">+{slides.length - 8}</span>
                     )}
                   </div>
                 </div>
@@ -2387,36 +3125,36 @@ Please structure this as a ready-to-deliver training course that someone could u
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setCurrentSlide(Math.min(slides.length - 1, currentSlide + 1))}
-                  disabled={currentSlide === slides.length - 1}
-                  className="border-teal-300 text-teal-700 hover:bg-teal-50 disabled:opacity-50"
+                  onClick={() => handleSlideChange('next')}
+                  disabled={currentSlide === slides.length - 1 || isAnimating}
+                  className="border-2 border-teal-300 text-teal-700 hover:bg-teal-50 disabled:opacity-50 transition-all duration-200 hover:scale-105 px-4 py-2"
                 >
                   Next
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
               </div>
-              
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowFullPresentation(true)}
-                className="border-teal-300 text-teal-700 hover:bg-teal-50 font-medium"
-              >
-                <Presentation className="h-4 w-4 mr-2" />
-                View Full Screen
-              </Button>
             </div>
 
-            {/* Quick Actions */}
-            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            {/* Enhanced Action Buttons */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               <Button
                 size="sm"
                 onClick={() => setShowFullPresentation(true)}
-                className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+                className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 py-3"
               >
                 <Presentation className="h-4 w-4 mr-2" />
-                Present Slides
+                Present Mode
               </Button>
+              
+              <Button
+                size="sm"
+                onClick={() => setShowEditablePresentation(true)}
+                className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 py-3"
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                Edit Slides
+              </Button>
+              
               <Button
                 size="sm"
                 variant="outline"
@@ -2424,10 +3162,23 @@ Please structure this as a ready-to-deliver training course that someone could u
                   const jsonStr = JSON.stringify(parsedPresentation, null, 2);
                   navigator.clipboard.writeText(jsonStr);
                 }}
-                className="border-teal-300 text-teal-700 hover:bg-teal-50 font-medium"
+                className="border-2 border-emerald-300 text-emerald-700 hover:bg-emerald-50 font-semibold transition-all duration-200 hover:scale-105 py-3"
               >
                 <Copy className="h-4 w-4 mr-2" />
-                Copy JSON
+                Copy Data
+              </Button>
+              
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  // Export functionality
+                  console.log('Export presentation');
+                }}
+                className="border-2 border-cyan-300 text-cyan-700 hover:bg-cyan-50 font-semibold transition-all duration-200 hover:scale-105 py-3"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Export
               </Button>
             </div>
           </div>
