@@ -1358,90 +1358,135 @@ const EditableSlidePresentation = ({
     })
   );
 
-  const currentSlideData = editableSlides[currentSlide];
-
-  const handleDragEnd = (event: any) => {
+  // Enhanced drag handler with grid snapping and history
+  const handleDragEnd = useCallback((event: any) => {
     const { active, delta } = event;
     
-    setEditableSlides(prev => prev.map((slide, idx) => {
-      if (idx === currentSlide) {
-        return {
-          ...slide,
-          elements: slide.elements.map((element: any) => 
-            element.id === active.id 
-              ? {
-                  ...element,
-                  style: {
-                    ...element.style,
-                    top: element.style.top + delta.y,
-                    left: element.style.left + delta.x,
+    setEditableSlides(prev => {
+      const newSlides = prev.map((slide, idx) => {
+        if (idx === currentSlide) {
+          return {
+            ...slide,
+            elements: slide.elements.map((element: any) => 
+              element.id === active.id 
+                ? {
+                    ...element,
+                    style: {
+                      ...element.style,
+                      top: snapToGridPosition(Math.max(0, element.style.top + delta.y)),
+                      left: snapToGridPosition(Math.max(0, element.style.left + delta.x)),
+                    }
                   }
-                }
-              : element
-          )
-        };
-      }
-      return slide;
-    }));
-  };
+                : element
+            )
+          };
+        }
+        return slide;
+      });
+      
+      // Add to history for undo functionality
+      addToHistory(newSlides);
+      addToast('Element moved', 'info');
+      
+      return newSlides;
+    });
+  }, [currentSlide, snapToGridPosition, addToHistory, addToast]);
 
-  const updateElement = (id: string, updates: any) => {
-    setEditableSlides(prev => prev.map((slide, idx) => {
-      if (idx === currentSlide) {
-        return {
-          ...slide,
-          elements: slide.elements.map((element: any) => 
-            element.id === id ? { ...element, ...updates } : element
-          )
-        };
+  // Enhanced handlers with history tracking
+  const updateElement = useCallback((id: string, updates: any) => {
+    setEditableSlides(prev => {
+      const newSlides = prev.map((slide, idx) => {
+        if (idx === currentSlide) {
+          return {
+            ...slide,
+            elements: slide.elements.map((element: any) => 
+              element.id === id ? { ...element, ...updates } : element
+            )
+          };
+        }
+        return slide;
+      });
+      
+      // Only add to history for significant changes (not text updates)
+      if (updates.style) {
+        addToHistory(newSlides);
       }
-      return slide;
-    }));
-  };
+      
+      return newSlides;
+    });
+  }, [currentSlide, addToHistory]);
 
-  const deleteElement = (id: string) => {
-    setEditableSlides(prev => prev.map((slide, idx) => {
-      if (idx === currentSlide) {
-        return {
-          ...slide,
-          elements: slide.elements.filter((element: any) => element.id !== id)
-        };
-      }
-      return slide;
-    }));
+  const deleteElement = useCallback((id: string) => {
+    setEditableSlides(prev => {
+      const newSlides = prev.map((slide, idx) => {
+        if (idx === currentSlide) {
+          return {
+            ...slide,
+            elements: slide.elements.filter((element: any) => element.id !== id)
+          };
+        }
+        return slide;
+      });
+      
+      addToHistory(newSlides);
+      addToast('Element deleted', 'info');
+      
+      return newSlides;
+    });
     setSelectedElement(null);
-  };
+  }, [currentSlide, addToHistory, addToast]);
 
-  const addTextElement = () => {
+  const addTextElement = useCallback(() => {
     const newElement = {
       id: `text-${Date.now()}`,
       type: 'text',
       text: 'New text element',
       style: {
-        top: 200,
-        left: 100,
+        top: snapToGridPosition(200),
+        left: snapToGridPosition(100),
         fontSize: '18px',
         fontWeight: 'normal',
         color: '#374151'
       }
     };
 
-    setEditableSlides(prev => prev.map((slide, idx) => {
-      if (idx === currentSlide) {
-        return {
-          ...slide,
-          elements: [...slide.elements, newElement]
-        };
-      }
-      return slide;
-    }));
+    setEditableSlides(prev => {
+      const newSlides = prev.map((slide, idx) => {
+        if (idx === currentSlide) {
+          return {
+            ...slide,
+            elements: [...slide.elements, newElement]
+          };
+        }
+        return slide;
+      });
+      
+      addToHistory(newSlides);
+      addToast('Text element added', 'success');
+      
+      return newSlides;
+    });
     
     setSelectedElement(newElement.id);
-  };
+  }, [currentSlide, snapToGridPosition, addToHistory, addToast]);
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        addToast('Image too large. Please select an image under 5MB.', 'error');
+        return;
+      }
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        addToast('Please select a valid image file.', 'error');
+        return;
+      }
+
+      addToast('Uploading image...', 'info');
+      
       const reader = new FileReader();
       reader.onload = (e) => {
         const newElement = {
@@ -1449,41 +1494,60 @@ const EditableSlidePresentation = ({
           type: 'image',
           src: e.target?.result as string,
           style: {
-            top: 150,
-            left: 300,
+            top: snapToGridPosition(150),
+            left: snapToGridPosition(300),
             width: '200px',
             height: 'auto'
           }
         };
 
-        setEditableSlides(prev => prev.map((slide, idx) => {
-          if (idx === currentSlide) {
-            return {
-              ...slide,
-              elements: [...slide.elements, newElement]
-            };
-          }
-          return slide;
-        }));
+        setEditableSlides(prev => {
+          const newSlides = prev.map((slide, idx) => {
+            if (idx === currentSlide) {
+              return {
+                ...slide,
+                elements: [...slide.elements, newElement]
+              };
+            }
+            return slide;
+          });
+          
+          addToHistory(newSlides);
+          addToast('Image added successfully', 'success');
+          
+          return newSlides;
+        });
         
         setSelectedElement(newElement.id);
       };
+      
+      reader.onerror = () => {
+        addToast('Failed to load image. Please try again.', 'error');
+      };
+      
       reader.readAsDataURL(file);
     }
-  };
+  }, [currentSlide, snapToGridPosition, addToHistory, addToast]);
 
-  const handleSave = () => {
-    // Convert back to original slide format
-    const updatedSlides = editableSlides.map(slide => ({
-      ...slide,
-      title: slide.elements.find((el: any) => el.id.startsWith('title-'))?.text || slide.title,
-      content: slide.elements
-        .filter((el: any) => el.id.startsWith('content-') && el.type === 'text')
-        .map((el: any) => el.text.replace(/^• /, ''))
-    }));
-    
-    onSave(updatedSlides);
-  };
+  const handleSave = useCallback(() => {
+    try {
+      // Convert back to original slide format
+      const updatedSlides = editableSlides.map(slide => ({
+        ...slide,
+        title: slide.elements.find((el: any) => el.id.startsWith('title-'))?.text || slide.title,
+        content: slide.elements
+          .filter((el: any) => el.id.startsWith('content-') && el.type === 'text')
+          .map((el: any) => el.text.replace(/^• /, ''))
+      }));
+      
+      onSave(updatedSlides);
+      addToast('Presentation saved successfully!', 'success');
+      setLastSaved(new Date());
+    } catch (error) {
+      addToast('Failed to save presentation. Please try again.', 'error');
+      console.error('Save error:', error);
+    }
+  }, [editableSlides, onSave, addToast]);
 
   return (
     <div className="fixed inset-0 z-50 bg-gray-100 flex flex-col">
@@ -1538,6 +1602,30 @@ const EditableSlidePresentation = ({
                 <div className="flex items-center space-x-3">
                   <Button
                     size="sm"
+                    onClick={undo}
+                    disabled={!canUndo}
+                    className="bg-gray-600 hover:bg-gray-700 text-white disabled:opacity-50"
+                    title="Undo (Ctrl+Z)"
+                  >
+                    <RotateCcw className="h-4 w-4 mr-2" />
+                    Undo
+                  </Button>
+                  
+                  <Button
+                    size="sm"
+                    onClick={redo}
+                    disabled={!canRedo}
+                    className="bg-gray-600 hover:bg-gray-700 text-white disabled:opacity-50"
+                    title="Redo (Ctrl+Y)"
+                  >
+                    <RotateCcw className="h-4 w-4 mr-2 scale-x-[-1]" />
+                    Redo
+                  </Button>
+                  
+                  <div className="h-6 w-px bg-gray-300"></div>
+
+                  <Button
+                    size="sm"
                     onClick={addTextElement}
                     className="bg-blue-600 hover:bg-blue-700 text-white"
                   >
@@ -1564,9 +1652,38 @@ const EditableSlidePresentation = ({
                   
                   <div className="h-6 w-px bg-gray-300"></div>
                   
-                  <span className="text-sm text-gray-600">
-                    Double-click to edit text • Drag to move elements
-                  </span>
+                  <Button
+                    size="sm"
+                    onClick={() => setShowGrid(!showGrid)}
+                    className={`${showGrid ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-600 hover:bg-gray-700'} text-white`}
+                  >
+                    <MousePointer className="h-4 w-4 mr-2" />
+                    Grid
+                  </Button>
+                  
+                  <Button
+                    size="sm"
+                    onClick={() => setSnapToGrid(!snapToGrid)}
+                    className={`${snapToGrid ? 'bg-orange-600 hover:bg-orange-700' : 'bg-gray-600 hover:bg-gray-700'} text-white`}
+                  >
+                    <Target className="h-4 w-4 mr-2" />
+                    Snap
+                  </Button>
+                  
+                  <div className="h-6 w-px bg-gray-300"></div>
+                  
+                  <div className="flex items-center space-x-2 text-sm text-gray-600">
+                    <span>Double-click to edit • Drag to move • Right-click for menu</span>
+                    {isAutoSaving && (
+                      <div className="flex items-center space-x-1 text-blue-600">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                        <span>Saving...</span>
+                      </div>
+                    )}
+                    <span className="text-xs text-gray-500">
+                      Last saved: {lastSaved.toLocaleTimeString()}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="flex items-center space-x-2">
@@ -1646,48 +1763,97 @@ const EditableSlidePresentation = ({
               collisionDetection={closestCenter}
               onDragEnd={handleDragEnd}
             >
-              <div 
-                className="w-full h-full bg-white rounded-lg shadow-xl relative overflow-hidden"
-                onClick={() => setSelectedElement(null)}
-              >
-                <SortableContext items={currentSlideData?.elements?.map((el: any) => el.id) || []}>
-                  {currentSlideData?.elements?.map((element: any) => (
-                    element.type === 'text' ? (
-                      <DraggableText
-                        key={element.id}
-                        id={element.id}
-                        text={element.text}
-                        style={element.style}
-                        onUpdate={updateElement}
-                        onDelete={deleteElement}
-                        isSelected={selectedElement === element.id}
-                        onSelect={setSelectedElement}
-                      />
-                    ) : (
-                      <DraggableImage
-                        key={element.id}
-                        id={element.id}
-                        src={element.src}
-                        style={element.style}
-                        onUpdate={updateElement}
-                        onDelete={deleteElement}
-                        isSelected={selectedElement === element.id}
-                        onSelect={setSelectedElement}
-                      />
-                    )
-                  ))}
-                </SortableContext>
+                              <div 
+                  ref={canvasRef}
+                  className="w-full h-full bg-white rounded-lg shadow-xl relative overflow-hidden"
+                  onClick={() => setSelectedElement(null)}
+                >
+                  {/* Grid Overlay */}
+                  {showGrid && (
+                    <div 
+                      className="absolute inset-0 pointer-events-none opacity-30"
+                      style={{
+                        backgroundImage: `
+                          linear-gradient(to right, #e5e7eb 1px, transparent 1px),
+                          linear-gradient(to bottom, #e5e7eb 1px, transparent 1px)
+                        `,
+                        backgroundSize: `${gridSize}px ${gridSize}px`
+                      }}
+                    />
+                  )}
 
-                {/* Canvas Guidelines */}
-                <div className="absolute inset-0 pointer-events-none">
-                  <div className="absolute top-1/2 left-0 right-0 h-px bg-blue-200 opacity-20"></div>
-                  <div className="absolute left-1/2 top-0 bottom-0 w-px bg-blue-200 opacity-20"></div>
+                  <SortableContext items={currentSlideData?.elements?.map((el: any) => el.id) || []}>
+                    <PresentationErrorBoundary>
+                      {currentSlideData?.elements?.map((element: any) => (
+                        element.type === 'text' ? (
+                          <DraggableText
+                            key={element.id}
+                            id={element.id}
+                            text={element.text}
+                            style={element.style}
+                            onUpdate={updateElement}
+                            onDelete={deleteElement}
+                            isSelected={selectedElement === element.id}
+                            onSelect={setSelectedElement}
+                          />
+                        ) : (
+                          <DraggableImage
+                            key={element.id}
+                            id={element.id}
+                            src={element.src}
+                            style={element.style}
+                            onUpdate={updateElement}
+                            onDelete={deleteElement}
+                            isSelected={selectedElement === element.id}
+                            onSelect={setSelectedElement}
+                          />
+                        )
+                      ))}
+                    </PresentationErrorBoundary>
+                  </SortableContext>
+
+                  {/* Enhanced Canvas Guidelines */}
+                  <div className="absolute inset-0 pointer-events-none">
+                    <div className="absolute top-1/2 left-0 right-0 h-px bg-blue-300 opacity-30"></div>
+                    <div className="absolute left-1/2 top-0 bottom-0 w-px bg-blue-300 opacity-30"></div>
+                    
+                    {/* Corner indicators */}
+                    <div className="absolute top-4 left-4 w-2 h-2 border-l-2 border-t-2 border-gray-300"></div>
+                    <div className="absolute top-4 right-4 w-2 h-2 border-r-2 border-t-2 border-gray-300"></div>
+                    <div className="absolute bottom-4 left-4 w-2 h-2 border-l-2 border-b-2 border-gray-300"></div>
+                    <div className="absolute bottom-4 right-4 w-2 h-2 border-r-2 border-b-2 border-gray-300"></div>
+                  </div>
                 </div>
-              </div>
             </DndContext>
           </div>
         </div>
       </div>
+
+      {/* Toast Notifications */}
+      <AnimatePresence>
+        {toasts.map((toast) => (
+          <motion.div
+            key={toast.id}
+            initial={{ opacity: 0, y: 50, x: '50%' }}
+            animate={{ opacity: 1, y: 0, x: '50%' }}
+            exit={{ opacity: 0, y: 50, x: '50%' }}
+            className={`
+              fixed bottom-4 left-1/2 transform -translate-x-1/2 z-[10000]
+              px-4 py-2 rounded-lg shadow-lg max-w-sm mx-auto
+              ${toast.type === 'success' ? 'bg-green-600 text-white' : 
+                toast.type === 'error' ? 'bg-red-600 text-white' : 
+                'bg-blue-600 text-white'}
+            `}
+          >
+            <div className="flex items-center space-x-2">
+              {toast.type === 'success' && <CheckCircle className="h-4 w-4" />}
+              {toast.type === 'error' && <X className="h-4 w-4" />}
+              {toast.type === 'info' && <Zap className="h-4 w-4" />}
+              <span className="text-sm font-medium">{toast.message}</span>
+            </div>
+          </motion.div>
+        ))}
+      </AnimatePresence>
     </div>
   );
 };
@@ -3571,19 +3737,21 @@ Please structure this as a ready-to-deliver training course that someone could u
 
     if (showEditablePresentation) {
       return (
-        <EditableSlidePresentation
-          slides={slides}
-          onClose={() => setShowEditablePresentation(false)}
-          presentationTitle={parsedPresentation.title}
-          onSave={(updatedSlides) => {
-            // Update the presentation data
-            setParsedPresentation({
-              ...parsedPresentation,
-              slides: updatedSlides
-            });
-            setShowEditablePresentation(false);
-          }}
-        />
+        <PresentationErrorBoundary>
+          <EditableSlidePresentation
+            slides={slides}
+            onClose={() => setShowEditablePresentation(false)}
+            presentationTitle={parsedPresentation.title}
+            onSave={(updatedSlides) => {
+              // Update the presentation data
+              setParsedPresentation({
+                ...parsedPresentation,
+                slides: updatedSlides
+              });
+              setShowEditablePresentation(false);
+            }}
+          />
+        </PresentationErrorBoundary>
       );
     }
 
