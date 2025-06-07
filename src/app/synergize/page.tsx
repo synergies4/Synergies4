@@ -1940,6 +1940,27 @@ const EditableSlidePresentation = ({
     }
   }, [debouncedSlides]);
 
+  // Enhanced handlers with history tracking - moved before useEffect
+  const deleteElement = useCallback((id: string) => {
+    setEditableSlides(prev => {
+      const newSlides = prev.map((slide, idx) => {
+        if (idx === currentSlide) {
+          return {
+            ...slide,
+            elements: slide.elements.filter((element: any) => element.id !== id)
+          };
+        }
+        return slide;
+      });
+      
+      addToHistory(newSlides);
+      addToast('Element deleted', 'info');
+      
+      return newSlides;
+    });
+    setSelectedElement(null);
+  }, [currentSlide, addToHistory, addToast]);
+
   // Global keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -2065,26 +2086,6 @@ const EditableSlidePresentation = ({
       return newSlides;
     });
   }, [currentSlide, addToHistory]);
-
-  const deleteElement = useCallback((id: string) => {
-    setEditableSlides(prev => {
-      const newSlides = prev.map((slide, idx) => {
-        if (idx === currentSlide) {
-          return {
-            ...slide,
-            elements: slide.elements.filter((element: any) => element.id !== id)
-          };
-        }
-        return slide;
-      });
-      
-      addToHistory(newSlides);
-      addToast('Element deleted', 'info');
-      
-      return newSlides;
-    });
-    setSelectedElement(null);
-  }, [currentSlide, addToHistory, addToast]);
 
   const addTextElement = useCallback(() => {
     // Find a good position for the new element
