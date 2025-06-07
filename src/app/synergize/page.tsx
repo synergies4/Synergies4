@@ -591,7 +591,8 @@ const DraggableText = React.memo(({
   onUpdate, 
   onDelete, 
   isSelected, 
-  onSelect 
+  onSelect,
+  isMobile = false
 }: {
   id: string;
   text: string;
@@ -600,6 +601,7 @@ const DraggableText = React.memo(({
   onDelete: (id: string) => void;
   isSelected: boolean;
   onSelect: (id: string) => void;
+  isMobile?: boolean;
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(text);
@@ -750,11 +752,13 @@ const DraggableText = React.memo(({
           willChange: 'transform', // GPU acceleration
         }}
         className={`
-          ${style.background ? 'p-0' : 'p-3'} rounded-lg transition-all duration-200 select-none
+          ${style.background ? 'p-0' : isMobile ? 'p-4' : 'p-3'} rounded-lg transition-all duration-200 select-none 
+          ${isMobile ? 'touch-manipulation' : ''}
           ${isSelected && !style.background ? 'ring-2 ring-blue-500 shadow-lg bg-blue-50/50' : 'hover:shadow-md'}
           ${isDragging ? 'opacity-75 shadow-2xl' : 'opacity-100'}
           ${isEditing ? 'bg-white border-2 border-blue-400' : style.background ? '' : 'bg-white/90 backdrop-blur-sm border border-gray-200'}
           ${text || style.background ? '' : 'border-dashed border-gray-300 bg-gray-50'}
+          ${isMobile ? 'min-h-[44px] min-w-[44px]' : ''}
         `}
         onClick={() => onSelect(id)}
         onDoubleClick={handleDoubleClick}
@@ -838,10 +842,10 @@ const DraggableText = React.memo(({
               <div className="absolute -top-1 -left-1 w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
             )}
             
-            {/* Action buttons - only show for text content, not background elements */}
+            {/* Enhanced Mobile-Friendly Action buttons */}
             {isSelected && (text || !style.background) && (
               <motion.div 
-                className="absolute -top-2 -right-2 flex space-x-1"
+                className={`absolute ${isMobile ? '-top-3 -right-3' : '-top-2 -right-2'} flex ${isMobile ? 'flex-col space-y-1' : 'space-x-1'}`}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={ANIMATION_CONFIG}
@@ -854,10 +858,11 @@ const DraggableText = React.memo(({
                       e.stopPropagation();
                       handleDoubleClick();
                     }}
-                    className="h-6 w-6 p-0 bg-blue-500 hover:bg-blue-600 text-white"
+                    className={`${isMobile ? 'h-8 w-8' : 'h-6 w-6'} p-0 bg-blue-500 hover:bg-blue-600 text-white shadow-lg touch-manipulation`}
                     aria-label="Edit text"
+                    title="Edit text"
                   >
-                    <Edit className="h-3 w-3" />
+                    <Edit className={`${isMobile ? 'h-4 w-4' : 'h-3 w-3'}`} />
                   </Button>
                 )}
                 <Button 
@@ -867,10 +872,11 @@ const DraggableText = React.memo(({
                     e.stopPropagation();
                     onDelete(id);
                   }}
-                  className="h-6 w-6 p-0"
+                  className={`${isMobile ? 'h-8 w-8' : 'h-6 w-6'} p-0 shadow-lg touch-manipulation`}
                   aria-label="Delete text element"
+                  title="Delete element"
                 >
-                  <Trash className="h-3 w-3" />
+                  <Trash className={`${isMobile ? 'h-4 w-4' : 'h-3 w-3'}`} />
                 </Button>
               </motion.div>
             )}
@@ -941,7 +947,8 @@ const DraggableImage = React.memo(({
   onUpdate, 
   onDelete, 
   isSelected, 
-  onSelect 
+  onSelect,
+  isMobile = false
 }: {
   id: string;
   src: string;
@@ -950,6 +957,7 @@ const DraggableImage = React.memo(({
   onDelete: (id: string) => void;
   isSelected: boolean;
   onSelect: (id: string) => void;
+  isMobile?: boolean;
 }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
@@ -1358,6 +1366,19 @@ const EditableSlidePresentation = ({
   const [isAutoSaving, setIsAutoSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date>(new Date());
   const [gridSize] = useState(20);
+  const [showMobileFAB, setShowMobileFAB] = useState(false);
+  
+  // Check for mobile
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   
   // Undo/Redo functionality
   const [history, setHistory] = useState<any[]>([editableSlides]);
@@ -1733,96 +1754,160 @@ const EditableSlidePresentation = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-gray-100 flex flex-col">
-      {/* Enhanced Editor Header */}
+      {/* Mobile-Optimized Editor Header */}
       <div className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="flex items-center justify-between p-4">
-          <div className="flex items-center space-x-4">
+        <div className={`flex items-center justify-between ${isMobile ? 'p-3' : 'p-4'}`}>
+          <div className="flex items-center space-x-2 flex-1 min-w-0">
             <Button
               variant="ghost"
               size="sm"
               onClick={onClose}
-              className="text-gray-600 hover:text-gray-800"
+              className={`text-gray-600 hover:text-gray-800 ${isMobile ? 'min-h-[44px] min-w-[44px] p-2' : ''} touch-manipulation`}
+              title="Close editor"
             >
-              <ArrowRight className="h-4 w-4 rotate-180 mr-2" />
-              Back
+              <ArrowRight className={`${isMobile ? 'h-5 w-5' : 'h-4 w-4'} rotate-180 ${isMobile ? '' : 'mr-2'}`} />
+              {!isMobile && <span>Back</span>}
             </Button>
-            <div className="h-6 w-px bg-gray-300"></div>
-            <h1 className="text-lg font-semibold text-gray-900">{presentationTitle}</h1>
-            <Badge className="bg-purple-100 text-purple-800">Editor Mode</Badge>
+            {!isMobile && <div className="h-6 w-px bg-gray-300"></div>}
+            <h1 className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold text-gray-900 truncate`}>{presentationTitle}</h1>
+            {!isMobile && <Badge className="bg-purple-100 text-purple-800">Editor Mode</Badge>}
           </div>
 
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowToolbar(!showToolbar)}
-              className="text-gray-600"
-            >
-              {showToolbar ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
-            </Button>
+          <div className="flex items-center space-x-2 flex-shrink-0">
+            {!isMobile && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowToolbar(!showToolbar)}
+                className="text-gray-600"
+                title="Toggle toolbar"
+              >
+                {showToolbar ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
+              </Button>
+            )}
             <Button
               size="sm"
               onClick={handleSave}
-              className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white"
+              className={`bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white ${isMobile ? 'min-h-[44px] px-4' : ''} touch-manipulation font-semibold`}
+              title="Save changes"
             >
-              <Save className="h-4 w-4 mr-2" />
-              Save Changes
+              <Save className={`${isMobile ? 'h-5 w-5' : 'h-4 w-4'} ${isMobile ? '' : 'mr-2'}`} />
+              {!isMobile && <span>Save Changes</span>}
             </Button>
           </div>
         </div>
 
-        {/* Floating Toolbar */}
+        {/* Enhanced Mobile/Desktop Toolbar */}
         <AnimatePresence>
-          {showToolbar && (
+          {(showToolbar || isMobile) && (
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="border-t border-gray-200 p-3 bg-gray-50"
+              className={`border-t border-gray-200 ${isMobile ? 'p-2' : 'p-3'} bg-gray-50`}
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <Button
-                    size="sm"
-                    onClick={undo}
-                    disabled={!canUndo}
-                    className="bg-gray-600 hover:bg-gray-700 text-white disabled:opacity-50"
-                    title="Undo (Ctrl+Z)"
-                  >
-                    <RotateCcw className="h-4 w-4 mr-2" />
-                    Undo
-                  </Button>
+              {isMobile ? (
+                /* Mobile Toolbar Layout */
+                <div className="space-y-3">
+                  {/* Action buttons row */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button
+                      size="sm"
+                      onClick={addTextElement}
+                      className="bg-blue-600 hover:bg-blue-700 text-white min-h-[44px] touch-manipulation"
+                      title="Add text element"
+                    >
+                      <Type className="h-5 w-5 mr-2" />
+                      Add Text
+                    </Button>
+                    
+                    <Button
+                      size="sm"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="bg-green-600 hover:bg-green-700 text-white min-h-[44px] touch-manipulation"
+                      title="Add image"
+                    >
+                      <ImageIcon className="h-5 w-5 mr-2" />
+                      Add Image
+                    </Button>
+                  </div>
                   
-                  <Button
-                    size="sm"
-                    onClick={redo}
-                    disabled={!canRedo}
-                    className="bg-gray-600 hover:bg-gray-700 text-white disabled:opacity-50"
-                    title="Redo (Ctrl+Y)"
-                  >
-                    <RotateCcw className="h-4 w-4 mr-2 scale-x-[-1]" />
-                    Redo
-                  </Button>
+                  {/* Controls row */}
+                  <div className="flex justify-between items-center">
+                    <div className="flex space-x-2">
+                      <Button
+                        size="sm"
+                        onClick={undo}
+                        disabled={!canUndo}
+                        className="bg-gray-600 hover:bg-gray-700 text-white disabled:opacity-50 min-h-[44px] min-w-[44px] touch-manipulation"
+                        title="Undo"
+                      >
+                        <RotateCcw className="h-5 w-5" />
+                      </Button>
+                      
+                      <Button
+                        size="sm"
+                        onClick={redo}
+                        disabled={!canRedo}
+                        className="bg-gray-600 hover:bg-gray-700 text-white disabled:opacity-50 min-h-[44px] min-w-[44px] touch-manipulation"
+                        title="Redo"
+                      >
+                        <RotateCcw className="h-5 w-5 scale-x-[-1]" />
+                      </Button>
+                      
+                      <Button
+                        size="sm"
+                        onClick={() => setShowGrid(!showGrid)}
+                        className={`${showGrid ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-600 hover:bg-gray-700'} text-white min-h-[44px] min-w-[44px] touch-manipulation`}
+                        title="Toggle grid"
+                      >
+                        <MousePointer className="h-5 w-5" />
+                      </Button>
+                    </div>
+                    
+                    {/* Slide navigation */}
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentSlide(Math.max(0, currentSlide - 1))}
+                        disabled={currentSlide === 0}
+                        className="min-h-[44px] min-w-[44px] touch-manipulation"
+                        title="Previous slide"
+                      >
+                        <ArrowRight className="h-5 w-5 rotate-180" />
+                      </Button>
+                      
+                      <span className="text-sm font-medium text-gray-700 px-2">
+                        {currentSlide + 1}/{editableSlides.length}
+                      </span>
+                      
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentSlide(Math.min(editableSlides.length - 1, currentSlide + 1))}
+                        disabled={currentSlide === editableSlides.length - 1}
+                        className="min-h-[44px] min-w-[44px] touch-manipulation"
+                        title="Next slide"
+                      >
+                        <ArrowRight className="h-5 w-5" />
+                      </Button>
+                    </div>
+                  </div>
                   
-                  <div className="h-6 w-px bg-gray-300"></div>
-
-                  <Button
-                    size="sm"
-                    onClick={addTextElement}
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
-                  >
-                    <Type className="h-4 w-4 mr-2" />
-                    Add Text
-                  </Button>
-                  
-                  <Button
-                    size="sm"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="bg-green-600 hover:bg-green-700 text-white"
-                  >
-                    <ImageIcon className="h-4 w-4 mr-2" />
-                    Add Image
-                  </Button>
+                  {/* Status indicators */}
+                  <div className="flex justify-between items-center text-xs text-gray-500">
+                    <span>Tap to edit • Drag to move</span>
+                    <div className="flex items-center space-x-2">
+                      {isAutoSaving && (
+                        <div className="flex items-center space-x-1 text-blue-600">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                          <span>Saving...</span>
+                        </div>
+                      )}
+                      <span>Saved: {lastSaved.toLocaleTimeString()}</span>
+                    </div>
+                  </div>
                   
                   <input
                     ref={fileInputRef}
@@ -1831,67 +1916,122 @@ const EditableSlidePresentation = ({
                     onChange={handleImageUpload}
                     className="hidden"
                   />
-                  
-                  <div className="h-6 w-px bg-gray-300"></div>
-                  
-                  <Button
-                    size="sm"
-                    onClick={() => setShowGrid(!showGrid)}
-                    className={`${showGrid ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-600 hover:bg-gray-700'} text-white`}
-                  >
-                    <MousePointer className="h-4 w-4 mr-2" />
-                    Grid
-                  </Button>
-                  
-                  <Button
-                    size="sm"
-                    onClick={() => setSnapToGrid(!snapToGrid)}
-                    className={`${snapToGrid ? 'bg-orange-600 hover:bg-orange-700' : 'bg-gray-600 hover:bg-gray-700'} text-white`}
-                  >
-                    <Target className="h-4 w-4 mr-2" />
-                    Snap
-                  </Button>
-                  
-                  <div className="h-6 w-px bg-gray-300"></div>
-                  
-                  <div className="flex items-center space-x-2 text-sm text-gray-600">
-                    <span>Double-click to edit • Drag to move • Right-click for menu</span>
-                    {isAutoSaving && (
-                      <div className="flex items-center space-x-1 text-blue-600">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                        <span>Saving...</span>
-                      </div>
-                    )}
-                    <span className="text-xs text-gray-500">
-                      Last saved: {lastSaved.toLocaleTimeString()}
+                </div>
+              ) : (
+                /* Desktop Toolbar Layout */
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <Button
+                      size="sm"
+                      onClick={undo}
+                      disabled={!canUndo}
+                      className="bg-gray-600 hover:bg-gray-700 text-white disabled:opacity-50"
+                      title="Undo (Ctrl+Z)"
+                    >
+                      <RotateCcw className="h-4 w-4 mr-2" />
+                      Undo
+                    </Button>
+                    
+                    <Button
+                      size="sm"
+                      onClick={redo}
+                      disabled={!canRedo}
+                      className="bg-gray-600 hover:bg-gray-700 text-white disabled:opacity-50"
+                      title="Redo (Ctrl+Y)"
+                    >
+                      <RotateCcw className="h-4 w-4 mr-2 scale-x-[-1]" />
+                      Redo
+                    </Button>
+                    
+                    <div className="h-6 w-px bg-gray-300"></div>
+
+                    <Button
+                      size="sm"
+                      onClick={addTextElement}
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      <Type className="h-4 w-4 mr-2" />
+                      Add Text
+                    </Button>
+                    
+                    <Button
+                      size="sm"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      <ImageIcon className="h-4 w-4 mr-2" />
+                      Add Image
+                    </Button>
+                    
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                    />
+                    
+                    <div className="h-6 w-px bg-gray-300"></div>
+                    
+                    <Button
+                      size="sm"
+                      onClick={() => setShowGrid(!showGrid)}
+                      className={`${showGrid ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-600 hover:bg-gray-700'} text-white`}
+                    >
+                      <MousePointer className="h-4 w-4 mr-2" />
+                      Grid
+                    </Button>
+                    
+                    <Button
+                      size="sm"
+                      onClick={() => setSnapToGrid(!snapToGrid)}
+                      className={`${snapToGrid ? 'bg-orange-600 hover:bg-orange-700' : 'bg-gray-600 hover:bg-gray-700'} text-white`}
+                    >
+                      <Target className="h-4 w-4 mr-2" />
+                      Snap
+                    </Button>
+                    
+                    <div className="h-6 w-px bg-gray-300"></div>
+                    
+                    <div className="flex items-center space-x-2 text-sm text-gray-600">
+                      <span>Double-click to edit • Drag to move • Right-click for menu</span>
+                      {isAutoSaving && (
+                        <div className="flex items-center space-x-1 text-blue-600">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                          <span>Saving...</span>
+                        </div>
+                      )}
+                      <span className="text-xs text-gray-500">
+                        Last saved: {lastSaved.toLocaleTimeString()}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm font-medium text-gray-700">
+                      Slide {currentSlide + 1} of {editableSlides.length}
                     </span>
+                    
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentSlide(Math.max(0, currentSlide - 1))}
+                      disabled={currentSlide === 0}
+                    >
+                      <ArrowRight className="h-4 w-4 rotate-180" />
+                    </Button>
+                    
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentSlide(Math.min(editableSlides.length - 1, currentSlide + 1))}
+                      disabled={currentSlide === editableSlides.length - 1}
+                    >
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
-
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm font-medium text-gray-700">
-                    Slide {currentSlide + 1} of {editableSlides.length}
-                  </span>
-                  
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setCurrentSlide(Math.max(0, currentSlide - 1))}
-                    disabled={currentSlide === 0}
-                  >
-                    <ArrowRight className="h-4 w-4 rotate-180" />
-                  </Button>
-                  
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setCurrentSlide(Math.min(editableSlides.length - 1, currentSlide + 1))}
-                    disabled={currentSlide === editableSlides.length - 1}
-                  >
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
@@ -1899,37 +2039,45 @@ const EditableSlidePresentation = ({
 
       {/* Main Editor Area */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Slide Thumbnails */}
-        <div className="w-64 bg-white border-r border-gray-200 overflow-y-auto">
-          <div className="p-4">
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Slides</h3>
-            <div className="space-y-3">
+        {/* Slide Thumbnails - Mobile optimized */}
+        <div className={`${isMobile ? 'w-20' : 'w-64'} bg-white border-r border-gray-200 overflow-y-auto`}>
+          <div className={`${isMobile ? 'p-2' : 'p-4'}`}>
+            <h3 className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-700 mb-3 ${isMobile ? 'text-center' : ''}`}>
+              {isMobile ? 'Slides' : 'Slides'}
+            </h3>
+            <div className={`${isMobile ? 'space-y-2' : 'space-y-3'}`}>
               {editableSlides.map((slide, index) => (
                 <motion.div
                   key={index}
                   onClick={() => setCurrentSlide(index)}
                   className={`
-                    p-3 rounded-lg border-2 cursor-pointer transition-all duration-200
+                    ${isMobile ? 'p-1' : 'p-3'} rounded-lg border-2 cursor-pointer transition-all duration-200 touch-manipulation
                     ${currentSlide === index 
                       ? 'border-purple-500 bg-purple-50 shadow-md' 
                       : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
                     }
                   `}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                  whileHover={{ scale: isMobile ? 1.05 : 1.02 }}
+                  whileTap={{ scale: 0.95 }}
+                  title={`Slide ${slide.slideNumber}: ${slide.elements.find((el: any) => el.id.startsWith('title-'))?.text || slide.title}`}
                 >
-                  <div className="aspect-video bg-white border rounded border-gray-200 mb-2 relative overflow-hidden">
-                    <div className="absolute inset-2 text-xs">
-                      <div className="font-semibold text-gray-800 truncate text-[10px] leading-tight">
-                        {slide.elements.find((el: any) => el.id.startsWith('title-'))?.text || slide.title}
+                  <div className={`aspect-video bg-white border rounded border-gray-200 ${isMobile ? 'mb-1' : 'mb-2'} relative overflow-hidden`}>
+                    <div className={`absolute ${isMobile ? 'inset-1' : 'inset-2'} text-xs`}>
+                      <div className={`font-semibold text-gray-800 truncate ${isMobile ? 'text-[8px]' : 'text-[10px]'} leading-tight`}>
+                        {isMobile 
+                          ? slide.slideNumber
+                          : (slide.elements.find((el: any) => el.id.startsWith('title-'))?.text || slide.title)
+                        }
                       </div>
-                      <div className="text-gray-500 mt-1 text-[8px]">
-                        {slide.elements.filter((el: any) => el.type === 'text' && el.text && el.text.trim()).length} elements
-                      </div>
+                      {!isMobile && (
+                        <div className="text-gray-500 mt-1 text-[8px]">
+                          {slide.elements.filter((el: any) => el.type === 'text' && el.text && el.text.trim()).length} elements
+                        </div>
+                      )}
                     </div>
                   </div>
-                  <div className="text-xs font-medium text-gray-700">
-                    Slide {slide.slideNumber}
+                  <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-700 ${isMobile ? 'text-center' : ''}`}>
+                    {isMobile ? slide.slideNumber : `Slide ${slide.slideNumber}`}
                   </div>
                 </motion.div>
               ))}
@@ -1937,22 +2085,36 @@ const EditableSlidePresentation = ({
           </div>
         </div>
 
-        {/* Slide Canvas */}
-        <div className="flex-1 bg-gray-200 p-8 overflow-auto">
-          <div className="mx-auto" style={{ width: '800px', height: '600px' }}>
+        {/* Enhanced Mobile Slide Canvas */}
+        <div className={`flex-1 bg-gray-200 ${isMobile ? 'p-2' : 'p-8'} overflow-auto`}>
+          <div 
+            className="mx-auto"
+            style={{ 
+              width: isMobile ? '100%' : '800px', 
+              height: isMobile ? '70vh' : '600px',
+              maxWidth: isMobile ? '100%' : '800px'
+            }}
+          >
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}
               onDragEnd={handleDragEnd}
             >
-                              <div 
-                  ref={canvasRef}
-                  className="w-full h-full relative overflow-hidden rounded-lg shadow-xl bg-white"
-                  style={{
-                    border: '1px solid #e5e7eb'
-                  }}
-                  onClick={() => setSelectedElement(null)}
-                >
+              <div 
+                ref={canvasRef}
+                className={`w-full h-full relative overflow-hidden rounded-lg shadow-xl bg-white ${isMobile ? 'touch-manipulation' : ''}`}
+                style={{
+                  border: '1px solid #e5e7eb',
+                  touchAction: isMobile ? 'pan-x pan-y' : 'auto'
+                }}
+                onClick={() => setSelectedElement(null)}
+                onTouchStart={(e) => {
+                  // Prevent default behavior to avoid scrolling issues on mobile
+                  if (isMobile && e.touches.length === 1) {
+                    e.preventDefault();
+                  }
+                }}
+              >
                   {/* Grid Overlay */}
                   {showGrid && (
                     <div 
@@ -1980,6 +2142,7 @@ const EditableSlidePresentation = ({
                             onDelete={deleteElement}
                             isSelected={selectedElement === element.id}
                             onSelect={setSelectedElement}
+                            isMobile={isMobile}
                           />
                         ) : (
                           <DraggableImage
@@ -1991,6 +2154,7 @@ const EditableSlidePresentation = ({
                             onDelete={deleteElement}
                             isSelected={selectedElement === element.id}
                             onSelect={setSelectedElement}
+                            isMobile={isMobile}
                           />
                         )
                       ))}
@@ -2014,6 +2178,84 @@ const EditableSlidePresentation = ({
         </div>
       </div>
 
+      {/* Mobile Floating Action Button */}
+      {isMobile && (
+        <motion.div
+          className="fixed bottom-6 right-6 z-[1000]"
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
+          <div className="relative">
+            <Button
+              onClick={() => setShowMobileFAB(!showMobileFAB)}
+              className="w-14 h-14 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-xl touch-manipulation"
+              size="lg"
+              title="Editor actions"
+            >
+              {showMobileFAB ? <X className="h-6 w-6" /> : <Plus className="h-6 w-6" />}
+            </Button>
+            
+            <AnimatePresence>
+              {showMobileFAB && (
+                <motion.div
+                  className="absolute bottom-16 right-0 space-y-3"
+                  initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.8, y: 20 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                >
+                  <Button
+                    onClick={() => {
+                      addTextElement();
+                      setShowMobileFAB(false);
+                    }}
+                    className="w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg touch-manipulation"
+                    title="Add text"
+                  >
+                    <Type className="h-5 w-5" />
+                  </Button>
+                  
+                  <Button
+                    onClick={() => {
+                      fileInputRef.current?.click();
+                      setShowMobileFAB(false);
+                    }}
+                    className="w-12 h-12 rounded-full bg-green-600 hover:bg-green-700 text-white shadow-lg touch-manipulation"
+                    title="Add image"
+                  >
+                    <ImageIcon className="h-5 w-5" />
+                  </Button>
+                  
+                  <Button
+                    onClick={() => {
+                      undo();
+                      setShowMobileFAB(false);
+                    }}
+                    disabled={!canUndo}
+                    className="w-12 h-12 rounded-full bg-gray-600 hover:bg-gray-700 text-white shadow-lg disabled:opacity-50 touch-manipulation"
+                    title="Undo"
+                  >
+                    <RotateCcw className="h-5 w-5" />
+                  </Button>
+                  
+                  <Button
+                    onClick={() => {
+                      setShowGrid(!showGrid);
+                      setShowMobileFAB(false);
+                    }}
+                    className={`w-12 h-12 rounded-full ${showGrid ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-600 hover:bg-gray-700'} text-white shadow-lg touch-manipulation`}
+                    title="Toggle grid"
+                  >
+                    <MousePointer className="h-5 w-5" />
+                  </Button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </motion.div>
+      )}
+
       {/* Toast Notifications */}
       <AnimatePresence>
         {toasts.map((toast) => (
@@ -2023,7 +2265,7 @@ const EditableSlidePresentation = ({
             animate={{ opacity: 1, y: 0, x: '50%' }}
             exit={{ opacity: 0, y: 50, x: '50%' }}
             className={`
-              fixed bottom-4 left-1/2 transform -translate-x-1/2 z-[10000]
+              fixed ${isMobile ? 'bottom-28' : 'bottom-4'} left-1/2 transform -translate-x-1/2 z-[10000]
               px-4 py-2 rounded-lg shadow-lg max-w-sm mx-auto
               ${toast.type === 'success' ? 'bg-green-600 text-white' : 
                 toast.type === 'error' ? 'bg-red-600 text-white' : 
@@ -5512,38 +5754,42 @@ Format as a realistic conversation with clear speaker labels and include decisio
               </Card>
             </div>
 
-            {/* Chat Interface */}
+            {/* Enhanced Mobile-First Chat Interface */}
             <div className="mt-6">
-              <Card className="h-[500px] flex flex-col border-0 shadow-xl overflow-hidden relative">
-                <CardHeader className={`bg-gradient-to-r ${currentRole.color} text-white rounded-t-lg flex-shrink-0`}>
+              <Card className={`${isMobile ? 'h-[70vh] min-h-[500px]' : 'h-[500px]'} flex flex-col border-0 shadow-xl overflow-hidden relative`}>
+                <CardHeader className={`bg-gradient-to-r ${currentRole.color} text-white rounded-t-lg flex-shrink-0 ${isMobile ? 'p-4' : 'p-6'}`}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      {currentRole.icon}
+                      <div className={`${isMobile ? 'w-8 h-8' : 'w-6 h-6'} flex items-center justify-center`}>
+                        {currentRole.icon}
+                      </div>
                       <div>
-                        <CardTitle className="text-lg">{currentRole.name} Assistant</CardTitle>
-                        <p className="text-sm opacity-90">{currentMode.name}</p>
+                        <CardTitle className={`${isMobile ? 'text-xl' : 'text-lg'} font-bold`}>{currentRole.name} Assistant</CardTitle>
+                        <p className={`${isMobile ? 'text-base' : 'text-sm'} opacity-90`}>{currentMode.name}</p>
                       </div>
                     </div>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={clearChat}
-                      className="text-white hover:bg-white/20"
+                      className={`text-white hover:bg-white/20 ${isMobile ? 'min-h-[44px] min-w-[44px]' : ''} touch-manipulation`}
+                      title="Clear chat"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className={`${isMobile ? 'h-5 w-5' : 'h-4 w-4'}`} />
                     </Button>
                   </div>
                 </CardHeader>
 
                 <CardContent className="flex-1 flex flex-col p-0 min-h-0 overflow-hidden">
-                  {/* Messages */}
+                  {/* Enhanced Mobile Messages Area */}
                   <div 
-                    className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 min-h-0 overscroll-contain"
+                    className={`flex-1 overflow-y-auto ${isMobile ? 'p-3' : 'p-4'} space-y-4 bg-gray-50 min-h-0 overscroll-contain`}
                     data-chat-container="true"
                     style={{
                       WebkitOverflowScrolling: 'touch',
                       scrollBehavior: 'smooth',
-                      touchAction: 'manipulation'
+                      touchAction: 'pan-y pinch-zoom',
+                      overscrollBehavior: 'contain'
                     }}
                   >
                     {messages.length === 0 && (
@@ -5565,13 +5811,13 @@ Format as a realistic conversation with clear speaker labels and include decisio
                     {messages.map((message) => (
                       <div
                         key={message.id}
-                        className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                        className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'} ${isMobile ? 'px-1' : ''}`}
                       >
                         <div
-                          className={`max-w-[80%] rounded-lg p-4 break-words ${
+                          className={`${isMobile ? 'max-w-[85%]' : 'max-w-[80%]'} rounded-lg ${isMobile ? 'p-3' : 'p-4'} break-words shadow-sm ${
                             message.type === 'user'
-                              ? 'bg-teal-600 text-white'
-                              : 'bg-white border shadow-sm'
+                              ? 'bg-gradient-to-r from-teal-600 to-emerald-600 text-white'
+                              : 'bg-white border border-gray-200'
                           }`}
                         >
                           <div className="flex items-start space-x-3">
@@ -5739,75 +5985,121 @@ Format as a realistic conversation with clear speaker labels and include decisio
                           </div>
                         )}
                         
-                        {/* Chat Input */}
-                        <div className="flex space-x-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => fileInputRef.current?.click()}
-                            className={`flex-shrink-0 ${isMobile ? 'min-h-[48px] min-w-[48px]' : 'min-h-[44px] min-w-[44px]'} touch-manipulation`}
-                            title="Upload file"
-                            disabled={false}
-                          >
-                            <Upload className={`${isMobile ? 'h-5 w-5' : 'h-4 w-4'}`} />
-                          </Button>
-                          
-                          {speechSupported && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={isListening ? stopVoiceInput : startVoiceInput}
-                              className={`flex-shrink-0 ${isMobile ? 'min-h-[48px] min-w-[48px]' : 'min-h-[44px] min-w-[44px]'} touch-manipulation ${
-                                isListening ? 'bg-red-50 border-red-300 text-red-600' : ''
-                              }`}
-                              title={isListening ? "Stop voice input" : "Start voice input"}
-                              disabled={false}
-                            >
-                              {isListening ? 
-                                <MicOff className={`animate-pulse ${isMobile ? 'h-5 w-5' : 'h-4 w-4'}`} /> : 
-                                <Mic className={`${isMobile ? 'h-5 w-5' : 'h-4 w-4'}`} />
-                              }
-                            </Button>
+                        {/* Enhanced Mobile Chat Input */}
+                        <div className={`flex ${isMobile ? 'flex-col space-y-3' : 'space-x-2'}`}>
+                          {/* Mobile: Action buttons row */}
+                          {isMobile && (
+                            <div className="flex space-x-2 justify-center">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => fileInputRef.current?.click()}
+                                className="flex-1 min-h-[48px] touch-manipulation bg-white border-gray-300 hover:bg-gray-50"
+                                title="Upload file"
+                                disabled={false}
+                              >
+                                <Upload className="h-5 w-5 mr-2" />
+                                <span className="text-sm font-medium">Upload</span>
+                              </Button>
+                              
+                              {speechSupported && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={isListening ? stopVoiceInput : startVoiceInput}
+                                  className={`flex-1 min-h-[48px] touch-manipulation ${
+                                    isListening ? 'bg-red-50 border-red-300 text-red-600' : 'bg-white border-gray-300 hover:bg-gray-50'
+                                  }`}
+                                  title={isListening ? "Stop voice input" : "Start voice input"}
+                                  disabled={false}
+                                >
+                                  {isListening ? 
+                                    <MicOff className="animate-pulse h-5 w-5 mr-2" /> : 
+                                    <Mic className="h-5 w-5 mr-2" />
+                                  }
+                                  <span className="text-sm font-medium">
+                                    {isListening ? 'Stop' : 'Voice'}
+                                  </span>
+                                </Button>
+                              )}
+                            </div>
                           )}
                           
-                          <div className="flex-1 relative">
-                            <SelfContainedChatInput
-                              initialValue={inputMessage}
-                              onSubmit={handleSendMessage}
-                              placeholder={stableMainPlaceholder}
-                              disabled={stableDisabled}
-                              className={stableMainClassName}
-                              ref={inputMessageRef}
-                            />
-                            
-                            {/* Voice feedback indicator */}
-                            {isListening && (
-                              <div className={`absolute ${isMobile ? 'top-3 right-16' : 'top-2 right-14'} flex items-center space-x-1 text-red-600`}>
-                                <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
-                                <span className="text-xs">Listening...</span>
-                              </div>
-                            )}
-                          </div>
+                          {/* Desktop: Inline buttons */}
+                          {!isMobile && (
+                            <>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => fileInputRef.current?.click()}
+                                className="flex-shrink-0 min-h-[44px] min-w-[44px] touch-manipulation"
+                                title="Upload file"
+                                disabled={false}
+                              >
+                                <Upload className="h-4 w-4" />
+                              </Button>
+                              
+                              {speechSupported && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={isListening ? stopVoiceInput : startVoiceInput}
+                                  className={`flex-shrink-0 min-h-[44px] min-w-[44px] touch-manipulation ${
+                                    isListening ? 'bg-red-50 border-red-300 text-red-600' : ''
+                                  }`}
+                                  title={isListening ? "Stop voice input" : "Start voice input"}
+                                  disabled={false}
+                                >
+                                  {isListening ? 
+                                    <MicOff className="animate-pulse h-4 w-4" /> : 
+                                    <Mic className="h-4 w-4" />
+                                  }
+                                </Button>
+                              )}
+                            </>
+                          )}
                           
-                          <Button
-                            onClick={() => {
-                              // Use the input ref to submit if available, otherwise fallback to handleSendMessage
-                              if (inputMessageRef.current && (inputMessageRef.current as any).hasValue?.()) {
-                                (inputMessageRef.current as any).submit?.();
-                              } else if (files.length > 0) {
-                                handleSendMessage('');
-                              }
-                            }}
-                            disabled={isLoading}
-                            className={`flex-shrink-0 ${isMobile ? 'min-h-[48px] px-4' : 'min-h-[50px] px-6'} bg-gradient-to-r ${currentRole.color} hover:opacity-90 transition-opacity touch-manipulation`}
-                            title="Send message"
-                          >
-                            {isLoading ? (
-                              <Loader2 className={`animate-spin ${isMobile ? 'h-5 w-5' : 'h-4 w-4'}`} />
-                            ) : (
-                              <Send className={`${isMobile ? 'h-5 w-5' : 'h-4 w-4'}`} />
-                            )}
-                          </Button>
+                          {/* Input area with send button */}
+                          <div className={`flex ${isMobile ? 'space-x-2' : 'flex-1'} relative`}>
+                            <div className="flex-1 relative">
+                              <SelfContainedChatInput
+                                initialValue={inputMessage}
+                                onSubmit={handleSendMessage}
+                                placeholder={stableMainPlaceholder}
+                                disabled={stableDisabled}
+                                className={`${stableMainClassName} ${isMobile ? 'min-h-[52px] text-base' : ''}`}
+                                ref={inputMessageRef}
+                              />
+                              
+                              {/* Voice feedback indicator */}
+                              {isListening && (
+                                <div className={`absolute ${isMobile ? 'top-4 right-4' : 'top-2 right-14'} flex items-center space-x-1 text-red-600 bg-white rounded-full px-2 py-1 shadow-sm`}>
+                                  <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
+                                  <span className={`${isMobile ? 'text-sm' : 'text-xs'} font-medium`}>Listening...</span>
+                                </div>
+                              )}
+                            </div>
+                            
+                            <Button
+                              onClick={() => {
+                                // Use the input ref to submit if available, otherwise fallback to handleSendMessage
+                                if (inputMessageRef.current && (inputMessageRef.current as any).hasValue?.()) {
+                                  (inputMessageRef.current as any).submit?.();
+                                } else if (files.length > 0) {
+                                  handleSendMessage('');
+                                }
+                              }}
+                              disabled={isLoading}
+                              className={`flex-shrink-0 ${isMobile ? 'min-h-[52px] min-w-[52px]' : 'min-h-[50px] px-6'} bg-gradient-to-r ${currentRole.color} hover:opacity-90 transition-all duration-200 touch-manipulation shadow-lg hover:shadow-xl`}
+                              title="Send message"
+                            >
+                              {isLoading ? (
+                                <Loader2 className={`animate-spin ${isMobile ? 'h-6 w-6' : 'h-4 w-4'}`} />
+                              ) : (
+                                <Send className={`${isMobile ? 'h-6 w-6' : 'h-4 w-4'}`} />
+                              )}
+                            </Button>
+                          </div>
                         </div>
                         
 
