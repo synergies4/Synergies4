@@ -20,7 +20,6 @@ import {
   Image as ImageIcon, 
   Loader2,
   Bot,
-  User,
   Sparkles,
   Zap,
   Brain,
@@ -34,30 +33,22 @@ import {
   Settings,
   MessageSquare,
   Lightbulb,
-  TrendingUp,
-  Award,
-  Globe,
   Download,
   Mic,
   MicOff,
   X,
   Menu,
-  Square,
-  Pause,
   RotateCcw,
   Edit,
   Save,
   Type,
   MousePointer,
-  Move,
   Trash,
-  Plus,
-  Maximize,
-  Minimize
+  Plus
 } from 'lucide-react';
 
 import { DndContext, closestCenter, useSensor, useSensors, PointerSensor, TouchSensor } from '@dnd-kit/core';
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { SortableContext } from '@dnd-kit/sortable';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -85,13 +76,9 @@ const GPU_OPTIMIZED_TRANSITION = {
 // Performance constants for Canva-like responsiveness
 const DEBOUNCE_DELAY = 100; // Reduced for faster response
 const INTERSECTION_THRESHOLD = 0.1;
-const RENDER_THROTTLE_MS = 8; // Target 120fps for ultra-smooth experience
 const AUTOSAVE_DEBOUNCE_MS = 800; // Faster autosave for better UX
-const STATE_UPDATE_BATCH_SIZE = 15; // Larger batches for efficiency
 
 // Performance monitoring
-let frameCount = 0;
-let lastFrameTime = performance.now();
 const TARGET_FPS = 120;
 
 // Performance optimization utilities
@@ -168,24 +155,24 @@ const useDebounce = (value: any, delay: number) => {
   return debouncedValue;
 };
 
-// Request Animation Frame throttling for smooth updates
-const useThrottledCallback = (callback: Function, delay: number) => {
-  const callbackRef = useRef(callback);
-  const timeoutRef = useRef<number | null>(null);
+// Request Animation Frame throttling for smooth updates (commented out until needed)
+// const useThrottledCallback = (callback: (...args: unknown[]) => void) => {
+//   const callbackRef = useRef(callback);
+//   const timeoutRef = useRef<number | null>(null);
 
-  useEffect(() => {
-    callbackRef.current = callback;
-  }, [callback]);
+//   useEffect(() => {
+//     callbackRef.current = callback;
+//   }, [callback]);
 
-  return useCallback((...args: any[]) => {
-    if (timeoutRef.current === null) {
-      timeoutRef.current = window.requestAnimationFrame(() => {
-        callbackRef.current(...args);
-        timeoutRef.current = null;
-      });
-    }
-  }, []);
-};
+//   return useCallback((...args: unknown[]) => {
+//     if (timeoutRef.current === null) {
+//       timeoutRef.current = window.requestAnimationFrame(() => {
+//         callbackRef.current(...args);
+//         timeoutRef.current = null;
+//       });
+//     }
+//   }, []);
+// };
 
 // Enhanced autosave with smart batching
 const useSmartAutosave = (data: any, onSave: (data: any) => Promise<void>) => {
@@ -2209,7 +2196,6 @@ const EditableSlidePresentation = ({
 
   // Enhanced performance monitoring and optimization
   const { fps, isLagging } = usePerformanceMonitor();
-  const { batchUpdate } = useBatchedUpdates();
   
   // Auto-save functionality with smart autosave
   const debouncedSlides = useDebounce(editableSlides, 2000);
@@ -2771,7 +2757,7 @@ const EditableSlidePresentation = ({
                 className="text-gray-600"
                 title="Toggle toolbar"
               >
-                {showToolbar ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
+                {showToolbar ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
               </Button>
             )}
             <Button
