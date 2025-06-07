@@ -4228,8 +4228,7 @@ Please structure this as a ready-to-deliver training course that someone could u
                     </div>
                   </>
                 )}
-              </div>
-
+                
                 {/* Speaker Notes Preview */}
                 {currentSlideData.speakerNotes && (
                   <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
