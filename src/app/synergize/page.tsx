@@ -492,10 +492,10 @@ const SlidePresentation = ({
                       ))}
                     </ul>
                   </div>
-                  {slide.imageUrl && (
+                  {(slide.imageUrl || (slide.imageElements && slide.imageElements.length > 0)) && (
                     <div className="flex items-center justify-center mt-4 lg:mt-0">
                       <img 
-                        src={slide.imageUrl} 
+                        src={slide.imageUrl || (slide.imageElements && slide.imageElements[0] ? slide.imageElements[0].src : '')} 
                         alt={`Slide ${slide.slideNumber}`}
                         className="max-w-full max-h-48 sm:max-h-64 lg:max-h-96 object-contain rounded-lg shadow-lg"
                       />
@@ -1574,11 +1574,16 @@ const EditableSlidePresentation = ({
           el.type !== 'image'
         );
         
+        // Extract image data for main slide object
+        const primaryImage = imageElements.length > 0 ? imageElements[0] : null;
+        
         return {
           ...slide,
           title: titleElement?.text || slide.title,
           content: contentElements.length > 0 ? contentElements : slide.content,
-          // Preserve images and custom elements in the slide data
+          // Add main image to slide for PDF export compatibility
+          imageUrl: primaryImage?.src || slide.imageUrl,
+          // Preserve all images and custom elements in the slide data
           imageElements: imageElements.length > 0 ? imageElements : undefined,
           customElements: customElements.length > 0 ? customElements : undefined,
           // Keep all elements for future editing
@@ -3996,7 +4001,7 @@ Please structure this as a ready-to-deliver training course that someone could u
             </div>
 
             {/* Enhanced Action Buttons */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               <Button
                 size="sm"
                 onClick={() => setShowFullPresentation(true)}
@@ -4018,38 +4023,101 @@ Please structure this as a ready-to-deliver training course that someone could u
               <Button
                 size="sm"
                 variant="outline"
-                onClick={async () => {
-                  try {
-                    const jsonStr = JSON.stringify(parsedPresentation, null, 2);
-                    await navigator.clipboard.writeText(jsonStr);
+                onClick={() => {
+                  // PDF Export functionality
+                  const exportToPDF = () => {
+                    const slides = parsedPresentation.slides || [];
+                    if (slides.length === 0) return;
                     
-                    // Show temporary success feedback
-                    const button = document.activeElement as HTMLButtonElement;
-                    const originalText = button.textContent;
-                    button.innerHTML = `<svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Copied!`;
+                    // Create a new window with the presentation
+                    const printWindow = window.open('', '_blank');
+                    if (!printWindow) return;
                     
+                    const slideHTML = slides.map((slide: any, index: number) => `
+                      <div class="slide" style="
+                        width: 210mm;
+                        height: 148mm;
+                        padding: 20mm;
+                        margin-bottom: 10mm;
+                        background: white;
+                        border: 1px solid #ddd;
+                        page-break-after: always;
+                        font-family: 'Arial', sans-serif;
+                        position: relative;
+                        box-sizing: border-box;
+                      ">
+                        <div style="display: flex; height: 100%; ${slide.layout === 'two-column' ? 'flex-direction: row;' : 'flex-direction: column;'}">
+                          ${slide.layout === 'title-slide' ? `
+                            <div style="text-align: center; display: flex; flex-direction: column; justify-content: center; height: 100%;">
+                              <h1 style="font-size: 36px; color: #059669; margin-bottom: 20px;">${slide.title}</h1>
+                              <div style="font-size: 18px; color: #666;">
+                                ${slide.content.map((item: string) => `<p style="margin: 10px 0;">${item}</p>`).join('')}
+                              </div>
+                            </div>
+                          ` : `
+                            <div style="${slide.layout === 'two-column' ? 'flex: 1; padding-right: 20px;' : 'flex: 1;'}">
+                              <h2 style="font-size: 28px; color: #059669; margin-bottom: 20px; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">${slide.title}</h2>
+                              <ul style="font-size: 16px; line-height: 1.6; color: #374151;">
+                                ${slide.content.map((item: string) => `<li style="margin-bottom: 10px;">${item}</li>`).join('')}
+                              </ul>
+                            </div>
+                            ${slide.imageUrl || (slide.imageElements && slide.imageElements.length > 0) ? `
+                              <div style="${slide.layout === 'two-column' ? 'flex: 1;' : 'margin-top: 20px;'} text-align: center;">
+                                <img src="${slide.imageUrl || (slide.imageElements && slide.imageElements[0] ? slide.imageElements[0].src : '')}" style="max-width: 100%; max-height: ${slide.layout === 'two-column' ? '300px' : '200px'}; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" />
+                              </div>
+                            ` : ''}
+                          `}
+                        </div>
+                        <div style="position: absolute; bottom: 10mm; right: 20mm; font-size: 12px; color: #9ca3af;">
+                          Slide ${slide.slideNumber || index + 1} of ${slides.length}
+                        </div>
+                      </div>
+                    `).join('');
+                    
+                    printWindow.document.write(`
+                      <!DOCTYPE html>
+                      <html>
+                        <head>
+                          <title>${parsedPresentation.title} - Presentation</title>
+                          <style>
+                            @media print {
+                              body { margin: 0; }
+                              .slide { page-break-after: always; }
+                            }
+                            body { margin: 0; padding: 20px; background: #f5f5f5; }
+                          </style>
+                        </head>
+                        <body>
+                          ${slideHTML}
+                        </body>
+                      </html>
+                    `);
+                    
+                    printWindow.document.close();
+                    printWindow.focus();
+                    
+                    // Trigger print dialog
                     setTimeout(() => {
-                      button.innerHTML = `<svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>Copy Data`;
-                    }, 2000);
-                  } catch (error) {
-                    console.error('Failed to copy:', error);
-                  }
+                      printWindow.print();
+                    }, 1000);
+                  };
+                  
+                  exportToPDF();
                 }}
-                className="border-2 border-emerald-300 text-emerald-700 hover:bg-emerald-50 font-semibold transition-all duration-200 hover:scale-105 py-3"
+                className="border-2 border-cyan-300 text-cyan-700 hover:bg-cyan-50 font-semibold transition-all duration-200 hover:scale-105 py-3"
               >
-                <Copy className="h-4 w-4 mr-2" />
-                Copy Data
+                <Download className="h-4 w-4 mr-2" />
+                Export PDF
               </Button>
               
               <Button
                 size="sm"
                 variant="outline"
                 onClick={() => {
-                  // Enhanced Export functionality
+                  // JSON Export functionality
                   const exportData = {
                     ...parsedPresentation,
                     exportedAt: new Date().toISOString(),
-                    format: 'json',
                     version: '1.0'
                   };
                   
@@ -4065,16 +4133,11 @@ Please structure this as a ready-to-deliver training course that someone could u
                   link.click();
                   document.body.removeChild(link);
                   URL.revokeObjectURL(url);
-                  
-                  // Show success message
-                  if ('navigator' in window && 'clipboard' in navigator) {
-                    navigator.clipboard.writeText(JSON.stringify(exportData, null, 2));
-                  }
                 }}
-                className="border-2 border-cyan-300 text-cyan-700 hover:bg-cyan-50 font-semibold transition-all duration-200 hover:scale-105 py-3"
+                className="border-2 border-emerald-300 text-emerald-700 hover:bg-emerald-50 font-semibold transition-all duration-200 hover:scale-105 py-3"
               >
-                <Download className="h-4 w-4 mr-2" />
-                Export
+                <Copy className="h-4 w-4 mr-2" />
+                Save JSON
               </Button>
             </div>
           </div>
