@@ -748,13 +748,9 @@ const DraggableText = React.memo(({
 
   const handleSelect = useCallback(() => {
     onSelect(id);
-    if (!isEditing) {
-      // Show format panel after a short delay if there's text
-      setTimeout(() => {
-        if (text && text.trim()) {
-          setShowFormatPanel(true);
-        }
-      }, 300);
+    if (!isEditing && text && text.trim()) {
+      // Show format panel immediately on first click
+      setShowFormatPanel(true);
       setShowContextMenu(false);
     }
   }, [onSelect, id, isEditing, text]);
@@ -970,8 +966,10 @@ const DraggableText = React.memo(({
                 textAlign: style.textAlign || 'left',
                 textShadow: style.textShadow,
                 maxWidth: style.maxWidth,
-                width: style.width,
-                height: style.height,
+                width: style.width || 'auto',
+                height: style.height || 'auto',
+                minWidth: style.width ? style.width : '150px',
+                minHeight: style.height ? style.height : '40px',
                 background: style.background,
                 backgroundColor: style.backgroundColor,
                 borderRadius: style.borderRadius,
@@ -1022,11 +1020,12 @@ const DraggableText = React.memo(({
                         setShowFormatPanel(true);
                         setShowContextMenu(false);
                       }}
-                      className={`${isMobile ? 'h-8 w-8' : 'h-6 w-6'} p-0 bg-purple-500 hover:bg-purple-600 text-white shadow-lg touch-manipulation ${isMobile ? 'mb-1' : 'mr-1'}`}
+                      className={`${isMobile ? 'h-8 px-3' : 'h-6 px-2'} bg-purple-500 hover:bg-purple-600 text-white shadow-lg touch-manipulation ${isMobile ? 'mb-1' : 'mr-1'} flex items-center space-x-1`}
                       aria-label="Format text"
-                      title="Format text"
+                      title="Format text (Bold, Italic, Colors, Bullets)"
                     >
                       <Type className={`${isMobile ? 'h-4 w-4' : 'h-3 w-3'}`} />
+                      {!isMobile && <span className="text-xs font-medium">Format</span>}
                     </Button>
                   </>
                 )}
@@ -1049,6 +1048,10 @@ const DraggableText = React.memo(({
             {/* PowerPoint/Canva style resize handles - Made bigger and more obvious */}
             {isSelected && !isEditing && !isMobile && (
               <>
+                {/* Resize instruction tooltip */}
+                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/75 text-white px-2 py-1 rounded text-xs whitespace-nowrap pointer-events-none">
+                  Drag corners to resize
+                </div>
                 {/* Corner resize handles - like PowerPoint */}
                 <div 
                   className="absolute -top-2 -left-2 w-4 h-4 bg-blue-500 border-2 border-white rounded cursor-nw-resize hover:bg-blue-600 shadow-lg transform hover:scale-110 transition-all duration-200"
@@ -1074,7 +1077,9 @@ const DraggableText = React.memo(({
                           width: `${newWidth}px`,
                           height: `${newHeight}px`,
                           left: startLeft + (startWidth - newWidth),
-                          top: startTop + (startHeight - newHeight)
+                          top: startTop + (startHeight - newHeight),
+                          minWidth: `${newWidth}px`,
+                          minHeight: `${newHeight}px`
                         }
                       });
                     };
@@ -1356,14 +1361,15 @@ const DraggableText = React.memo(({
               <span>Edit</span>
             </button>
             <button
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 setShowFormatPanel(true);
                 setShowContextMenu(false);
               }}
               className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 flex items-center space-x-2"
             >
               <Type className="h-3 w-3" />
-              <span>Format</span>
+              <span>Format Text</span>
             </button>
             <button
               onClick={handleCopy}
@@ -2245,6 +2251,8 @@ const EditableSlidePresentation = ({
       style: {
         top: snapToGridPosition(baseTop),
         left: snapToGridPosition(baseLeft),
+        width: '200px',
+        height: '50px',
         fontSize: '18px',
         fontWeight: 'normal',
         color: '#374151'
