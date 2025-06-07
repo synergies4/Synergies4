@@ -748,12 +748,12 @@ const DraggableText = React.memo(({
 
   const handleSelect = useCallback(() => {
     onSelect(id);
-    if (!isEditing && text && text.trim()) {
-      // Show format panel immediately on first click
+    if (!isEditing) {
+      // Always show format panel immediately when selecting text (even empty)
       setShowFormatPanel(true);
       setShowContextMenu(false);
     }
-  }, [onSelect, id, isEditing, text]);
+  }, [onSelect, id, isEditing]);
 
   const handleCopy = useCallback(() => {
     navigator.clipboard.writeText(text);
@@ -1230,7 +1230,7 @@ const DraggableText = React.memo(({
                   <Button
                     size="sm"
                     onClick={toggleBold}
-                    className={`h-8 w-8 p-0 ${style.fontWeight === 'bold' || style.fontWeight === '700' ? 'bg-blue-500 text-white' : 'bg-transparent text-gray-700 hover:bg-gray-200'}`}
+                    className={`h-8 w-8 p-0 ${style.fontWeight === 'bold' || style.fontWeight === '700' ? 'bg-blue-500 text-white' : 'bg-transparent text-gray-800 hover:bg-gray-200 hover:text-gray-900'}`}
                     title="Bold (Ctrl+B)"
                   >
                     <span className="font-bold text-sm">B</span>
@@ -1238,7 +1238,7 @@ const DraggableText = React.memo(({
                   <Button
                     size="sm"
                     onClick={toggleItalic}
-                    className={`h-8 w-8 p-0 ml-1 ${style.fontStyle === 'italic' ? 'bg-blue-500 text-white' : 'bg-transparent text-gray-700 hover:bg-gray-200'}`}
+                    className={`h-8 w-8 p-0 ml-1 ${style.fontStyle === 'italic' ? 'bg-blue-500 text-white' : 'bg-transparent text-gray-800 hover:bg-gray-200 hover:text-gray-900'}`}
                     title="Italic (Ctrl+I)"
                   >
                     <span className="italic text-sm">I</span>
@@ -1246,7 +1246,7 @@ const DraggableText = React.memo(({
                   <Button
                     size="sm"
                     onClick={toggleUnderline}
-                    className={`h-8 w-8 p-0 ml-1 ${style.textDecoration === 'underline' ? 'bg-blue-500 text-white' : 'bg-transparent text-gray-700 hover:bg-gray-200'}`}
+                    className={`h-8 w-8 p-0 ml-1 ${style.textDecoration === 'underline' ? 'bg-blue-500 text-white' : 'bg-transparent text-gray-800 hover:bg-gray-200 hover:text-gray-900'}`}
                     title="Underline (Ctrl+U)"
                   >
                     <span className="underline text-sm">U</span>
@@ -1254,7 +1254,7 @@ const DraggableText = React.memo(({
                   <Button
                     size="sm"
                     onClick={toggleBulletPoints}
-                    className={`h-8 w-8 p-0 ml-1 ${text.includes('•') ? 'bg-blue-500 text-white' : 'bg-transparent text-gray-700 hover:bg-gray-200'}`}
+                    className={`h-8 w-8 p-0 ml-1 ${text.includes('•') ? 'bg-blue-500 text-white' : 'bg-transparent text-gray-800 hover:bg-gray-200 hover:text-gray-900'}`}
                     title="Toggle bullet points"
                   >
                     <span className="text-sm">•</span>
@@ -1326,7 +1326,7 @@ const DraggableText = React.memo(({
                       key={value}
                       size="sm"
                       onClick={() => changeTextAlign(value)}
-                      className={`h-8 w-8 p-0 ${style.textAlign === value ? 'bg-blue-500 text-white' : 'bg-transparent text-gray-700 hover:bg-gray-200'}`}
+                      className={`h-8 w-8 p-0 ${style.textAlign === value ? 'bg-blue-500 text-white' : 'bg-transparent text-gray-800 hover:bg-gray-200 hover:text-gray-900'}`}
                       title={title}
                     >
                       <span className="text-sm">{icon}</span>
@@ -2459,7 +2459,11 @@ const EditableSlidePresentation = ({
     addToast('New slide added!', 'success');
   }, [editableSlides, addToHistory, addToast]);
 
-  const generateAIContent = useCallback(async () => {
+  const [showAIModal, setShowAIModal] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [aiContentType, setAiContentType] = useState('bullet-points');
+
+  const generateAIContent = useCallback(async (userPrompt: string, contentType: string) => {
     if (!currentSlideData) return;
     
     addToast('Generating AI content...', 'info');
@@ -2472,13 +2476,35 @@ const EditableSlidePresentation = ({
         .map((el: any) => el.text)
         .join('\n');
 
-      // Create AI prompt for content generation
-      const prompt = `Generate 3-4 bullet points for a presentation slide with the title "${currentTitle}". 
-      Current content: "${currentContent}"
-      
-      Please provide concise, professional bullet points that expand on this topic. 
-      Each bullet point should be 1-2 lines maximum.
-      Return only the bullet points, one per line, without bullet symbols (I'll add them).`;
+      // Create AI prompt based on user input and content type
+      let prompt = '';
+      switch (contentType) {
+        case 'bullet-points':
+          prompt = `Generate 3-4 bullet points for a presentation slide with the title "${currentTitle}". 
+          Context: ${userPrompt}
+          Current content: "${currentContent}"
+          
+          Please provide concise, professional bullet points that expand on this topic. 
+          Each bullet point should be 1-2 lines maximum.
+          Return only the bullet points, one per line, without bullet symbols (I'll add them).`;
+          break;
+        case 'paragraph':
+          prompt = `Generate a clear, professional paragraph for a presentation slide with the title "${currentTitle}".
+          Context: ${userPrompt}
+          
+          Write 2-3 sentences that explain this topic clearly for a business presentation.
+          Keep it concise and professional.`;
+          break;
+        case 'call-to-action':
+          prompt = `Generate a compelling call-to-action for a presentation slide with the title "${currentTitle}".
+          Context: ${userPrompt}
+          
+          Create 1-2 action-oriented sentences that motivate the audience to take specific steps.
+          Make it clear and actionable.`;
+          break;
+        default:
+          prompt = userPrompt;
+      }
 
       // Use the existing AI infrastructure
       const response = await fetch('/api/chat', {
@@ -2499,28 +2525,51 @@ const EditableSlidePresentation = ({
       const data = await response.json();
       const aiContent = data.response;
 
-      // Parse the AI response into bullet points
-      const bulletPoints = aiContent
-        .split('\n')
-        .filter((line: string) => line.trim())
-        .map((line: string) => `• ${line.trim().replace(/^[•\-\*]\s*/, '')}`)
-        .slice(0, 4); // Limit to 4 bullet points
+      // Create new elements based on content type
+      let newElements = [];
+      if (contentType === 'bullet-points') {
+        // Parse the AI response into bullet points
+        const bulletPoints = aiContent
+          .split('\n')
+          .filter((line: string) => line.trim())
+          .map((line: string) => `• ${line.trim().replace(/^[•\-\*]\s*/, '')}`)
+          .slice(0, 4); // Limit to 4 bullet points
 
-      // Add the AI-generated content as new text elements
-      const newElements = bulletPoints.map((point: string, index: number) => ({
-        id: `ai-content-${Date.now()}-${index}`,
-        type: 'text',
-        text: point,
-        style: {
-          top: 250 + (index * 50),
-          left: 120,
-          fontSize: '18px',
-          fontWeight: '400',
-          color: '#374151',
-          lineHeight: '1.5',
-          maxWidth: '600px'
-        }
-      }));
+        newElements = bulletPoints.map((point: string, index: number) => ({
+          id: `ai-content-${Date.now()}-${index}`,
+          type: 'text',
+          text: point,
+          style: {
+            top: 250 + (index * 50),
+            left: 120,
+            width: '600px',
+            height: '40px',
+            fontSize: '18px',
+            fontWeight: '400',
+            color: '#374151',
+            lineHeight: '1.5',
+            maxWidth: '600px'
+          }
+        }));
+      } else {
+        // Single text element for paragraph or call-to-action
+        newElements = [{
+          id: `ai-content-${Date.now()}`,
+          type: 'text',
+          text: aiContent.trim(),
+          style: {
+            top: 250,
+            left: 120,
+            width: '600px',
+            height: contentType === 'call-to-action' ? '60px' : '80px',
+            fontSize: contentType === 'call-to-action' ? '22px' : '18px',
+            fontWeight: contentType === 'call-to-action' ? '600' : '400',
+            color: contentType === 'call-to-action' ? '#0f766e' : '#374151',
+            lineHeight: '1.5',
+            maxWidth: '600px'
+          }
+        }];
+      }
 
       // Update the slide with new AI content
       setEditableSlides(prev => {
@@ -2538,7 +2587,9 @@ const EditableSlidePresentation = ({
         return newSlides;
       });
 
-      addToast(`Added ${bulletPoints.length} AI-generated bullet points!`, 'success');
+      addToast(`Added AI-generated ${contentType.replace('-', ' ')}!`, 'success');
+      setShowAIModal(false);
+      setAiPrompt('');
     } catch (error) {
       console.error('AI generation error:', error);
       addToast('Failed to generate AI content. Please try again.', 'error');
@@ -2882,7 +2933,7 @@ const EditableSlidePresentation = ({
                     
                     <Button
                       size="sm"
-                      onClick={generateAIContent}
+                      onClick={() => setShowAIModal(true)}
                       className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
                       title="Generate AI content for current slide"
                     >
@@ -3144,7 +3195,7 @@ const EditableSlidePresentation = ({
               <Button
                 size="sm"
                 onClick={() => setShowGrid(!showGrid)}
-                className={`h-8 w-8 p-0 rounded-full ${showGrid ? 'bg-purple-500 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
+                className={`h-8 w-8 p-0 rounded-full ${showGrid ? 'bg-purple-500 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-800 hover:text-gray-900'}`}
                 title="Toggle Grid"
               >
                 <MousePointer className="h-4 w-4" />
@@ -3240,6 +3291,86 @@ const EditableSlidePresentation = ({
           </div>
         </motion.div>
       )}
+
+      {/* AI Content Generation Modal */}
+      <AnimatePresence>
+        {showAIModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 z-[10000] flex items-center justify-center p-4"
+            onClick={() => setShowAIModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Generate AI Content</h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Content Type
+                  </label>
+                  <select
+                    value={aiContentType}
+                    onChange={(e) => setAiContentType(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  >
+                    <option value="bullet-points">Bullet Points</option>
+                    <option value="paragraph">Paragraph</option>
+                    <option value="call-to-action">Call-to-Action</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    What should this content be about?
+                  </label>
+                  <textarea
+                    value={aiPrompt}
+                    onChange={(e) => setAiPrompt(e.target.value)}
+                    placeholder="e.g., Benefits of our new product, Key project milestones, Next steps for the team..."
+                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                    rows={3}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Be specific about the topic, audience, or key points you want to cover.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex justify-end space-x-3 mt-6">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowAIModal(false)}
+                  className="text-gray-700"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => {
+                    if (aiPrompt.trim()) {
+                      generateAIContent(aiPrompt, aiContentType);
+                    } else {
+                      addToast('Please enter what you want to generate', 'error');
+                    }
+                  }}
+                  disabled={!aiPrompt.trim()}
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                >
+                  <Zap className="h-4 w-4 mr-2" />
+                  Generate Content
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Toast Notifications */}
       <AnimatePresence>
