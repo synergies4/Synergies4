@@ -1203,9 +1203,17 @@ const EditableSlidePresentation = ({
   onSave: (updatedSlides: any[]) => void;
 }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [editableSlides, setEditableSlides] = useState(slides.map(slide => ({
-    ...slide,
-    elements: [
+  const [editableSlides, setEditableSlides] = useState(slides.map(slide => {
+    // Check if slide already has elements (from previous editing)
+    if (slide.elements && slide.elements.length > 0) {
+      return {
+        ...slide,
+        elements: slide.elements
+      };
+    }
+    
+    // Initialize elements for new slides
+    const baseElements = [
       {
         id: `title-${slide.slideNumber}`,
         type: 'text',
@@ -1230,8 +1238,17 @@ const EditableSlidePresentation = ({
           color: '#374151'
         }
       }))
-    ]
-  })));
+    ];
+    
+    // Add any existing image elements
+    const imageElements = slide.imageElements || [];
+    const customElements = slide.customElements || [];
+    
+    return {
+      ...slide,
+      elements: [...baseElements, ...imageElements, ...customElements]
+    };
+  }));
   
   const [selectedElement, setSelectedElement] = useState<string | null>(null);
   const [showToolbar, setShowToolbar] = useState(true);
@@ -1537,14 +1554,37 @@ const EditableSlidePresentation = ({
 
   const handleSave = useCallback(() => {
     try {
-      // Convert back to original slide format
-      const updatedSlides = editableSlides.map(slide => ({
-        ...slide,
-        title: slide.elements.find((el: any) => el.id.startsWith('title-'))?.text || slide.title,
-        content: slide.elements
-          .filter((el: any) => el.id.startsWith('content-') && el.type === 'text')
-          .map((el: any) => el.text.replace(/^• /, ''))
-      }));
+      // Convert back to original slide format while preserving all content
+      const updatedSlides = editableSlides.map(slide => {
+        // Find title element
+        const titleElement = slide.elements.find((el: any) => el.id.startsWith('title-'));
+        
+        // Find content elements (text elements that aren't title)
+        const contentElements = slide.elements
+          .filter((el: any) => el.type === 'text' && !el.id.startsWith('title-'))
+          .map((el: any) => el.text.replace(/^• /, ''));
+        
+        // Find image elements
+        const imageElements = slide.elements.filter((el: any) => el.type === 'image');
+        
+        // Find any other custom elements
+        const customElements = slide.elements.filter((el: any) => 
+          !el.id.startsWith('title-') && 
+          !el.id.startsWith('content-') && 
+          el.type !== 'image'
+        );
+        
+        return {
+          ...slide,
+          title: titleElement?.text || slide.title,
+          content: contentElements.length > 0 ? contentElements : slide.content,
+          // Preserve images and custom elements in the slide data
+          imageElements: imageElements.length > 0 ? imageElements : undefined,
+          customElements: customElements.length > 0 ? customElements : undefined,
+          // Keep all elements for future editing
+          elements: slide.elements
+        };
+      });
       
       onSave(updatedSlides);
       addToast('Presentation saved successfully!', 'success');
@@ -3311,6 +3351,14 @@ export default function SynergizeAgile() {
     setHasInitialized(false);
   };
 
+  const updateMessage = useCallback((messageId: string, newContent: string) => {
+    setMessages(prev => prev.map(msg => 
+      msg.id === messageId 
+        ? { ...msg, content: newContent }
+        : msg
+    ));
+  }, []);
+
   // Handle URL parameters for transcript data from record meeting
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -3617,7 +3665,7 @@ Please structure this as a ready-to-deliver training course that someone could u
   const currentProvider = AI_PROVIDERS[selectedProvider];
 
   // Enhanced Presentation Display Component for Chat Messages
-  const PresentationDisplay = ({ messageContent }: { messageContent: string }) => {
+  const PresentationDisplay = ({ messageContent, messageId, onUpdateMessage }: { messageContent: string; messageId?: string; onUpdateMessage?: (id: string, newContent: string) => void }) => {
     const [parsedPresentation, setParsedPresentation] = useState<any>(null);
     const [currentSlide, setCurrentSlide] = useState(0);
     const [showFullPresentation, setShowFullPresentation] = useState(false);
@@ -3749,11 +3797,19 @@ Please structure this as a ready-to-deliver training course that someone could u
             onClose={() => setShowEditablePresentation(false)}
             presentationTitle={parsedPresentation.title}
             onSave={(updatedSlides) => {
-              // Update the presentation data
-              setParsedPresentation({
+              // Update the presentation data locally
+              const updatedPresentation = {
                 ...parsedPresentation,
                 slides: updatedSlides
-              });
+              };
+              setParsedPresentation(updatedPresentation);
+              
+              // Persist changes back to the original message content
+              if (messageId && onUpdateMessage) {
+                const updatedContent = `**${updatedPresentation.title}**\n\n\`\`\`json\n${JSON.stringify(updatedPresentation, null, 2)}\n\`\`\``;
+                onUpdateMessage(messageId, updatedContent);
+              }
+              
               setShowEditablePresentation(false);
             }}
           />
@@ -3962,9 +4018,22 @@ Please structure this as a ready-to-deliver training course that someone could u
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => {
-                  const jsonStr = JSON.stringify(parsedPresentation, null, 2);
-                  navigator.clipboard.writeText(jsonStr);
+                onClick={async () => {
+                  try {
+                    const jsonStr = JSON.stringify(parsedPresentation, null, 2);
+                    await navigator.clipboard.writeText(jsonStr);
+                    
+                    // Show temporary success feedback
+                    const button = document.activeElement as HTMLButtonElement;
+                    const originalText = button.textContent;
+                    button.innerHTML = `<svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Copied!`;
+                    
+                    setTimeout(() => {
+                      button.innerHTML = `<svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>Copy Data`;
+                    }, 2000);
+                  } catch (error) {
+                    console.error('Failed to copy:', error);
+                  }
                 }}
                 className="border-2 border-emerald-300 text-emerald-700 hover:bg-emerald-50 font-semibold transition-all duration-200 hover:scale-105 py-3"
               >
@@ -3976,8 +4045,31 @@ Please structure this as a ready-to-deliver training course that someone could u
                 size="sm"
                 variant="outline"
                 onClick={() => {
-                  // Export functionality
-                  console.log('Export presentation');
+                  // Enhanced Export functionality
+                  const exportData = {
+                    ...parsedPresentation,
+                    exportedAt: new Date().toISOString(),
+                    format: 'json',
+                    version: '1.0'
+                  };
+                  
+                  // Create downloadable file
+                  const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+                    type: 'application/json'
+                  });
+                  const url = URL.createObjectURL(blob);
+                  const link = document.createElement('a');
+                  link.href = url;
+                  link.download = `${parsedPresentation.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.json`;
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                  URL.revokeObjectURL(url);
+                  
+                  // Show success message
+                  if ('navigator' in window && 'clipboard' in navigator) {
+                    navigator.clipboard.writeText(JSON.stringify(exportData, null, 2));
+                  }
                 }}
                 className="border-2 border-cyan-300 text-cyan-700 hover:bg-cyan-50 font-semibold transition-all duration-200 hover:scale-105 py-3"
               >
@@ -4332,7 +4424,11 @@ Please structure this as a ready-to-deliver training course that someone could u
                         <p className="text-sm text-green-600 font-medium">
                           ✅ Presentation generated successfully!
                         </p>
-                        <PresentationDisplay messageContent={message.content} />
+                        <PresentationDisplay 
+                          messageContent={message.content} 
+                          messageId={message.id}
+                          onUpdateMessage={updateMessage}
+                        />
                       </div>
                     ) : (
                       <p className={`text-sm leading-relaxed whitespace-pre-wrap break-words ${message.type === 'user' ? 'text-white' : 'text-gray-900'}`}>
@@ -5174,7 +5270,11 @@ Format as a realistic conversation with clear speaker labels and include decisio
                                 <p className="text-sm text-green-600 font-medium">
                                   ✅ Presentation generated successfully!
                                 </p>
-                                <PresentationDisplay messageContent={message.content} />
+                                <PresentationDisplay 
+                                  messageContent={message.content} 
+                                  messageId={message.id}
+                                  onUpdateMessage={updateMessage}
+                                />
                               </div>
                             ) : (
                               <p className={`text-sm leading-relaxed whitespace-pre-wrap break-words ${message.type === 'user' ? 'text-white' : 'text-gray-900'}`}>
