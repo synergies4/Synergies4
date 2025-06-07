@@ -173,6 +173,8 @@ const PresentationSkeleton = React.memo(() => (
   </div>
 ));
 
+PresentationSkeleton.displayName = 'PresentationSkeleton';
+
 // Toast notification system
 const useToast = () => {
   const [toasts, setToasts] = useState<Array<{
@@ -916,6 +918,8 @@ const DraggableText = React.memo(({
   );
 });
 
+DraggableText.displayName = 'DraggableText';
+
 // Enhanced Draggable Image Component with Performance & UX improvements
 const DraggableImage = React.memo(({ 
   id, 
@@ -1183,6 +1187,8 @@ const DraggableImage = React.memo(({
     </>
   );
 });
+
+DraggableImage.displayName = 'DraggableImage';
 
 // Enhanced Editable Slide Presentation Component with Advanced Features
 const EditableSlidePresentation = ({ 
