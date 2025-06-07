@@ -1987,17 +1987,8 @@ const EditableSlidePresentation = ({
 }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [editableSlides, setEditableSlides] = useState(slides.map(slide => {
-    console.log(`Initializing slide ${slide.slideNumber}:`, {
-      hasExistingElements: !!(slide.elements && slide.elements.length > 0),
-      elementsCount: slide.elements?.length || 0,
-      hasImageElements: !!(slide.imageElements && slide.imageElements.length > 0),
-      imageElementsCount: slide.imageElements?.length || 0,
-      hasImageUrl: !!slide.imageUrl
-    });
-    
     // Check if slide already has elements (from previous editing)
     if (slide.elements && slide.elements.length > 0) {
-      console.log(`Using existing elements for slide ${slide.slideNumber}:`, slide.elements);
       return {
         ...slide,
         elements: slide.elements
@@ -2074,11 +2065,6 @@ const EditableSlidePresentation = ({
       );
     }
     
-    console.log(`Created clean slide elements for slide ${slide.slideNumber}:`, {
-      layout: slide.layout,
-      elementsCreated: baseElements.length
-    });
-    
     // Add any existing image elements with proper formatting
     const imageElements = (slide.imageElements || []).map((img: any) => ({
       ...img,
@@ -2109,12 +2095,6 @@ const EditableSlidePresentation = ({
     
     const customElements = slide.customElements || [];
     
-    console.log(`Created elements for slide ${slide.slideNumber}:`, {
-      baseElements: baseElements.length,
-      imageElements: imageElements.length,
-      customElements: customElements.length
-    });
-    
     return {
       ...slide,
       elements: [...baseElements, ...imageElements, ...customElements]
@@ -2129,6 +2109,7 @@ const EditableSlidePresentation = ({
   const [lastSaved, setLastSaved] = useState<Date>(new Date());
   const [gridSize] = useState(20);
   const [showMobileFAB, setShowMobileFAB] = useState(false);
+  const [showAIModal, setShowAIModal] = useState(false);
   
   // Check for mobile
   const [isMobile, setIsMobile] = useState(false);
@@ -2194,30 +2175,19 @@ const EditableSlidePresentation = ({
     return snapToGrid ? Math.round(position / gridSize) * gridSize : position;
   }, [snapToGrid, gridSize]);
 
-  // Enhanced performance monitoring and optimization
-  const { fps, isLagging } = usePerformanceMonitor();
-  
-  // Auto-save functionality with smart autosave
-  const debouncedSlides = useDebounce(editableSlides, 2000);
-  const { isAutoSaving: smartAutoSaving, lastSaved: smartLastSaved } = useSmartAutosave(
-    editableSlides,
-    async (data) => {
-      // Simulate save to backend
-      console.log('Smart autosave triggered for slides:', data.length);
-      return Promise.resolve();
-    }
-  );
+  // Simplified auto-save functionality
+  const debouncedSlides = useDebounce(editableSlides, 1000);
   
   useEffect(() => {
-    if (debouncedSlides !== editableSlides) {
+    if (debouncedSlides !== editableSlides && editableSlides.length > 0) {
       setIsAutoSaving(true);
-      // Simulate auto-save
+      // Simulate auto-save with faster response
       setTimeout(() => {
         setIsAutoSaving(false);
         setLastSaved(new Date());
-      }, 500);
+      }, 200);
     }
-  }, [debouncedSlides]);
+  }, [debouncedSlides, editableSlides]);
 
   // Enhanced handlers with history tracking - moved before useEffect
   const deleteElement = useCallback((id: string) => {
@@ -2297,13 +2267,13 @@ const EditableSlidePresentation = ({
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8,
+        distance: 3, // Much more responsive
       },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 250,
-        tolerance: 5,
+        delay: 100, // Faster touch response
+        tolerance: 8,
       },
     })
   );
@@ -2325,10 +2295,6 @@ const EditableSlidePresentation = ({
                       ...element.style,
                       top: snapToGridPosition(Math.max(0, element.style.top + delta.y)),
                       left: snapToGridPosition(Math.max(0, element.style.left + delta.x)),
-                      // GPU-accelerated smooth transition using transform3d for hardware acceleration
-                      transition: 'transform 0.12s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.12s ease-out',
-                      willChange: 'transform', // Optimize for animations
-                      transform: 'translate3d(0, 0, 0)', // Force GPU layer
                     }
                   }
                 : element
@@ -2371,7 +2337,6 @@ const EditableSlidePresentation = ({
 
   const addTextElement = useCallback(() => {
     // Find a good position for the new element
-    const existingElements = currentSlideData?.elements || [];
     const baseTop = 400;
     const baseLeft = 400;
     
@@ -2471,15 +2436,8 @@ const EditableSlidePresentation = ({
 
   const handleSave = useCallback(() => {
     try {
-      console.log('Saving presentation with editableSlides:', editableSlides);
-      
       // Convert back to original slide format while preserving all content
       const updatedSlides = editableSlides.map(slide => {
-        console.log(`Processing slide ${slide.slideNumber} for save:`, {
-          elementCount: slide.elements.length,
-          elements: slide.elements.map((el: any) => ({ id: el.id, type: el.type }))
-        });
-        
         // Find title element
         const titleElement = slide.elements.find((el: any) => el.id.startsWith('title-'));
         
@@ -2590,7 +2548,6 @@ const EditableSlidePresentation = ({
     addToast('New slide added!', 'success');
   }, [editableSlides, addToHistory, addToast]);
 
-  const [showAIModal, setShowAIModal] = useState(false);
   const [aiPrompt, setAiPrompt] = useState('');
   const [aiContentType, setAiContentType] = useState('bullet-points');
 
@@ -2892,27 +2849,17 @@ const EditableSlidePresentation = ({
                     </div>
                   </div>
                   
-                  {/* Enhanced Status indicators with Performance Monitor */}
+                  {/* Simplified Status indicators */}
                   <div className="flex justify-between items-center text-xs text-gray-500">
                     <span>Tap to edit • Drag to move</span>
                     <div className="flex items-center space-x-2">
-                      {/* Performance Monitor for Mobile */}
-                      <div className={`flex items-center space-x-1 px-2 py-1 rounded-full text-xs ${
-                        isLagging ? 'bg-red-100 text-red-700' : fps >= TARGET_FPS * 0.9 ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
-                      }`}>
-                        <div className={`w-1.5 h-1.5 rounded-full ${
-                          isLagging ? 'bg-red-500' : fps >= TARGET_FPS * 0.9 ? 'bg-green-500 animate-pulse' : 'bg-yellow-500'
-                        }`}></div>
-                        <span>{fps}fps</span>
-                      </div>
-                      
-                      {(isAutoSaving || smartAutoSaving) && (
+                      {isAutoSaving && (
                         <div className="flex items-center space-x-1 text-blue-600">
                           <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
                           <span>Saving...</span>
                         </div>
                       )}
-                      <span>Saved: {(smartLastSaved || lastSaved).toLocaleTimeString()}</span>
+                      <span>Saved: {lastSaved.toLocaleTimeString()}</span>
                     </div>
                   </div>
                   
@@ -3026,25 +2973,14 @@ const EditableSlidePresentation = ({
                     <div className="flex items-center space-x-2 text-sm text-gray-600">
                       <span>Double-click to edit • Drag to move • Right-click for menu</span>
                       
-                      {/* Desktop Performance Monitor */}
-                      <div className={`flex items-center space-x-1 px-2 py-1 rounded-full text-xs ${
-                        isLagging ? 'bg-red-100 text-red-700' : fps >= TARGET_FPS * 0.9 ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
-                      }`}>
-                        <div className={`w-2 h-2 rounded-full ${
-                          isLagging ? 'bg-red-500' : fps >= TARGET_FPS * 0.9 ? 'bg-green-500 animate-pulse' : 'bg-yellow-500'
-                        }`}></div>
-                        <span>{fps}fps</span>
-                        {isLagging && <span className="ml-1">⚠️</span>}
-                      </div>
-                      
-                      {(isAutoSaving || smartAutoSaving) && (
+                      {isAutoSaving && (
                         <div className="flex items-center space-x-1 text-blue-600">
                           <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
                           <span>Saving...</span>
                         </div>
                       )}
                       <span className="text-xs text-gray-500">
-                        Last saved: {(smartLastSaved || lastSaved).toLocaleTimeString()}
+                        Last saved: {lastSaved.toLocaleTimeString()}
                       </span>
                     </div>
                   </div>
@@ -3166,24 +3102,12 @@ const EditableSlidePresentation = ({
             >
               <div 
                 ref={canvasRef}
-                className={`w-full h-full relative overflow-hidden rounded-lg shadow-xl bg-white ${isMobile ? 'touch-manipulation' : ''} transition-all duration-200`}
+                className={`w-full h-full relative overflow-hidden rounded-lg shadow-xl bg-white ${isMobile ? 'touch-manipulation' : ''}`}
                 style={{
                   border: selectedElement ? '2px solid #3b82f6' : '1px solid #e5e7eb',
-                  touchAction: isMobile ? 'pan-x pan-y' : 'auto',
-                  willChange: 'transform, opacity', // GPU optimization
-                  transform: 'translate3d(0, 0, 0)', // Force GPU layer
-                  background: `linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)`,
-                  boxShadow: selectedElement 
-                    ? '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04), 0 0 0 2px rgba(59, 130, 246, 0.1)'
-                    : '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+                  touchAction: isMobile ? 'none' : 'auto', // Better mobile touch handling
                 }}
                 onClick={() => setSelectedElement(null)}
-                onTouchStart={(e) => {
-                  // Prevent default behavior to avoid scrolling issues on mobile
-                  if (isMobile && e.touches.length === 1) {
-                    e.preventDefault();
-                  }
-                }}
               >
                   {/* Grid Overlay */}
                   {showGrid && (
