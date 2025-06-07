@@ -7,7 +7,12 @@ import {
   Type, 
   ImageIcon, 
   Trash, 
-  Save 
+  Save,
+  Bold,
+  Italic,
+  Palette,
+  Plus,
+  Minus
 } from 'lucide-react';
 
 // Simple toast hook
@@ -153,6 +158,7 @@ export default function CleanSlideEditor({
     elementX: number;
     elementY: number;
   } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const [isAutoSaving, setIsAutoSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date>(new Date());
 
@@ -173,6 +179,12 @@ export default function CleanSlideEditor({
   }, [debouncedSlides, editableSlides]);
 
   const currentSlideData = useMemo(() => editableSlides[currentSlide], [editableSlides, currentSlide]);
+  
+  // Get selected element data
+  const selectedElementData = useMemo(() => {
+    if (!selectedElement || !currentSlideData) return null;
+    return currentSlideData.elements.find(el => el.id === selectedElement);
+  }, [selectedElement, currentSlideData]);
 
   // Update element
   const updateElement = useCallback((id: string, updates: Partial<SlideElement>) => {
@@ -188,6 +200,35 @@ export default function CleanSlideEditor({
       return slide;
     }));
   }, [currentSlide]);
+
+  // Formatting functions
+  const updateTextStyle = useCallback((styleUpdates: Partial<SlideElement['style']>) => {
+    if (!selectedElement || !selectedElementData) return;
+    updateElement(selectedElement, {
+      style: {
+        ...selectedElementData.style,
+        ...styleUpdates
+      }
+    });
+  }, [selectedElement, selectedElementData, updateElement]);
+
+  const increaseFontSize = useCallback(() => {
+    if (!selectedElementData?.style.fontSize) return;
+    const currentSize = parseInt(selectedElementData.style.fontSize);
+    updateTextStyle({ fontSize: `${Math.min(currentSize + 2, 72)}px` });
+  }, [selectedElementData, updateTextStyle]);
+
+  const decreaseFontSize = useCallback(() => {
+    if (!selectedElementData?.style.fontSize) return;
+    const currentSize = parseInt(selectedElementData.style.fontSize);
+    updateTextStyle({ fontSize: `${Math.max(currentSize - 2, 8)}px` });
+  }, [selectedElementData, updateTextStyle]);
+
+  const toggleBold = useCallback(() => {
+    const currentWeight = selectedElementData?.style.fontWeight || '400';
+    const newWeight = currentWeight === 'bold' || currentWeight === '700' ? '400' : 'bold';
+    updateTextStyle({ fontWeight: newWeight });
+  }, [selectedElementData, updateTextStyle]);
 
   // Add text element
   const addTextElement = useCallback(() => {
@@ -320,6 +361,7 @@ export default function CleanSlideEditor({
       elementY: element.style.top
     });
     setSelectedElement(elementId);
+    setIsDragging(false);
   }, [currentSlideData]);
 
   useEffect(() => {
@@ -328,6 +370,12 @@ export default function CleanSlideEditor({
 
       const deltaX = e.clientX - dragData.startX;
       const deltaY = e.clientY - dragData.startY;
+      
+      // If we've moved more than 5 pixels, consider it a drag
+      if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
+        setIsDragging(true);
+      }
+
       const newX = Math.max(0, dragData.elementX + deltaX);
       const newY = Math.max(0, dragData.elementY + deltaY);
 
@@ -342,6 +390,8 @@ export default function CleanSlideEditor({
 
     const handleMouseUp = () => {
       setDragData(null);
+      // Reset dragging after a short delay to allow click handler to check
+      setTimeout(() => setIsDragging(false), 100);
     };
 
     if (dragData) {
@@ -418,6 +468,96 @@ export default function CleanSlideEditor({
           </div>
         </div>
       </div>
+
+      {/* Formatting Panel - appears when text element is selected */}
+      {selectedElementData?.type === 'text' && (
+        <div className="bg-gray-50 border-b border-gray-200 px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <span className="text-sm font-medium text-gray-700">Format Text:</span>
+              
+              {/* Font size controls */}
+              <div className="flex items-center space-x-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={decreaseFontSize}
+                  className="w-8 h-8 p-0"
+                  title="Decrease font size"
+                >
+                  <Minus className="h-3 w-3" />
+                </Button>
+                <span className="text-sm font-mono min-w-[3rem] text-center">
+                  {selectedElementData.style.fontSize || '18px'}
+                </span>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={increaseFontSize}
+                  className="w-8 h-8 p-0"
+                  title="Increase font size"
+                >
+                  <Plus className="h-3 w-3" />
+                </Button>
+              </div>
+
+              {/* Bold toggle */}
+              <Button
+                size="sm"
+                variant={selectedElementData.style.fontWeight === 'bold' || selectedElementData.style.fontWeight === '700' ? 'default' : 'outline'}
+                onClick={toggleBold}
+                className="w-8 h-8 p-0"
+                title="Toggle bold"
+              >
+                <Bold className="h-3 w-3" />
+              </Button>
+
+              {/* Color picker */}
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-gray-600">Color:</span>
+                <div className="flex space-x-1">
+                  {['#374151', '#dc2626', '#059669', '#2563eb', '#7c3aed', '#ea580c'].map(color => (
+                    <button
+                      key={color}
+                      onClick={() => updateTextStyle({ color })}
+                      className={`w-6 h-6 rounded border-2 transition-all hover:scale-110 ${
+                        selectedElementData.style.color === color 
+                          ? 'border-gray-900 ring-2 ring-gray-300' 
+                          : 'border-gray-300'
+                      }`}
+                      style={{ backgroundColor: color }}
+                      title={`Change color to ${color}`}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Quick actions */}
+            <div className="flex items-center space-x-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setEditingElement(selectedElement)}
+                className="text-blue-600 border-blue-300 hover:bg-blue-50"
+              >
+                <Type className="h-3 w-3 mr-1" />
+                Edit Text
+              </Button>
+              
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => selectedElement && deleteElement(selectedElement)}
+                className="text-red-600 border-red-300 hover:bg-red-50"
+              >
+                <Trash className="h-3 w-3 mr-1" />
+                Delete
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="flex-1 flex overflow-hidden">
         {/* Slide Navigation */}
@@ -521,11 +661,16 @@ export default function CleanSlideEditor({
                   onMouseDown={(e) => handleMouseDown(e, element.id)}
                   onClick={(e) => {
                     e.stopPropagation();
-                    if (selectedElement === element.id) {
-                      setEditingElement(element.id);
-                    } else {
-                      setSelectedElement(element.id);
-                      setEditingElement(null);
+                    // Only handle clicks if we weren't dragging
+                    if (!isDragging) {
+                      if (selectedElement === element.id) {
+                        if (element.type === 'text') {
+                          setEditingElement(element.id);
+                        }
+                      } else {
+                        setSelectedElement(element.id);
+                        setEditingElement(null);
+                      }
                     }
                   }}
                 >
@@ -535,17 +680,23 @@ export default function CleanSlideEditor({
                         value={element.text || ''}
                         onChange={(e) => updateElement(element.id, { text: e.target.value })}
                         onBlur={() => setEditingElement(null)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Escape') {
+                            setEditingElement(null);
+                          }
+                        }}
                         autoFocus
-                        className="w-full h-full resize-none border-none outline-none bg-transparent"
+                        className="w-full h-full resize-none border-2 border-blue-400 outline-none bg-white bg-opacity-95 rounded p-2"
                         style={{
                           fontSize: element.style.fontSize,
                           fontWeight: element.style.fontWeight,
                           color: element.style.color,
                           lineHeight: element.style.lineHeight,
                         }}
+                        placeholder="Type your text here..."
                       />
                     ) : (
-                      <div className="whitespace-pre-wrap break-words">{element.text}</div>
+                      <div className="whitespace-pre-wrap break-words p-2">{element.text}</div>
                     )
                   ) : element.type === 'image' ? (
                     <img
@@ -559,13 +710,19 @@ export default function CleanSlideEditor({
               ))}
 
               {/* Instructions */}
-              {selectedElement && (
-                <div className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded text-sm">
-                  Selected • Click to edit • Drag to move
+              {editingElement && (
+                <div className="absolute top-4 right-4 bg-green-600 text-white px-3 py-1 rounded text-sm">
+                  Editing • Click outside to finish
                 </div>
               )}
               
-              {!selectedElement && (
+              {selectedElement && !editingElement && (
+                <div className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded text-sm">
+                  Selected • Click again to edit • Drag to move
+                </div>
+              )}
+              
+              {!selectedElement && !editingElement && (
                 <div className="absolute top-4 right-4 bg-gray-600 text-white px-3 py-1 rounded text-sm opacity-75">
                   Click an element to select
                 </div>
