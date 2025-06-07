@@ -62,6 +62,137 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { motion, AnimatePresence } from 'framer-motion';
 
+// Performance optimizations
+const ANIMATION_CONFIG = {
+  duration: 0.2,
+  ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number]
+};
+
+const DEBOUNCE_DELAY = 300;
+const INTERSECTION_THRESHOLD = 0.1;
+
+// Performance utilities
+const useDebounce = (value: any, delay: number) => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+};
+
+const useIntersectionObserver = (options: IntersectionObserverInit = {}) => {
+  const [isIntersecting, setIsIntersecting] = useState(false);
+  const targetRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const target = targetRef.current;
+    if (!target) return;
+
+    const observer = new IntersectionObserver(([entry]) => {
+      setIsIntersecting(entry.isIntersecting);
+    }, { threshold: INTERSECTION_THRESHOLD, ...options });
+
+    observer.observe(target);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  return { targetRef, isIntersecting };
+};
+
+// Enhanced error boundary
+class PresentationErrorBoundary extends React.Component<
+  { children: React.ReactNode; fallback?: React.ReactNode },
+  { hasError: boolean; error?: Error }
+> {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: any) {
+    console.error('Presentation Error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback || (
+        <div className="p-6 bg-red-50 border-2 border-red-200 rounded-xl shadow-lg">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-red-200 rounded-full flex items-center justify-center">
+              <X className="h-4 w-4 text-red-600" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-red-800">
+                Something went wrong with the presentation
+              </p>
+              <p className="text-xs text-red-600">
+                Please try refreshing or generating a new presentation
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+// Loading skeleton component
+const PresentationSkeleton = React.memo(() => (
+  <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-lg overflow-hidden animate-pulse">
+    <div className="bg-gradient-to-r from-gray-300 to-gray-400 h-24"></div>
+    <div className="p-6 space-y-4">
+      <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+      <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+      <div className="space-y-2">
+        {[1, 2, 3].map(i => (
+          <div key={i} className="h-3 bg-gray-200 rounded w-full"></div>
+        ))}
+      </div>
+      <div className="flex space-x-2 pt-4">
+        <div className="h-8 bg-gray-300 rounded w-24"></div>
+        <div className="h-8 bg-gray-300 rounded w-20"></div>
+      </div>
+    </div>
+  </div>
+));
+
+// Toast notification system
+const useToast = () => {
+  const [toasts, setToasts] = useState<Array<{
+    id: string;
+    message: string;
+    type: 'success' | 'error' | 'info';
+  }>>([]);
+
+  const addToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    const id = Date.now().toString();
+    setToasts(prev => [...prev, { id, message, type }]);
+    
+    setTimeout(() => {
+      setToasts(prev => prev.filter(toast => toast.id !== id));
+    }, 3000);
+  }, []);
+
+  return { toasts, addToast };
+};
+
 // Agile roles and their specific capabilities - Updated with professional color scheme
 const AGILE_ROLES = {
   'scrum-master': {
@@ -450,8 +581,8 @@ const SlidePresentation = ({
   );
 };
 
-// Draggable Text Component for Editable Slides
-const DraggableText = ({ 
+// Enhanced Draggable Text Component with Performance & UX improvements
+const DraggableText = React.memo(({ 
   id, 
   text, 
   style, 
@@ -470,7 +601,11 @@ const DraggableText = ({
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(text);
+  const [showContextMenu, setShowContextMenu] = useState(false);
+  const [contextMenuPos, setContextMenuPos] = useState({ x: 0, y: 0 });
   const textRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const debouncedEditText = useDebounce(editText, DEBOUNCE_DELAY);
 
   const {
     attributes,
@@ -483,108 +618,306 @@ const DraggableText = ({
 
   const transformStyle = CSS.Transform.toString(transform);
 
-  const handleDoubleClick = () => {
+  // Memoized handlers for performance
+  const handleDoubleClick = useCallback(() => {
     setIsEditing(true);
     setEditText(text);
-  };
+    setTimeout(() => {
+      textareaRef.current?.focus();
+      textareaRef.current?.select();
+    }, 0);
+  }, [text]);
 
-  const handleSave = () => {
-    onUpdate(id, { text: editText });
+  const handleSave = useCallback(() => {
+    if (editText.trim() !== text.trim()) {
+      onUpdate(id, { text: editText.trim() });
+    }
     setIsEditing(false);
-  };
+  }, [editText, text, id, onUpdate]);
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleCancel = useCallback(() => {
+    setIsEditing(false);
+    setEditText(text);
+  }, [text]);
+
+  const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSave();
     }
     if (e.key === 'Escape') {
-      setIsEditing(false);
-      setEditText(text);
+      e.preventDefault();
+      handleCancel();
     }
-  };
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      handleSave();
+    }
+  }, [handleSave, handleCancel]);
+
+  const handleContextMenu = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setContextMenuPos({ x: e.clientX, y: e.clientY });
+    setShowContextMenu(true);
+    onSelect(id);
+  }, [onSelect, id]);
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard.writeText(text);
+    setShowContextMenu(false);
+  }, [text]);
+
+  const handleDuplicate = useCallback(() => {
+    onUpdate(`${id}-copy-${Date.now()}`, { 
+      text: text + ' (Copy)',
+      style: {
+        ...style,
+        top: style.top + 20,
+        left: style.left + 20
+      }
+    });
+    setShowContextMenu(false);
+  }, [id, text, style, onUpdate]);
+
+  // Auto-save with debounce
+  useEffect(() => {
+    if (isEditing && debouncedEditText !== text && debouncedEditText.trim()) {
+      onUpdate(id, { text: debouncedEditText });
+    }
+  }, [debouncedEditText, isEditing, text, id, onUpdate]);
+
+  // Close context menu on outside click
+  useEffect(() => {
+    const handleClickOutside = () => setShowContextMenu(false);
+    if (showContextMenu) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [showContextMenu]);
+
+  // Enhanced keyboard navigation
+  useEffect(() => {
+    if (isSelected && !isEditing) {
+      const handleKeyDown = (e: KeyboardEvent) => {
+        switch (e.key) {
+          case 'Delete':
+          case 'Backspace':
+            e.preventDefault();
+            onDelete(id);
+            break;
+          case 'Enter':
+          case 'F2':
+            e.preventDefault();
+            handleDoubleClick();
+            break;
+          case 'ArrowUp':
+            e.preventDefault();
+            onUpdate(id, { style: { ...style, top: Math.max(0, style.top - 10) } });
+            break;
+          case 'ArrowDown':
+            e.preventDefault();
+            onUpdate(id, { style: { ...style, top: style.top + 10 } });
+            break;
+          case 'ArrowLeft':
+            e.preventDefault();
+            onUpdate(id, { style: { ...style, left: Math.max(0, style.left - 10) } });
+            break;
+          case 'ArrowRight':
+            e.preventDefault();
+            onUpdate(id, { style: { ...style, left: style.left + 10 } });
+            break;
+        }
+      };
+
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [isSelected, isEditing, id, style, onUpdate, onDelete, handleDoubleClick]);
 
   return (
-    <motion.div
-      ref={setNodeRef}
-      style={{
-        transform: transformStyle,
-        transition,
-        ...style,
-        position: 'absolute',
-        cursor: isDragging ? 'grabbing' : 'grab',
-        zIndex: isDragging ? 1000 : isSelected ? 100 : 1,
-      }}
-      className={`
-        p-3 rounded-lg transition-all duration-200 
-        ${isSelected ? 'ring-2 ring-blue-500 shadow-lg' : 'hover:shadow-md'}
-        ${isDragging ? 'opacity-75' : 'opacity-100'}
-        bg-white/90 backdrop-blur-sm border border-gray-200
-      `}
-      onClick={() => onSelect(id)}
-      onDoubleClick={handleDoubleClick}
-      {...attributes}
-      {...listeners}
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-    >
-      {isEditing ? (
-        <div className="min-w-[200px]">
-          <textarea
-            value={editText}
-            onChange={(e) => setEditText(e.target.value)}
-            onKeyDown={handleKeyPress}
-            onBlur={handleSave}
-            className="w-full p-2 border border-blue-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-            style={{ fontSize: style.fontSize || '16px', fontWeight: style.fontWeight || 'normal' }}
-            autoFocus
-            rows={Math.max(1, editText.split('\n').length)}
-          />
-          <div className="flex justify-end space-x-2 mt-2">
-            <Button size="sm" onClick={handleSave} className="h-6 px-2 text-xs">
-              <Save className="h-3 w-3" />
-            </Button>
-            <Button size="sm" variant="outline" onClick={() => setIsEditing(false)} className="h-6 px-2 text-xs">
-              <X className="h-3 w-3" />
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <div className="relative group">
-          <div 
-            style={{ 
-              fontSize: style.fontSize || '16px', 
-              fontWeight: style.fontWeight || 'normal',
-              color: style.color || '#000000'
-            }}
-            className="whitespace-pre-wrap break-words"
-          >
-            {text}
-          </div>
-          
-          {isSelected && (
-            <div className="absolute -top-2 -right-2 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+    <>
+      <motion.div
+        ref={setNodeRef}
+        style={{
+          transform: transformStyle,
+          transition,
+          ...style,
+          position: 'absolute',
+          cursor: isDragging ? 'grabbing' : isEditing ? 'text' : 'grab',
+          zIndex: isDragging ? 1000 : isSelected ? 100 : 1,
+          willChange: 'transform', // GPU acceleration
+        }}
+        className={`
+          p-3 rounded-lg transition-all duration-200 select-none
+          ${isSelected ? 'ring-2 ring-blue-500 shadow-lg bg-blue-50/50' : 'hover:shadow-md'}
+          ${isDragging ? 'opacity-75 shadow-2xl' : 'opacity-100'}
+          ${isEditing ? 'bg-white border-2 border-blue-400' : 'bg-white/90 backdrop-blur-sm border border-gray-200'}
+        `}
+        onClick={() => onSelect(id)}
+        onDoubleClick={handleDoubleClick}
+        onContextMenu={handleContextMenu}
+        {...(!isEditing ? attributes : {})}
+        {...(!isEditing ? listeners : {})}
+        whileHover={!isEditing ? { scale: 1.02 } : {}}
+        whileTap={!isEditing ? { scale: 0.98 } : {}}
+        layout
+        transition={ANIMATION_CONFIG}
+        role="textbox"
+        aria-label={`Editable text: ${text}`}
+        aria-selected={isSelected}
+        tabIndex={isSelected ? 0 : -1}
+      >
+        {isEditing ? (
+          <div className="min-w-[200px]">
+            <textarea
+              ref={textareaRef}
+              value={editText}
+              onChange={(e) => setEditText(e.target.value)}
+              onKeyDown={handleKeyPress}
+              onBlur={handleSave}
+              className="w-full p-2 border-0 rounded-md resize-none focus:outline-none bg-transparent text-inherit"
+              style={{ 
+                fontSize: style.fontSize || '16px', 
+                fontWeight: style.fontWeight || 'normal',
+                color: style.color || '#000000',
+                lineHeight: '1.4'
+              }}
+              rows={Math.max(1, editText.split('\n').length)}
+              placeholder="Enter text..."
+              aria-label="Edit text content"
+            />
+            <div className="flex justify-end space-x-2 mt-2">
               <Button 
                 size="sm" 
-                variant="destructive" 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDelete(id);
-                }}
-                className="h-6 w-6 p-0"
+                onClick={handleSave} 
+                className="h-6 px-2 text-xs bg-green-600 hover:bg-green-700"
+                aria-label="Save changes"
               >
-                <Trash className="h-3 w-3" />
+                <Save className="h-3 w-3" />
+              </Button>
+              <Button 
+                size="sm" 
+                variant="outline" 
+                onClick={handleCancel} 
+                className="h-6 px-2 text-xs"
+                aria-label="Cancel editing"
+              >
+                <X className="h-3 w-3" />
               </Button>
             </div>
-          )}
-        </div>
-      )}
-    </motion.div>
-  );
-};
+          </div>
+        ) : (
+          <div className="relative group">
+            <div 
+              style={{ 
+                fontSize: style.fontSize || '16px', 
+                fontWeight: style.fontWeight || 'normal',
+                color: style.color || '#000000',
+                lineHeight: '1.4'
+              }}
+              className="whitespace-pre-wrap break-words select-text"
+            >
+              {text || 'Empty text element'}
+            </div>
+            
+            {/* Accessibility indicator */}
+            {isSelected && (
+              <div className="absolute -top-1 -left-1 w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+            )}
+            
+            {/* Action buttons */}
+            {isSelected && (
+              <motion.div 
+                className="absolute -top-2 -right-2 flex space-x-1"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={ANIMATION_CONFIG}
+              >
+                <Button 
+                  size="sm" 
+                  variant="secondary"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDoubleClick();
+                  }}
+                  className="h-6 w-6 p-0 bg-blue-500 hover:bg-blue-600 text-white"
+                  aria-label="Edit text"
+                >
+                  <Edit className="h-3 w-3" />
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="destructive" 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(id);
+                  }}
+                  className="h-6 w-6 p-0"
+                  aria-label="Delete text element"
+                >
+                  <Trash className="h-3 w-3" />
+                </Button>
+              </motion.div>
+            )}
+          </div>
+        )}
+      </motion.div>
 
-// Draggable Image Component
-const DraggableImage = ({ 
+      {/* Enhanced Context Menu */}
+      <AnimatePresence>
+        {showContextMenu && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={ANIMATION_CONFIG}
+            className="fixed z-[9999] bg-white border border-gray-200 rounded-lg shadow-xl py-1 min-w-[120px]"
+            style={{
+              left: contextMenuPos.x,
+              top: contextMenuPos.y,
+            }}
+          >
+            <button
+              onClick={handleDoubleClick}
+              className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 flex items-center space-x-2"
+            >
+              <Edit className="h-3 w-3" />
+              <span>Edit</span>
+            </button>
+            <button
+              onClick={handleCopy}
+              className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 flex items-center space-x-2"
+            >
+              <Copy className="h-3 w-3" />
+              <span>Copy</span>
+            </button>
+            <button
+              onClick={handleDuplicate}
+              className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 flex items-center space-x-2"
+            >
+              <Plus className="h-3 w-3" />
+              <span>Duplicate</span>
+            </button>
+            <hr className="my-1" />
+            <button
+              onClick={() => {
+                onDelete(id);
+                setShowContextMenu(false);
+              }}
+              className="w-full px-3 py-2 text-left text-sm hover:bg-red-100 text-red-600 flex items-center space-x-2"
+            >
+              <Trash className="h-3 w-3" />
+              <span>Delete</span>
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+});
+
+// Enhanced Draggable Image Component with Performance & UX improvements
+const DraggableImage = React.memo(({ 
   id, 
   src, 
   style, 
@@ -601,6 +934,13 @@ const DraggableImage = ({
   isSelected: boolean;
   onSelect: (id: string) => void;
 }) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+  const [showContextMenu, setShowContextMenu] = useState(false);
+  const [contextMenuPos, setContextMenuPos] = useState({ x: 0, y: 0 });
+  const imgRef = useRef<HTMLImageElement>(null);
+  const { targetRef, isIntersecting } = useIntersectionObserver();
+
   const {
     attributes,
     listeners,
@@ -612,62 +952,239 @@ const DraggableImage = ({
 
   const transformStyle = CSS.Transform.toString(transform);
 
-  return (
-    <motion.div
-      ref={setNodeRef}
-      style={{
-        transform: transformStyle,
-        transition,
+  // Memoized handlers
+  const handleImageLoad = useCallback(() => {
+    setIsLoading(false);
+    setHasError(false);
+  }, []);
+
+  const handleImageError = useCallback(() => {
+    setIsLoading(false);
+    setHasError(true);
+  }, []);
+
+  const handleContextMenu = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setContextMenuPos({ x: e.clientX, y: e.clientY });
+    setShowContextMenu(true);
+    onSelect(id);
+  }, [onSelect, id]);
+
+  const handleDuplicate = useCallback(() => {
+    onUpdate(`${id}-copy-${Date.now()}`, { 
+      src,
+      style: {
         ...style,
-        position: 'absolute',
-        cursor: isDragging ? 'grabbing' : 'grab',
-        zIndex: isDragging ? 1000 : isSelected ? 100 : 1,
-      }}
-      className={`
-        rounded-lg transition-all duration-200 
-        ${isSelected ? 'ring-2 ring-blue-500 shadow-lg' : 'hover:shadow-md'}
-        ${isDragging ? 'opacity-75' : 'opacity-100'}
-      `}
-      onClick={() => onSelect(id)}
-      {...attributes}
-      {...listeners}
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-    >
-      <div className="relative group">
-        <img 
-          src={src} 
-          alt="Slide element"
-          className="rounded-lg shadow-sm max-w-full h-auto"
-          style={{ 
-            width: style.width || 'auto', 
-            height: style.height || 'auto',
-            maxWidth: '300px',
-            maxHeight: '200px'
-          }}
-        />
-        
-        {isSelected && (
-          <div className="absolute -top-2 -right-2 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <Button 
-              size="sm" 
-              variant="destructive" 
-              onClick={(e) => {
-                e.stopPropagation();
+        top: style.top + 20,
+        left: style.left + 20
+      }
+    });
+    setShowContextMenu(false);
+  }, [id, src, style, onUpdate]);
+
+  // Close context menu on outside click
+  useEffect(() => {
+    const handleClickOutside = () => setShowContextMenu(false);
+    if (showContextMenu) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [showContextMenu]);
+
+  // Enhanced keyboard navigation
+  useEffect(() => {
+    if (isSelected) {
+      const handleKeyDown = (e: KeyboardEvent) => {
+        switch (e.key) {
+          case 'Delete':
+          case 'Backspace':
+            e.preventDefault();
+            onDelete(id);
+            break;
+          case 'ArrowUp':
+            e.preventDefault();
+            onUpdate(id, { style: { ...style, top: Math.max(0, style.top - 10) } });
+            break;
+          case 'ArrowDown':
+            e.preventDefault();
+            onUpdate(id, { style: { ...style, top: style.top + 10 } });
+            break;
+          case 'ArrowLeft':
+            e.preventDefault();
+            onUpdate(id, { style: { ...style, left: Math.max(0, style.left - 10) } });
+            break;
+          case 'ArrowRight':
+            e.preventDefault();
+            onUpdate(id, { style: { ...style, left: style.left + 10 } });
+            break;
+        }
+      };
+
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [isSelected, id, style, onUpdate, onDelete]);
+
+  return (
+    <>
+      <motion.div
+        ref={(node) => {
+          setNodeRef(node);
+          if (targetRef) {
+            (targetRef as any).current = node;
+          }
+        }}
+        style={{
+          transform: transformStyle,
+          transition,
+          ...style,
+          position: 'absolute',
+          cursor: isDragging ? 'grabbing' : 'grab',
+          zIndex: isDragging ? 1000 : isSelected ? 100 : 1,
+          willChange: 'transform',
+        }}
+        className={`
+          rounded-lg transition-all duration-200 select-none
+          ${isSelected ? 'ring-2 ring-blue-500 shadow-lg' : 'hover:shadow-md'}
+          ${isDragging ? 'opacity-75 shadow-2xl' : 'opacity-100'}
+        `}
+        onClick={() => onSelect(id)}
+        onContextMenu={handleContextMenu}
+        {...attributes}
+        {...listeners}
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        layout
+        transition={ANIMATION_CONFIG}
+        role="img"
+        aria-label="Draggable image element"
+        aria-selected={isSelected}
+        tabIndex={isSelected ? 0 : -1}
+      >
+        <div className="relative group">
+          {/* Lazy loaded image with error handling */}
+          {isIntersecting && (
+            <>
+              {isLoading && (
+                <div 
+                  className="bg-gray-200 rounded-lg flex items-center justify-center animate-pulse"
+                  style={{ 
+                    width: style.width || '200px', 
+                    height: style.height || '150px',
+                    maxWidth: '300px',
+                    maxHeight: '200px'
+                  }}
+                >
+                  <ImageIcon className="h-8 w-8 text-gray-400" />
+                </div>
+              )}
+              
+              {hasError && (
+                <div 
+                  className="bg-red-50 border-2 border-red-200 rounded-lg flex flex-col items-center justify-center p-4"
+                  style={{ 
+                    width: style.width || '200px', 
+                    height: style.height || '150px',
+                    maxWidth: '300px',
+                    maxHeight: '200px'
+                  }}
+                >
+                  <X className="h-8 w-8 text-red-400 mb-2" />
+                  <span className="text-xs text-red-600 text-center">Failed to load image</span>
+                </div>
+              )}
+              
+              <img 
+                ref={imgRef}
+                src={src} 
+                alt="Slide element"
+                className={`rounded-lg shadow-sm max-w-full h-auto transition-opacity duration-200 ${
+                  isLoading || hasError ? 'opacity-0 absolute' : 'opacity-100'
+                }`}
+                style={{ 
+                  width: style.width || 'auto', 
+                  height: style.height || 'auto',
+                  maxWidth: '300px',
+                  maxHeight: '200px'
+                }}
+                onLoad={handleImageLoad}
+                onError={handleImageError}
+                loading="lazy"
+                draggable={false}
+              />
+            </>
+          )}
+          
+          {/* Accessibility indicator */}
+          {isSelected && (
+            <div className="absolute -top-1 -left-1 w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+          )}
+          
+          {/* Action buttons */}
+          {isSelected && (
+            <motion.div 
+              className="absolute -top-2 -right-2 flex space-x-1"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={ANIMATION_CONFIG}
+            >
+              <Button 
+                size="sm" 
+                variant="destructive" 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(id);
+                }}
+                className="h-6 w-6 p-0"
+                aria-label="Delete image element"
+              >
+                <Trash className="h-3 w-3" />
+              </Button>
+            </motion.div>
+          )}
+        </div>
+      </motion.div>
+
+      {/* Enhanced Context Menu */}
+      <AnimatePresence>
+        {showContextMenu && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={ANIMATION_CONFIG}
+            className="fixed z-[9999] bg-white border border-gray-200 rounded-lg shadow-xl py-1 min-w-[120px]"
+            style={{
+              left: contextMenuPos.x,
+              top: contextMenuPos.y,
+            }}
+          >
+            <button
+              onClick={handleDuplicate}
+              className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 flex items-center space-x-2"
+            >
+              <Plus className="h-3 w-3" />
+              <span>Duplicate</span>
+            </button>
+            <hr className="my-1" />
+            <button
+              onClick={() => {
                 onDelete(id);
+                setShowContextMenu(false);
               }}
-              className="h-6 w-6 p-0"
+              className="w-full px-3 py-2 text-left text-sm hover:bg-red-100 text-red-600 flex items-center space-x-2"
             >
               <Trash className="h-3 w-3" />
-            </Button>
-          </div>
+              <span>Delete</span>
+            </button>
+          </motion.div>
         )}
-      </div>
-    </motion.div>
+      </AnimatePresence>
+    </>
   );
-};
+});
 
-// Main Editable Slide Presentation Component
+// Enhanced Editable Slide Presentation Component with Advanced Features
 const EditableSlidePresentation = ({ 
   slides, 
   onClose, 
@@ -712,7 +1229,120 @@ const EditableSlidePresentation = ({
   
   const [selectedElement, setSelectedElement] = useState<string | null>(null);
   const [showToolbar, setShowToolbar] = useState(true);
+  const [showGrid, setShowGrid] = useState(true);
+  const [snapToGrid, setSnapToGrid] = useState(true);
+  const [isAutoSaving, setIsAutoSaving] = useState(false);
+  const [lastSaved, setLastSaved] = useState<Date>(new Date());
+  const [gridSize] = useState(20);
+  
+  // Undo/Redo functionality
+  const [history, setHistory] = useState<any[]>([editableSlides]);
+  const [historyIndex, setHistoryIndex] = useState(0);
+  const maxHistorySize = 50;
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const canvasRef = useRef<HTMLDivElement>(null);
+  const { toasts, addToast } = useToast();
+
+  // Memoized values for performance
+  const canUndo = useMemo(() => historyIndex > 0, [historyIndex]);
+  const canRedo = useMemo(() => historyIndex < history.length - 1, [historyIndex, history.length]);
+  const currentSlideData = useMemo(() => editableSlides[currentSlide], [editableSlides, currentSlide]);
+
+  // Undo/Redo handlers
+  const addToHistory = useCallback((newSlides: any[]) => {
+    setHistory(prev => {
+      const newHistory = prev.slice(0, historyIndex + 1);
+      newHistory.push(newSlides);
+      if (newHistory.length > maxHistorySize) {
+        newHistory.shift();
+        setHistoryIndex(maxHistorySize - 1);
+        return newHistory;
+      }
+      setHistoryIndex(newHistory.length - 1);
+      return newHistory;
+    });
+  }, [historyIndex, maxHistorySize]);
+
+  const undo = useCallback(() => {
+    if (canUndo) {
+      const newIndex = historyIndex - 1;
+      setHistoryIndex(newIndex);
+      setEditableSlides(history[newIndex]);
+      addToast('Undone', 'info');
+    }
+  }, [canUndo, historyIndex, history, addToast]);
+
+  const redo = useCallback(() => {
+    if (canRedo) {
+      const newIndex = historyIndex + 1;
+      setHistoryIndex(newIndex);
+      setEditableSlides(history[newIndex]);
+      addToast('Redone', 'info');
+    }
+  }, [canRedo, historyIndex, history, addToast]);
+
+  // Grid snapping utility
+  const snapToGridPosition = useCallback((position: number) => {
+    return snapToGrid ? Math.round(position / gridSize) * gridSize : position;
+  }, [snapToGrid, gridSize]);
+
+  // Auto-save functionality
+  const debouncedSlides = useDebounce(editableSlides, 2000);
+  
+  useEffect(() => {
+    if (debouncedSlides !== editableSlides) {
+      setIsAutoSaving(true);
+      // Simulate auto-save
+      setTimeout(() => {
+        setIsAutoSaving(false);
+        setLastSaved(new Date());
+      }, 500);
+    }
+  }, [debouncedSlides]);
+
+  // Global keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        switch (e.key) {
+          case 'z':
+            e.preventDefault();
+            if (e.shiftKey) {
+              redo();
+            } else {
+              undo();
+            }
+            break;
+          case 'y':
+            e.preventDefault();
+            redo();
+            break;
+          case 's':
+            e.preventDefault();
+            handleSave();
+            break;
+          case 'a':
+            e.preventDefault();
+            // Select all elements (future feature)
+            break;
+          case 'c':
+            e.preventDefault();
+            if (selectedElement) {
+              // Copy element (future feature)
+            }
+            break;
+          case 'v':
+            e.preventDefault();
+            // Paste element (future feature)
+            break;
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [selectedElement, undo, redo]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
