@@ -62,10 +62,17 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Performance optimizations
+// Performance optimizations and smooth animations
 const ANIMATION_CONFIG = {
   duration: 0.2,
   ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number]
+};
+
+const SMOOTH_TRANSITION_CONFIG = {
+  type: "spring",
+  stiffness: 300,
+  damping: 30,
+  mass: 0.8
 };
 
 const DEBOUNCE_DELAY = 300;
@@ -494,11 +501,27 @@ const SlidePresentation = ({
                   </div>
                   {(slide.imageUrl || (slide.imageElements && slide.imageElements.length > 0)) && (
                     <div className="flex items-center justify-center mt-4 lg:mt-0">
-                      <img 
-                        src={slide.imageUrl || (slide.imageElements && slide.imageElements[0] ? slide.imageElements[0].src : '')} 
-                        alt={`Slide ${slide.slideNumber}`}
-                        className="max-w-full max-h-48 sm:max-h-64 lg:max-h-96 object-contain rounded-lg shadow-lg"
-                      />
+                      <div className="relative group">
+                        <img 
+                          src={slide.imageUrl || (slide.imageElements && slide.imageElements[0] ? slide.imageElements[0].src : '')} 
+                          alt={`Slide ${slide.slideNumber} - ${slide.title}`}
+                          className="max-w-full max-h-48 sm:max-h-64 lg:max-h-96 object-contain rounded-xl shadow-2xl border-2 border-white/20 transition-all duration-300 group-hover:scale-105 group-hover:shadow-3xl"
+                          style={{
+                            filter: 'drop-shadow(0 10px 25px rgba(0,0,0,0.15))',
+                            background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+                          }}
+                          loading="lazy"
+                        />
+                        {/* Image overlay for better integration */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent rounded-xl pointer-events-none"></div>
+                        
+                        {/* Multiple images indicator */}
+                        {slide.imageElements && slide.imageElements.length > 1 && (
+                          <div className="absolute top-2 right-2 bg-black/70 text-white px-2 py-1 rounded-full text-xs font-medium">
+                            +{slide.imageElements.length - 1} more
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -583,7 +606,7 @@ const SlidePresentation = ({
   );
 };
 
-// Enhanced Draggable Text Component with Performance & UX improvements
+// Enhanced Draggable Text Component with Rich Text Formatting
 const DraggableText = React.memo(({ 
   id, 
   text, 
@@ -606,9 +629,11 @@ const DraggableText = React.memo(({
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(text);
   const [showContextMenu, setShowContextMenu] = useState(false);
+  const [showFormatPanel, setShowFormatPanel] = useState(false);
   const [contextMenuPos, setContextMenuPos] = useState({ x: 0, y: 0 });
   const textRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const formatPanelRef = useRef<HTMLDivElement>(null);
   const debouncedEditText = useDebounce(editText, DEBOUNCE_DELAY);
 
   const {
@@ -622,10 +647,49 @@ const DraggableText = React.memo(({
 
   const transformStyle = CSS.Transform.toString(transform);
 
+  // Rich text formatting functions
+  const applyFormatting = useCallback((formatting: any) => {
+    const updatedStyle = { ...style, ...formatting };
+    onUpdate(id, { style: updatedStyle });
+    setShowFormatPanel(false);
+  }, [style, onUpdate, id]);
+
+  const toggleBold = useCallback(() => {
+    const newWeight = style.fontWeight === 'bold' || style.fontWeight === '700' ? 'normal' : 'bold';
+    applyFormatting({ fontWeight: newWeight });
+  }, [style.fontWeight, applyFormatting]);
+
+  const toggleItalic = useCallback(() => {
+    const newStyle = style.fontStyle === 'italic' ? 'normal' : 'italic';
+    applyFormatting({ fontStyle: newStyle });
+  }, [style.fontStyle, applyFormatting]);
+
+  const toggleUnderline = useCallback(() => {
+    const newDecoration = style.textDecoration === 'underline' ? 'none' : 'underline';
+    applyFormatting({ textDecoration: newDecoration });
+  }, [style.textDecoration, applyFormatting]);
+
+  const changeFontSize = useCallback((size: string) => {
+    applyFormatting({ fontSize: size });
+  }, [applyFormatting]);
+
+  const changeTextColor = useCallback((color: string) => {
+    applyFormatting({ color });
+  }, [applyFormatting]);
+
+  const changeTextAlign = useCallback((align: string) => {
+    applyFormatting({ textAlign: align });
+  }, [applyFormatting]);
+
+  const changeBackgroundColor = useCallback((backgroundColor: string) => {
+    applyFormatting({ backgroundColor, padding: '8px', borderRadius: '4px' });
+  }, [applyFormatting]);
+
   // Memoized handlers for performance
   const handleDoubleClick = useCallback(() => {
     setIsEditing(true);
     setEditText(text);
+    setShowFormatPanel(false);
     setTimeout(() => {
       textareaRef.current?.focus();
       textareaRef.current?.select();
@@ -663,8 +727,17 @@ const DraggableText = React.memo(({
     e.preventDefault();
     setContextMenuPos({ x: e.clientX, y: e.clientY });
     setShowContextMenu(true);
+    setShowFormatPanel(false);
     onSelect(id);
   }, [onSelect, id]);
+
+  const handleSelect = useCallback(() => {
+    onSelect(id);
+    if (!isEditing) {
+      setShowFormatPanel(true);
+      setShowContextMenu(false);
+    }
+  }, [onSelect, id, isEditing]);
 
   const handleCopy = useCallback(() => {
     navigator.clipboard.writeText(text);
@@ -690,19 +763,46 @@ const DraggableText = React.memo(({
     }
   }, [debouncedEditText, isEditing, text, id, onUpdate]);
 
-  // Close context menu on outside click
+  // Close menus on outside click
   useEffect(() => {
-    const handleClickOutside = () => setShowContextMenu(false);
-    if (showContextMenu) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (formatPanelRef.current && !formatPanelRef.current.contains(event.target as Node)) {
+        setShowFormatPanel(false);
+      }
+      if (!formatPanelRef.current?.contains(event.target as Node)) {
+        setShowContextMenu(false);
+      }
+    };
+    
+    if (showFormatPanel || showContextMenu) {
       document.addEventListener('click', handleClickOutside);
       return () => document.removeEventListener('click', handleClickOutside);
     }
-  }, [showContextMenu]);
+  }, [showFormatPanel, showContextMenu]);
 
   // Enhanced keyboard navigation
   useEffect(() => {
     if (isSelected && !isEditing) {
       const handleKeyDown = (e: KeyboardEvent) => {
+        // Format shortcuts
+        if ((e.ctrlKey || e.metaKey) && !isEditing) {
+          switch (e.key) {
+            case 'b':
+              e.preventDefault();
+              toggleBold();
+              break;
+            case 'i':
+              e.preventDefault();
+              toggleItalic();
+              break;
+            case 'u':
+              e.preventDefault();
+              toggleUnderline();
+              break;
+          }
+          return;
+        }
+
         switch (e.key) {
           case 'Delete':
           case 'Backspace':
@@ -736,7 +836,19 @@ const DraggableText = React.memo(({
       document.addEventListener('keydown', handleKeyDown);
       return () => document.removeEventListener('keydown', handleKeyDown);
     }
-  }, [isSelected, isEditing, id, style, onUpdate, onDelete, handleDoubleClick]);
+  }, [isSelected, isEditing, id, style, onUpdate, onDelete, handleDoubleClick, toggleBold, toggleItalic, toggleUnderline]);
+
+  // Font size options
+  const fontSizes = ['12px', '14px', '16px', '18px', '20px', '24px', '28px', '32px', '36px', '48px', '72px'];
+  
+  // Color presets
+  const colorPresets = [
+    '#000000', '#374151', '#6B7280', '#9CA3AF',
+    '#EF4444', '#F97316', '#F59E0B', '#EAB308',
+    '#84CC16', '#22C55E', '#10B981', '#14B8A6',
+    '#06B6D4', '#0EA5E9', '#3B82F6', '#6366F1',
+    '#8B5CF6', '#A855F7', '#D946EF', '#EC4899'
+  ];
 
   return (
     <>
@@ -752,15 +864,16 @@ const DraggableText = React.memo(({
           willChange: 'transform', // GPU acceleration
         }}
         className={`
-          ${style.background ? 'p-0' : isMobile ? 'p-4' : 'p-3'} rounded-lg transition-all duration-200 select-none 
+          ${style.background || style.backgroundColor ? 'p-0' : isMobile ? 'p-4' : 'p-3'} 
+          rounded-lg transition-all duration-200 select-none 
           ${isMobile ? 'touch-manipulation' : ''}
-          ${isSelected && !style.background ? 'ring-2 ring-blue-500 shadow-lg bg-blue-50/50' : 'hover:shadow-md'}
+          ${isSelected && !style.background && !style.backgroundColor ? 'ring-2 ring-blue-500 shadow-lg bg-blue-50/50' : 'hover:shadow-md'}
           ${isDragging ? 'opacity-75 shadow-2xl' : 'opacity-100'}
-          ${isEditing ? 'bg-white border-2 border-blue-400' : style.background ? '' : 'bg-white/90 backdrop-blur-sm border border-gray-200'}
-          ${text || style.background ? '' : 'border-dashed border-gray-300 bg-gray-50'}
+          ${isEditing ? 'bg-white border-2 border-blue-400' : style.background || style.backgroundColor ? '' : 'bg-white/90 backdrop-blur-sm border border-gray-200'}
+          ${text || style.background || style.backgroundColor ? '' : 'border-dashed border-gray-300 bg-gray-50'}
           ${isMobile ? 'min-h-[44px] min-w-[44px]' : ''}
         `}
-        onClick={() => onSelect(id)}
+        onClick={handleSelect}
         onDoubleClick={handleDoubleClick}
         onContextMenu={handleContextMenu}
         {...(!isEditing ? attributes : {})}
@@ -786,8 +899,11 @@ const DraggableText = React.memo(({
               style={{ 
                 fontSize: style.fontSize || '16px', 
                 fontWeight: style.fontWeight || 'normal',
+                fontStyle: style.fontStyle || 'normal',
+                textDecoration: style.textDecoration || 'none',
                 color: style.color || '#000000',
-                lineHeight: style.lineHeight || '1.4'
+                lineHeight: style.lineHeight || '1.4',
+                textAlign: style.textAlign || 'left'
               }}
               rows={Math.max(1, editText.split('\n').length)}
               placeholder="Enter text..."
@@ -816,25 +932,31 @@ const DraggableText = React.memo(({
         ) : (
           <div className="relative group">
             <div 
+              ref={textRef}
               style={{ 
                 fontSize: style.fontSize || '16px', 
                 fontWeight: style.fontWeight || 'normal',
+                fontStyle: style.fontStyle || 'normal',
+                textDecoration: style.textDecoration || 'none',
                 color: style.color || '#000000',
                 lineHeight: style.lineHeight || '1.4',
+                textAlign: style.textAlign || 'left',
                 textShadow: style.textShadow,
                 maxWidth: style.maxWidth,
                 width: style.width,
                 height: style.height,
                 background: style.background,
+                backgroundColor: style.backgroundColor,
                 borderRadius: style.borderRadius,
                 boxShadow: style.boxShadow,
                 border: style.border,
+                padding: style.padding,
                 zIndex: style.zIndex || 'auto',
                 overflow: 'hidden'
               }}
               className={`whitespace-pre-wrap break-words select-text ${text ? '' : 'opacity-30'}`}
             >
-              {text || (style.background ? '' : 'Empty text element')}
+              {text || (style.background || style.backgroundColor ? '' : 'Empty text element')}
             </div>
             
             {/* Accessibility indicator */}
@@ -884,6 +1006,129 @@ const DraggableText = React.memo(({
         )}
       </motion.div>
 
+      {/* Rich Text Formatting Panel */}
+      <AnimatePresence>
+        {showFormatPanel && isSelected && !isEditing && (
+          <motion.div
+            ref={formatPanelRef}
+            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+            transition={ANIMATION_CONFIG}
+            className="fixed z-[9999] bg-white border border-gray-200 rounded-lg shadow-xl p-3 min-w-[320px]"
+            style={{
+              left: Math.min(window.innerWidth - 340, Math.max(10, (style.left || 0) + 50)),
+              top: Math.max(10, (style.top || 0) - 10),
+            }}
+          >
+            <div className="space-y-3">
+              {/* Font formatting row */}
+              <div className="flex items-center space-x-2">
+                <div className="flex bg-gray-100 rounded p-1">
+                  <Button
+                    size="sm"
+                    onClick={toggleBold}
+                    className={`h-8 w-8 p-0 ${style.fontWeight === 'bold' || style.fontWeight === '700' ? 'bg-blue-500 text-white' : 'bg-transparent text-gray-700 hover:bg-gray-200'}`}
+                    title="Bold (Ctrl+B)"
+                  >
+                    <span className="font-bold text-sm">B</span>
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={toggleItalic}
+                    className={`h-8 w-8 p-0 ml-1 ${style.fontStyle === 'italic' ? 'bg-blue-500 text-white' : 'bg-transparent text-gray-700 hover:bg-gray-200'}`}
+                    title="Italic (Ctrl+I)"
+                  >
+                    <span className="italic text-sm">I</span>
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={toggleUnderline}
+                    className={`h-8 w-8 p-0 ml-1 ${style.textDecoration === 'underline' ? 'bg-blue-500 text-white' : 'bg-transparent text-gray-700 hover:bg-gray-200'}`}
+                    title="Underline (Ctrl+U)"
+                  >
+                    <span className="underline text-sm">U</span>
+                  </Button>
+                </div>
+
+                {/* Font size selector */}
+                <select
+                  value={style.fontSize || '16px'}
+                  onChange={(e) => changeFontSize(e.target.value)}
+                  className="h-8 px-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500"
+                >
+                  {fontSizes.map(size => (
+                    <option key={size} value={size}>{parseInt(size)}px</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Color and alignment row */}
+              <div className="flex items-center space-x-2">
+                {/* Text color */}
+                <div className="flex items-center space-x-1">
+                  <span className="text-xs text-gray-600">Color:</span>
+                  <div className="flex space-x-1">
+                    {colorPresets.slice(0, 8).map(color => (
+                      <button
+                        key={color}
+                        onClick={() => changeTextColor(color)}
+                        className={`w-6 h-6 rounded border-2 ${style.color === color ? 'border-blue-500' : 'border-gray-300'}`}
+                        style={{ backgroundColor: color }}
+                        title={`Text color: ${color}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Background color row */}
+              <div className="flex items-center space-x-2">
+                <span className="text-xs text-gray-600">Background:</span>
+                <button
+                  onClick={() => changeBackgroundColor('transparent')}
+                  className={`w-6 h-6 rounded border-2 ${!style.backgroundColor || style.backgroundColor === 'transparent' ? 'border-blue-500' : 'border-gray-300'} bg-white relative`}
+                  title="No background"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-red-500 via-transparent to-red-500 opacity-30 rounded"></div>
+                </button>
+                {['#FEFCE8', '#FEF3C7', '#DBEAFE', '#E0E7FF', '#F3E8FF', '#FCE7F3'].map(color => (
+                  <button
+                    key={color}
+                    onClick={() => changeBackgroundColor(color)}
+                    className={`w-6 h-6 rounded border-2 ${style.backgroundColor === color ? 'border-blue-500' : 'border-gray-300'}`}
+                    style={{ backgroundColor: color }}
+                    title={`Background color: ${color}`}
+                  />
+                ))}
+              </div>
+
+              {/* Text alignment */}
+              <div className="flex items-center space-x-2">
+                <span className="text-xs text-gray-600">Align:</span>
+                <div className="flex bg-gray-100 rounded p-1">
+                  {[
+                    { value: 'left', icon: '⟵', title: 'Align left' },
+                    { value: 'center', icon: '⟷', title: 'Center' },
+                    { value: 'right', icon: '⟶', title: 'Align right' }
+                  ].map(({ value, icon, title }) => (
+                    <Button
+                      key={value}
+                      size="sm"
+                      onClick={() => changeTextAlign(value)}
+                      className={`h-8 w-8 p-0 ${style.textAlign === value ? 'bg-blue-500 text-white' : 'bg-transparent text-gray-700 hover:bg-gray-200'}`}
+                      title={title}
+                    >
+                      <span className="text-sm">{icon}</span>
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Enhanced Context Menu */}
       <AnimatePresence>
         {showContextMenu && (
@@ -904,6 +1149,13 @@ const DraggableText = React.memo(({
             >
               <Edit className="h-3 w-3" />
               <span>Edit</span>
+            </button>
+            <button
+              onClick={() => setShowFormatPanel(true)}
+              className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 flex items-center space-x-2"
+            >
+              <Type className="h-3 w-3" />
+              <span>Format</span>
             </button>
             <button
               onClick={handleCopy}
@@ -939,7 +1191,7 @@ const DraggableText = React.memo(({
 
 DraggableText.displayName = 'DraggableText';
 
-// Enhanced Draggable Image Component with Performance & UX improvements
+// Enhanced Draggable Image Component with Better PDF Support & Performance
 const DraggableImage = React.memo(({ 
   id, 
   src, 
@@ -962,7 +1214,9 @@ const DraggableImage = React.memo(({
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [showContextMenu, setShowContextMenu] = useState(false);
+  const [showResizeHandles, setShowResizeHandles] = useState(false);
   const [contextMenuPos, setContextMenuPos] = useState({ x: 0, y: 0 });
+  const [isResizing, setIsResizing] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
   const { targetRef, isIntersecting } = useIntersectionObserver();
 
@@ -1006,6 +1260,22 @@ const DraggableImage = React.memo(({
     });
     setShowContextMenu(false);
   }, [id, src, style, onUpdate]);
+
+  const handleResize = useCallback((newWidth: number, newHeight: number) => {
+    onUpdate(id, { 
+      style: { 
+        ...style, 
+        width: `${newWidth}px`, 
+        height: `${newHeight}px` 
+      } 
+    });
+  }, [id, style, onUpdate]);
+
+  const handleSelect = useCallback(() => {
+    onSelect(id);
+    setShowResizeHandles(true);
+    setShowContextMenu(false);
+  }, [onSelect, id]);
 
   // Close context menu on outside click
   useEffect(() => {
@@ -1073,7 +1343,7 @@ const DraggableImage = React.memo(({
           ${isSelected ? 'ring-2 ring-blue-500 shadow-lg' : 'hover:shadow-md'}
           ${isDragging ? 'opacity-75 shadow-2xl' : 'opacity-100'}
         `}
-        onClick={() => onSelect(id)}
+        onClick={handleSelect}
         onContextMenu={handleContextMenu}
         {...attributes}
         {...listeners}
@@ -1503,7 +1773,7 @@ const EditableSlidePresentation = ({
     })
   );
 
-  // Enhanced drag handler with grid snapping and history
+  // Enhanced drag handler with grid snapping, smooth animations, and history
   const handleDragEnd = useCallback((event: any) => {
     const { active, delta } = event;
     
@@ -1520,6 +1790,7 @@ const EditableSlidePresentation = ({
                       ...element.style,
                       top: snapToGridPosition(Math.max(0, element.style.top + delta.y)),
                       left: snapToGridPosition(Math.max(0, element.style.left + delta.x)),
+                      transition: 'all 0.2s ease-out', // Smooth transition after drag
                     }
                   }
                 : element
@@ -1531,11 +1802,10 @@ const EditableSlidePresentation = ({
       
       // Add to history for undo functionality
       addToHistory(newSlides);
-      addToast('Element moved', 'info');
       
       return newSlides;
     });
-  }, [currentSlide, snapToGridPosition, addToHistory, addToast]);
+  }, [currentSlide, snapToGridPosition, addToHistory]);
 
   // Enhanced handlers with history tracking
   const updateElement = useCallback((id: string, updates: any) => {
@@ -2161,22 +2431,147 @@ const EditableSlidePresentation = ({
                     </PresentationErrorBoundary>
                   </SortableContext>
 
-                  {/* Enhanced Canvas Guidelines */}
-                  <div className="absolute inset-0 pointer-events-none">
-                    <div className="absolute top-1/2 left-0 right-0 h-px bg-blue-300 opacity-30"></div>
-                    <div className="absolute left-1/2 top-0 bottom-0 w-px bg-blue-300 opacity-30"></div>
+                  {/* Enhanced Canvas Guidelines with smooth animations */}
+                  <motion.div 
+                    className="absolute inset-0 pointer-events-none"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3, ...ANIMATION_CONFIG }}
+                  >
+                    {/* Center guidelines */}
+                    <motion.div 
+                      className="absolute top-1/2 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-300 to-transparent"
+                      style={{ opacity: selectedElement ? 0.5 : 0.2 }}
+                      transition={{ duration: 0.3 }}
+                    />
+                    <motion.div 
+                      className="absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-blue-300 to-transparent"
+                      style={{ opacity: selectedElement ? 0.5 : 0.2 }}
+                      transition={{ duration: 0.3 }}
+                    />
                     
-                    {/* Corner indicators */}
-                    <div className="absolute top-4 left-4 w-2 h-2 border-l-2 border-t-2 border-gray-300"></div>
-                    <div className="absolute top-4 right-4 w-2 h-2 border-r-2 border-t-2 border-gray-300"></div>
-                    <div className="absolute bottom-4 left-4 w-2 h-2 border-l-2 border-b-2 border-gray-300"></div>
-                    <div className="absolute bottom-4 right-4 w-2 h-2 border-r-2 border-b-2 border-gray-300"></div>
-                  </div>
+                    {/* Grid overlay */}
+                    <AnimatePresence>
+                      {showGrid && (
+                        <motion.div 
+                          className="absolute inset-0"
+                          style={{
+                            backgroundImage: `
+                              linear-gradient(to right, rgba(229, 231, 235, 0.4) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(229, 231, 235, 0.4) 1px, transparent 1px)
+                            `,
+                            backgroundSize: `${gridSize}px ${gridSize}px`
+                          }}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={ANIMATION_CONFIG}
+                        />
+                      )}
+                    </AnimatePresence>
+                    
+                    {/* Corner indicators with hover effects */}
+                    <div className="absolute top-4 left-4 w-2 h-2 border-l-2 border-t-2 border-gray-300 transition-all duration-200 hover:border-blue-400 hover:scale-125"></div>
+                    <div className="absolute top-4 right-4 w-2 h-2 border-r-2 border-t-2 border-gray-300 transition-all duration-200 hover:border-blue-400 hover:scale-125"></div>
+                    <div className="absolute bottom-4 left-4 w-2 h-2 border-l-2 border-b-2 border-gray-300 transition-all duration-200 hover:border-blue-400 hover:scale-125"></div>
+                    <div className="absolute bottom-4 right-4 w-2 h-2 border-r-2 border-b-2 border-gray-300 transition-all duration-200 hover:border-blue-400 hover:scale-125"></div>
+                  </motion.div>
+                  
+                  {/* Slide transition overlay for smooth slide changes */}
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={currentSlide}
+                      className="absolute inset-0 pointer-events-none bg-gradient-to-br from-blue-50/20 via-transparent to-purple-50/20"
+                      initial={{ opacity: 0, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 1.02 }}
+                      transition={SMOOTH_TRANSITION_CONFIG}
+                    />
+                  </AnimatePresence>
                 </div>
             </DndContext>
           </div>
         </div>
       </div>
+
+      {/* Floating Quick Actions Toolbar */}
+      {selectedElement && !isMobile && (
+        <motion.div
+          className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[1000]"
+          initial={{ y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 100, opacity: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        >
+          <div className="bg-white/95 backdrop-blur-sm border border-gray-200 rounded-full px-4 py-2 shadow-xl flex items-center space-x-3">
+            <div className="flex items-center space-x-1">
+              <Button
+                size="sm"
+                onClick={undo}
+                disabled={!canUndo}
+                className="h-8 w-8 p-0 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 disabled:opacity-50"
+                title="Undo"
+              >
+                <RotateCcw className="h-4 w-4" />
+              </Button>
+              <Button
+                size="sm"
+                onClick={redo}
+                disabled={!canRedo}
+                className="h-8 w-8 p-0 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 disabled:opacity-50"
+                title="Redo"
+              >
+                <RotateCcw className="h-4 w-4 scale-x-[-1]" />
+              </Button>
+            </div>
+            
+            <div className="h-6 w-px bg-gray-300"></div>
+            
+            <div className="flex items-center space-x-1">
+              <Button
+                size="sm"
+                onClick={addTextElement}
+                className="h-8 px-3 rounded-full bg-blue-500 hover:bg-blue-600 text-white text-xs"
+                title="Add Text"
+              >
+                <Type className="h-4 w-4 mr-1" />
+                Text
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+                className="h-8 px-3 rounded-full bg-green-500 hover:bg-green-600 text-white text-xs"
+                title="Add Image"
+              >
+                <ImageIcon className="h-4 w-4 mr-1" />
+                Image
+              </Button>
+            </div>
+            
+            <div className="h-6 w-px bg-gray-300"></div>
+            
+            <div className="flex items-center space-x-1">
+              <Button
+                size="sm"
+                onClick={() => setShowGrid(!showGrid)}
+                className={`h-8 w-8 p-0 rounded-full ${showGrid ? 'bg-purple-500 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
+                title="Toggle Grid"
+              >
+                <MousePointer className="h-4 w-4" />
+              </Button>
+              <Button
+                size="sm"
+                onClick={handleSave}
+                className="h-8 px-3 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white text-xs"
+                title="Save"
+              >
+                <Save className="h-4 w-4 mr-1" />
+                Save
+              </Button>
+            </div>
+          </div>
+        </motion.div>
+      )}
 
       {/* Mobile Floating Action Button */}
       {isMobile && (
@@ -4561,7 +4956,19 @@ Please structure this as a ready-to-deliver training course that someone could u
                                 </div>
                                 ${slide.imageUrl || (slide.imageElements && slide.imageElements.length > 0) ? `
                                   <div style="${slide.layout === 'two-column' ? 'flex: 1;' : 'margin-top: 20px;'} text-align: center;">
-                                    <img src="${slide.imageUrl || (slide.imageElements && slide.imageElements[0] ? slide.imageElements[0].src : '')}" style="max-width: 100%; max-height: ${slide.layout === 'two-column' ? '300px' : '200px'}; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" />
+                                    <img src="${slide.imageUrl || (slide.imageElements && slide.imageElements[0] ? slide.imageElements[0].src : '')}" 
+                                         style="max-width: 100%; max-height: ${slide.layout === 'two-column' ? '300px' : '250px'}; 
+                                                border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); 
+                                                border: 2px solid rgba(255,255,255,0.8);" 
+                                         alt="Slide ${slide.slideNumber} Image" />
+                                    ${slide.imageElements && slide.imageElements.length > 1 ? `
+                                      <div style="margin-top: 10px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                                        ${slide.imageElements.slice(1, 4).map((img: any) => `
+                                          <img src="${img.src}" style="width: 80px; height: 60px; object-fit: cover; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" alt="Additional image" />
+                                        `).join('')}
+                                        ${slide.imageElements.length > 4 ? `<div style="font-size: 12px; color: #666; align-self: center;">+${slide.imageElements.length - 4} more</div>` : ''}
+                                      </div>
+                                    ` : ''}
                                   </div>
                                 ` : ''}
                               `}
