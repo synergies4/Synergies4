@@ -750,10 +750,11 @@ const DraggableText = React.memo(({
           willChange: 'transform', // GPU acceleration
         }}
         className={`
-          p-3 rounded-lg transition-all duration-200 select-none
-          ${isSelected ? 'ring-2 ring-blue-500 shadow-lg bg-blue-50/50' : 'hover:shadow-md'}
+          ${style.background ? 'p-0' : 'p-3'} rounded-lg transition-all duration-200 select-none
+          ${isSelected && !style.background ? 'ring-2 ring-blue-500 shadow-lg bg-blue-50/50' : 'hover:shadow-md'}
           ${isDragging ? 'opacity-75 shadow-2xl' : 'opacity-100'}
-          ${isEditing ? 'bg-white border-2 border-blue-400' : 'bg-white/90 backdrop-blur-sm border border-gray-200'}
+          ${isEditing ? 'bg-white border-2 border-blue-400' : style.background ? '' : 'bg-white/90 backdrop-blur-sm border border-gray-200'}
+          ${text || style.background ? '' : 'border-dashed border-gray-300 bg-gray-50'}
         `}
         onClick={() => onSelect(id)}
         onDoubleClick={handleDoubleClick}
@@ -782,7 +783,7 @@ const DraggableText = React.memo(({
                 fontSize: style.fontSize || '16px', 
                 fontWeight: style.fontWeight || 'normal',
                 color: style.color || '#000000',
-                lineHeight: '1.4'
+                lineHeight: style.lineHeight || '1.4'
               }}
               rows={Math.max(1, editText.split('\n').length)}
               placeholder="Enter text..."
@@ -815,11 +816,21 @@ const DraggableText = React.memo(({
                 fontSize: style.fontSize || '16px', 
                 fontWeight: style.fontWeight || 'normal',
                 color: style.color || '#000000',
-                lineHeight: '1.4'
+                lineHeight: style.lineHeight || '1.4',
+                textShadow: style.textShadow,
+                maxWidth: style.maxWidth,
+                width: style.width,
+                height: style.height,
+                background: style.background,
+                borderRadius: style.borderRadius,
+                boxShadow: style.boxShadow,
+                border: style.border,
+                zIndex: style.zIndex || 'auto',
+                overflow: 'hidden'
               }}
-              className="whitespace-pre-wrap break-words select-text"
+              className={`whitespace-pre-wrap break-words select-text ${text ? '' : 'opacity-30'}`}
             >
-              {text || 'Empty text element'}
+              {text || (style.background ? '' : 'Empty text element')}
             </div>
             
             {/* Accessibility indicator */}
@@ -827,26 +838,28 @@ const DraggableText = React.memo(({
               <div className="absolute -top-1 -left-1 w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
             )}
             
-            {/* Action buttons */}
-            {isSelected && (
+            {/* Action buttons - only show for text content, not background elements */}
+            {isSelected && (text || !style.background) && (
               <motion.div 
                 className="absolute -top-2 -right-2 flex space-x-1"
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={ANIMATION_CONFIG}
               >
-                <Button 
-                  size="sm" 
-                  variant="secondary"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDoubleClick();
-                  }}
-                  className="h-6 w-6 p-0 bg-blue-500 hover:bg-blue-600 text-white"
-                  aria-label="Edit text"
-                >
-                  <Edit className="h-3 w-3" />
-                </Button>
+                {text && (
+                  <Button 
+                    size="sm" 
+                    variant="secondary"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDoubleClick();
+                    }}
+                    className="h-6 w-6 p-0 bg-blue-500 hover:bg-blue-600 text-white"
+                    aria-label="Edit text"
+                  >
+                    <Edit className="h-3 w-3" />
+                  </Button>
+                )}
                 <Button 
                   size="sm" 
                   variant="destructive" 
@@ -1221,33 +1234,195 @@ const EditableSlidePresentation = ({
       };
     }
     
-    // Initialize elements for new slides
-    const baseElements = [
-      {
-        id: `title-${slide.slideNumber}`,
-        type: 'text',
-        text: slide.title,
-        style: {
-          top: 50,
-          left: 50,
-          fontSize: '32px',
-          fontWeight: 'bold',
-          color: '#1f2937'
+    // Initialize elements for new slides with modern design
+    const baseElements = [];
+    
+    // Create modern slide layouts based on slide type
+    if (slide.layout === 'title-slide') {
+      // Title slide with modern hero layout
+      baseElements.push(
+        // Main title with gradient background
+        {
+          id: `title-bg-${slide.slideNumber}`,
+          type: 'text',
+          text: '',
+          style: {
+            top: 60,
+            left: 40,
+            width: '720px',
+            height: '120px',
+            background: 'linear-gradient(135deg, #0f766e 0%, #059669 50%, #10b981 100%)',
+            borderRadius: '16px',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            zIndex: 1
+          }
+        },
+        // Title text overlay
+        {
+          id: `title-${slide.slideNumber}`,
+          type: 'text',
+          text: slide.title,
+          style: {
+            top: 90,
+            left: 80,
+            fontSize: '48px',
+            fontWeight: '800',
+            color: '#ffffff',
+            textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+            zIndex: 2,
+            maxWidth: '640px'
+          }
+        },
+        // Subtitle container
+        {
+          id: `subtitle-bg-${slide.slideNumber}`,
+          type: 'text',
+          text: '',
+          style: {
+            top: 220,
+            left: 60,
+            width: '680px',
+            height: '200px',
+            background: 'rgba(255, 255, 255, 0.95)',
+            borderRadius: '12px',
+            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+            border: '1px solid rgba(16, 185, 129, 0.2)',
+            zIndex: 1
+          }
+        },
+        // Content points with modern styling
+        ...slide.content.map((content: string, idx: number) => ({
+          id: `content-${slide.slideNumber}-${idx}`,
+          type: 'text',
+          text: content,
+          style: {
+            top: 250 + (idx * 40),
+            left: 100,
+            fontSize: '22px',
+            fontWeight: '500',
+            color: '#1f2937',
+            zIndex: 2,
+            maxWidth: '600px'
+          }
+        })),
+        // Decorative accent
+        {
+          id: `accent-${slide.slideNumber}`,
+          type: 'text',
+          text: '✨',
+          style: {
+            top: 30,
+            left: 680,
+            fontSize: '32px',
+            zIndex: 3
+          }
         }
-      },
-      ...slide.content.map((content: string, idx: number) => ({
-        id: `content-${slide.slideNumber}-${idx}`,
-        type: 'text',
-        text: `• ${content}`,
-        style: {
-          top: 120 + (idx * 50),
-          left: 70,
-          fontSize: '18px',
-          fontWeight: 'normal',
-          color: '#374151'
+      );
+    } else {
+      // Content slides with modern card-based layout
+      baseElements.push(
+        // Header section with gradient
+        {
+          id: `header-bg-${slide.slideNumber}`,
+          type: 'text',
+          text: '',
+          style: {
+            top: 40,
+            left: 40,
+            width: '720px',
+            height: '80px',
+            background: 'linear-gradient(90deg, #0f766e 0%, #059669 100%)',
+            borderRadius: '12px 12px 0 0',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+            zIndex: 1
+          }
+        },
+        // Title with modern typography
+        {
+          id: `title-${slide.slideNumber}`,
+          type: 'text',
+          text: slide.title,
+          style: {
+            top: 60,
+            left: 70,
+            fontSize: '36px',
+            fontWeight: '700',
+            color: '#ffffff',
+            zIndex: 2,
+            maxWidth: '660px'
+          }
+        },
+        // Content container
+        {
+          id: `content-bg-${slide.slideNumber}`,
+          type: 'text',
+          text: '',
+          style: {
+            top: 120,
+            left: 40,
+            width: '720px',
+            height: slide.content.length * 70 + 60,
+            background: 'rgba(255, 255, 255, 0.98)',
+            borderRadius: '0 0 12px 12px',
+            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+            border: '1px solid rgba(229, 231, 235, 0.6)',
+            zIndex: 1
+          }
+        },
+        // Content items with modern bullet points
+        ...slide.content.map((content: string, idx: number) => [
+          // Bullet point icon
+          {
+            id: `bullet-${slide.slideNumber}-${idx}`,
+            type: 'text',
+            text: '▶',
+            style: {
+              top: 150 + (idx * 70),
+              left: 80,
+              fontSize: '16px',
+              color: '#059669',
+              zIndex: 2
+            }
+          },
+          // Content text
+          {
+            id: `content-${slide.slideNumber}-${idx}`,
+            type: 'text',
+            text: content,
+            style: {
+              top: 145 + (idx * 70),
+              left: 110,
+              fontSize: '20px',
+              fontWeight: '500',
+              color: '#374151',
+              lineHeight: '1.6',
+              zIndex: 2,
+              maxWidth: '600px'
+            }
+          }
+        ]).flat(),
+        // Side accent bar
+        {
+          id: `accent-bar-${slide.slideNumber}`,
+          type: 'text',
+          text: '',
+          style: {
+            top: 40,
+            left: 30,
+            width: '6px',
+            height: slide.content.length * 70 + 140,
+            background: 'linear-gradient(180deg, #10b981 0%, #059669 100%)',
+            borderRadius: '3px',
+            zIndex: 3
+          }
         }
-      }))
-    ];
+      );
+    }
+    
+    console.log(`Created modern design elements for slide ${slide.slideNumber}:`, {
+      layout: slide.layout,
+      elementsCreated: baseElements.length
+    });
     
     // Add any existing image elements with proper formatting
     const imageElements = (slide.imageElements || []).map((img: any) => ({
@@ -1882,7 +2057,15 @@ const EditableSlidePresentation = ({
             >
                               <div 
                   ref={canvasRef}
-                  className="w-full h-full bg-white rounded-lg shadow-xl relative overflow-hidden"
+                  className="w-full h-full relative overflow-hidden rounded-lg shadow-xl"
+                  style={{
+                    background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%)',
+                    backgroundImage: `
+                      radial-gradient(circle at 25% 25%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
+                      radial-gradient(circle at 75% 75%, rgba(59, 130, 246, 0.1) 0%, transparent 50%)
+                    `,
+                    border: '1px solid rgba(226, 232, 240, 0.8)'
+                  }}
                   onClick={() => setSelectedElement(null)}
                 >
                   {/* Grid Overlay */}
@@ -3964,47 +4147,88 @@ Please structure this as a ready-to-deliver training course that someone could u
         {/* Enhanced Slide Preview with Animation */}
         {currentSlideData && (
           <div className="p-6">
-            {/* Slide Content Area */}
-            <div className={`bg-gradient-to-br from-gray-50 via-white to-teal-50 rounded-xl border-2 border-gray-100 p-6 mb-6 min-h-[280px] relative overflow-hidden transition-all duration-300 ${isAnimating ? 'opacity-50 transform translate-x-2' : 'opacity-100 transform translate-x-0'}`}>
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-teal-100 to-transparent rounded-full transform translate-x-16 -translate-y-16 opacity-50"></div>
+            {/* Modern Slide Content Area */}
+            <div className={`relative rounded-xl border-2 border-gray-100 mb-6 min-h-[320px] overflow-hidden transition-all duration-300 ${isAnimating ? 'opacity-50 transform translate-x-2' : 'opacity-100 transform translate-x-0'}`}
+              style={{
+                background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%)',
+                backgroundImage: `
+                  radial-gradient(circle at 25% 25%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
+                  radial-gradient(circle at 75% 75%, rgba(59, 130, 246, 0.1) 0%, transparent 50%)
+                `
+              }}
+            >
+              {/* Background Pattern */}
+              <div className="absolute inset-0">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-teal-200/30 to-transparent rounded-full transform translate-x-16 -translate-y-16"></div>
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-emerald-200/30 to-transparent rounded-full transform -translate-x-12 translate-y-12"></div>
+              </div>
               
-              <div className="relative z-10">
-                {/* Slide Header */}
-                <div className="flex items-start justify-between mb-6">
-                  <div className="flex-1">
-                    <h5 className="text-2xl font-bold text-gray-900 leading-tight mb-2">
-                      {currentSlideData.title}
-                    </h5>
-                    <div className="flex items-center space-x-3">
-                      <Badge variant="outline" className="border-teal-300 text-teal-700 bg-teal-50 px-3 py-1">
-                        {currentSlideData.layout || 'Standard'}
-                      </Badge>
-                      <span className="text-sm text-gray-500">
-                        Slide {currentSlideData.slideNumber}
-                      </span>
+              <div className="relative z-10 p-6">
+                {/* Modern Slide Header */}
+                {currentSlideData.layout === 'title-slide' ? (
+                  <div className="text-center py-8">
+                    <div className="inline-block">
+                      <div className="bg-gradient-to-r from-teal-600 to-emerald-600 text-white px-8 py-4 rounded-2xl shadow-lg mb-6">
+                        <h5 className="text-3xl font-bold leading-tight">
+                          {currentSlideData.title}
+                        </h5>
+                      </div>
+                      <div className="bg-white/95 backdrop-blur-sm rounded-xl p-6 shadow-md border border-teal-100">
+                        <div className="space-y-3">
+                          {currentSlideData.content?.slice(0, 3).map((item: string, idx: number) => (
+                            <div key={idx} className="text-lg text-gray-700 font-medium">
+                              {item}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-                
-                {/* Content with better typography */}
-                <div className="space-y-4">
-                  {currentSlideData.content?.map((item: string, idx: number) => (
-                    <div key={idx} className="flex items-start group">
-                      <div className="w-3 h-3 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-full mt-2 mr-4 flex-shrink-0 shadow-sm group-hover:scale-110 transition-transform duration-200"></div>
-                      <span className="text-base text-gray-800 leading-relaxed font-medium">
-                        {item}
-                      </span>
+                ) : (
+                  <>
+                    {/* Content Slide Header */}
+                    <div className="bg-gradient-to-r from-teal-600 to-emerald-600 text-white rounded-xl p-4 mb-6 shadow-lg">
+                      <h5 className="text-2xl font-bold leading-tight">
+                        {currentSlideData.title}
+                      </h5>
+                      <div className="flex items-center space-x-3 mt-2">
+                        <Badge className="bg-white/20 text-white border-white/30 px-3 py-1">
+                          {currentSlideData.layout || 'Standard'}
+                        </Badge>
+                        <span className="text-teal-100 text-sm">
+                          Slide {currentSlideData.slideNumber}
+                        </span>
+                      </div>
                     </div>
-                  ))}
-                  
-                  {currentSlideData.content?.length > 5 && (
-                    <div className="ml-7 mt-4">
-                      <p className="text-sm text-teal-600 font-medium bg-teal-50 px-3 py-2 rounded-lg inline-block">
-                        +{currentSlideData.content.length - 5} more points in full view
-                      </p>
+                    
+                    {/* Modern Content Display */}
+                    <div className="bg-white/95 backdrop-blur-sm rounded-xl p-6 shadow-md border border-gray-100">
+                      <div className="space-y-4">
+                        {currentSlideData.content?.slice(0, 4).map((item: string, idx: number) => (
+                          <div key={idx} className="flex items-start group">
+                            <div className="w-6 h-6 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-lg mt-1 mr-4 flex-shrink-0 shadow-sm group-hover:scale-110 transition-transform duration-200 flex items-center justify-center">
+                              <span className="text-white text-xs font-bold">▶</span>
+                            </div>
+                            <span className="text-base text-gray-800 leading-relaxed font-medium flex-1">
+                              {item}
+                            </span>
+                          </div>
+                        ))}
+                        
+                        {currentSlideData.content?.length > 4 && (
+                          <div className="ml-10 mt-4">
+                            <div className="bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-200 px-4 py-2 rounded-lg inline-block">
+                              <span className="text-sm text-teal-700 font-medium">
+                                +{currentSlideData.content.length - 4} more points in presentation
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  )}
-                </div>
+                  </>
+                )}
+              </div>
 
                 {/* Speaker Notes Preview */}
                 {currentSlideData.speakerNotes && (
