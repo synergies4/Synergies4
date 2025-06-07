@@ -1204,8 +1204,17 @@ const EditableSlidePresentation = ({
 }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [editableSlides, setEditableSlides] = useState(slides.map(slide => {
+    console.log(`Initializing slide ${slide.slideNumber}:`, {
+      hasExistingElements: !!(slide.elements && slide.elements.length > 0),
+      elementsCount: slide.elements?.length || 0,
+      hasImageElements: !!(slide.imageElements && slide.imageElements.length > 0),
+      imageElementsCount: slide.imageElements?.length || 0,
+      hasImageUrl: !!slide.imageUrl
+    });
+    
     // Check if slide already has elements (from previous editing)
     if (slide.elements && slide.elements.length > 0) {
+      console.log(`Using existing elements for slide ${slide.slideNumber}:`, slide.elements);
       return {
         ...slide,
         elements: slide.elements
@@ -1240,9 +1249,41 @@ const EditableSlidePresentation = ({
       }))
     ];
     
-    // Add any existing image elements
-    const imageElements = slide.imageElements || [];
+    // Add any existing image elements with proper formatting
+    const imageElements = (slide.imageElements || []).map((img: any) => ({
+      ...img,
+      type: 'image',
+      id: img.id || `image-${Date.now()}-${Math.random()}`,
+      style: img.style || {
+        top: 150,
+        left: 300,
+        width: '200px',
+        height: 'auto'
+      }
+    }));
+    
+    // Add primary imageUrl as an element if it exists and no imageElements
+    if (slide.imageUrl && imageElements.length === 0) {
+      imageElements.push({
+        id: `image-primary-${slide.slideNumber}`,
+        type: 'image',
+        src: slide.imageUrl,
+        style: {
+          top: 200,
+          left: 400,
+          width: '250px',
+          height: 'auto'
+        }
+      });
+    }
+    
     const customElements = slide.customElements || [];
+    
+    console.log(`Created elements for slide ${slide.slideNumber}:`, {
+      baseElements: baseElements.length,
+      imageElements: imageElements.length,
+      customElements: customElements.length
+    });
     
     return {
       ...slide,
@@ -1554,8 +1595,15 @@ const EditableSlidePresentation = ({
 
   const handleSave = useCallback(() => {
     try {
+      console.log('Saving presentation with editableSlides:', editableSlides);
+      
       // Convert back to original slide format while preserving all content
       const updatedSlides = editableSlides.map(slide => {
+        console.log(`Processing slide ${slide.slideNumber} for save:`, {
+          elementCount: slide.elements.length,
+          elements: slide.elements.map((el: any) => ({ id: el.id, type: el.type }))
+        });
+        
         // Find title element
         const titleElement = slide.elements.find((el: any) => el.id.startsWith('title-'));
         
@@ -1577,20 +1625,38 @@ const EditableSlidePresentation = ({
         // Extract image data for main slide object
         const primaryImage = imageElements.length > 0 ? imageElements[0] : null;
         
-        return {
+        console.log(`Slide ${slide.slideNumber} save data:`, {
+          title: titleElement?.text || slide.title,
+          contentCount: contentElements.length,
+          imageElementsCount: imageElements.length,
+          primaryImageSrc: primaryImage?.src ? 'present' : 'none',
+          customElementsCount: customElements.length
+        });
+        
+        const savedSlide = {
           ...slide,
           title: titleElement?.text || slide.title,
           content: contentElements.length > 0 ? contentElements : slide.content,
           // Add main image to slide for PDF export compatibility
           imageUrl: primaryImage?.src || slide.imageUrl,
-          // Preserve all images and custom elements in the slide data
-          imageElements: imageElements.length > 0 ? imageElements : undefined,
-          customElements: customElements.length > 0 ? customElements : undefined,
-          // Keep all elements for future editing
+          // Preserve all images and custom elements in the slide data - ALWAYS include these
+          imageElements: imageElements.length > 0 ? imageElements : slide.imageElements || [],
+          customElements: customElements.length > 0 ? customElements : slide.customElements || [],
+          // Keep all elements for future editing - THIS IS CRITICAL
           elements: slide.elements
         };
+        
+        console.log(`Final saved slide ${slide.slideNumber}:`, {
+          hasImageUrl: !!savedSlide.imageUrl,
+          imageElementsCount: savedSlide.imageElements?.length || 0,
+          customElementsCount: savedSlide.customElements?.length || 0,
+          elementsCount: savedSlide.elements?.length || 0
+        });
+        
+        return savedSlide;
       });
       
+      console.log('Final updatedSlides being passed to onSave:', updatedSlides);
       onSave(updatedSlides);
       addToast('Presentation saved successfully!', 'success');
       setLastSaved(new Date());
@@ -3802,17 +3868,25 @@ Please structure this as a ready-to-deliver training course that someone could u
             onClose={() => setShowEditablePresentation(false)}
             presentationTitle={parsedPresentation.title}
             onSave={(updatedSlides) => {
+              console.log('PresentationDisplay onSave called with updatedSlides:', updatedSlides);
+              
               // Update the presentation data locally
               const updatedPresentation = {
                 ...parsedPresentation,
                 slides: updatedSlides
               };
+              
+              console.log('Updated presentation object:', updatedPresentation);
               setParsedPresentation(updatedPresentation);
               
               // Persist changes back to the original message content
               if (messageId && onUpdateMessage) {
                 const updatedContent = `**${updatedPresentation.title}**\n\n\`\`\`json\n${JSON.stringify(updatedPresentation, null, 2)}\n\`\`\``;
+                console.log('Updating message content for message ID:', messageId);
+                console.log('New message content length:', updatedContent.length);
                 onUpdateMessage(messageId, updatedContent);
+              } else {
+                console.warn('Cannot persist changes - missing messageId or onUpdateMessage');
               }
               
               setShowEditablePresentation(false);
@@ -4033,46 +4107,122 @@ Please structure this as a ready-to-deliver training course that someone could u
                     const printWindow = window.open('', '_blank');
                     if (!printWindow) return;
                     
-                    const slideHTML = slides.map((slide: any, index: number) => `
-                      <div class="slide" style="
-                        width: 210mm;
-                        height: 148mm;
-                        padding: 20mm;
-                        margin-bottom: 10mm;
-                        background: white;
-                        border: 1px solid #ddd;
-                        page-break-after: always;
-                        font-family: 'Arial', sans-serif;
-                        position: relative;
-                        box-sizing: border-box;
-                      ">
-                        <div style="display: flex; height: 100%; ${slide.layout === 'two-column' ? 'flex-direction: row;' : 'flex-direction: column;'}">
-                          ${slide.layout === 'title-slide' ? `
-                            <div style="text-align: center; display: flex; flex-direction: column; justify-content: center; height: 100%;">
-                              <h1 style="font-size: 36px; color: #059669; margin-bottom: 20px;">${slide.title}</h1>
-                              <div style="font-size: 18px; color: #666;">
-                                ${slide.content.map((item: string) => `<p style="margin: 10px 0;">${item}</p>`).join('')}
-                              </div>
+                    const slideHTML = slides.map((slide: any, index: number) => {
+                      console.log(`Generating PDF for slide ${index + 1}:`, {
+                        hasElements: !!(slide.elements && slide.elements.length > 0),
+                        elementsCount: slide.elements?.length || 0,
+                        hasImageUrl: !!slide.imageUrl,
+                        hasImageElements: !!(slide.imageElements && slide.imageElements.length > 0),
+                        imageElementsCount: slide.imageElements?.length || 0
+                      });
+                      
+                      // Check if we have custom elements (from editor)
+                      const hasCustomElements = slide.elements && slide.elements.length > 0;
+                      
+                      if (hasCustomElements) {
+                        // Generate PDF using custom element positioning
+                        const textElements = slide.elements.filter((el: any) => el.type === 'text');
+                        const imageElements = slide.elements.filter((el: any) => el.type === 'image');
+                        
+                        const elementsHTML = [
+                          ...textElements.map((el: any) => `
+                            <div style="
+                              position: absolute;
+                              top: ${(el.style?.top || 0) * 0.75}px;
+                              left: ${(el.style?.left || 0) * 0.75}px;
+                              font-size: ${el.style?.fontSize || '16px'};
+                              font-weight: ${el.style?.fontWeight || 'normal'};
+                              color: ${el.style?.color || '#000000'};
+                              max-width: 400px;
+                              word-wrap: break-word;
+                            ">
+                              ${el.text || ''}
                             </div>
-                          ` : `
-                            <div style="${slide.layout === 'two-column' ? 'flex: 1; padding-right: 20px;' : 'flex: 1;'}">
-                              <h2 style="font-size: 28px; color: #059669; margin-bottom: 20px; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">${slide.title}</h2>
-                              <ul style="font-size: 16px; line-height: 1.6; color: #374151;">
-                                ${slide.content.map((item: string) => `<li style="margin-bottom: 10px;">${item}</li>`).join('')}
-                              </ul>
+                          `),
+                          ...imageElements.map((el: any) => `
+                            <img 
+                              src="${el.src || ''}" 
+                              style="
+                                position: absolute;
+                                top: ${(el.style?.top || 0) * 0.75}px;
+                                left: ${(el.style?.left || 0) * 0.75}px;
+                                width: ${el.style?.width || '200px'};
+                                height: ${el.style?.height || 'auto'};
+                                max-width: 300px;
+                                max-height: 200px;
+                                object-fit: contain;
+                                border-radius: 8px;
+                                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                              " 
+                            />
+                          `)
+                        ].join('');
+                        
+                        return `
+                          <div class="slide" style="
+                            width: 210mm;
+                            height: 148mm;
+                            padding: 20mm;
+                            margin-bottom: 10mm;
+                            background: white;
+                            border: 1px solid #ddd;
+                            page-break-after: always;
+                            font-family: 'Arial', sans-serif;
+                            position: relative;
+                            box-sizing: border-box;
+                          ">
+                            <div style="position: relative; width: 100%; height: 100%;">
+                              ${elementsHTML}
                             </div>
-                            ${slide.imageUrl || (slide.imageElements && slide.imageElements.length > 0) ? `
-                              <div style="${slide.layout === 'two-column' ? 'flex: 1;' : 'margin-top: 20px;'} text-align: center;">
-                                <img src="${slide.imageUrl || (slide.imageElements && slide.imageElements[0] ? slide.imageElements[0].src : '')}" style="max-width: 100%; max-height: ${slide.layout === 'two-column' ? '300px' : '200px'}; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" />
-                              </div>
-                            ` : ''}
-                          `}
-                        </div>
-                        <div style="position: absolute; bottom: 10mm; right: 20mm; font-size: 12px; color: #9ca3af;">
-                          Slide ${slide.slideNumber || index + 1} of ${slides.length}
-                        </div>
-                      </div>
-                    `).join('');
+                            <div style="position: absolute; bottom: 10mm; right: 20mm; font-size: 12px; color: #9ca3af;">
+                              Slide ${slide.slideNumber || index + 1} of ${slides.length}
+                            </div>
+                          </div>
+                        `;
+                      } else {
+                        // Use traditional layout for non-custom slides
+                        return `
+                          <div class="slide" style="
+                            width: 210mm;
+                            height: 148mm;
+                            padding: 20mm;
+                            margin-bottom: 10mm;
+                            background: white;
+                            border: 1px solid #ddd;
+                            page-break-after: always;
+                            font-family: 'Arial', sans-serif;
+                            position: relative;
+                            box-sizing: border-box;
+                          ">
+                            <div style="display: flex; height: 100%; ${slide.layout === 'two-column' ? 'flex-direction: row;' : 'flex-direction: column;'}">
+                              ${slide.layout === 'title-slide' ? `
+                                <div style="text-align: center; display: flex; flex-direction: column; justify-content: center; height: 100%;">
+                                  <h1 style="font-size: 36px; color: #059669; margin-bottom: 20px;">${slide.title}</h1>
+                                  <div style="font-size: 18px; color: #666;">
+                                    ${slide.content.map((item: string) => `<p style="margin: 10px 0;">${item}</p>`).join('')}
+                                  </div>
+                                </div>
+                              ` : `
+                                <div style="${slide.layout === 'two-column' ? 'flex: 1; padding-right: 20px;' : 'flex: 1;'}">
+                                  <h2 style="font-size: 28px; color: #059669; margin-bottom: 20px; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">${slide.title}</h2>
+                                  <ul style="font-size: 16px; line-height: 1.6; color: #374151;">
+                                    ${slide.content.map((item: string) => `<li style="margin-bottom: 10px;">${item}</li>`).join('')}
+                                  </ul>
+                                </div>
+                                ${slide.imageUrl || (slide.imageElements && slide.imageElements.length > 0) ? `
+                                  <div style="${slide.layout === 'two-column' ? 'flex: 1;' : 'margin-top: 20px;'} text-align: center;">
+                                    <img src="${slide.imageUrl || (slide.imageElements && slide.imageElements[0] ? slide.imageElements[0].src : '')}" style="max-width: 100%; max-height: ${slide.layout === 'two-column' ? '300px' : '200px'}; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" />
+                                  </div>
+                                ` : ''}
+                              `}
+                            </div>
+                            <div style="position: absolute; bottom: 10mm; right: 20mm; font-size: 12px; color: #9ca3af;">
+                              Slide ${slide.slideNumber || index + 1} of ${slides.length}
+                            </div>
+                          </div>
+                        `;
+                      }
+                    }).join('');
                     
                     printWindow.document.write(`
                       <!DOCTYPE html>
