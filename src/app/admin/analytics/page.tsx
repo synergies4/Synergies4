@@ -189,7 +189,7 @@ export default function Analytics() {
         .select('*')
         .eq('courses', courseId);
 
-      const userList = data.map(enrollment => ({
+      const userList = (data ?? []).map(enrollment => ({
         id: enrollment.user_id,
         name: enrollment.user_profiles?.name,
         email: enrollment.user_profiles?.email,
@@ -199,7 +199,7 @@ export default function Analytics() {
       }));
 
       setUserList(userList);
-      setSelectedCourse({ id: courseId, title: topCourses.find(c => c.id === courseId)?.title || '' });
+      setSelectedCourse({ id: courseId, title: analytics?.topCourses.find(c => c.id === courseId)?.title || '' });
       setShowUserModal(true);
     } catch (error) {
       console.error('Error fetching user list:', error);
