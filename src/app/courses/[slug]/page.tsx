@@ -170,33 +170,52 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
-        // Redirect to login
-        window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname);
+        // Redirect to login with redirect param
+        window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
         return;
       }
 
-      const response = await fetch(`/api/courses/${course.id}/enroll`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      // If course requires payment, use Stripe checkout
+      if (course.price && course.price > 0) {
+        const response = await fetch('/api/stripe/create-checkout-session', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            courseId: course.id,
+            successUrl: `${window.location.origin}/courses/success?course_id=${course.id}`,
+            cancelUrl: window.location.href
+          }),
+        });
 
-      const data = await response.json();
+        const checkoutData = await response.json();
 
-      if (response.ok) {
-        if (data.requiresPayment) {
-          // TODO: Redirect to payment page
-          alert('Payment integration coming soon! For now, course enrollment is free.');
-          await checkEnrollmentStatus(course.id);
+        if (response.ok && checkoutData.url) {
+          // Redirect to Stripe checkout
+          window.location.href = checkoutData.url;
         } else {
-          // Free course - enrollment successful
-          alert('Successfully enrolled in course!');
-          await checkEnrollmentStatus(course.id);
+          alert(checkoutData.message || 'Failed to create checkout session');
         }
       } else {
-        alert(data.message || 'Failed to enroll in course');
+        // Free course - use original enrollment flow
+        const response = await fetch(`/api/courses/${course.id}/enroll`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          alert('Successfully enrolled in course!');
+          await checkEnrollmentStatus(course.id);
+        } else {
+          alert(data.message || 'Failed to enroll in course');
+        }
       }
     } catch (error) {
       console.error('Error enrolling:', error);

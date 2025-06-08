@@ -29,6 +29,7 @@ import {
   Filter
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { Modal } from '@/components/ui/modal';
 
 interface AnalyticsData {
   overview: {
@@ -68,6 +69,9 @@ export default function Analytics() {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState('30d');
+  const [showUserModal, setShowUserModal] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState<{ id: string; title: string } | null>(null);
+  const [userList, setUserList] = useState([]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -175,6 +179,31 @@ export default function Analytics() {
   const formatPercentage = (value: number) => {
     const sign = value >= 0 ? '+' : '';
     return `${sign}${value.toFixed(1)}%`;
+  };
+
+  const handleViewUsers = async (courseId: string) => {
+    try {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from('enrollments')
+        .select('*')
+        .eq('courses', courseId);
+
+      const userList = data.map(enrollment => ({
+        id: enrollment.user_id,
+        name: enrollment.user_profiles?.name,
+        email: enrollment.user_profiles?.email,
+        progress: 0, // Placeholder for progress
+        status: 'Completed', // Placeholder for status
+        quizScore: 0 // Placeholder for quiz score
+      }));
+
+      setUserList(userList);
+      setSelectedCourse({ id: courseId, title: topCourses.find(c => c.id === courseId)?.title || '' });
+      setShowUserModal(true);
+    } catch (error) {
+      console.error('Error fetching user list:', error);
+    }
   };
 
   if (authLoading || loading) {
@@ -461,6 +490,69 @@ export default function Analytics() {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Per-Course Analytics Table */}
+        <div className="bg-white rounded-lg shadow-sm border p-6 mt-8">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Per-Course Analytics</h3>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead>
+                <tr>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Course</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Enrollments</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Revenue</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Completion Rate</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Avg. Quiz Score</th>
+                  <th className="px-4 py-2"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {analytics.topCourses.map((course) => (
+                  <tr key={course.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-2 font-medium text-gray-900">{course.title}</td>
+                    <td className="px-4 py-2">{course.enrollments}</td>
+                    <td className="px-4 py-2">{formatCurrency(course.revenue)}</td>
+                    <td className="px-4 py-2">{course.completionRate ? `${course.completionRate}%` : '—'}</td>
+                    <td className="px-4 py-2">{course.avgQuizScore ? `${course.avgQuizScore}%` : '—'}</td>
+                    <td className="px-4 py-2">
+                      <Button size="sm" variant="outline" onClick={() => handleViewUsers(course.id)}>
+                        View Users
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {/* User Drill-Down Modal */}
+          {showUserModal && (
+            <Modal onClose={() => setShowUserModal(false)}>
+              <h4 className="text-lg font-semibold mb-4">Enrolled Users for {selectedCourse?.title}</h4>
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead>
+                  <tr>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Progress</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Quiz Score</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {userList.map((user) => (
+                    <tr key={user.id}>
+                      <td className="px-4 py-2">{user.name}</td>
+                      <td className="px-4 py-2">{user.email}</td>
+                      <td className="px-4 py-2">{user.progress}%</td>
+                      <td className="px-4 py-2">{user.status}</td>
+                      <td className="px-4 py-2">{user.quizScore ? `${user.quizScore}%` : '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </Modal>
+          )}
         </div>
       </main>
     </div>

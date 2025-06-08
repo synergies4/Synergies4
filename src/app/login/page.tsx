@@ -23,16 +23,21 @@ export default function Login() {
   const router = useRouter();
   const { user, userProfile, loading } = useAuth();
 
+  const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+  const redirectUrl = searchParams.get('redirect');
+
   // Redirect if already logged in
   useEffect(() => {
     if (user && userProfile && !loading) {
-      if (userProfile.role === 'ADMIN') {
+      if (redirectUrl) {
+        router.push(redirectUrl);
+      } else if (userProfile.role === 'ADMIN') {
         router.push('/admin');
       } else {
         router.push('/dashboard');
       }
     }
-  }, [user, userProfile, router, loading]);
+  }, [user, userProfile, router, loading, redirectUrl]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -47,6 +47,8 @@ export default function Signup() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const router = useRouter();
+  const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+  const redirectUrl = searchParams ? searchParams.get('redirect') : null;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -93,7 +95,11 @@ export default function Signup() {
 
       setSuccess(true);
       setTimeout(() => {
-        router.push('/login');
+        if (redirectUrl) {
+          router.push(`/login?redirect=${encodeURIComponent(redirectUrl)}`);
+        } else {
+          router.push('/login');
+        }
       }, 3000);
     } catch (error) {
       console.error('Signup error:', error);

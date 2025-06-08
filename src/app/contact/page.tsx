@@ -108,6 +108,46 @@ export default function Contact() {
     }
   };
 
+  const handlePlanSelection = async (planId: string) => {
+    try {
+      const { createClient } = await import('@/lib/supabase/client');
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        // Redirect to login with plan selection in URL
+        window.location.href = `/login?redirect=${encodeURIComponent(`/contact?plan=${planId}`)}`;
+        return;
+      }
+
+      // Create Stripe checkout session for subscription
+      const response = await fetch('/api/stripe/create-subscription', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          planId,
+          successUrl: `${window.location.origin}/dashboard?subscription=success&plan=${planId}`,
+          cancelUrl: window.location.href
+        }),
+      });
+
+      const checkoutData = await response.json();
+
+      if (response.ok && checkoutData.url) {
+        // Redirect to Stripe checkout
+        window.location.href = checkoutData.url;
+      } else {
+        alert(checkoutData.message || 'Failed to create subscription checkout');
+      }
+    } catch (error) {
+      console.error('Error creating subscription:', error);
+      alert('Failed to start subscription. Please try again.');
+    }
+  };
+
   return (
     <PageLayout>
       {/* Hero Section */}
@@ -556,11 +596,7 @@ export default function Contact() {
                 </div>
 
                 <Button
-                  onClick={() => {
-                    document.getElementById('contact-form')?.scrollIntoView({ 
-                      behavior: 'smooth' 
-                    });
-                  }}
+                  onClick={() => handlePlanSelection('starter')}
                   className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white py-4 text-lg font-semibold rounded-xl border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                 >
                   Get Started
@@ -621,11 +657,7 @@ export default function Contact() {
                 </div>
 
                 <Button
-                  onClick={() => {
-                    document.getElementById('contact-form')?.scrollIntoView({ 
-                      behavior: 'smooth' 
-                    });
-                  }}
+                  onClick={() => handlePlanSelection('professional')}
                   className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white py-4 text-lg font-semibold rounded-xl border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                 >
                   Get Started
@@ -679,11 +711,7 @@ export default function Contact() {
                 </div>
 
                 <Button
-                  onClick={() => {
-                    document.getElementById('contact-form')?.scrollIntoView({ 
-                      behavior: 'smooth' 
-                    });
-                  }}
+                  onClick={() => handlePlanSelection('enterprise')}
                   className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white py-4 text-lg font-semibold rounded-xl border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                 >
                   Get Started
