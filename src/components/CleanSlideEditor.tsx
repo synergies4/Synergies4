@@ -405,10 +405,10 @@ export default function CleanSlideEditor({
 
     // Select element immediately
     setSelectedElement(elementId);
-    if (isMobile && selectedElementData?.type === 'text') {
+    if (isMobile && element.type === 'text') {
       setShowMobileToolbar(true);
     }
-  }, [currentSlideData, isMobile, selectedElementData]);
+  }, [currentSlideData, isMobile]);
 
   // Global pointer move handler
   useEffect(() => {
@@ -460,9 +460,12 @@ export default function CleanSlideEditor({
     // Only handle click if we didn't drag
     if (dragState?.hasMoved) return;
 
+    // Get the element data for the clicked element
+    const clickedElement = currentSlideData?.elements.find(el => el.id === elementId);
+
     if (selectedElement === elementId) {
       // Second click - enter edit mode for text
-      if (selectedElementData?.type === 'text') {
+      if (clickedElement?.type === 'text') {
         setEditingElement(elementId);
         if (isMobile) {
           setShowMobileToolbar(false); // Hide toolbar while editing
@@ -472,11 +475,11 @@ export default function CleanSlideEditor({
       // First click - select element
       setSelectedElement(elementId);
       setEditingElement(null);
-      if (isMobile && selectedElementData?.type === 'text') {
+      if (isMobile && clickedElement?.type === 'text') {
         setShowMobileToolbar(true);
       }
     }
-  }, [selectedElement, selectedElementData, dragState, isMobile]);
+  }, [selectedElement, dragState, isMobile, currentSlideData]);
 
   // Mobile Formatting Toolbar Component
   const MobileToolbar = () => {
