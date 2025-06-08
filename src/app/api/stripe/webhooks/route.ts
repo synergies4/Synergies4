@@ -260,7 +260,7 @@ async function initializeLessonProgress(supabase: any, userId: string, courseId:
 
     if (lessons && lessons.length > 0) {
       // Create progress records for all lessons
-      const progressRecords = lessons.map(lesson => ({
+      const progressRecords = lessons.map((lesson: any) => ({
         user_id: userId,
         lesson_id: lesson.id,
         enrollment_id: enrollment.id,
