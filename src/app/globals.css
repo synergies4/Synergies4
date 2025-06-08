@@ -339,4 +339,64 @@ p, li, span {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
+}
+
+/* Force Light Mode Override */
+.light,
+.light * {
+  color-scheme: light !important;
+}
+
+.light {
+  --foreground-rgb: 0, 0, 0 !important;
+  --background-start-rgb: 248, 250, 252 !important;
+  --background-end-rgb: 255, 255, 255 !important;
+  
+  --background: 0 0% 100% !important;
+  --foreground: 222.2 84% 4.9% !important;
+  --card: 0 0% 100% !important;
+  --card-foreground: 222.2 84% 4.9% !important;
+  --popover: 0 0% 100% !important;
+  --popover-foreground: 222.2 84% 4.9% !important;
+  --secondary: 210 40% 98% !important;
+  --secondary-foreground: 222.2 84% 4.9% !important;
+  --muted: 210 40% 98% !important;
+  --muted-foreground: 215.4 16.3% 46.9% !important;
+  --accent: 210 40% 98% !important;
+  --accent-foreground: 222.2 84% 4.9% !important;
+  --border: 214.3 31.8% 91.4% !important;
+  --input: 214.3 31.8% 91.4% !important;
+  
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(255, 255, 255)
+    )
+    rgb(248, 250, 252) !important;
+}
+
+/* Ensure cards and components have proper light backgrounds */
+.light .bg-white,
+.light [class*="bg-white"] {
+  background-color: white !important;
+}
+
+.light .bg-gray-50,
+.light [class*="bg-gray-50"] {
+  background-color: #f9fafb !important;
+}
+
+.light .text-gray-900,
+.light [class*="text-gray-900"] {
+  color: #111827 !important;
+}
+
+.light .text-gray-700,
+.light [class*="text-gray-700"] {
+  color: #374151 !important;
+}
+
+.light .text-gray-600,
+.light [class*="text-gray-600"] {
+  color: #4b5563 !important;
 } 

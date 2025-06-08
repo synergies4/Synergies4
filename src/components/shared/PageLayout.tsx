@@ -598,7 +598,7 @@ export default function PageLayout({ children, showStats = false }: PageLayoutPr
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 light" style={{ backgroundColor: 'rgb(248, 250, 252)' }}>
       {/* Skip Links for Accessibility */}
       <div className="sr-only">
         <a href="#main-content" className="skip-link">
