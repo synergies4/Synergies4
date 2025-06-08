@@ -53,7 +53,8 @@ export async function POST(request: NextRequest) {
 
       case 'invoice.payment_succeeded': {
         const invoice = event.data.object as Stripe.Invoice;
-        if (invoice.subscription) {
+        const subscriptionId = (invoice as any).subscription;
+        if (subscriptionId && typeof subscriptionId === 'string') {
           await handleSubscriptionRenewal(supabase, invoice);
         }
         break;
@@ -153,10 +154,9 @@ async function handleSubscriptionPayment(supabase: any, session: Stripe.Checkout
 
   try {
     // Get subscription details from Stripe
-    if (session.subscription) {
-      const subscription = await stripe.subscriptions.retrieve(
-        session.subscription as string
-      );
+    const subscriptionId = (session as any).subscription;
+    if (subscriptionId && typeof subscriptionId === 'string') {
+      const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
       // Create or update subscription record
       await supabase
@@ -183,10 +183,9 @@ async function handleSubscriptionPayment(supabase: any, session: Stripe.Checkout
 
 async function handleSubscriptionRenewal(supabase: any, invoice: Stripe.Invoice) {
   try {
-    if (invoice.subscription) {
-      const subscription = await stripe.subscriptions.retrieve(
-        invoice.subscription as string
-      );
+    const subscriptionId = (invoice as any).subscription;
+    if (subscriptionId && typeof subscriptionId === 'string') {
+      const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
       await supabase
         .from('subscriptions')
