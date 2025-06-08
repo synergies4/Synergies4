@@ -49,6 +49,8 @@ interface AnalyticsData {
     revenue: number;
     rating: number;
     category: string;
+    completionRate?: number;
+    avgQuizScore?: number;
   }>;
   userActivity: Array<{
     date: string;
