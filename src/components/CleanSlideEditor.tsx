@@ -76,12 +76,19 @@ const useIsMobile = () => {
 const getMobileStyles = (isMobile: boolean, baseStyles: any) => {
   if (!isMobile) return baseStyles;
   
+  // Ensure positioning is within mobile viewport
+  const safeLeft = Math.max(10, Math.min(baseStyles.left || 20, window.innerWidth - 100));
+  const safeTop = Math.max(20, Math.min(baseStyles.top || 50, 800)); // Keep within reasonable bounds
+  
   return {
     ...baseStyles,
-    fontSize: baseStyles.fontSize ? `${Math.max(parseInt(baseStyles.fontSize) * 0.75, 12)}px` : baseStyles.fontSize,
-    maxWidth: 'calc(100% - 40px)',
-    left: Math.min(baseStyles.left, 20),
-    top: Math.min(baseStyles.top, 500), // Prevent elements from going too far down
+    fontSize: baseStyles.fontSize ? `${Math.max(parseInt(baseStyles.fontSize) * 0.8, 12)}px` : baseStyles.fontSize,
+    maxWidth: 'calc(100vw - 40px)',
+    width: baseStyles.width && typeof baseStyles.width === 'string' && baseStyles.width.includes('calc') 
+      ? baseStyles.width 
+      : 'auto',
+    left: safeLeft,
+    top: safeTop,
   };
 };
 
@@ -143,13 +150,13 @@ export default function CleanSlideEditor({
       type: 'text',
       text: slide.title,
       style: {
-        top: 30,
+        top: 40,
         left: 20,
-        fontSize: '24px',
+        fontSize: '28px',
         fontWeight: 'bold',
         color: '#1f2937',
-        maxWidth: 'calc(100% - 40px)',
-        lineHeight: '1.2'
+        maxWidth: 'calc(100vw - 60px)',
+        lineHeight: '1.3'
       }
     });
 
@@ -160,13 +167,13 @@ export default function CleanSlideEditor({
         type: 'text',
         text: contentItem,
         style: {
-          top: 90 + (idx * 35),
+          top: 120 + (idx * 40),
           left: 20,
-          fontSize: '14px',
+          fontSize: '16px',
           fontWeight: '400',
           color: '#374151',
-          maxWidth: 'calc(100% - 40px)',
-          lineHeight: '1.4'
+          maxWidth: 'calc(100vw - 60px)',
+          lineHeight: '1.5'
         }
       });
     });
@@ -178,9 +185,9 @@ export default function CleanSlideEditor({
         type: 'image',
         src: slide.imageUrl,
         style: {
-          top: 250,
+          top: 300,
           left: 20,
-          width: 'calc(50% - 30px)',
+          width: 'calc(100vw - 80px)',
           height: 'auto'
         }
       });
@@ -501,7 +508,7 @@ export default function CleanSlideEditor({
     }
 
     return (
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl z-50 p-4">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl z-[60] p-4 max-h-[50vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-semibold text-gray-800 flex items-center">
             <Edit3 className="h-4 w-4 mr-2" />
@@ -757,7 +764,7 @@ export default function CleanSlideEditor({
         </div>
       )}
 
-      <div className="flex-1 flex overflow-hidden">
+      <div className={`flex-1 flex ${isMobile ? 'flex-col overflow-auto' : 'overflow-hidden'}`}>
         {/* Slide Navigation - Hidden on mobile, collapsible */}
         {!isMobile && (
           <div className="w-64 bg-white border-r border-gray-200 p-4">
@@ -817,14 +824,18 @@ export default function CleanSlideEditor({
         )}
 
         {/* Canvas */}
-        <div className={`flex-1 ${isMobile ? 'p-2' : 'p-8'} overflow-auto`}>
-          <div className="mx-auto" style={{ 
-            width: isMobile ? 'calc(100vw - 16px)' : '800px', 
-            height: isMobile ? 'calc(100vh - 200px)' : '600px',
-            maxWidth: isMobile ? 'calc(100vw - 16px)' : '800px'
-          }}>
+        <div className={`flex-1 ${isMobile ? 'p-0' : 'p-8'} ${isMobile ? 'overflow-visible' : 'overflow-auto'}`}>
+          <div className={`${isMobile ? 'w-full h-full' : 'mx-auto'}`} style={!isMobile ? { 
+            width: '800px', 
+            height: '600px',
+            maxWidth: '800px'
+          } : {}}>
             <div 
-              className={`slide-canvas w-full h-full bg-white rounded-lg shadow-lg ${isMobile ? 'border border-gray-200' : 'border-2 border-gray-200'} relative overflow-hidden`}
+              className={`slide-canvas ${isMobile ? 'w-full min-h-screen' : 'w-full h-full'} bg-white ${isMobile ? '' : 'rounded-lg shadow-lg'} ${isMobile ? 'border-0' : 'border-2 border-gray-200'} relative ${isMobile ? '' : 'overflow-hidden'}`}
+              style={isMobile ? { 
+                minHeight: 'calc(100vh - 80px)', // Account for header
+                paddingBottom: '100px' // Space for FABs and mobile navigation
+              } : {}}
               onClick={() => {
                 setSelectedElement(null);
                 setEditingElement(null);
@@ -925,17 +936,18 @@ export default function CleanSlideEditor({
 
           {/* Mobile slide navigation */}
           {isMobile && (
-            <div className="mt-4 flex items-center justify-center space-x-4">
+            <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 flex items-center justify-center space-x-4 bg-white rounded-full shadow-lg px-4 py-2 z-[50] border border-gray-200">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setCurrentSlide(Math.max(0, currentSlide - 1))}
                 disabled={currentSlide === 0}
+                className="w-8 h-8 p-0"
               >
                 <ArrowRight className="h-4 w-4 rotate-180" />
               </Button>
               
-              <span className="text-sm font-medium text-gray-700 px-4">
+              <span className="text-xs font-medium text-gray-700 px-2 whitespace-nowrap">
                 {currentSlide + 1} / {editableSlides.length}
               </span>
               
@@ -944,6 +956,7 @@ export default function CleanSlideEditor({
                 size="sm"
                 onClick={() => setCurrentSlide(Math.min(editableSlides.length - 1, currentSlide + 1))}
                 disabled={currentSlide === editableSlides.length - 1}
+                className="w-8 h-8 p-0"
               >
                 <ArrowRight className="h-4 w-4" />
               </Button>
@@ -975,7 +988,7 @@ export default function CleanSlideEditor({
       {isMobile && selectedElement && !showMobileToolbar && selectedElementData?.type === 'text' && (
         <Button
           onClick={() => setShowMobileToolbar(true)}
-          className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-blue-600 hover:bg-blue-700 shadow-lg"
+          className="fixed bottom-20 right-4 w-14 h-14 rounded-full bg-blue-600 hover:bg-blue-700 shadow-lg z-[50]"
         >
           <Edit3 className="h-6 w-6 text-white" />
         </Button>
@@ -986,7 +999,7 @@ export default function CleanSlideEditor({
         <Button
           onClick={() => deleteElement(selectedElement)}
           variant="outline"
-          className="fixed bottom-6 left-6 w-12 h-12 rounded-full border-red-300 bg-white text-red-600 hover:bg-red-50 shadow-lg"
+          className="fixed bottom-20 left-4 w-12 h-12 rounded-full border-red-300 bg-white text-red-600 hover:bg-red-50 shadow-lg z-[50]"
         >
           <Trash className="h-4 w-4" />
         </Button>
