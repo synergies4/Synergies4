@@ -72,6 +72,19 @@ const useIsMobile = () => {
   return isMobile;
 };
 
+// Helper function to get mobile-appropriate styles
+const getMobileStyles = (isMobile: boolean, baseStyles: any) => {
+  if (!isMobile) return baseStyles;
+  
+  return {
+    ...baseStyles,
+    fontSize: baseStyles.fontSize ? `${Math.max(parseInt(baseStyles.fontSize) * 0.75, 12)}px` : baseStyles.fontSize,
+    maxWidth: 'calc(100% - 40px)',
+    left: Math.min(baseStyles.left, 20),
+    top: Math.min(baseStyles.top, 500), // Prevent elements from going too far down
+  };
+};
+
 interface SlideElement {
   id: string;
   type: 'text' | 'image';
@@ -130,12 +143,12 @@ export default function CleanSlideEditor({
       type: 'text',
       text: slide.title,
       style: {
-        top: 60,
-        left: 80,
-        fontSize: '32px',
+        top: 30,
+        left: 20,
+        fontSize: '24px',
         fontWeight: 'bold',
         color: '#1f2937',
-        maxWidth: '640px',
+        maxWidth: 'calc(100% - 40px)',
         lineHeight: '1.2'
       }
     });
@@ -147,13 +160,13 @@ export default function CleanSlideEditor({
         type: 'text',
         text: contentItem,
         style: {
-          top: 140 + (idx * 45),
-          left: 80,
-          fontSize: '18px',
+          top: 90 + (idx * 35),
+          left: 20,
+          fontSize: '14px',
           fontWeight: '400',
           color: '#374151',
-          maxWidth: '640px',
-          lineHeight: '1.5'
+          maxWidth: 'calc(100% - 40px)',
+          lineHeight: '1.4'
         }
       });
     });
@@ -165,9 +178,9 @@ export default function CleanSlideEditor({
         type: 'image',
         src: slide.imageUrl,
         style: {
-          top: 200,
-          left: 450,
-          width: '200px',
+          top: 250,
+          left: 20,
+          width: 'calc(50% - 30px)',
           height: 'auto'
         }
       });
@@ -267,14 +280,14 @@ export default function CleanSlideEditor({
     const newElement: SlideElement = {
       id: `text-${Date.now()}`,
       type: 'text',
-      text: 'Click to edit',
+      text: 'Tap to edit',
       style: {
-        top: isMobile ? 200 : 300,
-        left: isMobile ? 50 : 300,
-        fontSize: isMobile ? '24px' : '18px',
+        top: isMobile ? 150 : 300,
+        left: isMobile ? 20 : 300,
+        fontSize: isMobile ? '16px' : '18px',
         fontWeight: '400',
         color: '#374151',
-        width: isMobile ? '280px' : '200px'
+        maxWidth: isMobile ? 'calc(100% - 40px)' : '200px'
       }
     };
 
@@ -312,9 +325,9 @@ export default function CleanSlideEditor({
         type: 'image',
         src: e.target?.result as string,
         style: {
-          top: isMobile ? 150 : 200,
-          left: isMobile ? 50 : 400,
-          width: isMobile ? '200px' : '200px',
+          top: isMobile ? 200 : 200,
+          left: isMobile ? 20 : 400,
+          width: isMobile ? 'calc(50% - 30px)' : '200px',
           height: 'auto'
         }
       };
@@ -605,9 +618,9 @@ export default function CleanSlideEditor({
               {!isMobile && "Back"}
             </Button>
             {!isMobile && <div className="h-6 w-px bg-gray-300"></div>}
-            <h1 className={`${isMobile ? 'text-sm' : 'text-lg'} font-semibold text-gray-900 truncate`}>
-              {isMobile ? presentationTitle.substring(0, 20) + '...' : presentationTitle}
-            </h1>
+                         <h1 className={`${isMobile ? 'text-xs' : 'text-lg'} font-semibold text-gray-900 truncate max-w-[120px]`}>
+               {isMobile ? presentationTitle.substring(0, 15) + (presentationTitle.length > 15 ? '...' : '') : presentationTitle}
+             </h1>
           </div>
 
           {/* Right section */}
@@ -806,9 +819,9 @@ export default function CleanSlideEditor({
         {/* Canvas */}
         <div className={`flex-1 ${isMobile ? 'p-2' : 'p-8'} overflow-auto`}>
           <div className="mx-auto" style={{ 
-            width: isMobile ? '100%' : '800px', 
-            height: isMobile ? '400px' : '600px',
-            maxWidth: isMobile ? '100vw' : '800px'
+            width: isMobile ? 'calc(100vw - 16px)' : '800px', 
+            height: isMobile ? 'calc(100vh - 200px)' : '600px',
+            maxWidth: isMobile ? 'calc(100vw - 16px)' : '800px'
           }}>
             <div 
               className={`slide-canvas w-full h-full bg-white rounded-lg shadow-lg ${isMobile ? 'border border-gray-200' : 'border-2 border-gray-200'} relative overflow-hidden`}
@@ -831,7 +844,9 @@ export default function CleanSlideEditor({
               />
 
               {/* Elements */}
-              {currentSlideData?.elements.map((element) => (
+              {currentSlideData?.elements.map((element) => {
+                const elementStyles = getMobileStyles(isMobile, element.style);
+                return (
                 <div
                   key={element.id}
                   className={`absolute select-none transition-all ${
@@ -840,15 +855,7 @@ export default function CleanSlideEditor({
                       : 'hover:ring-1 hover:ring-gray-300 cursor-pointer'
                   } ${isMobile ? 'touch-manipulation' : ''}`}
                   style={{
-                    top: element.style.top,
-                    left: element.style.left,
-                    width: element.style.width,
-                    height: element.style.height,
-                    fontSize: element.style.fontSize,
-                    fontWeight: element.style.fontWeight,
-                    color: element.style.color,
-                    maxWidth: element.style.maxWidth,
-                    lineHeight: element.style.lineHeight,
+                    ...elementStyles,
                     minHeight: isMobile ? '44px' : 'auto', // Touch target size
                     minWidth: isMobile ? '44px' : 'auto',
                   }}
@@ -873,10 +880,10 @@ export default function CleanSlideEditor({
                         autoFocus
                         className={`w-full h-full resize-none border-2 border-blue-400 outline-none bg-white bg-opacity-95 rounded ${isMobile ? 'p-3 text-base' : 'p-2'}`}
                         style={{
-                          fontSize: element.style.fontSize,
-                          fontWeight: element.style.fontWeight,
-                          color: element.style.color,
-                          lineHeight: element.style.lineHeight,
+                          fontSize: elementStyles.fontSize,
+                          fontWeight: elementStyles.fontWeight,
+                          color: elementStyles.color,
+                          lineHeight: elementStyles.lineHeight,
                         }}
                         placeholder="Type your text here..."
                       />
@@ -892,7 +899,8 @@ export default function CleanSlideEditor({
                     />
                   ) : null}
                 </div>
-              ))}
+                );
+              })}
 
               {/* Instructions */}
               {editingElement && (
