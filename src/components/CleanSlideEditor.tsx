@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   ArrowRight, 
@@ -12,18 +12,26 @@ import {
   Italic,
   Palette,
   Plus,
-  Minus
+  Minus,
+  Edit3,
+  X,
+  ChevronUp,
+  Smartphone
 } from 'lucide-react';
 
-// Simple toast hook
+// Toast hook
 const useToast = () => {
-  const [toasts, setToasts] = useState<Array<{id: string, message: string, type: 'success' | 'error' | 'info'}>>([]);
+  const [toasts, setToasts] = useState<Array<{
+    id: string;
+    message: string;
+    type: 'success' | 'error' | 'info';
+  }>>([]);
 
   const addToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
     const id = Date.now().toString();
     setToasts(prev => [...prev, { id, message, type }]);
     setTimeout(() => {
-      setToasts(prev => prev.filter(t => t.id !== id));
+      setToasts(prev => prev.filter(toast => toast.id !== id));
     }, 3000);
   }, []);
 
@@ -45,6 +53,23 @@ const useDebounce = (value: any, delay: number) => {
   }, [value, delay]);
 
   return debouncedValue;
+};
+
+// Mobile detection hook
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768 || 'ontouchstart' in window);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
+  return isMobile;
 };
 
 interface SlideElement {
@@ -90,35 +115,37 @@ export default function CleanSlideEditor({
   onSave 
 }: CleanSlideEditorProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [editableSlides, setEditableSlides] = useState<Slide[]>(slides.map(slide => {
-    // Initialize elements if they don't exist
+  
+  // Initialize slides with elements
+  const [editableSlides, setEditableSlides] = useState<Slide[]>(() => slides.map(slide => {
     if (slide.elements && slide.elements.length > 0) {
       return slide;
     }
 
     const elements: SlideElement[] = [];
     
-    // Add title element
+    // Add title
     elements.push({
       id: `title-${slide.slideNumber}`,
       type: 'text',
       text: slide.title,
       style: {
-        top: 80,
-        left: 60,
+        top: 60,
+        left: 80,
         fontSize: '32px',
-        fontWeight: '600',
+        fontWeight: 'bold',
         color: '#1f2937',
-        maxWidth: '680px'
+        maxWidth: '640px',
+        lineHeight: '1.2'
       }
     });
 
-    // Add content elements
-    slide.content.forEach((content, idx) => {
+    // Add content
+    slide.content.forEach((contentItem, idx) => {
       elements.push({
         id: `content-${slide.slideNumber}-${idx}`,
         type: 'text',
-        text: `• ${content}`,
+        text: contentItem,
         style: {
           top: 140 + (idx * 45),
           left: 80,
@@ -151,16 +178,21 @@ export default function CleanSlideEditor({
 
   const [selectedElement, setSelectedElement] = useState<string | null>(null);
   const [editingElement, setEditingElement] = useState<string | null>(null);
-  const [dragData, setDragData] = useState<{
-    id: string;
+  const [showMobileToolbar, setShowMobileToolbar] = useState(false);
+  
+  // Improved drag system
+  const [dragState, setDragState] = useState<{
+    elementId: string;
     startX: number;
     startY: number;
-    elementX: number;
-    elementY: number;
+    elementStartX: number;
+    elementStartY: number;
+    hasMoved: boolean;
   } | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
+  
   const [isAutoSaving, setIsAutoSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date>(new Date());
+  const isMobile = useIsMobile();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toasts, addToast } = useToast();
@@ -215,14 +247,14 @@ export default function CleanSlideEditor({
   const increaseFontSize = useCallback(() => {
     if (!selectedElementData?.style.fontSize) return;
     const currentSize = parseInt(selectedElementData.style.fontSize);
-    updateTextStyle({ fontSize: `${Math.min(currentSize + 2, 72)}px` });
-  }, [selectedElementData, updateTextStyle]);
+    updateTextStyle({ fontSize: `${Math.min(currentSize + (isMobile ? 4 : 2), 72)}px` });
+  }, [selectedElementData, updateTextStyle, isMobile]);
 
   const decreaseFontSize = useCallback(() => {
     if (!selectedElementData?.style.fontSize) return;
     const currentSize = parseInt(selectedElementData.style.fontSize);
-    updateTextStyle({ fontSize: `${Math.max(currentSize - 2, 8)}px` });
-  }, [selectedElementData, updateTextStyle]);
+    updateTextStyle({ fontSize: `${Math.max(currentSize - (isMobile ? 4 : 2), 8)}px` });
+  }, [selectedElementData, updateTextStyle, isMobile]);
 
   const toggleBold = useCallback(() => {
     const currentWeight = selectedElementData?.style.fontWeight || '400';
@@ -237,12 +269,12 @@ export default function CleanSlideEditor({
       type: 'text',
       text: 'Click to edit',
       style: {
-        top: 300,
-        left: 300,
-        fontSize: '18px',
+        top: isMobile ? 200 : 300,
+        left: isMobile ? 50 : 300,
+        fontSize: isMobile ? '24px' : '18px',
         fontWeight: '400',
         color: '#374151',
-        width: '200px'
+        width: isMobile ? '280px' : '200px'
       }
     };
 
@@ -257,8 +289,11 @@ export default function CleanSlideEditor({
     }));
     
     setSelectedElement(newElement.id);
+    if (isMobile) {
+      setShowMobileToolbar(true);
+    }
     addToast('Text added', 'success');
-  }, [currentSlide, addToast]);
+  }, [currentSlide, addToast, isMobile]);
 
   // Add image
   const handleImageUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -277,9 +312,9 @@ export default function CleanSlideEditor({
         type: 'image',
         src: e.target?.result as string,
         style: {
-          top: 200,
-          left: 400,
-          width: '200px',
+          top: isMobile ? 150 : 200,
+          left: isMobile ? 50 : 400,
+          width: isMobile ? '200px' : '200px',
           height: 'auto'
         }
       };
@@ -299,7 +334,7 @@ export default function CleanSlideEditor({
     };
     
     reader.readAsDataURL(file);
-  }, [currentSlide, addToast]);
+  }, [currentSlide, addToast, isMobile]);
 
   // Delete element
   const deleteElement = useCallback((id: string) => {
@@ -314,6 +349,7 @@ export default function CleanSlideEditor({
     }));
     setSelectedElement(null);
     setEditingElement(null);
+    setShowMobileToolbar(false);
     addToast('Element deleted', 'info');
   }, [currentSlide, addToast]);
 
@@ -336,6 +372,7 @@ export default function CleanSlideEditor({
       if (e.key === 'Escape') {
         setSelectedElement(null);
         setEditingElement(null);
+        setShowMobileToolbar(false);
       }
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault();
@@ -347,105 +384,250 @@ export default function CleanSlideEditor({
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [selectedElement, deleteElement, handleSave]);
 
-  // Mouse drag handlers
-  const handleMouseDown = useCallback((e: React.MouseEvent, elementId: string) => {
+  // Improved mouse/touch handlers
+  const handlePointerDown = useCallback((e: React.PointerEvent, elementId: string) => {
     e.stopPropagation();
     const element = currentSlideData?.elements.find(el => el.id === elementId);
     if (!element) return;
 
-    setDragData({
-      id: elementId,
+    const rect = e.currentTarget.getBoundingClientRect();
+    const canvasRect = e.currentTarget.closest('.slide-canvas')?.getBoundingClientRect();
+    if (!canvasRect) return;
+
+    setDragState({
+      elementId,
       startX: e.clientX,
       startY: e.clientY,
-      elementX: element.style.left,
-      elementY: element.style.top
+      elementStartX: element.style.left,
+      elementStartY: element.style.top,
+      hasMoved: false
     });
+
+    // Select element immediately
     setSelectedElement(elementId);
-    setIsDragging(false);
-  }, [currentSlideData]);
+    if (isMobile && selectedElementData?.type === 'text') {
+      setShowMobileToolbar(true);
+    }
+  }, [currentSlideData, isMobile, selectedElementData]);
 
+  // Global pointer move handler
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!dragData) return;
+    const handlePointerMove = (e: PointerEvent) => {
+      if (!dragState) return;
 
-      const deltaX = e.clientX - dragData.startX;
-      const deltaY = e.clientY - dragData.startY;
+      const deltaX = e.clientX - dragState.startX;
+      const deltaY = e.clientY - dragState.startY;
       
-      // If we've moved more than 5 pixels, consider it a drag
-      if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
-        setIsDragging(true);
+      // Check if we've moved enough to consider it a drag (larger threshold for touch)
+      const threshold = isMobile ? 15 : 8;
+      if (!dragState.hasMoved && (Math.abs(deltaX) > threshold || Math.abs(deltaY) > threshold)) {
+        setDragState(prev => prev ? { ...prev, hasMoved: true } : null);
       }
 
-      const newX = Math.max(0, dragData.elementX + deltaX);
-      const newY = Math.max(0, dragData.elementY + deltaY);
+      if (dragState.hasMoved) {
+        const newX = Math.max(0, dragState.elementStartX + deltaX);
+        const newY = Math.max(0, dragState.elementStartY + deltaY);
 
-      updateElement(dragData.id, {
-        style: {
-          ...currentSlideData?.elements.find(el => el.id === dragData.id)?.style,
-          left: newX,
-          top: newY
-        }
-      });
+        updateElement(dragState.elementId, {
+          style: {
+            ...currentSlideData?.elements.find(el => el.id === dragState.elementId)?.style,
+            left: newX,
+            top: newY
+          }
+        });
+      }
     };
 
-    const handleMouseUp = () => {
-      setDragData(null);
-      // Reset dragging after a short delay to allow click handler to check
-      setTimeout(() => setIsDragging(false), 100);
+    const handlePointerUp = () => {
+      setDragState(null);
     };
 
-    if (dragData) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
+    if (dragState) {
+      document.addEventListener('pointermove', handlePointerMove);
+      document.addEventListener('pointerup', handlePointerUp);
     }
 
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('pointermove', handlePointerMove);
+      document.removeEventListener('pointerup', handlePointerUp);
     };
-  }, [dragData, updateElement, currentSlideData]);
+  }, [dragState, updateElement, currentSlideData, isMobile]);
+
+  // Handle element clicks (separate from drag)
+  const handleElementClick = useCallback((e: React.MouseEvent, elementId: string) => {
+    e.stopPropagation();
+    
+    // Only handle click if we didn't drag
+    if (dragState?.hasMoved) return;
+
+    if (selectedElement === elementId) {
+      // Second click - enter edit mode for text
+      if (selectedElementData?.type === 'text') {
+        setEditingElement(elementId);
+        if (isMobile) {
+          setShowMobileToolbar(false); // Hide toolbar while editing
+        }
+      }
+    } else {
+      // First click - select element
+      setSelectedElement(elementId);
+      setEditingElement(null);
+      if (isMobile && selectedElementData?.type === 'text') {
+        setShowMobileToolbar(true);
+      }
+    }
+  }, [selectedElement, selectedElementData, dragState, isMobile]);
+
+  // Mobile Formatting Toolbar Component
+  const MobileToolbar = () => {
+    if (!isMobile || !selectedElementData || selectedElementData.type !== 'text' || !showMobileToolbar) {
+      return null;
+    }
+
+    return (
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl z-50 p-4">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-semibold text-gray-800 flex items-center">
+            <Edit3 className="h-4 w-4 mr-2" />
+            Format Text
+          </h3>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowMobileToolbar(false)}
+            className="p-2"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+
+        <div className="space-y-4">
+          {/* Font Size */}
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-700">Size:</span>
+            <div className="flex items-center space-x-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={decreaseFontSize}
+                className="w-10 h-10"
+              >
+                <Minus className="h-4 w-4" />
+              </Button>
+              <span className="text-lg font-mono min-w-[4rem] text-center">
+                {selectedElementData.style.fontSize || '18px'}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={increaseFontSize}
+                className="w-10 h-10"
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Bold Toggle */}
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-700">Bold:</span>
+            <Button
+              variant={selectedElementData.style.fontWeight === 'bold' || selectedElementData.style.fontWeight === '700' ? 'default' : 'outline'}
+              onClick={toggleBold}
+              className="w-12 h-10"
+            >
+              <Bold className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {/* Color Picker */}
+          <div>
+            <span className="text-sm font-medium text-gray-700 mb-2 block">Color:</span>
+            <div className="grid grid-cols-6 gap-2">
+              {['#374151', '#dc2626', '#059669', '#2563eb', '#7c3aed', '#ea580c'].map(color => (
+                <button
+                  key={color}
+                  onClick={() => updateTextStyle({ color })}
+                  className={`w-12 h-12 rounded-lg border-2 transition-all ${
+                    selectedElementData.style.color === color 
+                      ? 'border-gray-900 ring-2 ring-gray-300 scale-105' 
+                      : 'border-gray-300'
+                  }`}
+                  style={{ backgroundColor: color }}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="grid grid-cols-2 gap-3 pt-2">
+            <Button
+              onClick={() => {
+                setEditingElement(selectedElement);
+                setShowMobileToolbar(false);
+              }}
+              className="bg-blue-600 hover:bg-blue-700 text-white h-12"
+            >
+              <Type className="h-4 w-4 mr-2" />
+              Edit Text
+            </Button>
+            <Button
+              onClick={() => selectedElement && deleteElement(selectedElement)}
+              variant="outline"
+              className="border-red-300 text-red-600 hover:bg-red-50 h-12"
+            >
+              <Trash className="h-4 w-4 mr-2" />
+              Delete
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="fixed inset-0 z-50 bg-gray-50 flex flex-col">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="flex items-center justify-between p-4">
+        <div className={`flex items-center justify-between ${isMobile ? 'p-2' : 'p-4'}`}>
           {/* Left section */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
             <Button
               variant="ghost"
-              size="sm"
+              size={isMobile ? "sm" : "sm"}
               onClick={onClose}
               className="text-gray-600 hover:text-gray-800"
             >
-              <ArrowRight className="h-4 w-4 rotate-180 mr-2" />
-              Back
+              <ArrowRight className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'} rotate-180 mr-1`} />
+              {!isMobile && "Back"}
             </Button>
-            <div className="h-6 w-px bg-gray-300"></div>
-            <h1 className="text-lg font-semibold text-gray-900">{presentationTitle}</h1>
+            {!isMobile && <div className="h-6 w-px bg-gray-300"></div>}
+            <h1 className={`${isMobile ? 'text-sm' : 'text-lg'} font-semibold text-gray-900 truncate`}>
+              {isMobile ? presentationTitle.substring(0, 20) + '...' : presentationTitle}
+            </h1>
           </div>
 
           {/* Right section */}
-          <div className="flex items-center space-x-3">
+          <div className={`flex items-center ${isMobile ? 'space-x-1' : 'space-x-3'}`}>
             <Button
-              size="sm"
+              size={isMobile ? "sm" : "sm"}
               onClick={addTextElement}
               className="bg-blue-600 hover:bg-blue-700 text-white"
             >
-              <Type className="h-4 w-4 mr-2" />
-              Text
+              <Type className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'} ${!isMobile ? 'mr-2' : ''}`} />
+              {!isMobile && "Text"}
             </Button>
             
             <Button
-              size="sm"
+              size={isMobile ? "sm" : "sm"}
               onClick={() => fileInputRef.current?.click()}
               className="bg-green-600 hover:bg-green-700 text-white"
             >
-              <ImageIcon className="h-4 w-4 mr-2" />
-              Image
+              <ImageIcon className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'} ${!isMobile ? 'mr-2' : ''}`} />
+              {!isMobile && "Image"}
             </Button>
 
-            {selectedElement && (
+            {selectedElement && !isMobile && (
               <Button
                 size="sm"
                 onClick={() => deleteElement(selectedElement)}
@@ -455,22 +637,22 @@ export default function CleanSlideEditor({
               </Button>
             )}
             
-            <div className="h-6 w-px bg-gray-300"></div>
+            {!isMobile && <div className="h-6 w-px bg-gray-300"></div>}
             
             <Button
-              size="sm"
+              size={isMobile ? "sm" : "sm"}
               onClick={handleSave}
               className="bg-purple-600 hover:bg-purple-700 text-white"
             >
-              <Save className="h-4 w-4 mr-2" />
-              Save
+              <Save className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'} ${!isMobile ? 'mr-2' : ''}`} />
+              {!isMobile && "Save"}
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Formatting Panel - appears when text element is selected */}
-      {selectedElementData?.type === 'text' && (
+      {/* Desktop Formatting Panel */}
+      {!isMobile && selectedElementData?.type === 'text' && (
         <div className="bg-gray-50 border-b border-gray-200 px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -560,81 +742,88 @@ export default function CleanSlideEditor({
       )}
 
       <div className="flex-1 flex overflow-hidden">
-        {/* Slide Navigation */}
-        <div className="w-64 bg-white border-r border-gray-200 p-4">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-sm font-semibold text-gray-700">Slides</h3>
-            <span className="text-xs text-gray-500">{currentSlide + 1}/{editableSlides.length}</span>
-          </div>
-          
-          <div className="space-y-3">
-            {editableSlides.map((slide, index) => (
-              <div
-                key={slide.slideNumber}
-                onClick={() => setCurrentSlide(index)}
-                className={`
-                  p-3 rounded-lg border cursor-pointer transition-all
-                  ${currentSlide === index 
-                    ? 'border-blue-500 bg-blue-50 shadow-sm' 
-                    : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
-                  }
-                `}
-              >
-                <div className="aspect-video bg-gray-100 rounded mb-2 flex items-center justify-center text-xs text-gray-500">
-                  {slide.slideNumber}
+        {/* Slide Navigation - Hidden on mobile, collapsible */}
+        {!isMobile && (
+          <div className="w-64 bg-white border-r border-gray-200 p-4">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-sm font-semibold text-gray-700">Slides</h3>
+              <span className="text-xs text-gray-500">{currentSlide + 1}/{editableSlides.length}</span>
+            </div>
+            
+            <div className="space-y-3">
+              {editableSlides.map((slide, index) => (
+                <div
+                  key={slide.slideNumber}
+                  onClick={() => setCurrentSlide(index)}
+                  className={`
+                    p-3 rounded-lg border cursor-pointer transition-all
+                    ${currentSlide === index 
+                      ? 'border-blue-500 bg-blue-50 shadow-sm' 
+                      : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
+                    }
+                  `}
+                >
+                  <div className="aspect-video bg-gray-100 rounded mb-2 flex items-center justify-center text-xs text-gray-500">
+                    {slide.slideNumber}
+                  </div>
+                  <div className="text-xs font-medium text-gray-700 truncate">
+                    {slide.elements.find(el => el.id.startsWith('title-'))?.text || slide.title}
+                  </div>
                 </div>
-                <div className="text-xs font-medium text-gray-700 truncate">
-                  {slide.elements.find(el => el.id.startsWith('title-'))?.text || slide.title}
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
 
-          {/* Navigation buttons */}
-          <div className="mt-4 pt-4 border-t">
-            <div className="flex space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentSlide(Math.max(0, currentSlide - 1))}
-                disabled={currentSlide === 0}
-                className="flex-1"
-              >
-                <ArrowRight className="h-4 w-4 rotate-180" />
-              </Button>
-              
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentSlide(Math.min(editableSlides.length - 1, currentSlide + 1))}
-                disabled={currentSlide === editableSlides.length - 1}
-                className="flex-1"
-              >
-                <ArrowRight className="h-4 w-4" />
-              </Button>
+            {/* Navigation buttons */}
+            <div className="mt-4 pt-4 border-t">
+              <div className="flex space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentSlide(Math.max(0, currentSlide - 1))}
+                  disabled={currentSlide === 0}
+                  className="flex-1"
+                >
+                  <ArrowRight className="h-4 w-4 rotate-180" />
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentSlide(Math.min(editableSlides.length - 1, currentSlide + 1))}
+                  disabled={currentSlide === editableSlides.length - 1}
+                  className="flex-1"
+                >
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Canvas */}
-        <div className="flex-1 p-8 overflow-auto">
-          <div className="mx-auto" style={{ width: '800px', height: '600px' }}>
+        <div className={`flex-1 ${isMobile ? 'p-2' : 'p-8'} overflow-auto`}>
+          <div className="mx-auto" style={{ 
+            width: isMobile ? '100%' : '800px', 
+            height: isMobile ? '400px' : '600px',
+            maxWidth: isMobile ? '100vw' : '800px'
+          }}>
             <div 
-              className="w-full h-full bg-white rounded-lg shadow-lg border-2 border-gray-200 relative overflow-hidden"
+              className={`slide-canvas w-full h-full bg-white rounded-lg shadow-lg ${isMobile ? 'border border-gray-200' : 'border-2 border-gray-200'} relative overflow-hidden`}
               onClick={() => {
                 setSelectedElement(null);
                 setEditingElement(null);
+                setShowMobileToolbar(false);
               }}
             >
-              {/* Grid */}
+              {/* Grid - lighter on mobile */}
               <div 
-                className="absolute inset-0 opacity-5 pointer-events-none"
+                className={`absolute inset-0 pointer-events-none ${isMobile ? 'opacity-2' : 'opacity-5'}`}
                 style={{
                   backgroundImage: `
                     linear-gradient(to right, #000 1px, transparent 1px),
                     linear-gradient(to bottom, #000 1px, transparent 1px)
                   `,
-                  backgroundSize: '20px 20px'
+                  backgroundSize: isMobile ? '15px 15px' : '20px 20px'
                 }}
               />
 
@@ -642,11 +831,11 @@ export default function CleanSlideEditor({
               {currentSlideData?.elements.map((element) => (
                 <div
                   key={element.id}
-                  className={`absolute cursor-pointer select-none transition-all ${
+                  className={`absolute select-none transition-all ${
                     selectedElement === element.id 
-                      ? 'ring-2 ring-blue-500 ring-opacity-70' 
-                      : 'hover:ring-1 hover:ring-gray-300'
-                  }`}
+                      ? 'ring-2 ring-blue-500 ring-opacity-70 cursor-move' 
+                      : 'hover:ring-1 hover:ring-gray-300 cursor-pointer'
+                  } ${isMobile ? 'touch-manipulation' : ''}`}
                   style={{
                     top: element.style.top,
                     left: element.style.left,
@@ -657,36 +846,29 @@ export default function CleanSlideEditor({
                     color: element.style.color,
                     maxWidth: element.style.maxWidth,
                     lineHeight: element.style.lineHeight,
+                    minHeight: isMobile ? '44px' : 'auto', // Touch target size
+                    minWidth: isMobile ? '44px' : 'auto',
                   }}
-                  onMouseDown={(e) => handleMouseDown(e, element.id)}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    // Only handle clicks if we weren't dragging
-                    if (!isDragging) {
-                      if (selectedElement === element.id) {
-                        if (element.type === 'text') {
-                          setEditingElement(element.id);
-                        }
-                      } else {
-                        setSelectedElement(element.id);
-                        setEditingElement(null);
-                      }
-                    }
-                  }}
+                  onPointerDown={(e) => handlePointerDown(e, element.id)}
+                  onClick={(e) => handleElementClick(e, element.id)}
                 >
                   {element.type === 'text' ? (
                     editingElement === element.id ? (
                       <textarea
                         value={element.text || ''}
                         onChange={(e) => updateElement(element.id, { text: e.target.value })}
-                        onBlur={() => setEditingElement(null)}
+                        onBlur={() => {
+                          setEditingElement(null);
+                          if (isMobile) setShowMobileToolbar(true);
+                        }}
                         onKeyDown={(e) => {
                           if (e.key === 'Escape') {
                             setEditingElement(null);
+                            if (isMobile) setShowMobileToolbar(true);
                           }
                         }}
                         autoFocus
-                        className="w-full h-full resize-none border-2 border-blue-400 outline-none bg-white bg-opacity-95 rounded p-2"
+                        className={`w-full h-full resize-none border-2 border-blue-400 outline-none bg-white bg-opacity-95 rounded ${isMobile ? 'p-3 text-base' : 'p-2'}`}
                         style={{
                           fontSize: element.style.fontSize,
                           fontWeight: element.style.fontWeight,
@@ -696,7 +878,7 @@ export default function CleanSlideEditor({
                         placeholder="Type your text here..."
                       />
                     ) : (
-                      <div className="whitespace-pre-wrap break-words p-2">{element.text}</div>
+                      <div className={`whitespace-pre-wrap break-words ${isMobile ? 'p-3' : 'p-2'}`}>{element.text}</div>
                     )
                   ) : element.type === 'image' ? (
                     <img
@@ -711,40 +893,93 @@ export default function CleanSlideEditor({
 
               {/* Instructions */}
               {editingElement && (
-                <div className="absolute top-4 right-4 bg-green-600 text-white px-3 py-1 rounded text-sm">
-                  Editing • Click outside to finish
+                <div className={`absolute ${isMobile ? 'top-2 left-2 text-xs' : 'top-4 right-4 text-sm'} bg-green-600 text-white px-3 py-1 rounded`}>
+                  Editing • {isMobile ? 'Tap outside to finish' : 'Click outside to finish'}
                 </div>
               )}
               
               {selectedElement && !editingElement && (
-                <div className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded text-sm">
-                  Selected • Click again to edit • Drag to move
+                <div className={`absolute ${isMobile ? 'top-2 left-2 text-xs' : 'top-4 right-4 text-sm'} bg-blue-600 text-white px-3 py-1 rounded`}>
+                  Selected • {isMobile ? 'Tap again to edit • Drag to move' : 'Click again to edit • Drag to move'}
                 </div>
               )}
               
               {!selectedElement && !editingElement && (
-                <div className="absolute top-4 right-4 bg-gray-600 text-white px-3 py-1 rounded text-sm opacity-75">
-                  Click an element to select
+                <div className={`absolute ${isMobile ? 'top-2 left-2 text-xs' : 'top-4 right-4 text-sm'} bg-gray-600 text-white px-3 py-1 rounded opacity-75`}>
+                  {isMobile ? 'Tap an element to select' : 'Click an element to select'}
                 </div>
               )}
             </div>
           </div>
 
-          {/* Status */}
-          <div className="mt-4 text-center">
-            <div className="flex items-center justify-center space-x-4 text-sm text-gray-500">
-              <span>Slide {currentSlide + 1} of {editableSlides.length}</span>
-              {isAutoSaving && (
-                <div className="flex items-center space-x-1 text-blue-600">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                  <span>Saving...</span>
-                </div>
-              )}
-              <span>Last saved: {lastSaved.toLocaleTimeString()}</span>
+          {/* Mobile slide navigation */}
+          {isMobile && (
+            <div className="mt-4 flex items-center justify-center space-x-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentSlide(Math.max(0, currentSlide - 1))}
+                disabled={currentSlide === 0}
+              >
+                <ArrowRight className="h-4 w-4 rotate-180" />
+              </Button>
+              
+              <span className="text-sm font-medium text-gray-700 px-4">
+                {currentSlide + 1} / {editableSlides.length}
+              </span>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentSlide(Math.min(editableSlides.length - 1, currentSlide + 1))}
+                disabled={currentSlide === editableSlides.length - 1}
+              >
+                <ArrowRight className="h-4 w-4" />
+              </Button>
             </div>
-          </div>
+          )}
+
+          {/* Status */}
+          {!isMobile && (
+            <div className="mt-4 text-center">
+              <div className="flex items-center justify-center space-x-4 text-sm text-gray-500">
+                <span>Slide {currentSlide + 1} of {editableSlides.length}</span>
+                {isAutoSaving && (
+                  <div className="flex items-center space-x-1 text-blue-600">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                    <span>Saving...</span>
+                  </div>
+                )}
+                <span>Last saved: {lastSaved.toLocaleTimeString()}</span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Mobile Formatting Toolbar (slides up from bottom) */}
+      <MobileToolbar />
+
+      {/* Mobile FAB for selected element */}
+      {isMobile && selectedElement && !showMobileToolbar && selectedElementData?.type === 'text' && (
+        <Button
+          onClick={() => setShowMobileToolbar(true)}
+          className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-blue-600 hover:bg-blue-700 shadow-lg"
+        >
+          <Edit3 className="h-6 w-6 text-white" />
+        </Button>
+      )}
+
+      {/* Mobile delete FAB */}
+      {isMobile && selectedElement && !showMobileToolbar && (
+        <Button
+          onClick={() => deleteElement(selectedElement)}
+          variant="outline"
+          className="fixed bottom-6 left-6 w-12 h-12 rounded-full border-red-300 bg-white text-red-600 hover:bg-red-50 shadow-lg"
+        >
+          <Trash className="h-4 w-4" />
+        </Button>
+      )}
 
       {/* Hidden file input */}
       <input
@@ -756,7 +991,7 @@ export default function CleanSlideEditor({
       />
 
       {/* Toast notifications */}
-      <div className="fixed bottom-4 right-4 z-50 space-y-2">
+      <div className={`fixed ${isMobile ? 'bottom-20 right-4' : 'bottom-4 right-4'} z-40 space-y-2`}>
         {toasts.map((toast) => (
           <div
             key={toast.id}
