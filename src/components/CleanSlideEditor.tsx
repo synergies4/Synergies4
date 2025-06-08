@@ -199,6 +199,24 @@ export default function CleanSlideEditor({
   const [selectedElement, setSelectedElement] = useState<string | null>(null);
   const [editingElement, setEditingElement] = useState<string | null>(null);
   const [showMobileToolbar, setShowMobileToolbar] = useState(false);
+  const [toolbarTimeout, setToolbarTimeout] = useState<NodeJS.Timeout | null>(null);
+  
+  // Stable mobile toolbar management
+  const showMobileToolbarStable = useCallback((show: boolean) => {
+    if (toolbarTimeout) {
+      clearTimeout(toolbarTimeout);
+    }
+    
+    if (show) {
+      setShowMobileToolbar(true);
+    } else {
+      // Small delay before hiding to prevent accidental flickers
+      const timeout = setTimeout(() => {
+        setShowMobileToolbar(false);
+      }, 100);
+      setToolbarTimeout(timeout);
+    }
+  }, [toolbarTimeout]);
   
   // Improved drag system
   const [dragState, setDragState] = useState<{
@@ -310,10 +328,10 @@ export default function CleanSlideEditor({
     
     setSelectedElement(newElement.id);
     if (isMobile) {
-      setShowMobileToolbar(true);
+      showMobileToolbarStable(true);
     }
     addToast('Text added', 'success');
-  }, [currentSlide, addToast, isMobile]);
+  }, [currentSlide, addToast, isMobile, showMobileToolbarStable]);
 
   // Add image
   const handleImageUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -369,9 +387,9 @@ export default function CleanSlideEditor({
     }));
     setSelectedElement(null);
     setEditingElement(null);
-    setShowMobileToolbar(false);
+    showMobileToolbarStable(false);
     addToast('Element deleted', 'info');
-  }, [currentSlide, addToast]);
+  }, [currentSlide, addToast, showMobileToolbarStable]);
 
   // Save
   const handleSave = useCallback(() => {
@@ -392,7 +410,7 @@ export default function CleanSlideEditor({
       if (e.key === 'Escape') {
         setSelectedElement(null);
         setEditingElement(null);
-        setShowMobileToolbar(false);
+        showMobileToolbarStable(false);
       }
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault();
@@ -402,7 +420,7 @@ export default function CleanSlideEditor({
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [selectedElement, deleteElement, handleSave]);
+  }, [selectedElement, deleteElement, handleSave, showMobileToolbarStable]);
 
   // Improved mouse/touch handlers
   const handlePointerDown = useCallback((e: React.PointerEvent, elementId: string) => {
@@ -423,12 +441,14 @@ export default function CleanSlideEditor({
       hasMoved: false
     });
 
-    // Select element immediately
-    setSelectedElement(elementId);
-    if (isMobile && element.type === 'text') {
-      setShowMobileToolbar(true);
+    // Select element immediately only if not already selected
+    if (selectedElement !== elementId) {
+      setSelectedElement(elementId);
+      if (isMobile && element.type === 'text') {
+        showMobileToolbarStable(true);
+      }
     }
-  }, [currentSlideData, isMobile]);
+  }, [currentSlideData, isMobile, selectedElement, showMobileToolbarStable]);
 
   // Global pointer move handler
   useEffect(() => {
@@ -485,21 +505,22 @@ export default function CleanSlideEditor({
 
     if (selectedElement === elementId) {
       // Second click - enter edit mode for text
-      if (clickedElement?.type === 'text') {
+      if (clickedElement?.type === 'text' && !editingElement) {
         setEditingElement(elementId);
         if (isMobile) {
-          setShowMobileToolbar(false); // Hide toolbar while editing
+          showMobileToolbarStable(false); // Hide toolbar while editing
         }
       }
     } else {
       // First click - select element
       setSelectedElement(elementId);
       setEditingElement(null);
+      // Always show mobile toolbar for text elements, don't toggle
       if (isMobile && clickedElement?.type === 'text') {
-        setShowMobileToolbar(true);
+        showMobileToolbarStable(true);
       }
     }
-  }, [selectedElement, dragState, isMobile, currentSlideData]);
+  }, [selectedElement, editingElement, dragState, isMobile, currentSlideData, showMobileToolbarStable]);
 
   // Mobile Formatting Toolbar Component
   const MobileToolbar = () => {
@@ -517,7 +538,7 @@ export default function CleanSlideEditor({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setShowMobileToolbar(false)}
+            onClick={() => showMobileToolbarStable(false)}
             className="p-2"
           >
             <X className="h-4 w-4" />
@@ -587,7 +608,7 @@ export default function CleanSlideEditor({
             <Button
               onClick={() => {
                 setEditingElement(selectedElement);
-                setShowMobileToolbar(false);
+                showMobileToolbarStable(false);
               }}
               className="bg-blue-600 hover:bg-blue-700 text-white h-12"
             >
@@ -824,22 +845,25 @@ export default function CleanSlideEditor({
         )}
 
         {/* Canvas */}
-        <div className={`flex-1 ${isMobile ? 'p-0' : 'p-8'} ${isMobile ? 'overflow-visible' : 'overflow-auto'}`}>
-          <div className={`${isMobile ? 'w-full h-full' : 'mx-auto'}`} style={!isMobile ? { 
+        <div className={`flex-1 ${isMobile ? 'h-0' : 'p-8'} ${isMobile ? 'overflow-auto' : 'overflow-auto'}`}>
+          <div className={`${isMobile ? 'w-full min-h-full p-4' : 'mx-auto'}`} style={!isMobile ? { 
             width: '800px', 
             height: '600px',
             maxWidth: '800px'
-          } : {}}>
+          } : { minHeight: 'calc(100vh - 140px)' }}>
             <div 
-              className={`slide-canvas ${isMobile ? 'w-full min-h-screen' : 'w-full h-full'} bg-white ${isMobile ? '' : 'rounded-lg shadow-lg'} ${isMobile ? 'border-0' : 'border-2 border-gray-200'} relative ${isMobile ? '' : 'overflow-hidden'}`}
+              className={`slide-canvas w-full ${isMobile ? 'min-h-full' : 'h-full'} bg-white ${isMobile ? 'rounded-lg shadow' : 'rounded-lg shadow-lg'} border ${isMobile ? 'border-gray-200' : 'border-2 border-gray-200'} relative`}
               style={isMobile ? { 
-                minHeight: 'calc(100vh - 80px)', // Account for header
-                paddingBottom: '100px' // Space for FABs and mobile navigation
+                minHeight: '600px',
+                paddingBottom: '120px' // Extra space for floating elements
               } : {}}
-              onClick={() => {
-                setSelectedElement(null);
-                setEditingElement(null);
-                setShowMobileToolbar(false);
+              onClick={(e) => {
+                // Only deselect if clicking on empty canvas area, not if clicking toolbar
+                if (e.target === e.currentTarget) {
+                  setSelectedElement(null);
+                  setEditingElement(null);
+                  showMobileToolbarStable(false);
+                }
               }}
             >
               {/* Grid - lighter on mobile */}
@@ -880,12 +904,12 @@ export default function CleanSlideEditor({
                         onChange={(e) => updateElement(element.id, { text: e.target.value })}
                         onBlur={() => {
                           setEditingElement(null);
-                          if (isMobile) setShowMobileToolbar(true);
+                          if (isMobile) showMobileToolbarStable(true);
                         }}
                         onKeyDown={(e) => {
                           if (e.key === 'Escape') {
                             setEditingElement(null);
-                            if (isMobile) setShowMobileToolbar(true);
+                            if (isMobile) showMobileToolbarStable(true);
                           }
                         }}
                         autoFocus
@@ -987,7 +1011,7 @@ export default function CleanSlideEditor({
       {/* Mobile FAB for selected element */}
       {isMobile && selectedElement && !showMobileToolbar && selectedElementData?.type === 'text' && (
         <Button
-          onClick={() => setShowMobileToolbar(true)}
+          onClick={() => showMobileToolbarStable(true)}
           className="fixed bottom-20 right-4 w-14 h-14 rounded-full bg-blue-600 hover:bg-blue-700 shadow-lg z-[50]"
         >
           <Edit3 className="h-6 w-6 text-white" />
