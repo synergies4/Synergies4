@@ -63,6 +63,15 @@ interface AnalyticsData {
   }>;
 }
 
+interface UserListItem {
+  id: string;
+  name?: string;
+  email?: string;
+  progress: number;
+  status: string;
+  quizScore: number;
+}
+
 export default function Analytics() {
   const { user, userProfile, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -71,7 +80,7 @@ export default function Analytics() {
   const [timeRange, setTimeRange] = useState('30d');
   const [showUserModal, setShowUserModal] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState<{ id: string; title: string } | null>(null);
-  const [userList, setUserList] = useState([]);
+  const [userList, setUserList] = useState<UserListItem[]>([]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -189,7 +198,7 @@ export default function Analytics() {
         .select('*')
         .eq('courses', courseId);
 
-      const userList = (data ?? []).map(enrollment => ({
+      const userList: UserListItem[] = (data ?? []).map(enrollment => ({
         id: enrollment.user_id,
         name: enrollment.user_profiles?.name,
         email: enrollment.user_profiles?.email,
@@ -540,10 +549,10 @@ export default function Analytics() {
                   </tr>
                 </thead>
                 <tbody>
-                  {userList.map((user) => (
+                  {userList.map((user: UserListItem) => (
                     <tr key={user.id}>
-                      <td className="px-4 py-2">{user.name}</td>
-                      <td className="px-4 py-2">{user.email}</td>
+                      <td className="px-4 py-2">{user.name || '—'}</td>
+                      <td className="px-4 py-2">{user.email || '—'}</td>
                       <td className="px-4 py-2">{user.progress}%</td>
                       <td className="px-4 py-2">{user.status}</td>
                       <td className="px-4 py-2">{user.quizScore ? `${user.quizScore}%` : '—'}</td>
