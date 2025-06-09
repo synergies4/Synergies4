@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2023-10-16',
+  apiVersion: '2025-04-30.basil',
 });
 
 async function getAuthenticatedUser(request: NextRequest) {
@@ -33,6 +33,23 @@ async function getAuthenticatedUser(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Validate Stripe configuration
+    if (!process.env.STRIPE_SECRET_KEY) {
+      console.error('STRIPE_SECRET_KEY environment variable is not set');
+      return NextResponse.json(
+        { message: 'Stripe configuration error' },
+        { status: 500 }
+      );
+    }
+
+    if (!process.env.NEXT_PUBLIC_URL) {
+      console.error('NEXT_PUBLIC_URL environment variable is not set');
+      return NextResponse.json(
+        { message: 'Application configuration error' },
+        { status: 500 }
+      );
+    }
+
     const user = await getAuthenticatedUser(request);
 
     if (!user) {
@@ -125,8 +142,28 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Error creating checkout session:', error);
+    
+    // More detailed error logging
+    if (error instanceof Error) {
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+    }
+    
+    // Check if it's a Stripe-specific error
+    if (error && typeof error === 'object' && 'type' in error) {
+      console.error('Stripe error type:', (error as any).type);
+      console.error('Stripe error code:', (error as any).code);
+      console.error('Stripe error message:', (error as any).message);
+    }
+    
     return NextResponse.json(
-      { message: 'Failed to create checkout session' },
+      { 
+        message: 'Failed to create checkout session',
+        error: error instanceof Error ? error.message : 'Unknown error',
+        ...(process.env.NODE_ENV === 'development' && {
+          details: error
+        })
+      },
       { status: 500 }
     );
   }
