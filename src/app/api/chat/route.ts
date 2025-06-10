@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
 
 interface Message {
   id: string;
@@ -20,6 +22,44 @@ type AIProvider = 'anthropic' | 'openai' | 'google';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    
+    // Get user's personalization context
+    const supabase = createRouteHandlerClient({ cookies });
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    let personalizationContext = '';
+    if (user) {
+      const { data: onboarding } = await supabase
+        .from('user_onboarding')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+      
+      if (onboarding && onboarding.onboarding_completed) {
+        personalizationContext = `
+
+User Profile Context (tailor your responses to this user):
+- Name: ${onboarding.full_name}
+- Role: ${onboarding.job_title} at ${onboarding.company}
+- Primary Role: ${onboarding.primary_role}
+- Management Level: ${onboarding.management_level}
+- Experience: ${onboarding.years_experience} years
+- Team Size: ${onboarding.team_size}
+- Company Size: ${onboarding.company_size}
+- Work Environment: ${onboarding.work_environment}
+
+Current Challenges: ${onboarding.biggest_challenges?.join(', ') || 'None specified'}
+Primary Goals: ${onboarding.primary_goals?.join(', ') || 'None specified'}
+Focus Areas: ${onboarding.focus_areas?.join(', ') || 'None specified'}
+
+Communication Preferences:
+- Coaching Style: ${onboarding.coaching_style || 'balanced'}
+- Communication Tone: ${onboarding.communication_tone || 'professional'}
+- Learning Style: ${onboarding.learning_style || 'mixed'}
+
+IMPORTANT: Address them by name (${onboarding.full_name}) and provide advice that's relevant to their specific role, challenges, and experience level.`;
+      }
+    }
     
     // Handle both old format (message, history) and new format (messages)
     let message: string;
@@ -161,7 +201,9 @@ You can also help with:
 - Creating presentations and slideshows
 - Analyzing uploaded documents
 - Generating images (when requested)
-- Providing visual learning aids`;
+- Providing visual learning aids
+
+${personalizationContext}`;
 
     // Prepare request body based on provider
     switch (provider) {

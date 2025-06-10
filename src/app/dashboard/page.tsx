@@ -471,6 +471,9 @@ export default function StudentDashboard() {
                     <Button asChild size="sm" variant="outline" className="w-full sm:w-auto">
                       <Link href="/record-meeting">Record Meeting</Link>
                     </Button>
+                    <Button asChild size="sm" variant="outline" className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 border-0">
+                      <Link href="/pocket-coach">Pocket Coach</Link>
+                    </Button>
                     <Button asChild size="sm" className="w-full sm:w-auto">
                       <Link href="/meetings">View All Meetings</Link>
                     </Button>

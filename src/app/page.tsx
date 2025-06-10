@@ -130,6 +130,19 @@ export default function HomePage() {
                 </span>
               </Link>
             </Button>
+
+            <Button 
+              size="lg" 
+              className="w-full sm:w-auto text-base sm:text-lg px-8 sm:px-10 py-3 sm:py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 transition-all font-semibold rounded-xl shadow-2xl hover:shadow-purple-500/25 hover:scale-105 border-0 group h-auto" 
+              asChild
+            >
+              <Link href="/pocket-coach">
+                <span className="flex items-center justify-center text-white group-hover:text-white">
+                  <MessageSquare className="h-4 sm:h-5 w-4 sm:w-5 mr-2 group-hover:scale-110 transition-transform text-white group-hover:text-white" />
+                  Pocket Coach
+                </span>
+              </Link>
+            </Button>
           </div>
 
           {/* Enhanced Stats with Cards - Fixed Spacing */}
