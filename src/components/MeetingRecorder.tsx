@@ -120,7 +120,7 @@ export default function MeetingRecorder() {
     }
   };
 
-  const stopRecording = async (session: RecordingSession) => {
+  const stopRecording = async (recordingSession: RecordingSession) => {
     setIsLoading(true);
     try {
       const { createClient } = await import('@/lib/supabase/client');
@@ -139,8 +139,8 @@ export default function MeetingRecorder() {
           'Authorization': `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
-          botId: session.botId,
-          recordId: session.id
+          botId: recordingSession.botId,
+          recordId: recordingSession.id
         }),
       });
 
