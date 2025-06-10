@@ -24,7 +24,10 @@ import {
   CheckCircle,
   MessageSquare,
   Award,
-  PlayCircle
+  PlayCircle,
+  Calendar,
+  MapPin,
+  User
 } from 'lucide-react';
 import Image from 'next/image';
 
@@ -41,6 +44,13 @@ interface Course {
   image?: string;
   featured: boolean;
   created_at: string;
+  course_type?: string;
+  max_participants?: number;
+  location?: string;
+  instructor_name?: string;
+  materials_included?: string;
+  prerequisites?: string;
+  current_participants?: number;
 }
 
 export default function Courses() {
@@ -88,6 +98,7 @@ function CourseDirectorySection() {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedType, setSelectedType] = useState('All');
 
   useEffect(() => {
     fetchCourses();
@@ -176,16 +187,18 @@ function CourseDirectorySection() {
     }
   };
 
-  // Filter courses based on search and category
+  // Filter courses based on search, category, and type
   const filteredCourses = courses.filter(course => {
     const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          course.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'All' || course.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+    const matchesType = selectedType === 'All' || course.course_type === selectedType;
+    return matchesSearch && matchesCategory && matchesType;
   });
 
-  // Get unique categories
+  // Get unique categories and types
   const categories = ['All', ...Array.from(new Set(courses.map(course => course.category)))];
+  const courseTypes = ['All', 'digital', 'in_person', 'hybrid'];
 
   return (
     <section id="course-directory" className="py-24 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
@@ -265,9 +278,9 @@ function CourseDirectorySection() {
             
             {/* Main Container */}
             <div className="relative glass-effect-light rounded-2xl border border-white/50 p-8 shadow-xl">
-              <div className="flex flex-col md:flex-row gap-6 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 {/* Search */}
-                <div className="flex-1 relative">
+                <div className="relative">
                   <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                   <Input
                     placeholder="Search courses by title or description..."
@@ -277,8 +290,26 @@ function CourseDirectorySection() {
                   />
                 </div>
                 
+                {/* Course Type Filter */}
+                <div>
+                  <select
+                    value={selectedType}
+                    onChange={(e) => setSelectedType(e.target.value)}
+                    className="w-full h-12 px-4 text-lg border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/90 font-medium text-gray-900"
+                  >
+                    {courseTypes.map(type => (
+                      <option key={type} value={type} className="text-gray-900">
+                        {type === 'All' ? 'All Course Types' : 
+                         type === 'digital' ? '🌐 Digital Courses' :
+                         type === 'in_person' ? '🏢 In-Person Events' :
+                         type === 'hybrid' ? '🔄 Hybrid Courses' : type}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                
                 {/* Category Filter */}
-                <div className="md:w-64">
+                <div>
                   <select
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
@@ -301,7 +332,8 @@ function CourseDirectorySection() {
                     <span className="text-blue-600 font-semibold"> course{filteredCourses.length !== 1 ? 's' : ''} </span>
                     found
                     {searchTerm && <span className="text-gray-500"> for "{searchTerm}"</span>}
-                    {selectedCategory !== 'All' && <span className="text-gray-500"> in {selectedCategory}</span>}
+                    {selectedType !== 'All' && <span className="text-gray-500"> • {selectedType === 'digital' ? 'Digital' : selectedType === 'in_person' ? 'In-Person' : selectedType === 'hybrid' ? 'Hybrid' : selectedType} courses</span>}
+                    {selectedCategory !== 'All' && <span className="text-gray-500"> • {selectedCategory}</span>}
                   </p>
                 </div>
               )}
@@ -421,9 +453,38 @@ function CourseDirectorySection() {
                       </div>
                       <div className="flex items-center text-gray-500">
                         <Users className="h-4 w-4 mr-1" />
-                        <span>1,200+</span>
+                        <span>{course.course_type === 'in_person' && course.max_participants ? 
+                          `${course.current_participants || 0}/${course.max_participants}` : '1,200+'}</span>
                       </div>
                     </div>
+
+                    {/* In-Person Event Details */}
+                    {course.course_type === 'in_person' && (
+                      <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                        <div className="flex items-center mb-2">
+                          <Calendar className="h-4 w-4 text-amber-600 mr-2" />
+                          <span className="text-amber-800 font-semibold text-sm">In-Person Event</span>
+                        </div>
+                        {course.location && (
+                          <div className="flex items-center mb-1 text-sm text-amber-700">
+                            <MapPin className="h-3 w-3 mr-2" />
+                            <span>{course.location}</span>
+                          </div>
+                        )}
+                        {course.instructor_name && (
+                          <div className="flex items-center mb-1 text-sm text-amber-700">
+                            <User className="h-3 w-3 mr-2" />
+                            <span>Led by {course.instructor_name}</span>
+                          </div>
+                        )}
+                        {course.max_participants && (
+                          <div className="flex items-center text-sm text-amber-700">
+                            <Users className="h-3 w-3 mr-2" />
+                            <span>{course.max_participants - (course.current_participants || 0)} spots remaining</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
 
                     {/* Duration */}
                     {course.duration && (

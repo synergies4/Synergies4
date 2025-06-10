@@ -52,6 +52,13 @@ interface Course {
   image?: string;
   featured: boolean;
   created_at: string;
+  course_type?: string;
+  max_participants?: number;
+  location?: string;
+  instructor_name?: string;
+  materials_included?: string;
+  prerequisites?: string;
+  current_participants?: number;
 }
 
 interface Lesson {
@@ -453,6 +460,92 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                     <p className="text-lg leading-relaxed">{course.description}</p>
                   </div>
                 </div>
+
+                {/* In-Person Event Details */}
+                {course.course_type === 'in_person' && (
+                  <div className="animate-fade-in-up animation-delay-150">
+                    <h2 className="text-3xl font-bold text-gray-900 mb-6">Event Details</h2>
+                    <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-8 shadow-lg">
+                      <div className="flex items-center mb-6">
+                        <Calendar className="h-8 w-8 text-amber-600 mr-3" />
+                        <h3 className="text-2xl font-bold text-amber-900">In-Person Event</h3>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {course.location && (
+                          <div className="flex items-start space-x-3">
+                            <MapPin className="h-6 w-6 text-amber-600 mt-1 flex-shrink-0" />
+                            <div>
+                              <h4 className="font-semibold text-amber-900 mb-1">Location</h4>
+                              <p className="text-amber-800">{course.location}</p>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {course.instructor_name && (
+                          <div className="flex items-start space-x-3">
+                            <Users className="h-6 w-6 text-amber-600 mt-1 flex-shrink-0" />
+                            <div>
+                              <h4 className="font-semibold text-amber-900 mb-1">Instructor</h4>
+                              <p className="text-amber-800">{course.instructor_name}</p>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {course.max_participants && (
+                          <div className="flex items-start space-x-3">
+                            <Award className="h-6 w-6 text-amber-600 mt-1 flex-shrink-0" />
+                            <div>
+                              <h4 className="font-semibold text-amber-900 mb-1">Capacity</h4>
+                              <p className="text-amber-800">
+                                {course.current_participants || 0} / {course.max_participants} participants
+                              </p>
+                              <div className="w-full bg-amber-200 rounded-full h-2 mt-2">
+                                <div 
+                                  className="bg-amber-600 h-2 rounded-full transition-all duration-300"
+                                  style={{ 
+                                    width: `${Math.min(100, ((course.current_participants || 0) / course.max_participants) * 100)}%` 
+                                  }}
+                                ></div>
+                              </div>
+                              <p className="text-sm text-amber-700 mt-1">
+                                {Math.max(0, course.max_participants - (course.current_participants || 0))} spots remaining
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {course.materials_included && (
+                          <div className="flex items-start space-x-3">
+                            <BookOpen className="h-6 w-6 text-amber-600 mt-1 flex-shrink-0" />
+                            <div>
+                              <h4 className="font-semibold text-amber-900 mb-1">Materials Included</h4>
+                              <p className="text-amber-800">{course.materials_included}</p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      
+                      {course.prerequisites && (
+                        <div className="mt-6 p-4 bg-amber-100 rounded-lg">
+                          <h4 className="font-semibold text-amber-900 mb-2 flex items-center">
+                            <CheckCircle className="h-5 w-5 mr-2" />
+                            Prerequisites
+                          </h4>
+                          <p className="text-amber-800">{course.prerequisites}</p>
+                        </div>
+                      )}
+                      
+                      <div className="mt-6 p-4 bg-amber-600 text-white rounded-lg">
+                        <h4 className="font-semibold mb-2">📅 Event Notice</h4>
+                        <p className="text-amber-100">
+                          Detailed scheduling information, including exact dates and times, will be sent to registered participants. 
+                          Please ensure your contact information is up to date.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Course Modules */}
                 {modules.length > 0 && (

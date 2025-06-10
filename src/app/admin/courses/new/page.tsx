@@ -155,6 +155,54 @@ export default function CreateCourse() {
     setCurrentStep(prev => Math.max(prev - 1, 1));
   };
 
+  const generateAIContent = async (field: 'description' | 'shortDesc') => {
+    if (!formData.title || !formData.category || !formData.level) {
+      alert('Please fill in the course title, category, and level first to generate AI content.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const prompt = field === 'description' 
+        ? `Create a comprehensive course description for a ${formData.level.toLowerCase()} level ${formData.category} course titled "${formData.title}". Include learning objectives, target audience, key topics covered, and benefits. Make it engaging and professional.`
+        : `Create a compelling short description (2-3 sentences) for a ${formData.level.toLowerCase()} level ${formData.category} course titled "${formData.title}". Focus on the main value proposition and target audience.`;
+
+      const response = await fetch('/api/generate-content', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt,
+          type: 'course_content',
+          context: {
+            title: formData.title,
+            category: formData.category,
+            level: formData.level,
+            field
+          }
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate AI content');
+      }
+
+      const data = await response.json();
+      
+      if (data.content) {
+        handleInputChange(field, data.content);
+      } else {
+        throw new Error('No content received from AI');
+      }
+    } catch (error) {
+      console.error('Error generating AI content:', error);
+      alert(`Failed to generate ${field}. Please try again or write it manually.`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSubmit = async (status: string) => {
     if (!validateStep(currentStep)) return;
     
@@ -179,7 +227,13 @@ export default function CreateCourse() {
         duration: formData.duration,
         status: status,
         image: formData.image || null,
-        featured: formData.featured
+        featured: formData.featured,
+        course_type: formData.course_type,
+        max_participants: formData.max_participants ? parseInt(formData.max_participants) : null,
+        location: formData.location || null,
+        instructor_name: formData.instructor_name || null,
+        materials_included: formData.materials_included || null,
+        prerequisites: formData.prerequisites || null
       };
       
       const response = await fetch('/api/courses', {
@@ -442,6 +496,44 @@ export default function CreateCourse() {
       case 3:
         return (
           <div className="space-y-6">
+            {/* AI Content Generation */}
+            <Card className="bg-gradient-to-r from-purple-50 to-indigo-50 border-2 border-purple-200">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg font-bold text-purple-900 flex items-center">
+                  <Sparkles className="w-5 h-5 mr-2" />
+                  AI Content Generator
+                </CardTitle>
+                <CardDescription className="text-purple-700">
+                  Let AI help you create compelling course descriptions and content
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => generateAIContent('description')}
+                    className="w-full bg-white text-purple-700 border-purple-300 hover:bg-purple-50"
+                  >
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Generate Description
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => generateAIContent('shortDesc')}
+                    className="w-full bg-white text-purple-700 border-purple-300 hover:bg-purple-50"
+                  >
+                    <Star className="w-4 h-4 mr-2" />
+                    Generate Short Description
+                  </Button>
+                </div>
+                <div className="text-xs text-purple-600 bg-purple-100 p-3 rounded-lg">
+                  💡 AI will use your course title, category, and level to create tailored content
+                </div>
+              </CardContent>
+            </Card>
+
             <div className="space-y-2">
               <Label htmlFor="description" className="text-sm font-semibold text-gray-900 flex items-center">
                 <FileText className="w-4 h-4 mr-2 text-teal-600" />

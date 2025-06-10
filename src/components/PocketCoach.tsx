@@ -7,10 +7,12 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { ScrollArea } from './ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { Send, MessageCircle, User, Bot, Loader, Lightbulb, Target, Clock, Sparkles } from 'lucide-react';
+import { Send, MessageCircle, User, Bot, Loader, Lightbulb, Target, Clock, Sparkles, LogIn } from 'lucide-react';
 import { toast } from 'sonner';
 import { usePersonalization } from '@/hooks/usePersonalization';
+import { useAuth } from '@/contexts/AuthContext';
 import OnboardingModal from './OnboardingModal';
+import Link from 'next/link';
 
 interface Message {
   id: number;
@@ -58,6 +60,9 @@ export default function PocketCoach() {
   const [sessions, setSessions] = useState<CoachingSession[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Authentication
+  const { user, loading: authLoading } = useAuth();
+
   // Personalization
   const {
     hasCompletedOnboarding,
@@ -68,12 +73,13 @@ export default function PocketCoach() {
   } = usePersonalization();
 
   useEffect(() => {
-    loadRecentSessions();
-    // Add welcome message
-    const welcomeMessage: Message = {
-      id: Date.now(),
-      role: 'assistant',
-      content: `👋 Hello! I'm your personal AI coach. I'm here to help you navigate daily challenges, improve your skills, and achieve your goals.
+    if (user) {
+      loadRecentSessions();
+      // Add welcome message
+      const welcomeMessage: Message = {
+        id: Date.now(),
+        role: 'assistant',
+        content: `👋 Hello! I'm your personal AI coach. I'm here to help you navigate daily challenges, improve your skills, and achieve your goals.
 
 What's on your mind today? You can ask me about:
 • Leadership and team management
@@ -84,10 +90,11 @@ What's on your mind today? You can ask me about:
 • Or anything else you're dealing with!
 
 How can I support you right now?`,
-      timestamp: new Date().toISOString()
-    };
-    setMessages([welcomeMessage]);
-  }, []);
+        timestamp: new Date().toISOString()
+      };
+      setMessages([welcomeMessage]);
+    }
+  }, [user]);
 
   useEffect(() => {
     scrollToBottom();
@@ -194,6 +201,94 @@ What would you like to work on?`,
     };
     setMessages([welcomeMessage]);
   };
+
+  // Show loading state
+  if (authLoading) {
+    return (
+      <div className="max-w-4xl mx-auto p-6 space-y-6">
+        <div className="text-center space-y-4">
+          <div className="flex items-center justify-center gap-2">
+            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full flex items-center justify-center">
+              <Sparkles className="h-6 w-6 text-white" />
+            </div>
+            <h1 className="text-3xl font-bold text-gray-900">Pocket Coach</h1>
+          </div>
+          <div className="flex items-center justify-center space-x-2">
+            <Loader className="h-5 w-5 animate-spin text-gray-600" />
+            <span className="text-gray-600">Loading...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show login prompt if user is not authenticated
+  if (!user) {
+    return (
+      <div className="max-w-4xl mx-auto p-6 space-y-6">
+        <div className="text-center space-y-4">
+          <div className="flex items-center justify-center gap-2">
+            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full flex items-center justify-center">
+              <Sparkles className="h-6 w-6 text-white" />
+            </div>
+            <h1 className="text-3xl font-bold text-gray-900">Pocket Coach</h1>
+          </div>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Your personal AI coach is here to help you navigate daily challenges, develop skills, and achieve your goals. 
+            Get instant, personalized guidance tailored to your role and situation.
+          </p>
+        </div>
+
+        <Card className="shadow-lg">
+          <CardContent className="p-8 text-center space-y-6">
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
+              <LogIn className="h-8 w-8 text-blue-600" />
+            </div>
+            <div className="space-y-2">
+              <h2 className="text-2xl font-semibold text-gray-900">Sign in to access your coach</h2>
+              <p className="text-gray-600">
+                Please sign in to start a personalized coaching session and get tailored guidance for your specific needs.
+              </p>
+            </div>
+            <div className="space-y-3">
+              <Link href="/login">
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg">
+                  Sign In
+                </Button>
+              </Link>
+              <p className="text-sm text-gray-500">
+                Don't have an account? <Link href="/signup" className="text-blue-600 hover:underline">Sign up here</Link>
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-blue-50 to-purple-50 border-blue-200">
+          <CardContent className="p-6">
+            <h3 className="text-lg font-semibold text-blue-900 mb-3">🚀 What you'll get with Pocket Coach</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div className="space-y-2">
+                <p className="font-medium text-blue-800">Personalized Guidance</p>
+                <p className="text-blue-700">Get advice tailored to your specific role, challenges, and goals.</p>
+              </div>
+              <div className="space-y-2">
+                <p className="font-medium text-blue-800">Instant Support</p>
+                <p className="text-blue-700">24/7 availability whenever you need coaching support.</p>
+              </div>
+              <div className="space-y-2">
+                <p className="font-medium text-blue-800">Professional Development</p>
+                <p className="text-blue-700">Improve leadership, communication, and problem-solving skills.</p>
+              </div>
+              <div className="space-y-2">
+                <p className="font-medium text-blue-800">Session History</p>
+                <p className="text-blue-700">Access your previous conversations and track your progress.</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">

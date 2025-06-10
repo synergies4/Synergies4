@@ -26,7 +26,11 @@ import {
   Users,
   FileText,
   Plus,
-  Eye
+  Eye,
+  User,
+  Settings,
+  Edit3,
+  Save
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -81,6 +85,26 @@ export default function StudentDashboard() {
     averageScore: 0,
     totalMeetings: 0,
     activeBots: 0
+  });
+  const [userOnboarding, setUserOnboarding] = useState<any>(null);
+  const [editingProfile, setEditingProfile] = useState(false);
+  const [profileForm, setProfileForm] = useState({
+    full_name: '',
+    job_title: '',
+    company: '',
+    primary_role: '',
+    management_level: '',
+    years_experience: '',
+    team_size: '',
+    company_size: '',
+    work_environment: '',
+    team_structure: '',
+    biggest_challenges: [],
+    primary_goals: [],
+    focus_areas: [],
+    coaching_style: 'balanced',
+    communication_tone: 'professional',
+    learning_style: 'mixed'
   });
 
   useEffect(() => {
@@ -222,6 +246,39 @@ export default function StudentDashboard() {
         console.error('Error fetching subscription data:', error);
       }
 
+      // Fetch user onboarding/profile data
+      try {
+        const { data: onboarding } = await supabase
+          .from('user_onboarding')
+          .select('*')
+          .eq('user_id', session.user.id)
+          .single();
+
+        if (onboarding) {
+          setUserOnboarding(onboarding);
+          setProfileForm({
+            full_name: onboarding.full_name || '',
+            job_title: onboarding.job_title || '',
+            company: onboarding.company || '',
+            primary_role: onboarding.primary_role || '',
+            management_level: onboarding.management_level || '',
+            years_experience: onboarding.years_experience || '',
+            team_size: onboarding.team_size || '',
+            company_size: onboarding.company_size || '',
+            work_environment: onboarding.work_environment || '',
+            team_structure: onboarding.team_structure || '',
+            biggest_challenges: onboarding.biggest_challenges || [],
+            primary_goals: onboarding.primary_goals || [],
+            focus_areas: onboarding.focus_areas || [],
+            coaching_style: onboarding.coaching_style || 'balanced',
+            communication_tone: onboarding.communication_tone || 'professional',
+            learning_style: onboarding.learning_style || 'mixed'
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching user onboarding data:', error);
+      }
+
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     } finally {
@@ -234,6 +291,80 @@ export default function StudentDashboard() {
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '');
+  };
+
+  const saveProfile = async () => {
+    try {
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) return;
+
+      const { error } = await supabase
+        .from('user_onboarding')
+        .upsert({
+          user_id: session.user.id,
+          ...profileForm,
+          updated_at: new Date().toISOString()
+        });
+
+      if (error) {
+        throw error;
+      }
+
+      setUserOnboarding(profileForm);
+      setEditingProfile(false);
+      // Show success message
+      const toast = (await import('sonner')).toast;
+      toast.success('Profile updated successfully!');
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      const toast = (await import('sonner')).toast;
+      toast.error('Failed to save profile. Please try again.');
+    }
+  };
+
+  const handleSubscriptionUpgrade = async (planId: string) => {
+    try {
+      setLoading(true);
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        const toast = (await import('sonner')).toast;
+        toast.error('Please log in to upgrade your subscription.');
+        return;
+      }
+
+      const response = await fetch('/api/stripe/create-subscription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          planId,
+          successUrl: `${window.location.origin}/dashboard?subscription=success`,
+          cancelUrl: `${window.location.origin}/dashboard`,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.url) {
+        // Redirect to Stripe Checkout
+        window.location.href = data.url;
+      } else {
+        const toast = (await import('sonner')).toast;
+        toast.error(data.message || 'Failed to create subscription. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error creating subscription:', error);
+      const toast = (await import('sonner')).toast;
+      toast.error('Failed to create subscription. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Helper function to get badge styles based on difficulty level
@@ -345,10 +476,11 @@ export default function StudentDashboard() {
           {/* Main Content */}
           <div>
             <Tabs defaultValue="courses" className="space-y-4 md:space-y-6">
-              <TabsList className="grid w-full grid-cols-5 h-auto bg-white border border-gray-200">
+              <TabsList className="grid w-full grid-cols-6 h-auto bg-white border border-gray-200">
                 <TabsTrigger value="courses" className="text-xs md:text-sm py-2 md:py-3 text-gray-900 data-[state=active]:bg-teal-600 data-[state=active]:text-white">My Courses</TabsTrigger>
                 <TabsTrigger value="meetings" className="text-xs md:text-sm py-2 md:py-3 text-gray-900 data-[state=active]:bg-teal-600 data-[state=active]:text-white">Meetings</TabsTrigger>
                 <TabsTrigger value="progress" className="text-xs md:text-sm py-2 md:py-3 text-gray-900 data-[state=active]:bg-teal-600 data-[state=active]:text-white">Progress</TabsTrigger>
+                <TabsTrigger value="profile" className="text-xs md:text-sm py-2 md:py-3 text-gray-900 data-[state=active]:bg-teal-600 data-[state=active]:text-white">Profile</TabsTrigger>
                 <TabsTrigger value="subscription" className="text-xs md:text-sm py-2 md:py-3 text-gray-900 data-[state=active]:bg-teal-600 data-[state=active]:text-white">Subscription</TabsTrigger>
                 <TabsTrigger value="certificates" className="text-xs md:text-sm py-2 md:py-3 text-gray-900 data-[state=active]:bg-teal-600 data-[state=active]:text-white">Certificates</TabsTrigger>
               </TabsList>
@@ -697,6 +829,276 @@ export default function StudentDashboard() {
                 </div>
               </TabsContent>
 
+              <TabsContent value="profile" className="space-y-4 md:space-y-6">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-xl md:text-2xl font-bold text-gray-900">Profile & Personalization</h2>
+                  <Button
+                    onClick={() => editingProfile ? saveProfile() : setEditingProfile(true)}
+                    className="flex items-center gap-2"
+                  >
+                    {editingProfile ? (
+                      <>
+                        <Save className="h-4 w-4" />
+                        Save Changes
+                      </>
+                    ) : (
+                      <>
+                        <Edit3 className="h-4 w-4" />
+                        Edit Profile
+                      </>
+                    )}
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Personal Information */}
+                  <Card className="bg-white border border-gray-200 shadow-sm">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-lg text-gray-900">
+                        <User className="h-5 w-5 text-blue-600" />
+                        Personal Information
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-sm font-medium text-gray-700 mb-1 block">Full Name</label>
+                          {editingProfile ? (
+                            <Input
+                              value={profileForm.full_name}
+                              onChange={(e) => setProfileForm(prev => ({ ...prev, full_name: e.target.value }))}
+                              placeholder="Enter your full name"
+                            />
+                          ) : (
+                            <p className="text-gray-900">{userOnboarding?.full_name || 'Not provided'}</p>
+                          )}
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-gray-700 mb-1 block">Job Title</label>
+                          {editingProfile ? (
+                            <Input
+                              value={profileForm.job_title}
+                              onChange={(e) => setProfileForm(prev => ({ ...prev, job_title: e.target.value }))}
+                              placeholder="Enter your job title"
+                            />
+                          ) : (
+                            <p className="text-gray-900">{userOnboarding?.job_title || 'Not provided'}</p>
+                          )}
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-gray-700 mb-1 block">Company</label>
+                          {editingProfile ? (
+                            <Input
+                              value={profileForm.company}
+                              onChange={(e) => setProfileForm(prev => ({ ...prev, company: e.target.value }))}
+                              placeholder="Enter your company"
+                            />
+                          ) : (
+                            <p className="text-gray-900">{userOnboarding?.company || 'Not provided'}</p>
+                          )}
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-gray-700 mb-1 block">Years of Experience</label>
+                          {editingProfile ? (
+                            <Input
+                              value={profileForm.years_experience}
+                              onChange={(e) => setProfileForm(prev => ({ ...prev, years_experience: e.target.value }))}
+                              placeholder="Enter years of experience"
+                            />
+                          ) : (
+                            <p className="text-gray-900">{userOnboarding?.years_experience || 'Not provided'}</p>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Professional Details */}
+                  <Card className="bg-white border border-gray-200 shadow-sm">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-lg text-gray-900">
+                        <Settings className="h-5 w-5 text-green-600" />
+                        Professional Details
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div>
+                        <label className="text-sm font-medium text-gray-700 mb-1 block">Primary Role</label>
+                        {editingProfile ? (
+                          <Input
+                            value={profileForm.primary_role}
+                            onChange={(e) => setProfileForm(prev => ({ ...prev, primary_role: e.target.value }))}
+                            placeholder="e.g., Product Manager, Scrum Master"
+                          />
+                        ) : (
+                          <p className="text-gray-900">{userOnboarding?.primary_role || 'Not provided'}</p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-gray-700 mb-1 block">Management Level</label>
+                        {editingProfile ? (
+                          <Input
+                            value={profileForm.management_level}
+                            onChange={(e) => setProfileForm(prev => ({ ...prev, management_level: e.target.value }))}
+                            placeholder="e.g., Individual Contributor, Team Lead"
+                          />
+                        ) : (
+                          <p className="text-gray-900">{userOnboarding?.management_level || 'Not provided'}</p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-gray-700 mb-1 block">Team Size</label>
+                        {editingProfile ? (
+                          <Input
+                            value={profileForm.team_size}
+                            onChange={(e) => setProfileForm(prev => ({ ...prev, team_size: e.target.value }))}
+                            placeholder="e.g., 5-10 people"
+                          />
+                        ) : (
+                          <p className="text-gray-900">{userOnboarding?.team_size || 'Not provided'}</p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-gray-700 mb-1 block">Company Size</label>
+                        {editingProfile ? (
+                          <Input
+                            value={profileForm.company_size}
+                            onChange={(e) => setProfileForm(prev => ({ ...prev, company_size: e.target.value }))}
+                            placeholder="e.g., 100-500 employees"
+                          />
+                        ) : (
+                          <p className="text-gray-900">{userOnboarding?.company_size || 'Not provided'}</p>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Learning Preferences */}
+                  <Card className="bg-white border border-gray-200 shadow-sm">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-lg text-gray-900">
+                        <Target className="h-5 w-5 text-purple-600" />
+                        Learning Preferences
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div>
+                        <label className="text-sm font-medium text-gray-700 mb-1 block">Coaching Style</label>
+                        {editingProfile ? (
+                          <select
+                            value={profileForm.coaching_style}
+                            onChange={(e) => setProfileForm(prev => ({ ...prev, coaching_style: e.target.value }))}
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                          >
+                            <option value="directive">Directive</option>
+                            <option value="collaborative">Collaborative</option>
+                            <option value="balanced">Balanced</option>
+                            <option value="supportive">Supportive</option>
+                          </select>
+                        ) : (
+                          <p className="text-gray-900 capitalize">{userOnboarding?.coaching_style || 'balanced'}</p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-gray-700 mb-1 block">Communication Tone</label>
+                        {editingProfile ? (
+                          <select
+                            value={profileForm.communication_tone}
+                            onChange={(e) => setProfileForm(prev => ({ ...prev, communication_tone: e.target.value }))}
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                          >
+                            <option value="casual">Casual</option>
+                            <option value="professional">Professional</option>
+                            <option value="formal">Formal</option>
+                          </select>
+                        ) : (
+                          <p className="text-gray-900 capitalize">{userOnboarding?.communication_tone || 'professional'}</p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-gray-700 mb-1 block">Learning Style</label>
+                        {editingProfile ? (
+                          <select
+                            value={profileForm.learning_style}
+                            onChange={(e) => setProfileForm(prev => ({ ...prev, learning_style: e.target.value }))}
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                          >
+                            <option value="visual">Visual</option>
+                            <option value="auditory">Auditory</option>
+                            <option value="hands-on">Hands-on</option>
+                            <option value="mixed">Mixed</option>
+                          </select>
+                        ) : (
+                          <p className="text-gray-900 capitalize">{userOnboarding?.learning_style || 'mixed'}</p>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Goals & Challenges */}
+                  <Card className="bg-white border border-gray-200 shadow-sm">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-lg text-gray-900">
+                        <Award className="h-5 w-5 text-orange-600" />
+                        Goals & Challenges
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div>
+                        <label className="text-sm font-medium text-gray-700 mb-2 block">Current Challenges</label>
+                        {userOnboarding?.biggest_challenges?.length > 0 ? (
+                          <div className="flex flex-wrap gap-2">
+                            {userOnboarding.biggest_challenges.map((challenge: string, index: number) => (
+                              <Badge key={index} variant="outline" className="bg-red-50 text-red-700 border-red-200">
+                                {challenge}
+                              </Badge>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-gray-500 text-sm">No challenges specified</p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-gray-700 mb-2 block">Primary Goals</label>
+                        {userOnboarding?.primary_goals?.length > 0 ? (
+                          <div className="flex flex-wrap gap-2">
+                            {userOnboarding.primary_goals.map((goal: string, index: number) => (
+                              <Badge key={index} variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                                {goal}
+                              </Badge>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-gray-500 text-sm">No goals specified</p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-gray-700 mb-2 block">Focus Areas</label>
+                        {userOnboarding?.focus_areas?.length > 0 ? (
+                          <div className="flex flex-wrap gap-2">
+                            {userOnboarding.focus_areas.map((area: string, index: number) => (
+                              <Badge key={index} variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                                {area}
+                              </Badge>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-gray-500 text-sm">No focus areas specified</p>
+                        )}
+                      </div>
+                      {!userOnboarding && (
+                        <div className="text-center py-6">
+                          <p className="text-gray-600 mb-4">Complete your profile to get personalized AI coaching recommendations</p>
+                          <Button asChild>
+                            <Link href="/synergize">Complete Onboarding</Link>
+                          </Button>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+
               <TabsContent value="subscription" className="space-y-4 md:space-y-6">
                 <h2 className="text-xl md:text-2xl font-bold text-gray-900">Subscription Management</h2>
                 
@@ -725,10 +1127,27 @@ export default function StudentDashboard() {
                             <p>Next billing: {new Date(subscriptionData.current_period_end).toLocaleDateString()}</p>
                           </div>
                           <div className="pt-4 border-t">
-                            <Button variant="outline" className="w-full mb-2">
+                            <Button 
+                              variant="outline" 
+                              className="w-full mb-2"
+                              onClick={() => window.open('/contact#plans-pricing', '_blank')}
+                            >
                               Change Plan
                             </Button>
-                            <Button variant="ghost" className="w-full text-red-600 hover:text-red-700">
+                            <Button 
+                              variant="ghost" 
+                              className="w-full text-red-600 hover:text-red-700"
+                              onClick={() => {
+                                if (confirm('Are you sure you want to cancel your subscription?')) {
+                                  // Handle cancellation
+                                  const toast = (async () => {
+                                    const { toast } = await import('sonner');
+                                    return toast;
+                                  })();
+                                  toast.then(t => t.info('Please contact support to cancel your subscription.'));
+                                }
+                              }}
+                            >
                               Cancel Subscription
                             </Button>
                           </div>
@@ -739,9 +1158,30 @@ export default function StudentDashboard() {
                             <h3 className="text-lg font-semibold text-gray-900 mb-2">Free Plan</h3>
                             <p className="text-gray-600">You're currently on the free plan</p>
                           </div>
-                          <Button asChild className="w-full">
-                            <Link href="/contact">Upgrade to Premium</Link>
-                          </Button>
+                          <div className="space-y-2">
+                            <Button 
+                              className="w-full bg-blue-600 hover:bg-blue-700"
+                              onClick={() => handleSubscriptionUpgrade('starter')}
+                              disabled={loading}
+                            >
+                              {loading ? 'Processing...' : 'Upgrade to Starter ($29/month)'}
+                            </Button>
+                            <Button 
+                              className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700"
+                              onClick={() => handleSubscriptionUpgrade('professional')}
+                              disabled={loading}
+                            >
+                              {loading ? 'Processing...' : 'Upgrade to Professional ($79/month)'}
+                            </Button>
+                            <Button 
+                              variant="outline"
+                              className="w-full"
+                              onClick={() => handleSubscriptionUpgrade('enterprise')}
+                              disabled={loading}
+                            >
+                              {loading ? 'Processing...' : 'Upgrade to Enterprise ($199/month)'}
+                            </Button>
+                          </div>
                         </div>
                       )}
                     </CardContent>

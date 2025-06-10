@@ -200,6 +200,7 @@ export default function CleanSlideEditor({
   const [editingElement, setEditingElement] = useState<string | null>(null);
   const [showMobileToolbar, setShowMobileToolbar] = useState(false);
   const [toolbarTimeout, setToolbarTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [persistentSelection, setPersistentSelection] = useState(false);
   
   // Stable mobile toolbar management
   const showMobileToolbarStable = useCallback((show: boolean) => {
@@ -858,11 +859,21 @@ export default function CleanSlideEditor({
                 paddingBottom: '120px' // Extra space for floating elements
               } : {}}
               onClick={(e) => {
-                // Only deselect if clicking on empty canvas area, not if clicking toolbar
+                // Only deselect if clicking on empty canvas area AND not within 100px of toolbar areas
                 if (e.target === e.currentTarget) {
-                  setSelectedElement(null);
-                  setEditingElement(null);
-                  showMobileToolbarStable(false);
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const clickX = e.clientX - rect.left;
+                  const clickY = e.clientY - rect.top;
+                  
+                  // Don't deselect if clicking near top (where desktop toolbar is) or bottom (where mobile toolbar is)
+                  const isNearToolbar = clickY < 100 || clickY > rect.height - 150;
+                  
+                  if (!isNearToolbar) {
+                    setSelectedElement(null);
+                    setEditingElement(null);
+                    setPersistentSelection(false);
+                    showMobileToolbarStable(false);
+                  }
                 }
               }}
             >

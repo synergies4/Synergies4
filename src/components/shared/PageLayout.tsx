@@ -28,6 +28,7 @@ import {
   UserPlus
 } from 'lucide-react';
 import GlobalSearch from '@/components/shared/GlobalSearch';
+import MeetingRecorder from '@/components/MeetingRecorder';
 
 // Scroll to top component
 function ScrollToTop() {
@@ -83,7 +84,7 @@ function ScrollToTop() {
   return (
     <button
       onClick={scrollToTop}
-      className={`fixed bottom-6 right-6 z-50 p-3 rounded-full shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-110 group backdrop-blur-sm border-2 ${
+      className={`fixed bottom-6 right-20 z-40 p-3 rounded-full shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-110 group backdrop-blur-sm border-2 ${
         isDarkBackground 
           ? 'bg-white/90 hover:bg-white text-gray-900 border-white/30 shadow-white/20' 
           : 'bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white border-teal-500/30 shadow-teal-500/20'
@@ -614,8 +615,8 @@ export default function PageLayout({ children, showStats = false }: PageLayoutPr
         <Navigation isSearchOpen={isSearchOpen} setIsSearchOpen={setIsSearchOpen} headerVisible={headerVisible} lastScrollY={lastScrollY} />
       </div>
       
-      {/* Add padding-top to account for fixed header */}
-      <main id="main-content" role="main" className="min-h-screen pt-[140px]">
+      {/* Add padding-top to account for fixed header - more on mobile */}
+      <main id="main-content" role="main" className="min-h-screen pt-[160px] md:pt-[140px]">
         {children}
       </main>
       
@@ -626,6 +627,9 @@ export default function PageLayout({ children, showStats = false }: PageLayoutPr
       {showScrollTop && (
         <ScrollToTop />
       )}
+      
+      {/* Meeting Recorder Floating Button */}
+      <MeetingRecorder />
       
       {/* Global Search Modal */}
       <GlobalSearch 
