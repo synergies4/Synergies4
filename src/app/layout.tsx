@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { PerformanceOptimizer } from "@/components/PerformanceOptimizer";
+import PWAInstaller from "@/components/PWAInstaller";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -69,6 +70,15 @@ export const metadata: Metadata = {
   // App-specific
   applicationName: "Synergies4",
   category: "Education",
+  
+  // PWA-specific
+  manifest: "/manifest.webmanifest",
+  themeColor: "#0d9488",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Synergies4",
+  },
 };
 
 export const viewport: Viewport = {
@@ -94,10 +104,22 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.webmanifest" />
         <meta name="theme-color" content="#0d9488" />
+        
+        {/* PWA Meta Tags */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Synergies4" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="msapplication-config" content="/browserconfig.xml" />
+        <meta name="msapplication-TileColor" content="#0d9488" />
+        <meta name="application-name" content="Synergies4" />
       </head>
       <body className={inter.className} suppressHydrationWarning>
         <PerformanceOptimizer />
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          {children}
+          <PWAInstaller />
+        </AuthProvider>
       </body>
     </html>
   );

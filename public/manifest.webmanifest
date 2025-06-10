@@ -1,15 +1,16 @@
 {
-  "name": "Synergies4",
-  "short_name": "S4",
-  "description": "AI-Powered Learning Platform",
+  "name": "Synergies4 - AI Learning Platform",
+  "short_name": "Synergies4",
+  "description": "AI-Powered Learning Platform for Professional Development",
   "dir": "auto",
   "lang": "en-US",
   "display": "standalone",
-  "orientation": "any",
+  "orientation": "portrait",
   "scope": "/",
   "start_url": "/",
-  "background_color": "#fff",
-  "theme_color": "#4b1aff",
+  "background_color": "#ffffff",
+  "theme_color": "#0d9488",
+  "categories": ["education", "productivity", "business"],
   "icons": [
     {
       "src": "/android-chrome-36x36.png",
