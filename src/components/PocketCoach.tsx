@@ -106,7 +106,17 @@ How can I support you right now?`,
 
   const loadRecentSessions = async () => {
     try {
-      const response = await fetch('/api/pocket-coach');
+      const { createClient } = await import('@/lib/supabase/client');
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) return;
+
+      const response = await fetch('/api/pocket-coach', {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+      });
       if (response.ok) {
         const data = await response.json();
         setSessions(data.sessions || []);
@@ -132,10 +142,19 @@ How can I support you right now?`,
     setIsLoading(true);
 
     try {
+      const { createClient } = await import('@/lib/supabase/client');
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        throw new Error('Authentication required');
+      }
+
       const response = await fetch('/api/pocket-coach', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
           message: text,
