@@ -530,7 +530,7 @@ function BrochureSection() {
             </span>
           </h2>
           
-          <p className="text-xl md:text-2xl text-gray-200/90 max-w-4xl mx-auto leading-relaxed font-light mb-12">
+          <p className="text-xl md:text-2xl text-gray-100 max-w-4xl mx-auto leading-relaxed font-light mb-12">
             Join a community of professionals shaping the future of 
             <span className="text-cyan-300 font-medium"> agile leadership </span>
             and organizational excellence

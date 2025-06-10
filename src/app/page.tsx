@@ -213,9 +213,9 @@ function ValuePropositionsSection() {
       <div className="container mx-auto px-4 relative z-10">
         {/* Enhanced Header */}
         <div className="text-center mb-20">
-          <div className="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full border border-white/30 mb-8">
+          <div className="inline-flex items-center px-4 py-2 bg-white/90 backdrop-blur-sm rounded-full border border-teal-200/50 mb-8">
             <span className="w-2 h-2 bg-gradient-to-r from-teal-400 to-emerald-400 rounded-full mr-3 animate-pulse"></span>
-            <span className="text-white text-sm font-medium">Why Choose Synergies4?</span>
+            <span className="text-teal-700 text-sm font-medium">Why Choose Synergies4?</span>
           </div>
           
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-8 leading-tight">
@@ -464,9 +464,9 @@ function FeaturedCoursesSection() {
       <div className="container mx-auto px-4 relative z-10">
         {/* Enhanced Header */}
         <div className="text-center mb-20">
-          <div className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-teal-500/20 to-emerald-500/20 backdrop-blur-sm rounded-full border border-teal-300/30 mb-8">
-            <BookOpen className="w-5 h-5 text-teal-300 mr-3" />
-            <span className="text-teal-100 font-medium">Featured Learning Experiences</span>
+          <div className="inline-flex items-center px-6 py-3 bg-white/90 backdrop-blur-sm rounded-full border border-teal-200/50 mb-8">
+            <BookOpen className="w-5 h-5 text-teal-600 mr-3" />
+            <span className="text-teal-700 font-medium">Featured Learning Experiences</span>
           </div>
           
           <h2 className="text-4xl md:text-6xl font-bold mb-8 leading-tight">
@@ -1051,9 +1051,9 @@ function CTASection() {
       </div>
 
       <div className="container mx-auto px-4 text-center relative z-10">
-        <div className="inline-flex items-center px-6 py-3 bg-white/20 backdrop-blur-sm rounded-full border border-white/30 mb-8">
-          <Rocket className="w-5 h-5 text-teal-300 mr-3" />
-          <span className="text-white font-medium">Ready to Get Started?</span>
+        <div className="inline-flex items-center px-6 py-3 bg-white/90 backdrop-blur-sm rounded-full border border-teal-200/50 mb-8">
+          <Rocket className="w-5 h-5 text-teal-600 mr-3" />
+          <span className="text-teal-700 font-medium">Ready to Get Started?</span>
         </div>
         
         <h2 className="text-4xl md:text-6xl font-bold mb-8 leading-tight">
