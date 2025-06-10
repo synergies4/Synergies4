@@ -11,6 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import PageLayout from '@/components/shared/PageLayout';
 import HeroSection from '@/components/shared/HeroSection';
+import PocketCoach from '@/components/PocketCoach';
+import OnboardingQuestionnaire from '@/components/OnboardingQuestionnaire';
 import { 
   Send, 
   Copy, 
@@ -374,6 +376,16 @@ const INTERACTION_MODES = {
     name: 'Role-Based Advisor',
     icon: <Brain className="w-5 h-5" />,
     description: 'Get personalized advice based on your specific role'
+  },
+  'pocket-coach': {
+    name: 'Pocket Coach',
+    icon: <Sparkles className="w-5 h-5" />,
+    description: 'Your personal AI coach for daily challenges and growth'
+  },
+  'onboarding': {
+    name: 'Personalize AI',
+    icon: <Settings className="w-5 h-5" />,
+    description: 'Complete your profile to customize your AI experience'
   }
 };
 
@@ -7220,7 +7232,7 @@ Format as a realistic conversation with clear speaker labels and include decisio
                   </div>
 
                   {/* Specialized Mode Interface */}
-                  <div className="border-t bg-white p-4 flex-shrink-0 max-h-[300px] overflow-y-auto relative">
+                  <div className={`border-t bg-white ${(selectedMode === 'pocket-coach' || selectedMode === 'onboarding') ? 'fixed inset-0 z-50' : 'p-4 flex-shrink-0 max-h-[300px] overflow-y-auto relative'}`}>
                     {selectedMode === 'presentation' && (
                       <PresentationGenerator
                         currentRole={currentRole}
@@ -7259,6 +7271,53 @@ Format as a realistic conversation with clear speaker labels and include decisio
                         copyMessage={copyMessage}
                         selectedProvider={selectedProvider}
                       />
+                    )}
+                    
+                    {selectedMode === 'pocket-coach' && (
+                      <div className="h-full bg-white overflow-auto">
+                        {/* Close button for full screen mode */}
+                        <div className="absolute top-4 right-4 z-10">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setSelectedMode('chat')}
+                            className="bg-white hover:bg-gray-50 shadow-lg"
+                          >
+                            <X className="h-4 w-4 mr-2" />
+                            Back to Chat
+                          </Button>
+                        </div>
+                        <div className="container mx-auto pt-16">
+                          <PocketCoach />
+                        </div>
+                      </div>
+                    )}
+                    
+                    {selectedMode === 'onboarding' && (
+                      <div className="h-full bg-gray-50 overflow-auto">
+                        {/* Close button for full screen mode */}
+                        <div className="absolute top-4 right-4 z-10">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setSelectedMode('chat')}
+                            className="bg-white hover:bg-gray-50 shadow-lg"
+                          >
+                            <X className="h-4 w-4 mr-2" />
+                            Back to Chat
+                          </Button>
+                        </div>
+                        <div className="container mx-auto pt-16">
+                          <OnboardingQuestionnaire 
+                            onComplete={() => {
+                              // After completion, return to chat mode and refresh onboarding data
+                              setSelectedMode('chat');
+                              // Could also trigger a state update here instead of reload
+                              setTimeout(() => window.location.reload(), 1000);
+                            }}
+                          />
+                        </div>
+                      </div>
                     )}
                     
                     {selectedMode === 'chat' && (

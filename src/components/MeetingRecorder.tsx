@@ -192,43 +192,47 @@ export default function MeetingRecorder() {
               <Video className="h-6 w-6" />
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <Video className="h-5 w-5" />
+          <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto bg-white border-0 shadow-2xl rounded-xl">
+            <DialogHeader className="pb-6 border-b border-gray-100">
+              <DialogTitle className="flex items-center gap-3 text-2xl font-bold text-gray-900">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                  <Video className="h-5 w-5 text-white" />
+                </div>
                 Meeting Recorder
               </DialogTitle>
+              <p className="text-gray-600 mt-2">Record meetings across Zoom, Google Meet, and Microsoft Teams with our AI-powered recording bot</p>
             </DialogHeader>
 
-            <div className="space-y-6">
+            <div className="space-y-8 py-6">
               {/* Start New Recording */}
-              <Card>
+              <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 shadow-lg">
                 <CardHeader>
-                  <CardTitle className="text-lg">Start New Recording</CardTitle>
-                  <CardDescription>
+                  <CardTitle className="text-xl font-bold text-gray-900">Start New Recording</CardTitle>
+                  <CardDescription className="text-gray-700">
                     Enter a meeting URL to start recording automatically
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <label className="text-sm font-medium mb-2 block">
-                      Meeting URL <span className="text-red-500">*</span>
+                    <label className="text-sm font-semibold mb-2 block text-gray-800">
+                      Meeting URL <span className="text-red-600">*</span>
                     </label>
                     <Input
                       placeholder="https://meet.google.com/xyz-abcd-efg"
                       value={meetingUrl}
                       onChange={(e) => setMeetingUrl(e.target.value)}
                       disabled={isStarting}
+                      className="bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500"
                     />
                     {meetingUrl && (
-                      <p className="text-sm text-gray-500 mt-1">
+                      <p className="text-sm text-blue-700 mt-2 font-medium">
                         Platform: {detectPlatform(meetingUrl)}
                       </p>
                     )}
                   </div>
 
                   <div>
-                    <label className="text-sm font-medium mb-2 block">
+                    <label className="text-sm font-semibold mb-2 block text-gray-800">
                       Bot Name (Optional)
                     </label>
                     <Input
@@ -236,22 +240,23 @@ export default function MeetingRecorder() {
                       value={botName}
                       onChange={(e) => setBotName(e.target.value)}
                       disabled={isStarting}
+                      className="bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500"
                     />
                   </div>
 
                   <Button 
                     onClick={startRecording} 
                     disabled={isStarting || !meetingUrl.trim()}
-                    className="w-full"
+                    className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold py-3 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
                   >
                     {isStarting ? (
                       <>
-                        <Clock className="h-4 w-4 mr-2 animate-spin" />
+                        <Clock className="h-5 w-5 mr-2 animate-spin" />
                         Starting Recording...
                       </>
                     ) : (
                       <>
-                        <Mic className="h-4 w-4 mr-2" />
+                        <Mic className="h-5 w-5 mr-2" />
                         Start Recording
                       </>
                     )}
@@ -261,10 +266,10 @@ export default function MeetingRecorder() {
 
               {/* Active Sessions */}
               {activeSessions.length > 0 && (
-                <Card>
+                <Card className="bg-gradient-to-br from-red-50 to-orange-50 border-red-200 shadow-lg">
                   <CardHeader>
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <Users className="h-5 w-5" />
+                    <CardTitle className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                      <Users className="h-6 w-6 text-red-600" />
                       Active Recordings ({activeSessions.length})
                     </CardTitle>
                   </CardHeader>
@@ -353,15 +358,27 @@ export default function MeetingRecorder() {
               )}
 
               {/* Quick Setup Tips */}
-              <Card className="bg-blue-50 border-blue-200">
+              <Card className="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-200 shadow-lg">
                 <CardHeader>
-                  <CardTitle className="text-sm text-blue-800">Quick Setup Tips</CardTitle>
+                  <CardTitle className="text-lg font-bold text-emerald-800">📚 Quick Setup Tips</CardTitle>
                 </CardHeader>
-                <CardContent className="text-sm text-blue-700 space-y-2">
-                  <p>• <strong>Zoom:</strong> Works with meeting URLs or join links</p>
-                  <p>• <strong>Google Meet:</strong> Use meet.google.com/xxx-xxxx-xxx format</p>
-                  <p>• <strong>Teams:</strong> Use teams.microsoft.com meeting links</p>
-                  <p>• Bot will join automatically and send a chat message when recording starts</p>
+                <CardContent className="text-sm text-emerald-800 space-y-3">
+                  <div className="flex items-start gap-2">
+                    <span className="font-bold text-blue-600">🟦 Zoom:</span>
+                    <span>Works with meeting URLs or join links</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="font-bold text-green-600">🟢 Google Meet:</span>
+                    <span>Use meet.google.com/xxx-xxxx-xxx format</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="font-bold text-purple-600">🟣 Teams:</span>
+                    <span>Use teams.microsoft.com meeting links</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="font-bold text-teal-600">🤖</span>
+                    <span>Bot will join automatically and send a chat message when recording starts</span>
+                  </div>
                 </CardContent>
               </Card>
             </div>
