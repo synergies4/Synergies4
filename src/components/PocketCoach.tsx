@@ -9,6 +9,8 @@ import { ScrollArea } from './ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Send, MessageCircle, User, Bot, Loader, Lightbulb, Target, Clock, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
+import { usePersonalization } from '@/hooks/usePersonalization';
+import OnboardingModal from './OnboardingModal';
 
 interface Message {
   id: number;
@@ -55,6 +57,15 @@ export default function PocketCoach() {
   const [sessionId, setSessionId] = useState<number | null>(null);
   const [sessions, setSessions] = useState<CoachingSession[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Personalization
+  const {
+    hasCompletedOnboarding,
+    showOnboardingModal,
+    completeOnboarding,
+    dismissOnboarding,
+    getAIContext
+  } = usePersonalization();
 
   useEffect(() => {
     loadRecentSessions();
@@ -124,7 +135,8 @@ How can I support you right now?`,
           sessionId,
           context: {
             timestamp: new Date().toISOString(),
-            messageCount: messages.length
+            messageCount: messages.length,
+            personalizationContext: getAIContext()
           }
         }),
       });
@@ -395,6 +407,13 @@ What would you like to work on?`,
           </div>
         </CardContent>
       </Card>
+
+      {/* Onboarding Modal */}
+      <OnboardingModal
+        isOpen={showOnboardingModal}
+        onComplete={completeOnboarding}
+        onDismiss={dismissOnboarding}
+      />
     </div>
   );
 } 

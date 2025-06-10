@@ -11,8 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import PageLayout from '@/components/shared/PageLayout';
 import HeroSection from '@/components/shared/HeroSection';
-import PocketCoach from '@/components/PocketCoach';
-import OnboardingQuestionnaire from '@/components/OnboardingQuestionnaire';
+import OnboardingModal from '@/components/OnboardingModal';
+import { usePersonalization } from '@/hooks/usePersonalization';
 import { 
   Send, 
   Copy, 
@@ -376,16 +376,6 @@ const INTERACTION_MODES = {
     name: 'Role-Based Advisor',
     icon: <Brain className="w-5 h-5" />,
     description: 'Get personalized advice based on your specific role'
-  },
-  'pocket-coach': {
-    name: 'Pocket Coach',
-    icon: <Sparkles className="w-5 h-5" />,
-    description: 'Your personal AI coach for daily challenges and growth'
-  },
-  'onboarding': {
-    name: 'Personalize AI',
-    icon: <Settings className="w-5 h-5" />,
-    description: 'Complete your profile to customize your AI experience'
   }
 };
 
@@ -4553,6 +4543,17 @@ export default function SynergizeAgile() {
     isSubscribed: false
   });
 
+  // Personalization
+  const {
+    onboardingData,
+    hasCompletedOnboarding,
+    showOnboardingModal,
+    loading: personalizationLoading,
+    completeOnboarding,
+    dismissOnboarding,
+    getAIContext
+  } = usePersonalization();
+
 
 
   // Fetch user's conversation limits
@@ -4874,12 +4875,15 @@ export default function SynergizeAgile() {
       const mode = INTERACTION_MODES[selectedMode as keyof typeof INTERACTION_MODES];
       const provider = AI_PROVIDERS[selectedProvider];
 
-      // Enhanced prompt based on role and mode
+      // Enhanced prompt based on role and mode with personalization
+      const personalizationContext = getAIContext();
       let systemPrompt = `You are an expert Agile AI assistant specialized in ${role.name} responsibilities. 
       Current mode: ${mode.name} - ${mode.description}
       
       Role context: ${role.description}
       Key capabilities: ${role.capabilities.join(', ')}
+      
+      ${personalizationContext}
       
       Based on the user's role as ${role.name} and the current mode (${mode.name}), provide specific, actionable advice.
       
@@ -4888,7 +4892,8 @@ export default function SynergizeAgile() {
       - Use bullet points for complex information
       - Provide practical examples when helpful
       - If asked about technical topics outside your expertise, politely redirect to your core areas
-      - Be encouraging and supportive while maintaining professionalism`;
+      - Be encouraging and supportive while maintaining professionalism
+      ${personalizationContext ? '- Use the user profile context to personalize your advice and examples' : ''}`;
 
       if (selectedMode === 'presentation') {
         systemPrompt += ` Generate presentation content with clear slides, talking points, and visual suggestions.`;
@@ -7232,7 +7237,7 @@ Format as a realistic conversation with clear speaker labels and include decisio
                   </div>
 
                   {/* Specialized Mode Interface */}
-                  <div className={`border-t bg-white ${(selectedMode === 'pocket-coach' || selectedMode === 'onboarding') ? 'fixed inset-0 z-50' : 'p-4 flex-shrink-0 max-h-[300px] overflow-y-auto relative'}`}>
+                  <div className="border-t bg-white p-4 flex-shrink-0 max-h-[300px] overflow-y-auto relative">
                     {selectedMode === 'presentation' && (
                       <PresentationGenerator
                         currentRole={currentRole}
@@ -7273,53 +7278,7 @@ Format as a realistic conversation with clear speaker labels and include decisio
                       />
                     )}
                     
-                    {selectedMode === 'pocket-coach' && (
-                      <div className="h-full bg-white overflow-auto">
-                        {/* Close button for full screen mode */}
-                        <div className="absolute top-4 right-4 z-10">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setSelectedMode('chat')}
-                            className="bg-white hover:bg-gray-50 shadow-lg"
-                          >
-                            <X className="h-4 w-4 mr-2" />
-                            Back to Chat
-                          </Button>
-                        </div>
-                        <div className="container mx-auto pt-16">
-                          <PocketCoach />
-                        </div>
-                      </div>
-                    )}
-                    
-                    {selectedMode === 'onboarding' && (
-                      <div className="h-full bg-gray-50 overflow-auto">
-                        {/* Close button for full screen mode */}
-                        <div className="absolute top-4 right-4 z-10">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setSelectedMode('chat')}
-                            className="bg-white hover:bg-gray-50 shadow-lg"
-                          >
-                            <X className="h-4 w-4 mr-2" />
-                            Back to Chat
-                          </Button>
-                        </div>
-                        <div className="container mx-auto pt-16">
-                          <OnboardingQuestionnaire 
-                            onComplete={() => {
-                              // After completion, return to chat mode and refresh onboarding data
-                              setSelectedMode('chat');
-                              // Could also trigger a state update here instead of reload
-                              setTimeout(() => window.location.reload(), 1000);
-                            }}
-                          />
-                        </div>
-                      </div>
-                    )}
-                    
+
                     {selectedMode === 'chat' && (
                       <div className="space-y-4">
                         {/* File Upload Area for Chat Mode */}
@@ -7514,6 +7473,13 @@ Format as a realistic conversation with clear speaker labels and include decisio
           </div>
         </div>
       </section>
+
+      {/* Onboarding Modal */}
+      <OnboardingModal
+        isOpen={showOnboardingModal}
+        onComplete={completeOnboarding}
+        onDismiss={dismissOnboarding}
+      />
     </PageLayout>
   );
 } 

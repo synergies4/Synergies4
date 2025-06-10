@@ -60,9 +60,15 @@ export async function POST(request: NextRequest) {
 
     // Build AI context from user data
     const aiContext = buildAIContext(onboarding, session, context);
+    
+    // Add personalization context if provided
+    let fullContext = aiContext;
+    if (context?.personalizationContext) {
+      fullContext = `${aiContext}\n\nAdditional User Context:\n${context.personalizationContext}`;
+    }
 
     // Generate AI response
-    const aiResponse = await generateAIResponse(message, aiContext);
+    const aiResponse = await generateAIResponse(message, fullContext);
 
     // Update session with new messages
     const updatedMessages = [

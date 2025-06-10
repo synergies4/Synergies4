@@ -167,6 +167,7 @@ function Navigation({ isSearchOpen, setIsSearchOpen, headerVisible, lastScrollY 
   const navigationItems = [
     { label: 'About Us', href: '/about-us' },
     { label: 'Courses', href: '/courses' },
+    { label: 'Pocket Coach', href: '/pocket-coach' },
     { label: 'Coaching', href: '/coaching' },
     { label: 'Consulting', href: '/consulting' },
     { label: 'Industry Insight', href: '/industry-insight' },
