@@ -53,6 +53,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { motion, AnimatePresence } from 'framer-motion';
 import CleanSlideEditor from '@/components/CleanSlideEditor';
+import { createClient } from '@/lib/supabase/client';
 
 // Enhanced Canva-like performance optimizations and ultra-smooth animations
 const ANIMATION_CONFIG = {
@@ -4533,9 +4534,65 @@ export default function SynergizeAgile() {
   const [showScrollIndicator, setShowScrollIndicator] = useState(false);
   // Response counter for session limit
   const [responseCount, setResponseCount] = useState(0);
-  const maxResponses = 3;
+  const [maxResponses, setMaxResponses] = useState(3); // Will be updated based on subscription
+  const [userLimits, setUserLimits] = useState({
+    maxConversations: 10,
+    currentConversations: 0,
+    isSubscribed: false
+  });
 
 
+
+  // Fetch user's conversation limits
+  useEffect(() => {
+    const fetchUserLimits = async () => {
+      try {
+        const supabase = createClient();
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session) {
+          // Check subscription status
+          const { data: subscription } = await supabase
+            .from('subscriptions')
+            .select('plan_id, status')
+            .eq('user_id', session.user.id)
+            .eq('status', 'active')
+            .single();
+
+          // Get user content settings
+          const { data: settings } = await supabase
+            .from('user_content_settings')
+            .select('max_conversations, current_conversations')
+            .eq('user_id', session.user.id)
+            .single();
+
+          const isSubscribed = subscription && subscription.status === 'active';
+          let maxConversations = 10; // Free tier default
+
+          if (isSubscribed) {
+            // Set unlimited for subscribed users
+            maxConversations = 999999;
+          } else if (settings) {
+            maxConversations = settings.max_conversations;
+          }
+
+          setUserLimits({
+            maxConversations,
+            currentConversations: settings?.current_conversations || 0,
+            isSubscribed
+          });
+
+          // Set session response limit based on subscription
+          setMaxResponses(isSubscribed ? 999999 : 3);
+        }
+      } catch (error) {
+        console.error('Error fetching user limits:', error);
+        // Keep default limits on error
+      }
+    };
+
+    fetchUserLimits();
+  }, []);
 
   // Check for mobile device and speech recognition support
   useEffect(() => {
@@ -4864,7 +4921,9 @@ export default function SynergizeAgile() {
           const limitMessage: Message = {
             id: (Date.now() + 2).toString(),
             type: 'ai',
-            content: "🎯 **You've reached your session limit!**\n\nWant to continue your Agile learning journey with unlimited access? Our premium plans offer:\n\n• **Unlimited AI conversations**\n• **Advanced presentation tools**\n• **Priority support**\n• **Custom training scenarios**\n\nReady to unlock your full potential?",
+            content: userLimits.isSubscribed 
+              ? "🎯 **Session Complete!**\n\nGreat conversation! Feel free to start a new session anytime with your unlimited access.\n\n• **Unlimited AI conversations**\n• **Advanced presentation tools**\n• **Priority support**\n• **Custom training scenarios**\n\nYour subscription gives you full access to all features!" 
+              : "🎯 **You've reached your session limit!**\n\nWant to continue your Agile learning journey with unlimited access? Our premium plans offer:\n\n• **Unlimited AI conversations**\n• **Advanced presentation tools**\n• **Priority support**\n• **Custom training scenarios**\n\nReady to unlock your full potential?",
             timestamp: new Date(),
             mode: selectedMode,
             role: selectedRole,
@@ -6255,9 +6314,15 @@ Please structure this as a ready-to-deliver training course that someone could u
                 className="w-full bg-white text-emerald-600 hover:bg-gray-100 font-semibold rounded-xl shadow-lg transition-all hover:scale-105"
                 asChild
               >
-                <a href="/contact" target="_blank" rel="noopener noreferrer">
-                  Get Unlimited Access
-                </a>
+                {userLimits.isSubscribed ? (
+                  <a href="/synergize" onClick={() => window.location.reload()}>
+                    Start New Session
+                  </a>
+                ) : (
+                  <a href="/contact" target="_blank" rel="noopener noreferrer">
+                    Get Unlimited Access
+                  </a>
+                )}
               </Button>
             </div>
           )}
@@ -7105,9 +7170,15 @@ Format as a realistic conversation with clear speaker labels and include decisio
                           className="w-full bg-white text-emerald-600 hover:bg-gray-100 font-semibold rounded-lg shadow-lg transition-all hover:scale-105 text-sm py-2"
                           asChild
                         >
-                          <a href="/contact" target="_blank" rel="noopener noreferrer">
-                            Get Unlimited Access
-                          </a>
+                          {userLimits.isSubscribed ? (
+                            <a href="/synergize" onClick={() => window.location.reload()}>
+                              Start New Session
+                            </a>
+                          ) : (
+                            <a href="/contact" target="_blank" rel="noopener noreferrer">
+                              Get Unlimited Access
+                            </a>
+                          )}
                         </Button>
                       </div>
                     )}

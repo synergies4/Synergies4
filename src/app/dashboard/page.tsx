@@ -18,7 +18,8 @@ import {
   Calendar,
   Target,
   Menu,
-  X
+  X,
+  ArrowRight
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -280,51 +281,84 @@ export default function StudentDashboard() {
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
                     {enrollments.map((enrollment) => (
-                      <Card key={enrollment.id} className="mb-6">
-                        <CardContent className="p-6">
-                          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                            <div className="flex items-center space-x-4 mb-4 md:mb-0">
-                              <Image src={enrollment.course.image || '/default-course.png'} alt={enrollment.course.title} width={80} height={80} className="rounded-lg object-cover" />
-                              <div>
-                                <h3 className="text-xl font-bold text-gray-900">{enrollment.course.title}</h3>
-                                <p className="text-gray-600 text-sm mb-2">{enrollment.course.description}</p>
-                                <div className="flex items-center space-x-2">
-                                  <Badge className={getLevelBadgeStyle(enrollment.course.level)}>{enrollment.course.level}</Badge>
-                                  <Badge variant="secondary">{enrollment.course.category}</Badge>
-                                </div>
+                      <Card key={enrollment.id} className="h-full flex flex-col">
+                        <CardContent className="p-6 flex flex-col flex-1">
+                          {/* Course Header - Fixed Height */}
+                          <div className="flex items-start space-x-4 mb-4">
+                            <Image 
+                              src={enrollment.course.image || '/default-course.png'} 
+                              alt={enrollment.course.title} 
+                              width={60} 
+                              height={60} 
+                              className="rounded-lg object-cover flex-shrink-0" 
+                            />
+                            <div className="flex-1 min-w-0">
+                              <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 min-h-[3.5rem]">
+                                {enrollment.course.title}
+                              </h3>
+                              <div className="flex items-center space-x-2 mb-2">
+                                <Badge className={getLevelBadgeStyle(enrollment.course.level)}>{enrollment.course.level}</Badge>
+                                <Badge variant="secondary">{enrollment.course.category}</Badge>
                               </div>
                             </div>
-                            <div className="flex flex-col items-end space-y-2">
-                              <Progress value={enrollment.progress_percentage} className="w-32 mb-2" />
-                              <span className="text-xs text-gray-500">Progress: {enrollment.progress_percentage}%</span>
-                              <span className="text-xs text-gray-500">Lessons Completed: {enrollment.lessonsCompleted || 0} / {enrollment.totalLessons || '—'}</span>
-                              {enrollment.certificate_issued && (
-                                <Button size="sm" variant="outline" asChild>
-                                  <Link href={`/certificates/${enrollment.id}`}>Download Certificate</Link>
-                                </Button>
+                          </div>
+
+                          {/* Course Description - Fixed Height */}
+                          <p className="text-gray-600 text-sm mb-4 line-clamp-2 min-h-[2.5rem] flex-shrink-0">
+                            {enrollment.course.description}
+                          </p>
+
+                          {/* Progress Section - Fixed Height */}
+                          <div className="mb-4 flex-shrink-0">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-sm font-medium text-gray-700">Progress</span>
+                              <span className="text-sm text-gray-500">{enrollment.progress_percentage}%</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
+                              <div 
+                                className="bg-gradient-to-r from-blue-600 to-teal-600 h-2.5 rounded-full transition-all duration-300"
+                                style={{ width: `${Math.max(enrollment.progress_percentage, 2)}%` }}
+                              ></div>
+                            </div>
+                            <div className="flex justify-between text-xs text-gray-500">
+                              <span>Lessons: {enrollment.lessonsCompleted || 0} / {enrollment.totalLessons || '—'}</span>
+                              {enrollment.timeSpent && (
+                                <span>Time: {enrollment.timeSpent}h</span>
                               )}
-                              <Button size="sm" asChild>
-                                <Link href={`/learn/${createCourseSlug(enrollment.course.title)}`}>Continue Learning</Link>
-                              </Button>
                             </div>
                           </div>
-                          {/* Quiz Performance */}
+
+                          {/* Quiz Performance - Flex Section */}
                           {quizAttempts.filter(q => q.course.title === enrollment.course.title).length > 0 && (
-                            <div className="mt-4">
-                              <h4 className="text-sm font-semibold mb-2">Quiz Performance</h4>
-                              <ul className="space-y-1">
-                                {quizAttempts.filter(q => q.course.title === enrollment.course.title).map((attempt) => (
-                                  <li key={attempt.id} className="text-xs text-gray-700">
-                                    Score: {attempt.score} / {attempt.total_points} ({attempt.percentage}%) on {new Date(attempt.completed_at).toLocaleDateString()}
-                                  </li>
+                            <div className="mb-4 flex-1">
+                              <h4 className="text-sm font-semibold mb-2 text-gray-700">Quiz Performance</h4>
+                              <div className="bg-gray-50 rounded-lg p-3">
+                                {quizAttempts.filter(q => q.course.title === enrollment.course.title).slice(0, 2).map((attempt) => (
+                                  <div key={attempt.id} className="text-xs text-gray-600 mb-1 last:mb-0">
+                                    <span className="font-medium">{attempt.percentage}%</span> on {new Date(attempt.completed_at).toLocaleDateString()}
+                                  </div>
                                 ))}
-                              </ul>
+                              </div>
                             </div>
                           )}
-                          {/* Time Spent (if available) */}
-                          {enrollment.timeSpent && (
-                            <div className="mt-2 text-xs text-gray-500">Time Spent: {enrollment.timeSpent} hours</div>
-                          )}
+
+                          {/* Action Buttons - Fixed at Bottom */}
+                          <div className="flex flex-col space-y-2 mt-auto pt-4">
+                            {enrollment.certificate_issued && (
+                              <Button size="sm" variant="outline" asChild className="w-full">
+                                <Link href={`/certificates/${enrollment.id}`}>
+                                  <Award className="w-4 h-4 mr-2" />
+                                  Download Certificate
+                                </Link>
+                              </Button>
+                            )}
+                            <Button size="sm" asChild className="w-full">
+                              <Link href={`/learn/${createCourseSlug(enrollment.course.title)}`}>
+                                Continue Learning
+                                <ArrowRight className="w-4 h-4 ml-2" />
+                              </Link>
+                            </Button>
+                          </div>
                         </CardContent>
                       </Card>
                     ))}

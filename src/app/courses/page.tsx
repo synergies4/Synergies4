@@ -238,9 +238,9 @@ function CourseDirectorySection() {
               <blockquote className="text-lg font-semibold text-gray-900 italic mb-4 leading-relaxed">
                 "AI is not going to replace managers, but managers who use AI will replace the managers who do not."
               </blockquote>
-              <cite className="flex items-center text-gray-700 font-medium">
+              <cite className="flex items-center text-gray-800 font-medium">
                 <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center mr-3 text-white text-sm font-bold">RT</div>
-                <span className="text-sm">Rob Thomas, IBM Senior Vice President</span>
+                <span className="text-sm text-gray-800">Rob Thomas, IBM Senior Vice President</span>
               </cite>
             </div>
 
@@ -249,9 +249,9 @@ function CourseDirectorySection() {
               <blockquote className="text-lg font-semibold text-gray-900 italic mb-4 leading-relaxed">
                 "AI could eliminate up to 50% of entry-level white-collar jobs within the next five years."
               </blockquote>
-              <cite className="flex items-center text-gray-700 font-medium">
+              <cite className="flex items-center text-gray-800 font-medium">
                 <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center mr-3 text-white text-sm font-bold">DA</div>
-                <span className="text-sm">Dario Amodei, CEO of Anthropic</span>
+                <span className="text-sm text-gray-800">Dario Amodei, CEO of Anthropic</span>
               </cite>
             </div>
           </div>

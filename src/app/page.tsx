@@ -89,9 +89,9 @@ export default function HomePage() {
               <blockquote className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900 italic mb-4 leading-relaxed">
                 "You're going to lose your job to someone who is using AI."
               </blockquote>
-              <cite className="flex items-center justify-center text-gray-700 font-medium">
+              <cite className="flex items-center justify-center text-gray-800 font-medium">
                 <div className="w-8 h-8 bg-gradient-to-r from-slate-600 to-gray-600 rounded-full flex items-center justify-center mr-3 text-white text-sm font-bold">JH</div>
-                <span className="text-base sm:text-lg">Jensen Huang, CEO of Nvidia</span>
+                <span className="text-base sm:text-lg text-gray-800">Jensen Huang, CEO of Nvidia</span>
               </cite>
             </div>
           </div>
@@ -552,7 +552,7 @@ function FeaturedCoursesSection() {
                     </h3>
                     
                     {/* Description */}
-                    <p className="text-gray-200/80 text-sm leading-relaxed mb-4 flex-1 group-hover:text-white/90 transition-colors">
+                    <p className="text-gray-100 text-sm leading-relaxed mb-4 flex-1 group-hover:text-white transition-colors">
                       {course.short_desc}
                     </p>
 
@@ -567,9 +567,9 @@ function FeaturedCoursesSection() {
                             />
                           ))}
                         </div>
-                        <span className="text-gray-200 font-medium ml-1">{course.rating || '4.8'}</span>
+                        <span className="text-gray-100 font-medium ml-1">{course.rating || '4.8'}</span>
                       </div>
-                      <div className="flex items-center text-gray-200 group-hover:text-white transition-colors">
+                      <div className="flex items-center text-gray-100 group-hover:text-white transition-colors">
                         <Users className="h-4 w-4 mr-1" />
                         <span>{course.students || '1,200'}+</span>
                       </div>
@@ -622,7 +622,7 @@ function FeaturedCoursesSection() {
               </Link>
             </Button>
             
-            <div className="text-gray-200/60 text-sm">
+            <div className="text-gray-100 text-sm">
               Join <span className="font-semibold text-cyan-300">10,000+</span> learners worldwide
             </div>
           </div>
