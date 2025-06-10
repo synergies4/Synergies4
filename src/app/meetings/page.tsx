@@ -24,9 +24,11 @@ import {
   Mic,
   CheckSquare,
   AlertCircle,
-  Plus
+  Plus,
+  Settings
 } from 'lucide-react';
 import Link from 'next/link';
+import CalendarIntegration from '@/components/CalendarIntegration';
 
 interface MeetingTranscript {
   id: string;
@@ -171,52 +173,60 @@ export default function MeetingsPage() {
           </div>
         </div>
 
-        {/* Search and Filters */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  placeholder="Search meetings, participants, or keywords..."
-                  value={searchTerm}
-                  onChange={(e) => handleSearch(e.target.value)}
-                  className="pl-10"
-                />
+        {/* Tabs */}
+        <Tabs defaultValue="recordings" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto md:mx-0">
+            <TabsTrigger value="recordings">Meeting Recordings</TabsTrigger>
+            <TabsTrigger value="calendar">Calendar Integration</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="recordings" className="space-y-6">
+            {/* Search and Filters */}
+            <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                    <Input
+                      placeholder="Search meetings, participants, or keywords..."
+                      value={searchTerm}
+                      onChange={(e) => handleSearch(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant={selectedPlatform === 'all' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => handlePlatformFilter('all')}
+                  >
+                    All
+                  </Button>
+                  <Button
+                    variant={selectedPlatform === 'zoom' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => handlePlatformFilter('zoom')}
+                  >
+                    📹 Zoom
+                  </Button>
+                  <Button
+                    variant={selectedPlatform === 'google-meet' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => handlePlatformFilter('google-meet')}
+                  >
+                    📊 Meet
+                  </Button>
+                  <Button
+                    variant={selectedPlatform === 'teams' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => handlePlatformFilter('teams')}
+                  >
+                    💼 Teams
+                  </Button>
+                </div>
               </div>
             </div>
-            <div className="flex gap-2">
-              <Button
-                variant={selectedPlatform === 'all' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => handlePlatformFilter('all')}
-              >
-                All
-              </Button>
-              <Button
-                variant={selectedPlatform === 'zoom' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => handlePlatformFilter('zoom')}
-              >
-                📹 Zoom
-              </Button>
-              <Button
-                variant={selectedPlatform === 'google-meet' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => handlePlatformFilter('google-meet')}
-              >
-                📊 Meet
-              </Button>
-              <Button
-                variant={selectedPlatform === 'teams' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => handlePlatformFilter('teams')}
-              >
-                💼 Teams
-              </Button>
-            </div>
-          </div>
-        </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -422,18 +432,24 @@ export default function MeetingsPage() {
           </div>
         )}
 
-        {/* Pagination */}
-        {pagination.hasMore && (
-          <div className="text-center mt-8">
-            <Button
-              variant="outline"
-              onClick={() => setPagination(prev => ({ ...prev, offset: prev.offset + prev.limit }))}
-              disabled={loading}
-            >
-              Load More Meetings
-            </Button>
-          </div>
-        )}
+            {/* Pagination */}
+            {pagination.hasMore && (
+              <div className="text-center mt-8">
+                <Button
+                  variant="outline"
+                  onClick={() => setPagination(prev => ({ ...prev, offset: prev.offset + prev.limit }))}
+                  disabled={loading}
+                >
+                  Load More Meetings
+                </Button>
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="calendar" className="space-y-6">
+            <CalendarIntegration />
+          </TabsContent>
+        </Tabs>
       </div>
     </PageLayout>
   );

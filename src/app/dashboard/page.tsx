@@ -21,7 +21,12 @@ import {
   X,
   ArrowRight,
   BarChart3,
-  CreditCard
+  CreditCard,
+  Video,
+  Users,
+  FileText,
+  Plus,
+  Eye
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -64,6 +69,8 @@ export default function StudentDashboard() {
   const { user, userProfile, loading: authLoading, isLoggingOut } = useAuth();
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [quizAttempts, setQuizAttempts] = useState<QuizAttempt[]>([]);
+  const [meetings, setMeetings] = useState<any[]>([]);
+  const [activeBots, setActiveBots] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [subscriptionData, setSubscriptionData] = useState<any>(null);
   const [contentUsage, setContentUsage] = useState<any>(null);
@@ -71,7 +78,9 @@ export default function StudentDashboard() {
     totalCourses: 0,
     completedCourses: 0,
     totalHours: 0,
-    averageScore: 0
+    averageScore: 0,
+    totalMeetings: 0,
+    activeBots: 0
   });
 
   useEffect(() => {
@@ -140,6 +149,41 @@ export default function StudentDashboard() {
           ...prev,
           averageScore: Math.round(averageScore)
         }));
+      }
+
+      // Fetch meetings data
+      try {
+        const meetingsResponse = await fetch('/api/meeting-transcripts?limit=5', {
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+        });
+
+        if (meetingsResponse.ok) {
+          const meetingsData = await meetingsResponse.json();
+          setMeetings(meetingsData.transcripts || []);
+          setStats(prev => ({
+            ...prev,
+            totalMeetings: meetingsData.pagination?.total || 0
+          }));
+        }
+
+        const activeBotsResponse = await fetch('/api/meeting-recorder/active', {
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+        });
+
+        if (activeBotsResponse.ok) {
+          const botsData = await activeBotsResponse.json();
+          setActiveBots(botsData || []);
+          setStats(prev => ({
+            ...prev,
+            activeBots: botsData?.length || 0
+          }));
+        }
+      } catch (error) {
+        console.error('Error fetching meetings data:', error);
       }
 
       // Fetch subscription data
@@ -236,7 +280,7 @@ export default function StudentDashboard() {
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-6 mb-6 md:mb-8">
             <Card className="bg-white border border-gray-200 shadow-sm">
               <CardContent className="p-4 md:p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
@@ -245,6 +289,18 @@ export default function StudentDashboard() {
                     <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.totalCourses}</p>
                   </div>
                   <BookOpen className="h-6 w-6 md:h-8 md:w-8 text-blue-600 self-end md:self-auto" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white border border-gray-200 shadow-sm">
+              <CardContent className="p-4 md:p-6">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+                  <div className="mb-2 md:mb-0">
+                    <p className="text-xs md:text-sm font-medium text-gray-600">Meetings</p>
+                    <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.totalMeetings}</p>
+                  </div>
+                  <Video className="h-6 w-6 md:h-8 md:w-8 text-teal-600 self-end md:self-auto" />
                 </div>
               </CardContent>
             </Card>
@@ -289,8 +345,9 @@ export default function StudentDashboard() {
           {/* Main Content */}
           <div>
             <Tabs defaultValue="courses" className="space-y-4 md:space-y-6">
-              <TabsList className="grid w-full grid-cols-4 h-auto bg-white border border-gray-200">
+              <TabsList className="grid w-full grid-cols-5 h-auto bg-white border border-gray-200">
                 <TabsTrigger value="courses" className="text-xs md:text-sm py-2 md:py-3 text-gray-900 data-[state=active]:bg-teal-600 data-[state=active]:text-white">My Courses</TabsTrigger>
+                <TabsTrigger value="meetings" className="text-xs md:text-sm py-2 md:py-3 text-gray-900 data-[state=active]:bg-teal-600 data-[state=active]:text-white">Meetings</TabsTrigger>
                 <TabsTrigger value="progress" className="text-xs md:text-sm py-2 md:py-3 text-gray-900 data-[state=active]:bg-teal-600 data-[state=active]:text-white">Progress</TabsTrigger>
                 <TabsTrigger value="subscription" className="text-xs md:text-sm py-2 md:py-3 text-gray-900 data-[state=active]:bg-teal-600 data-[state=active]:text-white">Subscription</TabsTrigger>
                 <TabsTrigger value="certificates" className="text-xs md:text-sm py-2 md:py-3 text-gray-900 data-[state=active]:bg-teal-600 data-[state=active]:text-white">Certificates</TabsTrigger>
@@ -405,6 +462,165 @@ export default function StudentDashboard() {
                     ))}
                   </div>
                 )}
+              </TabsContent>
+
+              <TabsContent value="meetings" className="space-y-4 md:space-y-6">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+                  <h2 className="text-xl md:text-2xl font-bold text-gray-900">Meeting Recordings</h2>
+                  <div className="flex gap-2">
+                    <Button asChild size="sm" variant="outline" className="w-full sm:w-auto">
+                      <Link href="/record-meeting">Record Meeting</Link>
+                    </Button>
+                    <Button asChild size="sm" className="w-full sm:w-auto">
+                      <Link href="/meetings">View All Meetings</Link>
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Active Recording Bots */}
+                {activeBots.length > 0 && (
+                  <Card className="bg-gradient-to-r from-red-50 to-orange-50 border-red-200">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-red-900">
+                        <Video className="h-5 w-5 text-red-600" />
+                        Active Recordings ({activeBots.length})
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {activeBots.map((bot) => (
+                        <div key={bot.id} className="flex items-center justify-between p-3 bg-white rounded-lg border">
+                          <div className="flex items-center gap-3">
+                            <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                            <div>
+                              <p className="font-medium text-gray-900">{bot.botName || 'Meeting Recorder'}</p>
+                              <p className="text-sm text-gray-600">{bot.platform} • {bot.status}</p>
+                            </div>
+                          </div>
+                          <Badge variant="destructive" className="bg-red-100 text-red-800">
+                            {bot.status === 'recording' ? 'Recording' : 'Joining...'}
+                          </Badge>
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Recent Meetings */}
+                <Card className="bg-white border border-gray-200 shadow-sm">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-gray-900">
+                      <FileText className="h-5 w-5" />
+                      Recent Meeting Transcripts
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {meetings.length === 0 ? (
+                      <div className="text-center py-8">
+                        <Video className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">No meetings recorded yet</h3>
+                        <p className="text-gray-600 mb-4">Start recording meetings to see transcripts here</p>
+                        <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                          <Button asChild size="sm">
+                            <Link href="/record-meeting">Record Local Meeting</Link>
+                          </Button>
+                          <Button asChild size="sm" variant="outline">
+                            <Link href="#" onClick={(e) => {
+                              e.preventDefault();
+                              // This will open the floating recorder
+                              const recordButton = document.querySelector('[data-recorder-trigger]') as HTMLElement;
+                              recordButton?.click();
+                            }}>Join External Meeting</Link>
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {meetings.slice(0, 5).map((meeting) => (
+                          <div key={meeting.id} className="flex items-start justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                            <div className="flex-1">
+                              <h4 className="font-medium text-gray-900 mb-1">{meeting.title}</h4>
+                              <div className="flex items-center gap-4 text-sm text-gray-600 mb-2">
+                                <div className="flex items-center gap-1">
+                                  <Calendar className="h-4 w-4" />
+                                  {new Date(meeting.meeting_date).toLocaleDateString()}
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <Clock className="h-4 w-4" />
+                                  {Math.floor((meeting.duration_minutes || 0) / 60)}h {(meeting.duration_minutes || 0) % 60}m
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <Users className="h-4 w-4" />
+                                  {meeting.participants?.length || 0} participants
+                                </div>
+                              </div>
+                              <p className="text-sm text-gray-600 line-clamp-2">{meeting.summary}</p>
+                            </div>
+                            <div className="flex items-center gap-2 ml-4">
+                              <Button size="sm" variant="outline" asChild>
+                                <Link href={`/meetings/${meeting.id}`}>
+                                  <Eye className="h-4 w-4 mr-1" />
+                                  View
+                                </Link>
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                        {meetings.length > 5 && (
+                          <div className="text-center pt-4 border-t">
+                            <Button variant="outline" asChild>
+                              <Link href="/meetings">View All {stats.totalMeetings} Meetings</Link>
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Quick Actions */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Card className="bg-gradient-to-br from-teal-50 to-emerald-50 border-teal-200">
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center">
+                          <Video className="h-5 w-5 text-teal-600" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-teal-900">Record Meeting</h3>
+                          <p className="text-sm text-teal-700">Record local audio or screen</p>
+                        </div>
+                      </div>
+                      <Button asChild className="w-full bg-teal-600 hover:bg-teal-700">
+                        <Link href="/record-meeting">Start Recording</Link>
+                      </Button>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                          <Plus className="h-5 w-5 text-blue-600" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-blue-900">Join Meeting</h3>
+                          <p className="text-sm text-blue-700">Add recorder to any meeting</p>
+                        </div>
+                      </div>
+                      <Button 
+                        className="w-full bg-blue-600 hover:bg-blue-700"
+                        data-recorder-trigger
+                        onClick={() => {
+                          // Open the floating recorder dialog
+                          const event = new CustomEvent('openRecorder');
+                          window.dispatchEvent(event);
+                        }}
+                      >
+                        Add Recorder Bot
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </div>
               </TabsContent>
 
               <TabsContent value="progress" className="space-y-4 md:space-y-6">
