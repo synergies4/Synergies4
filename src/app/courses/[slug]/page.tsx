@@ -36,7 +36,8 @@ import {
   Video,
   Link as LinkIcon,
   File,
-  FileText
+  FileText,
+  MapPin
 } from 'lucide-react';
 
 // Interfaces
