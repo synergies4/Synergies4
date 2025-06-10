@@ -545,14 +545,14 @@ function FeaturedCoursesSection() {
                   </div>
 
                   {/* Card Content */}
-                  <div className="flex flex-col flex-1 p-6 bg-white/5">
+                  <div className="flex flex-col flex-1 p-6 bg-white/90">
                     {/* Title */}
-                    <h3 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-200 transition-colors line-clamp-2 min-h-[3.5rem] flex items-start">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-teal-600 transition-colors line-clamp-2 min-h-[3.5rem] flex items-start">
                       {course.title}
                     </h3>
                     
                     {/* Description */}
-                    <p className="text-gray-100 text-sm leading-relaxed mb-4 flex-1 group-hover:text-white transition-colors">
+                    <p className="text-gray-600 text-sm leading-relaxed mb-4 flex-1 group-hover:text-gray-700 transition-colors">
                       {course.short_desc}
                     </p>
 
@@ -567,9 +567,9 @@ function FeaturedCoursesSection() {
                             />
                           ))}
                         </div>
-                        <span className="text-gray-100 font-medium ml-1">{course.rating || '4.8'}</span>
+                        <span className="text-gray-700 font-medium ml-1">{course.rating || '4.8'}</span>
                       </div>
-                      <div className="flex items-center text-gray-100 group-hover:text-white transition-colors">
+                      <div className="flex items-center text-gray-600 group-hover:text-gray-700 transition-colors">
                         <Users className="h-4 w-4 mr-1" />
                         <span>{course.students || '1,200'}+</span>
                       </div>
@@ -581,7 +581,7 @@ function FeaturedCoursesSection() {
                         {formatPrice(course.price)}
                       </div>
                       {course.price && course.price > 0 && (
-                        <div className="text-sm text-gray-300/60 line-through">
+                        <div className="text-sm text-gray-400 line-through">
                           ${Math.round(course.price * 1.4)}
                         </div>
                       )}
