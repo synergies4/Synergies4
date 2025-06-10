@@ -3,9 +3,10 @@ import { createClient } from '@/lib/supabase/server';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const supabase = await createClient();
     const { data: { user }, error: userError } = await supabase.auth.getUser();
 
@@ -19,7 +20,7 @@ export async function GET(
     const { data: presentation, error } = await supabase
       .from('user_presentations')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', id)
       .eq('user_id', user.id)
       .single();
 
@@ -35,7 +36,7 @@ export async function GET(
     await supabase
       .from('user_presentations')
       .update({ last_accessed_at: new Date().toISOString() })
-      .eq('id', params.id);
+      .eq('id', id);
 
     // Log content access
     await supabase
@@ -43,7 +44,7 @@ export async function GET(
       .insert({
         user_id: user.id,
         content_type: 'presentation',
-        content_id: params.id,
+        content_id: id,
         access_type: 'view'
       });
 
@@ -60,9 +61,10 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const supabase = await createClient();
     const { data: { user }, error: userError } = await supabase.auth.getUser();
 
@@ -76,12 +78,12 @@ export async function PUT(
     const updates = await request.json();
     
     // Remove fields that shouldn't be updated directly
-    const { id, user_id, created_at, ...allowedUpdates } = updates;
+    const { id: updateId, user_id, created_at, ...allowedUpdates } = updates;
 
     const { data: presentation, error } = await supabase
       .from('user_presentations')
       .update(allowedUpdates)
-      .eq('id', params.id)
+      .eq('id', id)
       .eq('user_id', user.id)
       .select()
       .single();
@@ -100,7 +102,7 @@ export async function PUT(
       .insert({
         user_id: user.id,
         content_type: 'presentation',
-        content_id: params.id,
+        content_id: id,
         access_type: 'edit'
       });
 
@@ -117,9 +119,10 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const supabase = await createClient();
     const { data: { user }, error: userError } = await supabase.auth.getUser();
 
@@ -133,7 +136,7 @@ export async function DELETE(
     const { error } = await supabase
       .from('user_presentations')
       .delete()
-      .eq('id', params.id)
+      .eq('id', id)
       .eq('user_id', user.id);
 
     if (error) {
@@ -150,7 +153,7 @@ export async function DELETE(
       .insert({
         user_id: user.id,
         content_type: 'presentation',
-        content_id: params.id,
+        content_id: id,
         access_type: 'delete'
       });
 
