@@ -10,6 +10,7 @@ async function getAuthenticatedUser(request: NextRequest) {
   try {
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.error('No authorization header or invalid format');
       return null;
     }
 
@@ -17,10 +18,17 @@ async function getAuthenticatedUser(request: NextRequest) {
     const supabase = await createClient();
     
     const { data: { user }, error } = await supabase.auth.getUser(token);
-    if (error || !user) {
+    if (error) {
+      console.error('Supabase auth error:', error);
+      return null;
+    }
+    
+    if (!user) {
+      console.error('No user found for token');
       return null;
     }
 
+    console.log('User authenticated:', user.id, user.email);
     return {
       id: user.id,
       email: user.email
@@ -80,18 +88,39 @@ const PRICING_PLANS = {
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await getAuthenticatedUser(request);
-
-    if (!user) {
-      return NextResponse.json(
-        { message: 'Authentication required' },
-        { status: 401 }
-      );
+    console.log('Starting subscription creation...');
+    
+    // Try server-side auth first
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      console.error('Server-side auth failed, trying token auth...');
+      const tokenUser = await getAuthenticatedUser(request);
+      if (!tokenUser) {
+        console.error('Both auth methods failed');
+        return NextResponse.json(
+          { message: 'Authentication required' },
+          { status: 401 }
+        );
+      }
+      // Use token user data
+      var authenticatedUser = tokenUser;
+    } else {
+      // Use server-side user data
+      var authenticatedUser = {
+        id: user.id,
+        email: user.email
+      };
     }
 
+    console.log('Authenticated user:', authenticatedUser.id);
+
     const { planId, successUrl, cancelUrl } = await request.json();
+    console.log('Request data:', { planId, successUrl, cancelUrl });
 
     if (!planId || !PRICING_PLANS[planId as keyof typeof PRICING_PLANS]) {
+      console.error('Invalid plan ID:', planId);
       return NextResponse.json(
         { message: 'Invalid plan ID' },
         { status: 400 }
@@ -99,17 +128,26 @@ export async function POST(request: NextRequest) {
     }
 
     const plan = PRICING_PLANS[planId as keyof typeof PRICING_PLANS];
-    const supabase = await createClient();
+    console.log('Selected plan:', plan.name, plan.price);
 
     // Check if user already has an active subscription
-    const { data: existingSubscription } = await supabase
+    const { data: existingSubscription, error: subscriptionCheckError } = await supabase
       .from('subscriptions')
       .select('id, status, plan_id')
-      .eq('user_id', user.id)
+      .eq('user_id', authenticatedUser.id)
       .eq('status', 'active')
       .single();
 
+    if (subscriptionCheckError && subscriptionCheckError.code !== 'PGRST116') {
+      console.error('Error checking existing subscription:', subscriptionCheckError);
+      return NextResponse.json(
+        { message: 'Database error checking subscription' },
+        { status: 500 }
+      );
+    }
+
     if (existingSubscription) {
+      console.log('User already has active subscription:', existingSubscription.plan_id);
       return NextResponse.json(
         { message: 'You already have an active subscription' },
         { status: 400 }
@@ -120,36 +158,56 @@ export async function POST(request: NextRequest) {
     let customerId: string;
     
     // Check if customer already exists
-    const { data: existingCustomer } = await supabase
+    const { data: existingCustomer, error: customerError } = await supabase
       .from('stripe_customers')
       .select('stripe_customer_id')
-      .eq('user_id', user.id)
+      .eq('user_id', authenticatedUser.id)
       .single();
+
+    if (customerError && customerError.code !== 'PGRST116') {
+      console.error('Error checking existing customer:', customerError);
+      return NextResponse.json(
+        { message: 'Database error checking customer' },
+        { status: 500 }
+      );
+    }
 
     if (existingCustomer) {
       customerId = existingCustomer.stripe_customer_id;
+      console.log('Using existing customer:', customerId);
     } else {
+      console.log('Creating new Stripe customer...');
       // Create new customer
       const customer = await stripe.customers.create({
-        email: user.email,
+        email: authenticatedUser.email,
         metadata: {
-          userId: user.id
+          userId: authenticatedUser.id
         }
       });
       
       customerId = customer.id;
+      console.log('Created new customer:', customerId);
       
       // Save customer ID to database
-      await supabase
+      const { error: insertError } = await supabase
         .from('stripe_customers')
         .insert({
-          user_id: user.id,
+          user_id: authenticatedUser.id,
           stripe_customer_id: customerId,
-          email: user.email
+          email: authenticatedUser.email
         });
+
+      if (insertError) {
+        console.error('Error saving customer to database:', insertError);
+        return NextResponse.json(
+          { message: 'Database error saving customer' },
+          { status: 500 }
+        );
+      }
     }
 
     // Create checkout session for subscription
+    console.log('Creating Stripe checkout session...');
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       payment_method_types: ['card'],
@@ -173,17 +231,19 @@ export async function POST(request: NextRequest) {
       success_url: successUrl || `${process.env.NEXT_PUBLIC_URL}/dashboard?subscription=success`,
       cancel_url: cancelUrl || `${process.env.NEXT_PUBLIC_URL}/contact#plans-pricing`,
       metadata: {
-        userId: user.id,
+        userId: authenticatedUser.id,
         planId: planId,
         type: 'subscription'
       },
       subscription_data: {
         metadata: {
-          userId: user.id,
+          userId: authenticatedUser.id,
           planId: planId
         }
       }
     });
+
+    console.log('Checkout session created:', session.id);
 
     return NextResponse.json({ 
       sessionId: session.id,
