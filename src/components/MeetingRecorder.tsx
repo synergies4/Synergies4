@@ -123,9 +123,9 @@ export default function MeetingRecorder() {
     try {
       const { createClient } = await import('@/lib/supabase/client');
       const supabase = createClient();
-      const { data: { authSession } } = await supabase.auth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       
-      if (!authSession) {
+      if (!session) {
         toast.error('Authentication required');
         return;
       }
@@ -134,7 +134,7 @@ export default function MeetingRecorder() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authSession.access_token}`,
+          'Authorization': `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
           botId: session.botId,
