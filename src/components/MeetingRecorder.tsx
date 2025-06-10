@@ -1,3 +1,5 @@
+// MeetingRecorder component for handling meeting recordings across platforms
+// Supports Zoom, Google Meet, and Microsoft Teams integration
 'use client';
 
 import { useState, useEffect } from 'react';
