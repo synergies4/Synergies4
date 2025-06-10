@@ -179,19 +179,19 @@ function Navigation({ isSearchOpen, setIsSearchOpen, headerVisible, lastScrollY 
         : '-translate-y-full opacity-0'
     }`}>
       {/* AI Assistant Promotion Banner - Fixed Mobile Layout */}
-      <div className={`bg-gradient-to-r from-teal-600 to-emerald-600 text-white py-3 px-4 transition-all duration-300 ${
+      <div className={`bg-gradient-to-r from-teal-600 to-emerald-600 py-3 px-4 transition-all duration-300 ${
         lastScrollY > 50 ? 'opacity-95' : 'opacity-100'
       }`} role="banner">
         <div className="container mx-auto">
           <Link href="/synergize" className="block hover:opacity-90 transition-opacity">
             <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-center cursor-pointer">
               <p className="text-sm sm:text-base font-bold text-white">
-                🚀 Try our AI learning assistant - Get personalized course recommendations instantly.
+                🎯 Try our AI learning assistant - Get personalized course recommendations instantly.
               </p>
-              <div className="flex items-center gap-2 text-xs sm:text-sm bg-white/20 rounded-full px-3 py-1 hover:bg-white/30 transition-colors">
-                <Brain className="w-4 h-4 text-white" />
-                <span className="font-semibold text-white">Try Synergize AI</span>
-                <ArrowRight className="w-3 h-3 text-white" />
+              <div className="flex items-center gap-2 text-xs sm:text-sm bg-white rounded-full px-3 py-1 hover:bg-gray-50 transition-colors">
+                <Brain className="w-4 h-4 text-teal-600" />
+                <span className="font-semibold text-teal-600">Try Synergize AI</span>
+                <ArrowRight className="w-3 h-3 text-teal-600" />
               </div>
             </div>
           </Link>

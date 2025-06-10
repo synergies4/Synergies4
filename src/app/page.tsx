@@ -1089,12 +1089,12 @@ function CTASection() {
             
             <Button 
               size="lg" 
-              className="w-full sm:w-auto bg-gradient-to-r from-white/20 to-white/10 border-2 border-white text-white hover:bg-white hover:text-teal-600 shadow-2xl hover:shadow-white/25 transition-all hover:scale-105 font-semibold rounded-xl group" 
+              className="w-full sm:w-auto bg-white border-2 border-white text-teal-600 hover:bg-gray-50 hover:text-teal-700 shadow-2xl hover:shadow-white/25 transition-all hover:scale-105 font-semibold rounded-xl group" 
               asChild
             >
               <Link href="/contact">
-                <span className="flex items-center justify-center text-white group-hover:text-teal-600 font-semibold">
-                  <MessageSquare className="h-5 w-5 mr-2 text-white group-hover:text-teal-600" />
+                <span className="flex items-center justify-center text-teal-600 group-hover:text-teal-700 font-semibold">
+                  <MessageSquare className="h-5 w-5 mr-2 text-teal-600 group-hover:text-teal-700" />
                   Talk to an Expert
                 </span>
               </Link>

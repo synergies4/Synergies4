@@ -515,9 +515,9 @@ function BrochureSection() {
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-16">
-          <div className="inline-flex items-center px-6 py-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 mb-8">
-            <Download className="w-5 h-5 text-blue-300 mr-3" />
-            <span className="text-white/90 font-medium">Course Catalog</span>
+          <div className="inline-flex items-center px-6 py-3 bg-white/80 backdrop-blur-sm rounded-full border border-blue-200/50 mb-8">
+            <Download className="w-5 h-5 text-blue-600 mr-3" />
+            <span className="text-blue-700 font-medium">Course Catalog</span>
           </div>
           
           <h2 className="text-4xl md:text-6xl font-bold mb-8 leading-tight">

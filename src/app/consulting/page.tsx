@@ -443,9 +443,9 @@ function CTASection() {
       </div>
 
       <div className="container mx-auto px-4 text-center relative z-10">
-        <div className="inline-flex items-center px-6 py-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 mb-8">
-          <Rocket className="w-5 h-5 text-teal-300 mr-3" />
-          <span className="text-white/90 font-medium">Ready to Transform?</span>
+        <div className="inline-flex items-center px-6 py-3 bg-white/80 backdrop-blur-sm rounded-full border border-teal-200/50 mb-8">
+          <Rocket className="w-5 h-5 text-teal-600 mr-3" />
+          <span className="text-teal-700 font-medium">Ready to Transform?</span>
         </div>
         
         <h2 className="text-4xl md:text-6xl font-bold mb-8 leading-tight">
