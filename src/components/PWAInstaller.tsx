@@ -28,8 +28,15 @@ export default function PWAInstaller() {
   const [isAndroid, setIsAndroid] = useState(false);
   const [showManualPrompt, setShowManualPrompt] = useState(false);
   const [showInstructionsModal, setShowInstructionsModal] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    // Set client flag to enable rendering
+    setIsClient(true);
+
+    // Only run in browser environment
+    if (typeof window === 'undefined') return;
+
     // Detect device type and browser
     const detectDevice = () => {
       const userAgent = navigator.userAgent.toLowerCase();
@@ -121,8 +128,10 @@ export default function PWAInstaller() {
     setShowInstructionsModal(false);
     setDeferredPrompt(null);
     
-    // Store dismissal in localStorage to avoid showing again soon
-    localStorage.setItem('pwa-install-dismissed', Date.now().toString());
+    // Store dismissal in localStorage to avoid showing again soon (only in browser)
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.setItem('pwa-install-dismissed', Date.now().toString());
+    }
   };
 
   const getInstallInstructions = () => {
@@ -150,15 +159,23 @@ export default function PWAInstaller() {
   const shouldShowPrompt = () => {
     if (isInstalled) return false;
     
-    const lastDismissed = localStorage.getItem('pwa-install-dismissed');
-    if (lastDismissed) {
-      const dismissedTime = parseInt(lastDismissed);
-      const hoursSinceDismissed = (Date.now() - dismissedTime) / (1000 * 60 * 60);
-      if (hoursSinceDismissed < 24) return false; // Don't show again for 24 hours
+    // Check localStorage only in browser environment
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const lastDismissed = localStorage.getItem('pwa-install-dismissed');
+      if (lastDismissed) {
+        const dismissedTime = parseInt(lastDismissed);
+        const hoursSinceDismissed = (Date.now() - dismissedTime) / (1000 * 60 * 60);
+        if (hoursSinceDismissed < 24) return false; // Don't show again for 24 hours
+      }
     }
     
     return (showInstallPrompt && deferredPrompt) || (showManualPrompt && isMobile);
   };
+
+  // Don't render on server side
+  if (!isClient) {
+    return null;
+  }
 
   // Don't show if conditions aren't met
   if (!shouldShowPrompt()) {
