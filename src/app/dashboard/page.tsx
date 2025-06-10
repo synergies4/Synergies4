@@ -19,7 +19,9 @@ import {
   Target,
   Menu,
   X,
-  ArrowRight
+  ArrowRight,
+  BarChart3,
+  CreditCard
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -63,6 +65,8 @@ export default function StudentDashboard() {
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [quizAttempts, setQuizAttempts] = useState<QuizAttempt[]>([]);
   const [loading, setLoading] = useState(true);
+  const [subscriptionData, setSubscriptionData] = useState<any>(null);
+  const [contentUsage, setContentUsage] = useState<any>(null);
   const [stats, setStats] = useState({
     totalCourses: 0,
     completedCourses: 0,
@@ -136,6 +140,42 @@ export default function StudentDashboard() {
           ...prev,
           averageScore: Math.round(averageScore)
         }));
+      }
+
+      // Fetch subscription data
+      try {
+        const { data: subscription } = await supabase
+          .from('subscriptions')
+          .select('*')
+          .eq('user_id', session.user.id)
+          .eq('status', 'active')
+          .single();
+
+        const { data: settings } = await supabase
+          .from('user_content_settings')
+          .select('*')
+          .eq('user_id', session.user.id)
+          .single();
+
+        const { count: presentationsCount } = await supabase
+          .from('user_presentations')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', session.user.id);
+
+        const { count: conversationsCount } = await supabase
+          .from('user_conversations')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', session.user.id)
+          .eq('is_archived', false);
+
+        setSubscriptionData(subscription);
+        setContentUsage({
+          settings,
+          currentPresentations: presentationsCount || 0,
+          currentConversations: conversationsCount || 0
+        });
+      } catch (error) {
+        console.error('Error fetching subscription data:', error);
       }
 
     } catch (error) {
@@ -249,9 +289,10 @@ export default function StudentDashboard() {
           {/* Main Content */}
           <div>
             <Tabs defaultValue="courses" className="space-y-4 md:space-y-6">
-              <TabsList className="grid w-full grid-cols-3 h-auto bg-white border border-gray-200">
+              <TabsList className="grid w-full grid-cols-4 h-auto bg-white border border-gray-200">
                 <TabsTrigger value="courses" className="text-xs md:text-sm py-2 md:py-3 text-gray-900 data-[state=active]:bg-teal-600 data-[state=active]:text-white">My Courses</TabsTrigger>
                 <TabsTrigger value="progress" className="text-xs md:text-sm py-2 md:py-3 text-gray-900 data-[state=active]:bg-teal-600 data-[state=active]:text-white">Progress</TabsTrigger>
+                <TabsTrigger value="subscription" className="text-xs md:text-sm py-2 md:py-3 text-gray-900 data-[state=active]:bg-teal-600 data-[state=active]:text-white">Subscription</TabsTrigger>
                 <TabsTrigger value="certificates" className="text-xs md:text-sm py-2 md:py-3 text-gray-900 data-[state=active]:bg-teal-600 data-[state=active]:text-white">Certificates</TabsTrigger>
               </TabsList>
 
@@ -435,6 +476,173 @@ export default function StudentDashboard() {
                     </CardContent>
                   </Card>
                 </div>
+              </TabsContent>
+
+              <TabsContent value="subscription" className="space-y-4 md:space-y-6">
+                <h2 className="text-xl md:text-2xl font-bold text-gray-900">Subscription Management</h2>
+                
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Current Plan Card */}
+                  <Card className="bg-white border border-gray-200 shadow-sm">
+                    <CardHeader>
+                      <CardTitle className="text-lg text-gray-900 flex items-center gap-2">
+                        <Award className="h-5 w-5 text-teal-600" />
+                        Current Plan
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {subscriptionData ? (
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <span className="text-lg font-semibold text-gray-900 capitalize">
+                              {subscriptionData.plan_id} Plan
+                            </span>
+                            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                              Active
+                            </Badge>
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            <p>Started: {new Date(subscriptionData.created_at).toLocaleDateString()}</p>
+                            <p>Next billing: {new Date(subscriptionData.current_period_end).toLocaleDateString()}</p>
+                          </div>
+                          <div className="pt-4 border-t">
+                            <Button variant="outline" className="w-full mb-2">
+                              Change Plan
+                            </Button>
+                            <Button variant="ghost" className="w-full text-red-600 hover:text-red-700">
+                              Cancel Subscription
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          <div className="text-center py-6">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-2">Free Plan</h3>
+                            <p className="text-gray-600">You're currently on the free plan</p>
+                          </div>
+                          <Button asChild className="w-full">
+                            <Link href="/contact">Upgrade to Premium</Link>
+                          </Button>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  {/* Usage Statistics Card */}
+                  <Card className="bg-white border border-gray-200 shadow-sm">
+                    <CardHeader>
+                      <CardTitle className="text-lg text-gray-900 flex items-center gap-2">
+                        <BarChart3 className="h-5 w-5 text-blue-600" />
+                        Usage Statistics
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {contentUsage?.settings ? (
+                        <div className="space-y-6">
+                          {/* Presentations Usage */}
+                          <div>
+                            <div className="flex justify-between items-center mb-2">
+                              <span className="text-sm font-medium text-gray-700">Presentations</span>
+                              <span className="text-sm text-gray-500">
+                                {contentUsage.currentPresentations} / {contentUsage.settings.max_presentations}
+                              </span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2.5">
+                              <div 
+                                className="bg-gradient-to-r from-blue-600 to-teal-600 h-2.5 rounded-full transition-all duration-300"
+                                style={{ 
+                                  width: `${Math.min((contentUsage.currentPresentations / contentUsage.settings.max_presentations) * 100, 100)}%` 
+                                }}
+                              ></div>
+                            </div>
+                          </div>
+
+                          {/* Conversations Usage */}
+                          <div>
+                            <div className="flex justify-between items-center mb-2">
+                              <span className="text-sm font-medium text-gray-700">AI Conversations</span>
+                              <span className="text-sm text-gray-500">
+                                {contentUsage.currentConversations} / {contentUsage.settings.max_conversations}
+                              </span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2.5">
+                              <div 
+                                className="bg-gradient-to-r from-emerald-600 to-cyan-600 h-2.5 rounded-full transition-all duration-300"
+                                style={{ 
+                                  width: `${Math.min((contentUsage.currentConversations / contentUsage.settings.max_conversations) * 100, 100)}%` 
+                                }}
+                              ></div>
+                            </div>
+                          </div>
+
+                          {/* Purchase Additional Credits */}
+                          {(contentUsage.currentPresentations >= contentUsage.settings.max_presentations * 0.8 || 
+                            contentUsage.currentConversations >= contentUsage.settings.max_conversations * 0.8) && (
+                            <div className="pt-4 border-t">
+                              <p className="text-sm text-amber-600 mb-3">
+                                You're approaching your limits. Consider upgrading or purchasing additional credits.
+                              </p>
+                              <div className="flex gap-2">
+                                <Button size="sm" variant="outline" className="flex-1">
+                                  Buy Credits
+                                </Button>
+                                <Button size="sm" asChild className="flex-1">
+                                  <Link href="/contact">Upgrade Plan</Link>
+                                </Button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="text-center py-6">
+                          <p className="text-gray-600">Loading usage statistics...</p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Billing History */}
+                <Card className="bg-white border border-gray-200 shadow-sm">
+                  <CardHeader>
+                    <CardTitle className="text-lg text-gray-900 flex items-center gap-2">
+                      <CreditCard className="h-5 w-5 text-purple-600" />
+                      Billing History
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {subscriptionData ? (
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                          <div>
+                            <p className="font-medium text-gray-900">{subscriptionData.plan_id} Plan</p>
+                            <p className="text-sm text-gray-500">
+                              {new Date(subscriptionData.created_at).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-medium text-gray-900">
+                              ${subscriptionData.plan_id === 'starter' ? '29' : 
+                                subscriptionData.plan_id === 'professional' ? '79' : '199'}/month
+                            </p>
+                            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                              Paid
+                            </Badge>
+                          </div>
+                        </div>
+                        <div className="pt-3">
+                          <Button variant="ghost" className="text-sm">
+                            Download Invoice
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center py-6">
+                        <p className="text-gray-600">No billing history available</p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
               </TabsContent>
 
               <TabsContent value="certificates" className="space-y-4 md:space-y-6">

@@ -4551,20 +4551,26 @@ export default function SynergizeAgile() {
         const { data: { session } } = await supabase.auth.getSession();
         
         if (session) {
+          console.log('🔍 Checking subscription for user:', session.user.id);
+          
           // Check subscription status
-          const { data: subscription } = await supabase
+          const { data: subscription, error: subError } = await supabase
             .from('subscriptions')
             .select('plan_id, status')
             .eq('user_id', session.user.id)
             .eq('status', 'active')
             .single();
 
+          console.log('📋 Subscription query result:', { subscription, error: subError });
+
           // Get user content settings
-          const { data: settings } = await supabase
+          const { data: settings, error: settingsError } = await supabase
             .from('user_content_settings')
             .select('max_conversations, current_conversations')
             .eq('user_id', session.user.id)
             .single();
+
+          console.log('⚙️ Settings query result:', { settings, error: settingsError });
 
           const isSubscribed = Boolean(subscription && subscription.status === 'active');
           let maxConversations = 10; // Free tier default
@@ -4572,9 +4578,20 @@ export default function SynergizeAgile() {
           if (isSubscribed) {
             // Set unlimited for subscribed users
             maxConversations = 999999;
+            console.log('✅ User is subscribed with plan:', subscription?.plan_id);
           } else if (settings) {
             maxConversations = settings.max_conversations;
+            console.log('📊 Using settings max conversations:', maxConversations);
+          } else {
+            console.log('🆓 Using free tier defaults');
           }
+
+          console.log('🎯 Final limits:', {
+            maxConversations,
+            currentConversations: settings?.current_conversations || 0,
+            isSubscribed,
+            maxResponses: isSubscribed ? 999999 : 3
+          });
 
           setUserLimits({
             maxConversations,
