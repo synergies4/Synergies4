@@ -213,9 +213,9 @@ function ValuePropositionsSection() {
       <div className="container mx-auto px-4 relative z-10">
         {/* Enhanced Header */}
         <div className="text-center mb-20">
-          <div className="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 mb-8">
+          <div className="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full border border-white/30 mb-8">
             <span className="w-2 h-2 bg-gradient-to-r from-teal-400 to-emerald-400 rounded-full mr-3 animate-pulse"></span>
-            <span className="text-white/90 text-sm font-medium">Why Choose Synergies4?</span>
+            <span className="text-white text-sm font-medium">Why Choose Synergies4?</span>
           </div>
           
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-8 leading-tight">
@@ -236,13 +236,13 @@ function ValuePropositionsSection() {
           
           {/* Human-AI Collaboration Quote */}
           <div className="mt-12 mb-8">
-            <div className="max-w-3xl mx-auto p-6 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl">
+            <div className="max-w-3xl mx-auto p-6 bg-gray-900/80 backdrop-blur-sm border border-gray-700/50 rounded-xl">
               <blockquote className="text-lg md:text-xl font-semibold text-white italic mb-4 leading-relaxed text-center">
                 "Superhuman innovation is about humans and AI working together to achieve outcomes neither could alone."
               </blockquote>
-              <cite className="flex items-center justify-center text-white font-medium">
+              <cite className="flex items-center justify-center text-gray-200 font-medium">
                 <div className="w-8 h-8 bg-gradient-to-r from-cyan-400 to-teal-400 rounded-full flex items-center justify-center mr-3 text-gray-900 text-sm font-bold">CD</div>
-                <span className="text-white">Chris Duffey, Author and AI Technologist</span>
+                <span className="text-gray-200">Chris Duffey, Author and AI Technologist</span>
               </cite>
             </div>
           </div>
@@ -479,7 +479,7 @@ function FeaturedCoursesSection() {
             </span>
           </h2>
           
-          <p className="text-xl md:text-2xl text-gray-200/90 max-w-4xl mx-auto leading-relaxed font-light">
+          <p className="text-xl md:text-2xl text-gray-100 max-w-4xl mx-auto leading-relaxed font-light">
             Discover our most popular courses designed by 
             <span className="text-cyan-300 font-medium"> industry experts </span>
             to accelerate your career growth and unlock your full potential.
@@ -1051,9 +1051,9 @@ function CTASection() {
       </div>
 
       <div className="container mx-auto px-4 text-center relative z-10">
-        <div className="inline-flex items-center px-6 py-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 mb-8">
+        <div className="inline-flex items-center px-6 py-3 bg-white/20 backdrop-blur-sm rounded-full border border-white/30 mb-8">
           <Rocket className="w-5 h-5 text-teal-300 mr-3" />
-          <span className="text-white/90 font-medium">Ready to Get Started?</span>
+          <span className="text-white font-medium">Ready to Get Started?</span>
         </div>
         
         <h2 className="text-4xl md:text-6xl font-bold mb-8 leading-tight">
@@ -1067,7 +1067,7 @@ function CTASection() {
         </h2>
         
         
-        <p className="text-xl md:text-2xl text-teal-100/90 max-w-4xl mx-auto leading-relaxed font-light mb-12">
+        <p className="text-xl md:text-2xl text-gray-100 max-w-4xl mx-auto leading-relaxed font-light mb-12">
           Join thousands of professionals who have accelerated their growth with our 
           <span className="text-white font-medium"> AI-powered learning platform</span>
         </p>
@@ -1110,12 +1110,12 @@ function CTASection() {
             { number: "4.9", label: "Average Rating", icon: <Star className="w-5 h-5" /> },
             { number: "50+", label: "Expert Courses", icon: <BookOpen className="w-5 h-5" /> }
           ].map((stat, index) => (
-            <div key={index} className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 transition-all hover:bg-white/10 hover:scale-105 group">
+            <div key={index} className="bg-gray-900/70 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-6 transition-all hover:bg-gray-900/80 hover:scale-105 group">
               <div className="flex items-center justify-center mb-3 text-teal-300 transition-colors group-hover:text-white">
                 {stat.icon}
               </div>
               <div className="text-2xl md:text-3xl font-bold text-white mb-1 transition-transform group-hover:scale-110">{stat.number}</div>
-              <div className="text-sm text-teal-200/80 uppercase tracking-wide font-medium transition-colors group-hover:text-white/90">{stat.label}</div>
+              <div className="text-sm text-gray-200 uppercase tracking-wide font-medium transition-colors group-hover:text-white/90">{stat.label}</div>
             </div>
           ))}
         </div>

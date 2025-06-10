@@ -171,7 +171,37 @@ async function handleSubscriptionPayment(supabase: any, session: Stripe.Checkout
           updated_at: new Date().toISOString()
         });
 
-      console.log(`Subscription created for user ${userId}, plan ${planId}`);
+      // Initialize/update user content settings based on subscription plan
+      let maxPresentations = 5;
+      let maxConversations = 10;
+      
+      switch (planId) {
+        case 'starter':
+          maxPresentations = 20;
+          maxConversations = 50;
+          break;
+        case 'professional':
+          maxPresentations = 50;
+          maxConversations = 200;
+          break;
+        case 'enterprise':
+          maxPresentations = 100;
+          maxConversations = 500;
+          break;
+      }
+
+      await supabase
+        .from('user_content_settings')
+        .upsert({
+          user_id: userId,
+          subscription_id: subscription.id,
+          plan_type: planId,
+          max_presentations: maxPresentations,
+          max_conversations: maxConversations,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'user_id' });
+
+      console.log(`Subscription created for user ${userId}, plan ${planId} with limits: ${maxPresentations} presentations, ${maxConversations} conversations`);
     }
     
   } catch (error) {
@@ -204,6 +234,7 @@ async function handleSubscriptionRenewal(supabase: any, invoice: Stripe.Invoice)
 
 async function handleSubscriptionCancellation(supabase: any, subscription: Stripe.Subscription) {
   try {
+    // Update subscription status
     await supabase
       .from('subscriptions')
       .update({
@@ -213,6 +244,25 @@ async function handleSubscriptionCancellation(supabase: any, subscription: Strip
       })
       .eq('stripe_subscription_id', subscription.id);
 
+    // Reset user content settings to free tier
+    const { data: subscriptionData } = await supabase
+      .from('subscriptions')
+      .select('user_id')
+      .eq('stripe_subscription_id', subscription.id)
+      .single();
+
+    if (subscriptionData) {
+      await supabase
+        .from('user_content_settings')
+        .update({
+          plan_type: 'free',
+          max_presentations: 5,
+          max_conversations: 10,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', subscriptionData.user_id);
+    }
+
     console.log(`Subscription cancelled: ${subscription.id}`);
   } catch (error) {
     console.error('Error handling subscription cancellation:', error);
@@ -221,6 +271,14 @@ async function handleSubscriptionCancellation(supabase: any, subscription: Strip
 
 async function handleSubscriptionUpdate(supabase: any, subscription: Stripe.Subscription) {
   try {
+    // Get current subscription data to check for plan changes
+    const { data: currentSub } = await supabase
+      .from('subscriptions')
+      .select('user_id, plan_id')
+      .eq('stripe_subscription_id', subscription.id)
+      .single();
+
+    // Update subscription record
     await supabase
       .from('subscriptions')
       .update({
@@ -230,6 +288,40 @@ async function handleSubscriptionUpdate(supabase: any, subscription: Stripe.Subs
         updated_at: new Date().toISOString()
       })
       .eq('stripe_subscription_id', subscription.id);
+
+    // Update user content settings if subscription is active
+    if (currentSub && subscription.status === 'active') {
+      let maxPresentations = 5;
+      let maxConversations = 10;
+      
+      // Get plan from subscription metadata or current plan
+      const planId = currentSub.plan_id;
+      
+      switch (planId) {
+        case 'starter':
+          maxPresentations = 20;
+          maxConversations = 50;
+          break;
+        case 'professional':
+          maxPresentations = 50;
+          maxConversations = 200;
+          break;
+        case 'enterprise':
+          maxPresentations = 100;
+          maxConversations = 500;
+          break;
+      }
+
+      await supabase
+        .from('user_content_settings')
+        .upsert({
+          user_id: currentSub.user_id,
+          plan_type: planId,
+          max_presentations: maxPresentations,
+          max_conversations: maxConversations,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'user_id' });
+    }
 
     console.log(`Subscription updated: ${subscription.id}`);
   } catch (error) {
