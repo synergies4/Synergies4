@@ -88,6 +88,17 @@ export async function POST(request: NextRequest) {
   try {
     console.log('Starting subscription creation...');
     
+    // Check environment variables
+    if (!process.env.STRIPE_SECRET_KEY) {
+      console.error('STRIPE_SECRET_KEY environment variable is not set');
+      return NextResponse.json(
+        { message: 'Stripe configuration error' },
+        { status: 500 }
+      );
+    }
+    
+    console.log('Environment check passed - Stripe key exists');
+    
     // Try server-side auth first
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -252,8 +263,17 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Error creating subscription:', error);
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      stripeKeyExists: !!process.env.STRIPE_SECRET_KEY,
+      stripeKeyPrefix: process.env.STRIPE_SECRET_KEY?.substring(0, 7)
+    });
     return NextResponse.json(
-      { message: 'Failed to create subscription' },
+      { 
+        message: 'Failed to create subscription',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     );
   }
