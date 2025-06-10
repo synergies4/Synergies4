@@ -44,7 +44,17 @@ export default function MeetingRecorder() {
 
   const fetchActiveSessions = async () => {
     try {
-      const response = await fetch('/api/meeting-recorder/active');
+      const { createClient } = await import('@/lib/supabase/client');
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) return;
+
+      const response = await fetch('/api/meeting-recorder/active', {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+      });
       if (response.ok) {
         const sessions = await response.json();
         setActiveSessions(sessions);
@@ -62,10 +72,20 @@ export default function MeetingRecorder() {
 
     setIsStarting(true);
     try {
+      const { createClient } = await import('@/lib/supabase/client');
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        toast.error('Authentication required');
+        return;
+      }
+
       const response = await fetch('/api/meeting-recorder/start', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
           meetingUrl: meetingUrl.trim(),
@@ -101,10 +121,20 @@ export default function MeetingRecorder() {
   const stopRecording = async (session: RecordingSession) => {
     setIsLoading(true);
     try {
+      const { createClient } = await import('@/lib/supabase/client');
+      const supabase = createClient();
+      const { data: { authSession } } = await supabase.auth.getSession();
+      
+      if (!authSession) {
+        toast.error('Authentication required');
+        return;
+      }
+
       const response = await fetch('/api/meeting-recorder/stop', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authSession.access_token}`,
         },
         body: JSON.stringify({
           botId: session.botId,
