@@ -268,15 +268,7 @@ export default function StudentDashboard() {
         return;
       }
 
-      // Fetch user profile
-      const { data: profile } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', session.user.id)
-        .single();
-
-      setUser(session.user);
-      setUserProfile(profile);
+      // User profile comes from AuthContext, no need to fetch separately
 
       // Fetch enrollments with course details
       const { data: enrollmentsData } = await supabase
