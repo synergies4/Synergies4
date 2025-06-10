@@ -37,6 +37,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import { UserAvatar } from '@/components/UserAvatar';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 interface Enrollment {
   id: string;
@@ -107,6 +108,10 @@ export default function StudentDashboard() {
     communication_tone: 'professional',
     learning_style: 'mixed'
   });
+  const [refreshing, setRefreshing] = useState(false);
+
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     if (!authLoading && user) {
@@ -117,66 +122,198 @@ export default function StudentDashboard() {
     }
   }, [user, authLoading, isLoggingOut]);
 
-  const fetchDashboardData = async () => {
+  // Check for subscription success and refresh data
+  useEffect(() => {
+    const subscriptionSuccess = searchParams.get('subscription');
+    if (subscriptionSuccess === 'success' && user) {
+      // Clear the URL parameter
+      const url = new URL(window.location.href);
+      url.searchParams.delete('subscription');
+      window.history.replaceState({}, '', url.toString());
+      
+      // Show success notification
+      (async () => {
+        const toast = (await import('sonner')).toast;
+        toast.success('Payment successful! Your subscription is being activated...', {
+          duration: 5000,
+        });
+      })();
+      
+      // Force refresh subscription data with retry logic
+      refreshSubscriptionData();
+    }
+  }, [user, searchParams]);
+
+  const refreshSubscriptionData = async (retryCount = 0, useAPI = false) => {
     try {
-      setLoading(true);
+      setRefreshing(true);
       const supabase = createClient();
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) return;
 
-      // Fetch enrollments
-      const enrollmentsResponse = await fetch('/api/enrollments', {
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-        },
-      });
+      if (useAPI) {
+        // Use the API endpoint to fetch from Stripe directly
+        console.log('Refreshing subscription via API...');
+        const response = await fetch('/api/subscription/refresh', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json',
+          },
+        });
 
-      if (enrollmentsResponse.ok) {
-        const enrollmentsData = await enrollmentsResponse.json();
-        setEnrollments(enrollmentsData.enrollments || []);
+        if (response.ok) {
+          const data = await response.json();
+          setSubscriptionData(data.subscription);
+          setContentUsage({
+            settings: {
+              plan_type: data.usage.planType,
+              max_presentations: data.usage.maxPresentations,
+              max_conversations: data.usage.maxConversations
+            },
+            currentPresentations: data.usage.currentPresentations,
+            currentConversations: data.usage.currentConversations
+          });
+          console.log('Subscription refreshed via API:', data);
+          return;
+        } else {
+          console.log('API refresh failed, falling back to database query...');
+        }
+      }
+
+      // Try multiple queries to handle different subscription states
+      let subscription = null;
+      
+      // First try: active subscriptions
+      const { data: activeSubscription } = await supabase
+        .from('subscriptions')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .eq('status', 'active')
+        .single();
+
+      if (activeSubscription) {
+        subscription = activeSubscription;
+      } else {
+        // Second try: any subscription that's not cancelled
+        const { data: anySubscription } = await supabase
+          .from('subscriptions')
+          .select('*')
+          .eq('user_id', session.user.id)
+          .neq('status', 'cancelled')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+
+        subscription = anySubscription;
+      }
+
+      if (subscription) {
+        setSubscriptionData(subscription);
         
-        // Calculate stats
-        const totalCourses = enrollmentsData.enrollments?.length || 0;
-        const completedCourses = enrollmentsData.enrollments?.filter(
-          (e: Enrollment) => e.status === 'COMPLETED'
-        ).length || 0;
-        const totalHours = enrollmentsData.enrollments?.reduce(
-          (sum: number, e: Enrollment) => sum + (e.course.duration || 0), 0
-        ) || 0;
+        // Also refresh content usage settings
+        const { data: settings } = await supabase
+          .from('user_content_settings')
+          .select('*')
+          .eq('user_id', session.user.id)
+          .single();
 
+        const { count: presentationsCount } = await supabase
+          .from('user_presentations')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', session.user.id);
+
+        const { count: conversationsCount } = await supabase
+          .from('user_conversations')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', session.user.id)
+          .eq('is_archived', false);
+
+        setContentUsage({
+          settings,
+          currentPresentations: presentationsCount || 0,
+          currentConversations: conversationsCount || 0
+        });
+
+        console.log('Subscription data refreshed:', subscription);
+      } else if (retryCount < 3) {
+        // Retry in case webhook is still processing
+        console.log(`No subscription found, retrying in 2 seconds... (attempt ${retryCount + 1}/3)`);
+        setTimeout(() => refreshSubscriptionData(retryCount + 1, retryCount === 2), 2000);
+        return;
+      } else {
+        // Final retry with API call
+        console.log('Final retry using API call...');
+        setTimeout(() => refreshSubscriptionData(0, true), 1000);
+      }
+      
+    } catch (error) {
+      console.error('Error refreshing subscription data:', error);
+      if (retryCount < 3) {
+        setTimeout(() => refreshSubscriptionData(retryCount + 1, retryCount === 2), 2000);
+      }
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  const fetchDashboardData = async () => {
+    try {
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        router.push('/login');
+        return;
+      }
+
+      // Fetch user profile
+      const { data: profile } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', session.user.id)
+        .single();
+
+      setUser(session.user);
+      setUserProfile(profile);
+
+      // Fetch enrollments with course details
+      const { data: enrollmentsData } = await supabase
+        .from('course_enrollments')
+        .select(`
+          *,
+          course:courses (
+            id, title, description, image, category, level, duration, price
+          )
+        `)
+        .eq('user_id', session.user.id)
+        .order('enrolled_at', { ascending: false });
+
+      if (enrollmentsData) {
+        setEnrollments(enrollmentsData);
         setStats(prev => ({
           ...prev,
-          totalCourses,
-          completedCourses,
-          totalHours
+          totalCourses: enrollmentsData.length,
+          completedCourses: enrollmentsData.filter(e => e.status === 'COMPLETED').length
         }));
       }
 
       // Fetch quiz attempts
-      const quizResponse = await fetch('/api/quiz-attempts', {
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-        },
-      });
+      const { data: quizData } = await supabase
+        .from('quiz_attempts')
+        .select(`
+          *,
+          course:courses (title)
+        `)
+        .eq('user_id', session.user.id)
+        .order('completed_at', { ascending: false });
 
-      if (quizResponse.ok) {
-        const quizData = await quizResponse.json();
-        setQuizAttempts(quizData.attempts || []);
-        
-        // Calculate average score
-        const attempts = quizData.attempts || [];
-        const averageScore = attempts.length > 0 
-          ? attempts.reduce((sum: number, a: QuizAttempt) => sum + a.percentage, 0) / attempts.length
-          : 0;
-        
-        setStats(prev => ({
-          ...prev,
-          averageScore: Math.round(averageScore)
-        }));
+      if (quizData) {
+        setQuizAttempts(quizData);
       }
 
-      // Fetch meetings data
+      // Fetch meetings and active bots
       try {
         const meetingsResponse = await fetch('/api/meeting-transcripts?limit=5', {
           headers: {
@@ -211,14 +348,34 @@ export default function StudentDashboard() {
         console.error('Error fetching meetings data:', error);
       }
 
-      // Fetch subscription data
+      // Fetch subscription data with improved logic
       try {
-        const { data: subscription } = await supabase
+        // Try multiple queries to handle different subscription states
+        let subscription = null;
+        
+        // First try: active subscriptions
+        const { data: activeSubscription } = await supabase
           .from('subscriptions')
           .select('*')
           .eq('user_id', session.user.id)
           .eq('status', 'active')
           .single();
+
+        if (activeSubscription) {
+          subscription = activeSubscription;
+        } else {
+          // Second try: any subscription that's not cancelled (including trialing, past_due, etc.)
+          const { data: anySubscription } = await supabase
+            .from('subscriptions')
+            .select('*')
+            .eq('user_id', session.user.id)
+            .neq('status', 'cancelled')
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single();
+
+          subscription = anySubscription;
+        }
 
         const { data: settings } = await supabase
           .from('user_content_settings')
@@ -243,6 +400,9 @@ export default function StudentDashboard() {
           currentPresentations: presentationsCount || 0,
           currentConversations: conversationsCount || 0
         });
+
+        console.log('Subscription data:', subscription);
+        console.log('Content usage:', { settings, presentationsCount, conversationsCount });
       } catch (error) {
         console.error('Error fetching subscription data:', error);
       }
@@ -1101,86 +1261,143 @@ export default function StudentDashboard() {
               </TabsContent>
 
               <TabsContent value="subscription" className="space-y-4 md:space-y-6">
-                <h2 className="text-xl md:text-2xl font-bold text-gray-900">Subscription Management</h2>
-                
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+                  <h2 className="text-xl md:text-2xl font-bold text-gray-900">Subscription Management</h2>
+                  <div className="flex items-center gap-2">
+                    {refreshing && (
+                      <div className="flex items-center gap-2 text-sm text-blue-600">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                        Updating subscription...
+                      </div>
+                    )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => refreshSubscriptionData(0, true)}
+                      disabled={refreshing}
+                      className="flex items-center gap-2"
+                    >
+                      <BarChart3 className="h-4 w-4" />
+                      Refresh Status
+                    </Button>
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Current Plan Card */}
+                  {/* Current Plan */}
                   <Card className="bg-white border border-gray-200 shadow-sm">
                     <CardHeader>
-                      <CardTitle className="text-lg text-gray-900 flex items-center gap-2">
-                        <Award className="h-5 w-5 text-teal-600" />
+                      <CardTitle className="flex items-center gap-2 text-gray-900">
+                        <CreditCard className="h-5 w-5 text-teal-600" />
                         Current Plan
                       </CardTitle>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="space-y-4">
                       {subscriptionData ? (
                         <div className="space-y-4">
                           <div className="flex items-center justify-between">
-                            <span className="text-lg font-semibold text-gray-900 capitalize">
-                              {subscriptionData.plan_id} Plan
-                            </span>
-                            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                              Active
+                            <div>
+                              <h3 className="text-lg font-semibold text-gray-900 capitalize">
+                                {subscriptionData.plan_id === 'starter' && 'Starter Plan'}
+                                {subscriptionData.plan_id === 'professional' && 'Professional Plan'}
+                                {subscriptionData.plan_id === 'enterprise' && 'Enterprise Plan'}
+                              </h3>
+                              <p className="text-sm text-gray-600 capitalize">
+                                Status: {subscriptionData.status}
+                              </p>
+                            </div>
+                            <Badge className="bg-teal-100 text-teal-800">
+                              {subscriptionData.status === 'active' ? 'Active' : subscriptionData.status}
                             </Badge>
                           </div>
-                          <div className="text-sm text-gray-600">
-                            <p>Started: {new Date(subscriptionData.created_at).toLocaleDateString()}</p>
-                            <p>Next billing: {new Date(subscriptionData.current_period_end).toLocaleDateString()}</p>
+                          
+                          {subscriptionData.current_period_end && (
+                            <div className="text-sm text-gray-600">
+                              <p>Current period ends: {new Date(subscriptionData.current_period_end).toLocaleDateString()}</p>
+                            </div>
+                          )}
+
+                          <div className="space-y-2">
+                            <h4 className="font-medium text-gray-900">Plan Features:</h4>
+                            <ul className="text-sm text-gray-600 space-y-1">
+                              {subscriptionData.plan_id === 'starter' && (
+                                <>
+                                  <li>• 20 Presentations</li>
+                                  <li>• 50 AI Conversations</li>
+                                  <li>• Basic presentation templates</li>
+                                  <li>• Email support</li>
+                                </>
+                              )}
+                              {subscriptionData.plan_id === 'professional' && (
+                                <>
+                                  <li>• 50 Presentations</li>
+                                  <li>• 200 AI Conversations</li>
+                                  <li>• Advanced presentation tools</li>
+                                  <li>• Priority support</li>
+                                  <li>• 1-on-1 coaching sessions</li>
+                                </>
+                              )}
+                              {subscriptionData.plan_id === 'enterprise' && (
+                                <>
+                                  <li>• 100 Presentations</li>
+                                  <li>• 500 AI Conversations</li>
+                                  <li>• White-label branding</li>
+                                  <li>• Dedicated account manager</li>
+                                  <li>• API access</li>
+                                </>
+                              )}
+                            </ul>
                           </div>
-                          <div className="pt-4 border-t">
+
+                          {subscriptionData.status === 'active' && (
                             <Button 
                               variant="outline" 
-                              className="w-full mb-2"
-                              onClick={() => window.open('/contact#plans-pricing', '_blank')}
-                            >
-                              Change Plan
-                            </Button>
-                            <Button 
-                              variant="ghost" 
-                              className="w-full text-red-600 hover:text-red-700"
+                              size="sm" 
+                              className="w-full"
                               onClick={() => {
-                                if (confirm('Are you sure you want to cancel your subscription?')) {
-                                  // Handle cancellation
-                                  const toast = (async () => {
-                                    const { toast } = await import('sonner');
-                                    return toast;
-                                  })();
-                                  toast.then(t => t.info('Please contact support to cancel your subscription.'));
-                                }
+                                // Handle subscription management (cancel, change plan, etc.)
+                                alert('Subscription management coming soon!');
                               }}
                             >
-                              Cancel Subscription
+                              Manage Subscription
                             </Button>
-                          </div>
+                          )}
                         </div>
                       ) : (
                         <div className="space-y-4">
-                          <div className="text-center py-6">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">Free Plan</h3>
-                            <p className="text-gray-600">You're currently on the free plan</p>
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h3 className="text-lg font-semibold text-gray-900">Free Plan</h3>
+                              <p className="text-sm text-gray-600">Limited features</p>
+                            </div>
+                            <Badge variant="secondary">Free</Badge>
                           </div>
+                          
+                          <div className="space-y-2">
+                            <h4 className="font-medium text-gray-900">Plan Features:</h4>
+                            <ul className="text-sm text-gray-600 space-y-1">
+                              <li>• 5 Presentations</li>
+                              <li>• 10 AI Conversations</li>
+                              <li>• Basic templates</li>
+                              <li>• Community support</li>
+                            </ul>
+                          </div>
+
                           <div className="space-y-2">
                             <Button 
-                              className="w-full bg-blue-600 hover:bg-blue-700"
+                              size="sm" 
+                              className="w-full bg-teal-600 hover:bg-teal-700"
                               onClick={() => handleSubscriptionUpgrade('starter')}
-                              disabled={loading}
                             >
-                              {loading ? 'Processing...' : 'Upgrade to Starter ($29/month)'}
+                              Upgrade to Starter - $29/mo
                             </Button>
                             <Button 
-                              className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700"
-                              onClick={() => handleSubscriptionUpgrade('professional')}
-                              disabled={loading}
-                            >
-                              {loading ? 'Processing...' : 'Upgrade to Professional ($79/month)'}
-                            </Button>
-                            <Button 
+                              size="sm" 
                               variant="outline"
                               className="w-full"
-                              onClick={() => handleSubscriptionUpgrade('enterprise')}
-                              disabled={loading}
+                              onClick={() => handleSubscriptionUpgrade('professional')}
                             >
-                              {loading ? 'Processing...' : 'Upgrade to Enterprise ($199/month)'}
+                              Upgrade to Professional - $79/mo
                             </Button>
                           </div>
                         </div>
@@ -1188,28 +1405,28 @@ export default function StudentDashboard() {
                     </CardContent>
                   </Card>
 
-                  {/* Usage Statistics Card */}
+                  {/* Usage Statistics */}
                   <Card className="bg-white border border-gray-200 shadow-sm">
                     <CardHeader>
-                      <CardTitle className="text-lg text-gray-900 flex items-center gap-2">
+                      <CardTitle className="flex items-center gap-2 text-gray-900">
                         <BarChart3 className="h-5 w-5 text-blue-600" />
                         Usage Statistics
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
                       {contentUsage?.settings ? (
-                        <div className="space-y-6">
+                        <div className="space-y-4">
                           {/* Presentations Usage */}
                           <div>
-                            <div className="flex justify-between items-center mb-2">
+                            <div className="flex items-center justify-between mb-2">
                               <span className="text-sm font-medium text-gray-700">Presentations</span>
                               <span className="text-sm text-gray-500">
                                 {contentUsage.currentPresentations} / {contentUsage.settings.max_presentations}
                               </span>
                             </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2.5">
+                            <div className="w-full bg-gray-200 rounded-full h-2">
                               <div 
-                                className="bg-gradient-to-r from-blue-600 to-teal-600 h-2.5 rounded-full transition-all duration-300"
+                                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
                                 style={{ 
                                   width: `${Math.min((contentUsage.currentPresentations / contentUsage.settings.max_presentations) * 100, 100)}%` 
                                 }}
@@ -1219,15 +1436,15 @@ export default function StudentDashboard() {
 
                           {/* Conversations Usage */}
                           <div>
-                            <div className="flex justify-between items-center mb-2">
+                            <div className="flex items-center justify-between mb-2">
                               <span className="text-sm font-medium text-gray-700">AI Conversations</span>
                               <span className="text-sm text-gray-500">
                                 {contentUsage.currentConversations} / {contentUsage.settings.max_conversations}
                               </span>
                             </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2.5">
+                            <div className="w-full bg-gray-200 rounded-full h-2">
                               <div 
-                                className="bg-gradient-to-r from-emerald-600 to-cyan-600 h-2.5 rounded-full transition-all duration-300"
+                                className="bg-teal-600 h-2 rounded-full transition-all duration-300"
                                 style={{ 
                                   width: `${Math.min((contentUsage.currentConversations / contentUsage.settings.max_conversations) * 100, 100)}%` 
                                 }}
@@ -1235,74 +1452,100 @@ export default function StudentDashboard() {
                             </div>
                           </div>
 
-                          {/* Purchase Additional Credits */}
-                          {(contentUsage.currentPresentations >= contentUsage.settings.max_presentations * 0.8 || 
-                            contentUsage.currentConversations >= contentUsage.settings.max_conversations * 0.8) && (
-                            <div className="pt-4 border-t">
-                              <p className="text-sm text-amber-600 mb-3">
-                                You're approaching your limits. Consider upgrading or purchasing additional credits.
-                              </p>
-                              <div className="flex gap-2">
-                                <Button size="sm" variant="outline" className="flex-1">
-                                  Buy Credits
-                                </Button>
-                                <Button size="sm" asChild className="flex-1">
-                                  <Link href="/contact">Upgrade Plan</Link>
-                                </Button>
-                              </div>
+                          <div className="pt-2 border-t">
+                            <div className="text-sm text-gray-600">
+                              <p>Plan: <span className="font-medium capitalize">{contentUsage.settings.plan_type}</span></p>
                             </div>
-                          )}
+                          </div>
                         </div>
                       ) : (
-                        <div className="text-center py-6">
-                          <p className="text-gray-600">Loading usage statistics...</p>
+                        <div className="text-center py-4">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                          <p className="text-sm text-gray-600">Loading usage statistics...</p>
                         </div>
                       )}
                     </CardContent>
                   </Card>
                 </div>
 
-                {/* Billing History */}
-                <Card className="bg-white border border-gray-200 shadow-sm">
-                  <CardHeader>
-                    <CardTitle className="text-lg text-gray-900 flex items-center gap-2">
-                      <CreditCard className="h-5 w-5 text-purple-600" />
-                      Billing History
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {subscriptionData ? (
-                      <div className="space-y-3">
-                        <div className="flex justify-between items-center py-3 border-b border-gray-100">
-                          <div>
-                            <p className="font-medium text-gray-900">{subscriptionData.plan_id} Plan</p>
-                            <p className="text-sm text-gray-500">
-                              {new Date(subscriptionData.created_at).toLocaleDateString()}
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-medium text-gray-900">
-                              ${subscriptionData.plan_id === 'starter' ? '29' : 
-                                subscriptionData.plan_id === 'professional' ? '79' : '199'}/month
-                            </p>
-                            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                              Paid
-                            </Badge>
-                          </div>
-                        </div>
-                        <div className="pt-3">
-                          <Button variant="ghost" className="text-sm">
-                            Download Invoice
+                {/* Subscription Plans (for free users) */}
+                {!subscriptionData && (
+                  <div className="mt-8">
+                    <h3 className="text-xl font-bold text-gray-900 mb-4">Upgrade Your Plan</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      {/* Starter Plan */}
+                      <Card className="border-2 border-gray-200 hover:border-teal-500 transition-colors">
+                        <CardHeader>
+                          <CardTitle className="text-lg">Starter Plan</CardTitle>
+                          <div className="text-2xl font-bold">$29<span className="text-sm font-normal">/month</span></div>
+                        </CardHeader>
+                        <CardContent>
+                          <ul className="space-y-2 text-sm text-gray-600 mb-4">
+                            <li>• 20 Presentations</li>
+                            <li>• 50 AI Conversations</li>
+                            <li>• Basic templates</li>
+                            <li>• Email support</li>
+                          </ul>
+                          <Button 
+                            className="w-full bg-teal-600 hover:bg-teal-700"
+                            onClick={() => handleSubscriptionUpgrade('starter')}
+                          >
+                            Get Started
                           </Button>
+                        </CardContent>
+                      </Card>
+
+                      {/* Professional Plan */}
+                      <Card className="border-2 border-teal-500 relative">
+                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                          <Badge className="bg-teal-600 text-white">Most Popular</Badge>
                         </div>
-                      </div>
-                    ) : (
-                      <div className="text-center py-6">
-                        <p className="text-gray-600">No billing history available</p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
+                        <CardHeader>
+                          <CardTitle className="text-lg">Professional Plan</CardTitle>
+                          <div className="text-2xl font-bold">$79<span className="text-sm font-normal">/month</span></div>
+                        </CardHeader>
+                        <CardContent>
+                          <ul className="space-y-2 text-sm text-gray-600 mb-4">
+                            <li>• 50 Presentations</li>
+                            <li>• 200 AI Conversations</li>
+                            <li>• Advanced tools</li>
+                            <li>• Priority support</li>
+                            <li>• 1-on-1 coaching</li>
+                          </ul>
+                          <Button 
+                            className="w-full bg-teal-600 hover:bg-teal-700"
+                            onClick={() => handleSubscriptionUpgrade('professional')}
+                          >
+                            Get Professional
+                          </Button>
+                        </CardContent>
+                      </Card>
+
+                      {/* Enterprise Plan */}
+                      <Card className="border-2 border-gray-200 hover:border-teal-500 transition-colors">
+                        <CardHeader>
+                          <CardTitle className="text-lg">Enterprise Plan</CardTitle>
+                          <div className="text-2xl font-bold">$199<span className="text-sm font-normal">/month</span></div>
+                        </CardHeader>
+                        <CardContent>
+                          <ul className="space-y-2 text-sm text-gray-600 mb-4">
+                            <li>• 100 Presentations</li>
+                            <li>• 500 AI Conversations</li>
+                            <li>• White-label branding</li>
+                            <li>• Dedicated manager</li>
+                            <li>• API access</li>
+                          </ul>
+                          <Button 
+                            className="w-full bg-teal-600 hover:bg-teal-700"
+                            onClick={() => handleSubscriptionUpgrade('enterprise')}
+                          >
+                            Get Enterprise
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </div>
+                )}
               </TabsContent>
 
               <TabsContent value="certificates" className="space-y-4 md:space-y-6">
