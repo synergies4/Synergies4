@@ -98,7 +98,8 @@ export class PWAUtils {
     if ('caches' in window) {
       try {
         const cache = await caches.open('api-cache-v1');
-        return await cache.match(url);
+        const response = await cache.match(url);
+        return response || null;
       } catch (error) {
         console.error('Failed to get cached response:', error);
       }
