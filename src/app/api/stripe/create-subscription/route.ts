@@ -94,6 +94,8 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
+    let authenticatedUser;
+    
     if (authError || !user) {
       console.error('Server-side auth failed, trying token auth...');
       const tokenUser = await getAuthenticatedUser(request);
@@ -105,10 +107,10 @@ export async function POST(request: NextRequest) {
         );
       }
       // Use token user data
-      var authenticatedUser = tokenUser;
+      authenticatedUser = tokenUser;
     } else {
       // Use server-side user data
-      var authenticatedUser = {
+      authenticatedUser = {
         id: user.id,
         email: user.email
       };
