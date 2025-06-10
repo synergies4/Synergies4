@@ -4566,7 +4566,7 @@ export default function SynergizeAgile() {
             .eq('user_id', session.user.id)
             .single();
 
-          const isSubscribed = subscription && subscription.status === 'active';
+          const isSubscribed = Boolean(subscription && subscription.status === 'active');
           let maxConversations = 10; // Free tier default
 
           if (isSubscribed) {
