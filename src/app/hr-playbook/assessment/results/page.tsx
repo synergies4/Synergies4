@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import PageLayout from '@/components/shared/PageLayout';
-import { generateAssessmentPDF } from '@/lib/pdfGenerator';
+// Dynamic import for client-side PDF generation
 import { 
   ArrowLeft,
   CheckCircle, 
@@ -182,20 +182,35 @@ function ResultsContent() {
     }
   };
 
-  const downloadPDFReport = () => {
-    if (!resultsData) return;
+  const downloadPDFReport = async () => {
+    if (!resultsData) {
+      console.error('No results data available for PDF generation');
+      return;
+    }
     
-    const recommendations = getRecommendations(resultsData.overallPercentage, resultsData.categoryScores);
-    
-    const pdfData = {
-      overallPercentage: resultsData.overallPercentage,
-      categoryScores: resultsData.categoryScores,
-      readinessLevel: resultsData.readinessLevel,
-      contactInfo: resultsData.contactInfo,
-      recommendations: recommendations
-    };
-    
-    generateAssessmentPDF(pdfData);
+    try {
+      console.log('Starting PDF generation...', resultsData);
+      
+      // Dynamic import to ensure client-side only
+      const { generateAssessmentPDF } = await import('@/lib/pdfGenerator');
+      
+      const recommendations = getRecommendations(resultsData.overallPercentage, resultsData.categoryScores);
+      
+      const pdfData = {
+        overallPercentage: resultsData.overallPercentage,
+        categoryScores: resultsData.categoryScores,
+        readinessLevel: resultsData.readinessLevel,
+        contactInfo: resultsData.contactInfo,
+        recommendations: recommendations
+      };
+      
+      console.log('PDF data prepared:', pdfData);
+      generateAssessmentPDF(pdfData);
+      console.log('PDF generation completed');
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Sorry, there was an error generating the PDF report. Please try again.');
+    }
   };
 
   if (!resultsData) {
