@@ -118,14 +118,28 @@ export default function CreateCourse() {
     prerequisites: '',
   });
 
-  const steps = [
-    { number: 1, title: 'Basic Info', description: 'Course fundamentals', icon: BookOpen },
-    { number: 2, title: 'Details', description: 'Pricing & specifics', icon: FileText },
-    { number: 3, title: 'Content', description: 'Description & media', icon: Sparkles },
-    { number: 4, title: 'Modules', description: 'Course modules & lessons', icon: BookOpen },
-    { number: 5, title: 'Quiz', description: 'Optional course quiz', icon: Target },
-    { number: 6, title: 'Review', description: 'Final review', icon: CheckCircle }
-  ];
+  const getStepsForCourseType = (courseType: string) => {
+    const baseSteps = [
+      { number: 1, title: 'Basic Info', description: 'Course fundamentals', icon: BookOpen },
+      { number: 2, title: 'Details', description: 'Pricing & specifics', icon: FileText },
+      { number: 3, title: 'Content', description: 'Description & media', icon: Sparkles },
+    ];
+
+    const digitalSteps = [
+      { number: 4, title: 'Modules', description: 'Course modules & lessons', icon: BookOpen },
+      { number: 5, title: 'Quiz', description: 'Optional course quiz', icon: Target },
+    ];
+
+    const reviewStep = { number: courseType === 'digital' || courseType === 'hybrid' ? 6 : 4, title: 'Review', description: 'Final review', icon: CheckCircle };
+
+    if (courseType === 'digital' || courseType === 'hybrid') {
+      return [...baseSteps, ...digitalSteps, reviewStep];
+    } else {
+      return [...baseSteps, reviewStep];
+    }
+  };
+
+  const steps = getStepsForCourseType(formData.course_type);
 
   const categories = [
     { value: 'agile', label: 'Agile & Scrum', color: 'bg-blue-100 text-blue-800' },
@@ -185,11 +199,20 @@ export default function CreateCourse() {
         [field]: ''
       }));
     }
+
+    // If course type changes, reset step if we're beyond the new max
+    if (field === 'course_type') {
+      const newSteps = getStepsForCourseType(value as string);
+      if (currentStep > newSteps.length) {
+        setCurrentStep(newSteps.length);
+      }
+    }
   };
 
   const nextStep = () => {
     if (validateStep(currentStep)) {
-      setCurrentStep(prev => Math.min(prev + 1, steps.length));
+      const currentSteps = getStepsForCourseType(formData.course_type);
+      setCurrentStep(prev => Math.min(prev + 1, currentSteps.length));
     }
   };
 
@@ -865,11 +888,11 @@ export default function CreateCourse() {
         );
       
       case 4:
-        return (
-          <div className="space-y-6">
-            {/* Only show modules for digital courses */}
-            {formData.course_type === 'digital' && (
-              <>
+        // This could be either Modules (for digital/hybrid) or Review (for in-person)
+        if (formData.course_type === 'digital' || formData.course_type === 'hybrid') {
+          return (
+            <div className="space-y-6">
+              {/* Show modules for digital/hybrid courses */}
                 <div className="flex justify-between items-center">
                   <div>
                     <h3 className="text-xl font-bold text-gray-900 flex items-center">
@@ -940,8 +963,6 @@ export default function CreateCourse() {
                                            {content.type.charAt(0).toUpperCase() + content.type.slice(1)}
                                          </p>
                                        </div>
-                                     </div>
-                                   </div>
                                  ))}
                                </div>
                              ) : (
@@ -953,23 +974,100 @@ export default function CreateCourse() {
                     ))}
                   </div>
                 )}
-              </>
-            )}
 
-            {/* For in-person courses, show a note */}
-            {formData.course_type === 'in_person' && (
-              <Card className="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200">
-                <CardContent className="text-center py-12">
-                  <Users className="h-12 w-12 text-amber-600 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-amber-900 mb-2">In-Person Course</h3>
-                  <p className="text-amber-700">
-                    In-person courses don't require digital modules. The course content will be delivered during the live sessions.
-                  </p>
-                </CardContent>
               </Card>
             )}
           </div>
         );
+      } else {
+        // For in-person courses, step 4 is Review
+        const selectedCategory = categories.find(cat => cat.value === formData.category);
+        return (
+          <div className="space-y-6">
+            <div className="bg-gradient-to-r from-teal-50 to-emerald-50 p-6 rounded-xl border-2 border-teal-200">
+              <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                <CheckCircle className="w-5 h-5 mr-2 text-teal-600" />
+                Course Review
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-sm font-semibold text-gray-600">Title</p>
+                    <p className="text-lg font-bold text-gray-900">{formData.title || 'Untitled Course'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-600">Category</p>
+                    {selectedCategory && (
+                      <Badge className={`${selectedCategory.color} text-sm`}>
+                        {selectedCategory.label}
+                      </Badge>
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-600">Level</p>
+                    <p className="text-gray-900 font-medium">{formData.level}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-600">Type</p>
+                    <p className="text-gray-900 font-medium capitalize">{formData.course_type.replace('_', ' ')}</p>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-sm font-semibold text-gray-600">Price</p>
+                    <p className="text-2xl font-bold text-emerald-600">${formData.price || '0.00'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-600">Duration</p>
+                    <p className="text-gray-900 font-medium">{formData.duration || 'Not specified'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-600">Featured</p>
+                    <p className="text-gray-900 font-medium">{formData.featured ? 'Yes' : 'No'}</p>
+                  </div>
+                </div>
+              </div>
+              
+              {formData.description && (
+                <div className="mt-6">
+                  <p className="text-sm font-semibold text-gray-600 mb-2">Description Preview</p>
+                  <div className="bg-white p-4 rounded-lg border max-h-32 overflow-y-auto">
+                    <p className="text-gray-900 text-sm">{formData.description}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Show modules and quiz summary for digital/hybrid courses */}
+              {(formData.course_type === 'digital' || formData.course_type === 'hybrid') && (
+                <div className="mt-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm font-semibold text-gray-600 mb-2">Modules</p>
+                      <div className="bg-white p-3 rounded-lg border">
+                        <p className="text-gray-900 text-sm">{modules.length} modules created</p>
+                        <p className="text-xs text-gray-500">
+                          {modules.reduce((total, module) => total + module.contents.length, 0)} total lessons
+                        </p>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-600 mb-2">Quiz</p>
+                      <div className="bg-white p-3 rounded-lg border">
+                        <p className="text-gray-900 text-sm">
+                          {quizQuestions.length > 0 ? `${quizQuestions.length} questions` : 'No quiz'}
+                        </p>
+                        {quizTitle && (
+                          <p className="text-xs text-gray-500">{quizTitle}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
       
       case 5:
         return (
@@ -1087,6 +1185,7 @@ export default function CreateCourse() {
         );
       
       case 6:
+        // For digital/hybrid courses, step 6 is Review
         const selectedCategory = categories.find(cat => cat.value === formData.category);
         return (
           <div className="space-y-6">
@@ -1142,6 +1241,34 @@ export default function CreateCourse() {
                   </div>
                 </div>
               )}
+
+              {/* Show modules and quiz summary for digital/hybrid courses */}
+              {(formData.course_type === 'digital' || formData.course_type === 'hybrid') && (
+                <div className="mt-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm font-semibold text-gray-600 mb-2">Modules</p>
+                      <div className="bg-white p-3 rounded-lg border">
+                        <p className="text-gray-900 text-sm">{modules.length} modules created</p>
+                        <p className="text-xs text-gray-500">
+                          {modules.reduce((total, module) => total + module.contents.length, 0)} total lessons
+                        </p>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-600 mb-2">Quiz</p>
+                      <div className="bg-white p-3 rounded-lg border">
+                        <p className="text-gray-900 text-sm">
+                          {quizQuestions.length > 0 ? `${quizQuestions.length} questions` : 'No quiz'}
+                        </p>
+                        {quizTitle && (
+                          <p className="text-xs text-gray-500">{quizTitle}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         );
@@ -1183,11 +1310,11 @@ export default function CreateCourse() {
 
         {/* Progress Steps */}
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-          <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border-0 p-6">
-            <div className="flex items-center justify-between">
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border-0 p-4 sm:p-6">
+            <div className="flex items-center justify-between overflow-x-auto">
               {steps.map((step, index) => (
-                <div key={step.number} className="flex items-center">
-                  <div className={`flex items-center justify-center w-12 h-12 rounded-full font-bold text-sm transition-all duration-300 ${
+                <div key={step.number} className="flex items-center flex-shrink-0">
+                  <div className={`flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full font-bold text-xs sm:text-sm transition-all duration-300 ${
                     currentStep === step.number 
                       ? 'bg-gradient-to-r from-teal-600 to-emerald-600 text-white shadow-lg' 
                       : currentStep > step.number 
@@ -1195,26 +1322,35 @@ export default function CreateCourse() {
                       : 'bg-gray-200 text-gray-500'
                   }`}>
                     {currentStep > step.number ? (
-                      <CheckCircle className="w-6 h-6" />
+                      <CheckCircle className="w-4 h-4 sm:w-6 sm:h-6" />
                     ) : (
-                      <step.icon className="w-6 h-6" />
+                      <step.icon className="w-4 h-4 sm:w-6 sm:h-6" />
                     )}
                   </div>
-                  <div className="ml-3 hidden sm:block">
-                    <p className={`text-sm font-semibold ${currentStep >= step.number ? 'text-gray-900' : 'text-gray-500'}`}>
+                  <div className="ml-2 sm:ml-3 hidden md:block min-w-0">
+                    <p className={`text-xs sm:text-sm font-semibold truncate ${currentStep >= step.number ? 'text-gray-900' : 'text-gray-500'}`}>
                       {step.title}
                     </p>
-                    <p className={`text-xs ${currentStep >= step.number ? 'text-gray-600' : 'text-gray-400'}`}>
+                    <p className={`text-xs truncate ${currentStep >= step.number ? 'text-gray-600' : 'text-gray-400'}`}>
                       {step.description}
                     </p>
                   </div>
                   {index < steps.length - 1 && (
-                    <div className={`w-16 h-1 mx-4 rounded-full transition-all duration-300 ${
+                    <div className={`w-8 sm:w-16 h-1 mx-2 sm:mx-4 rounded-full transition-all duration-300 flex-shrink-0 ${
                       currentStep > step.number ? 'bg-green-500' : 'bg-gray-200'
                     }`} />
                   )}
                 </div>
               ))}
+            </div>
+            {/* Mobile step indicator */}
+            <div className="block md:hidden mt-3 text-center">
+              <p className="text-sm font-semibold text-gray-900">
+                {steps[currentStep - 1]?.title}
+              </p>
+              <p className="text-xs text-gray-600">
+                Step {currentStep} of {steps.length}
+              </p>
             </div>
           </div>
         </div>
