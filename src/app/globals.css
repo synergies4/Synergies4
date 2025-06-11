@@ -171,13 +171,153 @@ a:focus {
 /* Enhanced Typography Accessibility */
 h1, h2, h3, h4, h5, h6 {
   line-height: 1.3;
-  color: #1f2937; /* Ensure high contrast */
+  color: #1f2937 !important; /* Ensure high contrast */
   font-weight: 600;
 }
 
 p, li, span {
-  color: #374151; /* Improved contrast */
+  color: #374151 !important; /* Improved contrast */
   line-height: 1.6;
+}
+
+/* ENHANCED TEXT CONTRAST - Force better visibility */
+.text-gray-600 {
+  color: #374151 !important; /* Much darker for better contrast */
+}
+
+.text-gray-500 {
+  color: #4b5563 !important; /* Darker gray for better readability */
+}
+
+.text-gray-400 {
+  color: #6b7280 !important; /* Darker for accessibility */
+}
+
+.text-gray-300 {
+  color: #9ca3af !important; /* Only use for decorative elements */
+}
+
+/* Enhanced Input and Form Controls Contrast */
+input::placeholder,
+textarea::placeholder {
+  color: #6b7280 !important; /* Much darker placeholder text */
+  opacity: 1 !important;
+}
+
+/* Form Labels - Ensure they're always dark enough */
+label {
+  color: #1f2937 !important;
+  font-weight: 500 !important;
+}
+
+/* Enhanced Modal and Card Text */
+.modal-text,
+.card-text,
+.modal-content *,
+.card-content * {
+  color: #1f2937 !important;
+}
+
+/* Force dark text for descriptions and helper text */
+.text-muted,
+.text-muted-foreground,
+[class*="text-muted"] {
+  color: #4b5563 !important;
+}
+
+/* Enhanced Button Text Contrast */
+button,
+[role="button"] {
+  font-weight: 500;
+}
+
+/* Light background text should be dark */
+.bg-white *,
+.bg-gray-50 *,
+.bg-slate-50 * {
+  color: #1f2937;
+}
+
+/* Dark background text should be light */
+.bg-gray-900 *,
+.bg-slate-900 *,
+.bg-black * {
+  color: #f9fafb;
+}
+
+/* Enhanced Focus States for Better Accessibility */
+input:focus,
+textarea:focus,
+select:focus,
+button:focus {
+  outline: 3px solid #14b8a6 !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.2) !important;
+}
+
+/* Enhanced Select and Dropdown Text */
+select option {
+  color: #1f2937 !important;
+  background: white !important;
+}
+
+/* Enhanced Table Text */
+table,
+th,
+td {
+  color: #1f2937 !important;
+}
+
+/* Enhanced Alert and Notification Text */
+.alert,
+.notification,
+[role="alert"] {
+  color: #1f2937 !important;
+}
+
+/* Force Dark Text on Light Gradients */
+.bg-gradient-to-r.from-teal-50,
+.bg-gradient-to-r.from-emerald-50,
+.bg-gradient-to-r.from-blue-50,
+.bg-gradient-to-r.from-gray-50 {
+  color: #1f2937 !important;
+}
+
+/* Override any transparent or low-contrast text */
+*[class*="text-gray-"]:not([class*="text-gray-900"]):not([class*="text-gray-800"]):not([class*="text-gray-700"]) {
+  color: #4b5563 !important;
+}
+
+/* Ensure list items are readable */
+li, ul li, ol li {
+  color: #374151 !important;
+}
+
+/* Enhanced Badge and Tag Text */
+.badge,
+[class*="badge"] {
+  font-weight: 600 !important;
+}
+
+/* Enhanced Card Headers and Titles */
+.card-header,
+.card-title,
+[class*="card-header"],
+[class*="card-title"] {
+  color: #1f2937 !important;
+  font-weight: 600 !important;
+}
+
+/* Enhanced Navigation Text */
+nav a,
+.nav-link {
+  color: #374151 !important;
+  font-weight: 500 !important;
+}
+
+nav a:hover,
+.nav-link:hover {
+  color: #0d9488 !important;
 }
 
 /* Improved Color Contrast */

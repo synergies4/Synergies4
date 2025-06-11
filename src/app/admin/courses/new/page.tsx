@@ -899,7 +899,7 @@ export default function CreateCourse() {
                     <BookOpen className="w-5 h-5 mr-2 text-teal-600" />
                     Course Modules
                   </h3>
-                  <p className="text-gray-600">Add modules and lessons to your course curriculum</p>
+                  <p className="text-gray-700 font-medium">Add modules and lessons to your course curriculum</p>
                 </div>
                 <Button onClick={() => addModule()} className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700">
                   <Plus className="w-4 h-4 mr-2" />
@@ -912,7 +912,7 @@ export default function CreateCourse() {
                   <CardContent className="text-center py-12">
                     <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                     <h3 className="text-lg font-medium text-gray-900 mb-2">No modules yet</h3>
-                    <p className="text-gray-600 mb-4">Start building your course by adding your first module.</p>
+                    <p className="text-gray-700 font-medium mb-4">Start building your course by adding your first module.</p>
                     <Button onClick={() => addModule()} variant="outline">
                       <Plus className="w-4 h-4 mr-2" />
                       Add First Module
@@ -1077,7 +1077,7 @@ export default function CreateCourse() {
                   <Target className="w-5 h-5 mr-2 text-purple-600" />
                   Course Quiz (Optional)
                 </h3>
-                <p className="text-gray-600">Add a quiz to test student knowledge</p>
+                <p className="text-gray-700 font-medium">Add a quiz to test student knowledge</p>
               </div>
               <Button onClick={() => addQuizQuestion()} variant="outline" className="border-purple-300 text-purple-700 hover:bg-purple-50">
                 <Plus className="w-4 h-4 mr-2" />
@@ -1121,7 +1121,7 @@ export default function CreateCourse() {
                 <CardContent className="text-center py-12">
                   <Target className="h-12 w-12 text-purple-400 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 mb-2">No quiz questions yet</h3>
-                  <p className="text-gray-600 mb-4">Add questions to create a quiz for this course.</p>
+                  <p className="text-gray-700 font-medium mb-4">Add questions to create a quiz for this course.</p>
                   <Button onClick={() => addQuizQuestion()} variant="outline" className="border-purple-300 text-purple-700 hover:bg-purple-50">
                     <Plus className="w-4 h-4 mr-2" />
                     Add First Question
@@ -1173,7 +1173,7 @@ export default function CreateCourse() {
                             />
                           </div>
                         ))}
-                        <p className="text-xs text-gray-500">Select the radio button next to the correct answer</p>
+                        <p className="text-sm text-gray-700 font-medium">Select the radio button next to the correct answer</p>
                       </div>
                     </CardContent>
                   </Card>
@@ -1292,7 +1292,7 @@ export default function CreateCourse() {
                   <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-teal-700 bg-clip-text text-transparent">
                     Create New Course
                   </h1>
-                  <p className="text-gray-600 font-medium">Build engaging learning experiences for your students</p>
+                  <p className="text-gray-800 font-semibold">Build engaging learning experiences for your students</p>
                 </div>
               </div>
               <div className="flex gap-3">
@@ -1327,10 +1327,10 @@ export default function CreateCourse() {
                     )}
                   </div>
                   <div className="ml-2 sm:ml-3 hidden md:block min-w-0">
-                    <p className={`text-xs sm:text-sm font-semibold truncate ${currentStep >= step.number ? 'text-gray-900' : 'text-gray-500'}`}>
+                    <p className={`text-xs sm:text-sm font-semibold truncate ${currentStep >= step.number ? 'text-gray-900' : 'text-gray-700'}`}>
                       {step.title}
                     </p>
-                    <p className={`text-xs truncate ${currentStep >= step.number ? 'text-gray-600' : 'text-gray-400'}`}>
+                    <p className={`text-xs truncate ${currentStep >= step.number ? 'text-gray-700' : 'text-gray-600'}`}>
                       {step.description}
                     </p>
                   </div>
@@ -1347,7 +1347,7 @@ export default function CreateCourse() {
               <p className="text-sm font-semibold text-gray-900">
                 {steps[currentStep - 1]?.title}
               </p>
-              <p className="text-xs text-gray-600">
+              <p className="text-xs text-gray-700 font-medium">
                 Step {currentStep} of {steps.length}
               </p>
             </div>
@@ -1361,7 +1361,7 @@ export default function CreateCourse() {
               <CardTitle className="text-2xl font-bold text-gray-900">
                 {steps[currentStep - 1]?.title}
               </CardTitle>
-              <CardDescription className="text-gray-600 text-lg">
+              <CardDescription className="text-gray-800 text-lg font-medium">
                 {steps[currentStep - 1]?.description}
               </CardDescription>
             </CardHeader>
