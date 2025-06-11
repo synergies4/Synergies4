@@ -300,8 +300,7 @@ button,
 /* Override dark background sections to use light text for better contrast */
 section[class*="bg-slate-8"] *:not([class*="text-"]):not([class*="bg-gradient"]):not([class*="bg-white"]),
 section[class*="bg-gray-8"] *:not([class*="text-"]):not([class*="bg-gradient"]):not([class*="bg-white"]),
-section[class*="bg-slate-9"] *:not([class*="text-"]):not([class*="bg-gradient"]):not([class*="bg-white"]),
-section[class*="bg-gray-9"] *:not([class*="text-"]):not([class*="bg-gradient"]):not([class*="bg-white"]) {
+section[class*="bg-slate-9"] *:not([class*="text-"]):not([class*="bg-gradient"]):not([class*="bg-white"]) {
   color: #f1f5f9 !important;
 }
 
@@ -1038,4 +1037,129 @@ p, span, div, label, input, textarea, select {
 /* Ensure all course titles are visible */
 h3.text-xl.font-bold {
   color: #111827 !important;
+}
+
+/* AGGRESSIVE fixes for specific invisible elements */
+
+/* Force "Why Choose Synergies4?" badge text to be visible */
+.inline-flex.items-center span.text-teal-700.text-sm.font-medium,
+.inline-flex.items-center span.text-teal-700.font-medium,
+span.text-teal-700.text-sm.font-medium,
+span.text-teal-700.font-medium {
+  color: #0f766e !important;
+  font-weight: 600 !important;
+}
+
+/* Force all teal-700 text to be visible */
+.text-teal-700 {
+  color: #0f766e !important;
+}
+
+/* Force badge containers to have proper contrast */
+.bg-white\/90.backdrop-blur-sm .text-teal-700,
+.bg-white\/90 .text-teal-700 {
+  color: #0f766e !important;
+  font-weight: 600 !important;
+}
+
+/* Fix any transparent gradient text headings */
+h2 span.bg-gradient-to-r.bg-clip-text.text-transparent,
+.text-4xl span.bg-gradient-to-r.bg-clip-text.text-transparent,
+.text-6xl span.bg-gradient-to-r.bg-clip-text.text-transparent {
+  color: #ffffff !important;
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+}
+
+/* Force section headings to be visible on dark backgrounds */
+.bg-gradient-to-br.from-slate-800 h2,
+.bg-gradient-to-br.from-slate-800 .text-4xl,
+.bg-gradient-to-br.from-slate-800 .text-6xl {
+  color: #ffffff !important;
+}
+
+.bg-gradient-to-br.from-slate-800 h2 span,
+.bg-gradient-to-br.from-slate-800 .text-4xl span,
+.bg-gradient-to-br.from-slate-800 .text-6xl span {
+  color: #ffffff !important;
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+}
+
+/* Force all badge text in white containers to be dark */
+.bg-white\/90 span,
+.bg-white span,
+div[class*="bg-white"] span {
+  color: #0f766e !important;
+}
+
+/* Fix course description text on dark backgrounds */
+.bg-gradient-to-br.from-slate-800 p,
+.bg-gradient-to-br.from-slate-800 .text-xl,
+.bg-gradient-to-br.from-slate-800 .text-2xl {
+  color: #f3f4f6 !important;
+}
+
+/* Ensure all text in dark sections is light */
+.py-24.bg-gradient-to-br.from-slate-800 * {
+  color: inherit;
+}
+
+/* Force specific problem elements */
+section.py-24.bg-gradient-to-br.from-slate-800 h2 {
+  color: #ffffff !important;
+}
+
+section.py-24.bg-gradient-to-br.from-slate-800 h2 span {
+  color: #ffffff !important;
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+}
+
+/* Override any remaining invisible text */
+[class*="text-transparent"] {
+  color: #111827 !important;
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+}
+
+/* Dark background sections get white text */
+[class*="bg-slate-8"] [class*="text-transparent"],
+[class*="bg-gray-8"] [class*="text-transparent"] {
+  color: #ffffff !important;
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+}
+
+/* Very aggressive badge fix */
+.inline-flex.items-center.px-4.py-2 span,
+.inline-flex.items-center.px-6.py-3 span {
+  color: #0f766e !important;
+  font-weight: 600 !important;
+  text-shadow: none !important;
+}
+
+/* Course card pricing fix - be more specific */
+.course-card .text-2xl.font-bold,
+div[class*="course-card"] .text-2xl.font-bold,
+.text-2xl.font-bold.bg-gradient-to-r.from-cyan-300.to-teal-400 {
+  color: #0f766e !important;
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+}
+
+/* Nuclear option for all problematic gradient text */
+* {
+  -webkit-text-fill-color: unset !important;
+}
+
+/* But restore proper text fill for specific elements */
+input, textarea, select {
+  -webkit-text-fill-color: initial !important;
 } 
