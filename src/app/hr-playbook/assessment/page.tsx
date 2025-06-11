@@ -355,6 +355,30 @@ export default function HRAssessment() {
     // Here you would typically send the data to your backend
     try {
       const results = calculateResults();
+      const readinessInfo = getReadinessLevel(results.overallPercentage);
+      
+      // Prepare results data for storage/sharing
+      const resultsData = {
+        overallPercentage: results.overallPercentage,
+        categoryScores: Object.fromEntries(
+          Object.entries(results.categoryScores).map(([category, scores]) => [
+            category,
+            {
+              score: scores.score,
+              maxScore: scores.maxScore,
+              percentage: Math.round((scores.score / scores.maxScore) * 100)
+            }
+          ])
+        ),
+        readinessLevel: readinessInfo.level,
+        contactInfo: {
+          name: assessment.contactInfo.name,
+          company: assessment.contactInfo.company
+        }
+      };
+      
+      // Store results in localStorage for the dedicated results page
+      localStorage.setItem('hrAssessmentResults', JSON.stringify(resultsData));
       
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -365,6 +389,9 @@ export default function HRAssessment() {
         results: results,
         timestamp: new Date().toISOString()
       });
+      
+      // Show the results after successful submission
+      setShowResults(true);
       
     } catch (error) {
       console.error('Error submitting assessment:', error);
@@ -571,7 +598,13 @@ export default function HRAssessment() {
                 </Card>
               </div>
 
-              <div className="mt-8 text-center">
+              <div className="mt-8 text-center space-x-4">
+                <Link href="/hr-playbook/assessment/results">
+                  <Button variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-50">
+                    <FileText className="w-4 h-4 mr-2" />
+                    View Shareable Results
+                  </Button>
+                </Link>
                 <Link href="/hr-playbook">
                   <Button variant="outline">
                     <ArrowLeft className="w-4 h-4 mr-2" />
