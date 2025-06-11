@@ -915,4 +915,127 @@ p, span, div, label, input, textarea, select {
 
 .text-gray-100 {
   color: #d1d5db !important;
+}
+
+/* Fix specific invisible text issues on homepage */
+
+/* Fix pricing text with invisible gradients */
+.bg-gradient-to-r.from-cyan-300.to-teal-400.bg-clip-text.text-transparent {
+  background: linear-gradient(to right, #0f766e, #047857) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+}
+
+/* Fix gradient text that's too light */
+.bg-gradient-to-r.from-teal-600.to-emerald-600.bg-clip-text.text-transparent {
+  color: #0f766e !important;
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+}
+
+/* Fix specific course card elements */
+.course-card .text-2xl.font-bold.bg-gradient-to-r {
+  color: #0f766e !important;
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+}
+
+/* Fix company names in partners section */
+.text-xl.font-semibold.text-gray-400 {
+  color: #4b5563 !important;
+}
+
+/* Fix strikethrough prices */
+.text-sm.text-gray-400.line-through {
+  color: #6b7280 !important;
+}
+
+/* Fix star ratings */
+.text-gray-400.h-4.w-4 {
+  color: #9ca3af !important;
+}
+
+/* Ensure all course card text is visible */
+.course-card h3,
+.course-card .text-xl.font-bold {
+  color: #111827 !important;
+}
+
+.course-card p {
+  color: #374151 !important;
+}
+
+.course-card .text-gray-700 {
+  color: #111827 !important;
+}
+
+/* Fix certification section text */
+.text-xl.text-gray-600 {
+  color: #1f2937 !important;
+}
+
+/* Fix any remaining gradient text issues */
+[class*="bg-gradient-to-r"][class*="bg-clip-text"][class*="text-transparent"] {
+  color: #0f766e !important;
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+}
+
+/* Course level badges - ensure they're visible */
+.bg-gradient-to-r.from-teal-400.to-cyan-600 {
+  background: linear-gradient(to right, #0f766e, #047857) !important;
+}
+
+/* Fix any transparent pricing text */
+[class*="text-2xl"][class*="font-bold"][class*="text-transparent"] {
+  color: #0f766e !important;
+  background: none !important;
+}
+
+/* Ensure all user count and rating text is visible */
+.flex.items-center.text-gray-600 {
+  color: #111827 !important;
+}
+
+.flex.items-center.text-gray-600 span {
+  color: #111827 !important;
+}
+
+/* Fix testimonial text */
+.text-gray-900.mb-4.font-medium {
+  color: #111827 !important;
+}
+
+/* Fix certification card descriptions */
+.text-gray-600.leading-relaxed {
+  color: #1f2937 !important;
+}
+
+/* Override any remaining light text */
+.text-gray-300,
+.text-gray-200,
+.text-gray-100 {
+  color: #4b5563 !important;
+}
+
+/* Special case for dark backgrounds with light text */
+.bg-teal-600 .text-gray-100,
+.bg-gradient-to-br .text-gray-100,
+[class*="bg-teal"] .text-gray-100 {
+  color: #f3f4f6 !important;
+}
+
+/* Fix any remaining course card pricing */
+.course-card .text-2xl {
+  color: #0f766e !important;
+  font-weight: bold !important;
+}
+
+/* Ensure all course titles are visible */
+h3.text-xl.font-bold {
+  color: #111827 !important;
 } 
