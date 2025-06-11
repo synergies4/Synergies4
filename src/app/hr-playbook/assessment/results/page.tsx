@@ -69,6 +69,7 @@ function ResultsContent() {
     if (encodedResults) {
       try {
         const decodedResults = JSON.parse(atob(encodedResults));
+        console.log('Decoded results from URL:', decodedResults);
         setResultsData(decodedResults);
       } catch (error) {
         console.error('Error decoding results:', error);
@@ -78,7 +79,32 @@ function ResultsContent() {
       const storedResults = localStorage.getItem('hrAssessmentResults');
       if (storedResults) {
         try {
-          setResultsData(JSON.parse(storedResults));
+          const parsedResults = JSON.parse(storedResults);
+          console.log('Stored results from localStorage:', parsedResults);
+          
+          // Check if data is in nested structure and flatten it
+          if (parsedResults.results) {
+            // Calculate readiness level based on percentage
+            const percentage = parsedResults.results.overallPercentage;
+            let readinessLevel = 'Beginning';
+            if (percentage >= 85) readinessLevel = 'Advanced';
+            else if (percentage >= 70) readinessLevel = 'Ready';
+            else if (percentage >= 55) readinessLevel = 'Developing';
+            
+            const flattenedData = {
+              overallPercentage: parsedResults.results.overallPercentage,
+              categoryScores: parsedResults.results.categoryScores,
+              readinessLevel: parsedResults.results.readinessLevel || readinessLevel,
+              contactInfo: {
+                name: parsedResults.contactInfo?.name || '',
+                company: parsedResults.contactInfo?.company || ''
+              }
+            };
+            console.log('Flattened results data:', flattenedData);
+            setResultsData(flattenedData);
+          } else {
+            setResultsData(parsedResults);
+          }
         } catch (error) {
           console.error('Error parsing stored results:', error);
         }
@@ -183,34 +209,44 @@ function ResultsContent() {
   };
 
   const downloadPDFReport = async () => {
+    console.log('🔥 Download PDF button clicked!');
+    
     if (!resultsData) {
-      console.error('No results data available for PDF generation');
+      console.error('❌ No results data available for PDF generation');
+      alert('No assessment data found. Please retake the assessment.');
       return;
     }
     
+    console.log('✅ Results data found:', resultsData);
+    
     try {
-      console.log('Starting PDF generation...', resultsData);
+      console.log('🚀 Starting PDF generation process...');
       
       // Simple test first
       const testPDF = async () => {
+        console.log('📄 Creating simple test PDF...');
         const jsPDF = (await import('jspdf')).default;
         const doc = new jsPDF();
         doc.text('Test PDF Generation', 10, 10);
         doc.text('HR Assessment Results', 10, 20);
         doc.text(`Score: ${resultsData.overallPercentage}%`, 10, 30);
+        doc.text(`Company: ${resultsData.contactInfo.company || 'N/A'}`, 10, 40);
+        doc.text(`Name: ${resultsData.contactInfo.name || 'N/A'}`, 10, 50);
         doc.save('test-assessment-report.pdf');
-        console.log('Simple PDF test completed');
+        console.log('✅ Simple PDF test completed and downloaded!');
       };
       
       // Try simple test first
       await testPDF();
       
-      // If simple test works, try full PDF
+      // If simple test works, try full PDF after delay
       setTimeout(async () => {
         try {
+          console.log('🎨 Generating full branded PDF...');
           const { generateAssessmentPDF } = await import('@/lib/pdfGenerator');
           
           const recommendations = getRecommendations(resultsData.overallPercentage, resultsData.categoryScores);
+          console.log('📋 Recommendations generated:', recommendations);
           
           const pdfData = {
             overallPercentage: resultsData.overallPercentage,
@@ -220,17 +256,18 @@ function ResultsContent() {
             recommendations: recommendations
           };
           
-          console.log('PDF data prepared:', pdfData);
+          console.log('📊 Full PDF data prepared:', pdfData);
           generateAssessmentPDF(pdfData);
-          console.log('Full PDF generation completed');
+          console.log('🎉 Full PDF generation completed!');
         } catch (fullPdfError) {
-          console.error('Full PDF generation failed:', fullPdfError);
+          console.error('❌ Full PDF generation failed:', fullPdfError);
+          alert('Simple PDF worked, but there was an issue with the full branded PDF. Please check console for details.');
         }
-      }, 1000);
+      }, 2000);
       
     } catch (error) {
-      console.error('Error generating PDF:', error);
-      alert('Sorry, there was an error generating the PDF report. Please try again.');
+      console.error('💥 Error in PDF generation process:', error);
+      alert('Sorry, there was an error generating the PDF report. Please check console and try again.');
     }
   };
 
