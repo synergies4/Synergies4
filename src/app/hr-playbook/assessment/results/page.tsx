@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import PageLayout from '@/components/shared/PageLayout';
+import { generateAssessmentPDF } from '@/lib/pdfGenerator';
 import { 
   ArrowLeft,
   CheckCircle, 
@@ -179,6 +180,22 @@ function ResultsContent() {
         console.log('Error copying to clipboard:', error);
       }
     }
+  };
+
+  const downloadPDFReport = () => {
+    if (!resultsData) return;
+    
+    const recommendations = getRecommendations(resultsData.overallPercentage, resultsData.categoryScores);
+    
+    const pdfData = {
+      overallPercentage: resultsData.overallPercentage,
+      categoryScores: resultsData.categoryScores,
+      readinessLevel: resultsData.readinessLevel,
+      contactInfo: resultsData.contactInfo,
+      recommendations: recommendations
+    };
+    
+    generateAssessmentPDF(pdfData);
   };
 
   if (!resultsData) {
@@ -393,7 +410,11 @@ function ResultsContent() {
                       Action plan template
                     </div>
                   </div>
-                  <Button variant="outline" className="w-full mt-4 border-green-600 text-green-600 hover:bg-green-50">
+                  <Button 
+                    variant="outline" 
+                    onClick={downloadPDFReport}
+                    className="w-full mt-4 border-green-600 text-green-600 hover:bg-green-50"
+                  >
                     <FileText className="w-4 h-4 mr-2" />
                     Download Report
                   </Button>
