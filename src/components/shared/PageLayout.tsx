@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import GlobalSearch from '@/components/shared/GlobalSearch';
 import MeetingRecorder from '@/components/MeetingRecorder';
+import MegaMenu from '@/components/shared/MegaMenu';
 
 // Scroll to top component
 function ScrollToTop() {
@@ -122,65 +123,13 @@ interface NavigationProps {
 }
 
 function Navigation({ isSearchOpen, setIsSearchOpen, headerVisible, lastScrollY }: NavigationProps) {
-  const { user, userProfile, signOut } = useAuth();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [headerHeight, setHeaderHeight] = useState(0);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && mobileMenuOpen) {
-        setMobileMenuOpen(false);
-      }
-    };
-    
-    if (mobileMenuOpen) {
-      document.addEventListener('keydown', handleKeyDown);
-      // Prevent body scroll when mobile menu is open
-      document.body.style.overflow = 'hidden';
-      
-      // Calculate actual header height dynamically
-      const calculateHeaderHeight = () => {
-        const banner = document.querySelector('[role="banner"]') as HTMLElement;
-        const nav = document.querySelector('[role="navigation"]') as HTMLElement;
-        if (banner && nav) {
-          const totalHeight = banner.offsetHeight + nav.offsetHeight;
-          setHeaderHeight(totalHeight);
-        }
-      };
-      
-      // Calculate immediately and on resize
-      calculateHeaderHeight();
-      window.addEventListener('resize', calculateHeaderHeight);
-      
-      return () => {
-        window.removeEventListener('resize', calculateHeaderHeight);
-      };
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = 'unset';
-    };
-  }, [mobileMenuOpen]);
-
-  const navigationItems = [
-    { label: 'About Us', href: '/about-us' },
-    { label: 'Courses', href: '/courses' },
-    { label: 'Pocket Coach', href: '/pocket-coach' },
-    { label: 'Coaching', href: '/coaching' },
-    { label: 'Consulting', href: '/consulting' },
-    { label: 'Industry Insight', href: '/industry-insight' },
-  ];
-
   return (
     <div className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
       headerVisible 
         ? 'translate-y-0 opacity-100' 
         : '-translate-y-full opacity-0'
     }`}>
-      {/* AI Assistant Promotion Banner - Fixed Mobile Layout */}
+      {/* AI Assistant Promotion Banner */}
       <div className={`bg-gradient-to-r from-teal-600 to-emerald-600 py-3 px-4 transition-all duration-300 ${
         lastScrollY > 50 ? 'opacity-95' : 'opacity-100'
       }`} role="banner">
@@ -217,33 +166,8 @@ function Navigation({ isSearchOpen, setIsSearchOpen, headerVisible, lastScrollY 
               </Link>
             </div>
             
-            {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center justify-center flex-1 space-x-6 mx-8">
-              {navigationItems.map((item) => (
-                <Link 
-                  key={item.label}
-                  href={item.href} 
-                  className="text-gray-600 hover:text-teal-600 transition-colors font-medium whitespace-nowrap text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 rounded-md px-2 py-1"
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </div>
-            
-            {/* Desktop Action Buttons */}
-            <div className="hidden lg:flex items-center space-x-3 flex-shrink-0">
-              <Link href="/synergize" className="group">
-                <Button 
-                  className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-sm px-4 py-2 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
-                  aria-label="Access Synergize AI assistant"
-                >
-                  <Brain className="w-4 h-4 mr-2" />
-                  Synergize AI
-                  <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
-              
-              {/* Desktop Search Button */}
+            {/* Desktop Search Button */}
+            <div className="hidden lg:flex items-center space-x-3 mr-4">
               <Button
                 variant="outline"
                 size="sm"
@@ -257,43 +181,15 @@ function Navigation({ isSearchOpen, setIsSearchOpen, headerVisible, lastScrollY 
                   <span className="text-xs">⌘</span>K
                 </kbd>
               </Button>
-
-              {user ? (
-                <div className="flex items-center space-x-2">
-                  <Link href={userProfile?.role === 'ADMIN' ? '/admin' : '/dashboard'}>
-                    <Button variant="outline" size="sm" className="text-gray-900 hover:text-teal-600 border-gray-400 hover:border-teal-500 hover:bg-teal-50 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-white">
-                      {userProfile?.role === 'ADMIN' ? 'Admin Dashboard' : 'Dashboard'}
-                    </Button>
-                  </Link>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => signOut()}
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-400 hover:border-red-500 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 bg-white"
-                    aria-label="Sign out"
-                  >
-                    <LogOut className="w-4 h-4" />
-                  </Button>
-                </div>
-              ) : (
-                <>
-                  <Link href="/login">
-                    <Button variant="outline" size="sm" className="text-gray-900 hover:text-teal-600 border-gray-400 hover:border-teal-500 hover:bg-teal-50 font-medium focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-white">
-                      Login
-                    </Button>
-                  </Link>
-                  <Link href="/signup">
-                    <Button size="sm" className="bg-teal-600 hover:bg-teal-700 text-white font-medium focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
-                      Sign Up
-                    </Button>
-                  </Link>
-                </>
-              )}
             </div>
 
-            {/* Mobile/Tablet Action Buttons */}
-            <div className="lg:hidden flex items-center space-x-2">
-              {/* Mobile Search Button - Always Visible */}
+            {/* MegaMenu Navigation */}
+            <div className="flex-1 flex justify-end">
+              <MegaMenu isScrolled={lastScrollY > 50} />
+            </div>
+
+            {/* Mobile Search Button */}
+            <div className="lg:hidden ml-2">
               <Button
                 variant="outline"
                 size="sm"
@@ -303,141 +199,8 @@ function Navigation({ isSearchOpen, setIsSearchOpen, headerVisible, lastScrollY 
               >
                 <Search className="w-5 h-5" />
               </Button>
-
-              {/* Mobile Menu Button */}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 text-gray-700 hover:text-teal-600"
-                aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-                aria-expanded={mobileMenuOpen}
-                aria-controls="mobile-menu"
-              >
-                {mobileMenuOpen ? (
-                  <X className="h-6 w-6 text-gray-700" />
-                ) : (
-                  <Menu className="h-6 w-6 text-gray-700" />
-                )}
-              </Button>
             </div>
           </div>
-
-          {/* Mobile Menu */}
-          {mobileMenuOpen && (
-            <div 
-              id="mobile-menu"
-              className="lg:hidden absolute left-0 right-0 bg-white shadow-2xl z-[99999] border-t border-gray-200"
-              style={{ 
-                top: '100%',
-                width: '100vw',
-                height: '70vh',
-                maxHeight: '70vh'
-              }}
-              role="menu"
-              aria-label="Mobile navigation menu"
-            >
-              <div className="h-full overflow-y-scroll bg-white" style={{ WebkitOverflowScrolling: 'touch' }}>
-                <div className="p-4 space-y-4">
-                  {/* Navigation Links */}
-                  <div className="space-y-3">
-                    {navigationItems.map((item) => (
-                      <Link
-                        key={item.label}
-                        href={item.href}
-                        className="block text-gray-800 hover:text-teal-600 hover:bg-teal-50 transition-colors font-semibold py-4 px-4 text-base rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-gray-50 border border-gray-200"
-                        onClick={() => setMobileMenuOpen(false)}
-                        role="menuitem"
-                      >
-                        {item.label}
-                      </Link>
-                    ))}
-                    
-                    {/* Mobile Search - Additional Option */}
-                    <button
-                      onClick={() => {
-                        setIsSearchOpen(true);
-                        setMobileMenuOpen(false);
-                      }}
-                      className="w-full flex items-center text-gray-800 hover:text-teal-600 hover:bg-teal-50 transition-colors font-semibold py-4 px-4 text-base rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-gray-50 border border-gray-200"
-                      role="menuitem"
-                    >
-                      <Search className="w-5 h-5 mr-3" />
-                      Search
-                    </button>
-                  </div>
-                  
-                  {/* Action Buttons */}
-                  <div className="space-y-3 py-4">
-                    <Button 
-                      asChild 
-                      className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-150 text-base py-3 h-12 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
-                    >
-                      <Link href="/synergize" onClick={() => setMobileMenuOpen(false)} role="menuitem">
-                        <Brain className="w-5 h-5 mr-2" />
-                        Synergize AI
-                      </Link>
-                    </Button>
-                    
-                    <Button 
-                      asChild 
-                      className="w-full bg-gradient-to-r from-slate-600 to-gray-600 hover:from-slate-700 hover:to-gray-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-150 text-base py-3 h-12 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-                    >
-                      <Link href="/contact" onClick={() => setMobileMenuOpen(false)} role="menuitem">
-                        <MessageSquare className="w-5 h-5 mr-2" />
-                        Contact Us
-                      </Link>
-                    </Button>
-                  </div>
-                  
-                  {/* Auth Section */}
-                  <div className="border-t border-gray-200 pt-4 pb-4 bg-gray-50 rounded-lg">
-                    {user ? (
-                      <div className="space-y-3">
-                        <div className="flex items-center space-x-3 py-2 px-3 bg-white rounded-lg border border-gray-200 shadow-sm">
-                          <UserAvatar />
-                          <span className="text-gray-700 font-medium text-sm">Welcome back!</span>
-                        </div>
-                        <Button variant="outline" className="w-full text-base py-3 h-12 border-gray-300 text-gray-900 hover:text-teal-600 hover:bg-teal-50 hover:border-teal-300 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-white font-semibold" asChild>
-                          <Link href={userProfile?.role === 'ADMIN' ? '/admin' : '/dashboard'} onClick={() => setMobileMenuOpen(false)} role="menuitem">
-                            <BarChart3 className="w-5 h-5 mr-2" />
-                            {userProfile?.role === 'ADMIN' ? 'Admin Dashboard' : 'Dashboard'}
-                          </Link>
-                        </Button>
-                        <Button
-                          variant="outline"
-                          className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 border-red-300 hover:border-red-400 text-base py-3 h-12 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 bg-white font-semibold"
-                          onClick={() => {
-                            signOut();
-                            setMobileMenuOpen(false);
-                          }}
-                          role="menuitem"
-                        >
-                          <LogOut className="w-5 h-5 mr-2" />
-                          Sign Out
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        <Button variant="outline" className="w-full text-base py-3 h-12 border-gray-300 text-gray-900 hover:text-teal-600 hover:bg-teal-50 hover:border-teal-300 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-white font-semibold" asChild>
-                          <Link href="/login" onClick={() => setMobileMenuOpen(false)} role="menuitem">
-                            <User className="w-5 h-5 mr-2" />
-                            Login
-                          </Link>
-                        </Button>
-                        <Button className="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold text-base py-3 h-12 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 shadow-md hover:shadow-lg transition-all duration-150" asChild>
-                          <Link href="/signup" onClick={() => setMobileMenuOpen(false)} role="menuitem">
-                            <UserPlus className="w-5 h-5 mr-2" />
-                            Sign Up
-                          </Link>
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </nav>
     </div>
