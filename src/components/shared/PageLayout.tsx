@@ -167,7 +167,7 @@ function Navigation({ isSearchOpen, setIsSearchOpen, headerVisible, lastScrollY 
             </div>
             
             {/* Desktop Search Button */}
-            <div className="hidden lg:flex items-center space-x-3 mr-4">
+            <div className="hidden lg:flex items-center space-x-3 ml-8 mr-6">
               <Button
                 variant="outline"
                 size="sm"

@@ -232,10 +232,68 @@ label {
   color: #4b5563 !important;
 }
 
+/* CRITICAL FIX: Override transparent text that becomes invisible */
+button:not([class*="bg-gradient-to-r"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]) .text-transparent,
+a:not([class*="bg-gradient-to-r"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]) .text-transparent,
+span:not([class*="bg-gradient-to-r"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]) .text-transparent {
+  color: #1f2937 !important;
+  -webkit-text-fill-color: #1f2937 !important;
+  background: none !important;
+  background-clip: unset !important;
+  -webkit-background-clip: unset !important;
+}
+
+/* Fix white text on light backgrounds */
+.bg-white *:not([class*="text-"]):not([class*="bg-gradient-to-r"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]),
+.bg-gray-50 *:not([class*="text-"]):not([class*="bg-gradient-to-r"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]),
+.bg-slate-50 *:not([class*="text-"]):not([class*="bg-gradient-to-r"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]) {
+  color: #1f2937 !important;
+}
+
+/* Force proper button text visibility */
+button:not([class*="bg-gradient-to-r"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]):not([class*="bg-black"]),
+a[role="button"]:not([class*="bg-gradient-to-r"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]):not([class*="bg-black"]) {
+  color: #1f2937 !important;
+}
+
+/* Fix breadcrumb and navigation text */
+nav *:not([class*="bg-gradient-to-r"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]),
+[aria-label*="breadcrumb"] *:not([class*="bg-gradient-to-r"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]),
+.breadcrumb *:not([class*="bg-gradient-to-r"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]) {
+  color: #374151 !important;
+}
+
 /* Enhanced Button Text Contrast */
 button,
 [role="button"] {
   font-weight: 500;
+}
+
+/* Fix outline and ghost button text visibility */
+button[class*="variant-outline"]:not([class*="bg-gradient-to-r"]),
+button[class*="variant-ghost"]:not([class*="bg-gradient-to-r"]),
+button[class*="border"]:not([class*="bg-gradient-to-r"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]) {
+  color: #1f2937 !important;
+}
+
+/* Fix specific button and link text issues */
+.bg-white button:not([class*="bg-gradient-to-r"]):not([class*="bg-teal"]):not([class*="bg-blue"]),
+.bg-gray-50 button:not([class*="bg-gradient-to-r"]):not([class*="bg-teal"]):not([class*="bg-blue"]),
+.bg-slate-50 button:not([class*="bg-gradient-to-r"]):not([class*="bg-teal"]):not([class*="bg-blue"]) {
+  color: #1f2937 !important;
+}
+
+/* Fix invisible hover states */
+button:hover:not([class*="bg-gradient-to-r"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]),
+a:hover:not([class*="bg-gradient-to-r"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]) {
+  color: #0d9488 !important;
+}
+
+/* Ensure text visibility in cards and containers */
+.bg-white .card *:not([class*="bg-gradient-to-r"]),
+.bg-gray-50 .card *:not([class*="bg-gradient-to-r"]),
+.bg-slate-50 .card *:not([class*="bg-gradient-to-r"]) {
+  color: #1f2937 !important;
 }
 
 /* Simplified background-based text color rules */
@@ -779,12 +837,26 @@ footer a:hover {
   color: #0f766e !important;
 }
 
-/* Fix gradient text that becomes invisible */
-[class*="bg-gradient"][class*="bg-clip-text"][class*="text-transparent"] {
-  background: none !important;
-  -webkit-background-clip: unset !important;
+/* SAFER gradient text handling - only apply to elements that actually have gradients */
+[class*="bg-gradient-to-"][class*="bg-clip-text"][class*="text-transparent"] {
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: transparent !important;
+}
+
+/* CRITICAL: Remove text-transparent from elements without proper gradients */
+.text-transparent:not([class*="bg-gradient-to-"]) {
+  color: #1f2937 !important;
+  -webkit-text-fill-color: #1f2937 !important;
   background-clip: unset !important;
-  color: #0f766e !important;
+  -webkit-background-clip: unset !important;
+}
+
+/* Fix any remaining invisible text issues */
+*:not([class*="bg-gradient-to-"])[class*="text-transparent"] {
+  color: #1f2937 !important;
+  -webkit-text-fill-color: #1f2937 !important;
 }
 
 /* Dark background text should be light */
