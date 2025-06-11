@@ -445,6 +445,7 @@ export default function CleanSlideEditor({
     // Select element immediately only if not already selected
     if (selectedElement !== elementId) {
       setSelectedElement(elementId);
+      setPersistentSelection(true); // Make selection persistent on pointer down
       if (isMobile && element.type === 'text') {
         showMobileToolbarStable(true);
       }
@@ -508,14 +509,17 @@ export default function CleanSlideEditor({
       // Second click - enter edit mode for text
       if (clickedElement?.type === 'text' && !editingElement) {
         setEditingElement(elementId);
+        setPersistentSelection(true); // Keep selection persistent
         if (isMobile) {
           showMobileToolbarStable(false); // Hide toolbar while editing
         }
       }
     } else {
-      // First click - select element
+      // First click - select element and make selection persistent
       setSelectedElement(elementId);
       setEditingElement(null);
+      setPersistentSelection(true); // Enable persistent selection
+      
       // Always show mobile toolbar for text elements, don't toggle
       if (isMobile && clickedElement?.type === 'text') {
         showMobileToolbarStable(true);
@@ -605,7 +609,7 @@ export default function CleanSlideEditor({
           </div>
 
           {/* Actions */}
-          <div className="grid grid-cols-2 gap-3 pt-2">
+          <div className="grid grid-cols-3 gap-3 pt-2">
             <Button
               onClick={() => {
                 setEditingElement(selectedElement);
@@ -615,6 +619,18 @@ export default function CleanSlideEditor({
             >
               <Type className="h-4 w-4 mr-2" />
               Edit Text
+            </Button>
+            <Button
+              onClick={() => {
+                setSelectedElement(null);
+                setPersistentSelection(false);
+                showMobileToolbarStable(false);
+              }}
+              variant="outline"
+              className="border-gray-300 text-gray-600 hover:bg-gray-50 h-12"
+            >
+              <X className="h-4 w-4 mr-2" />
+              Deselect
             </Button>
             <Button
               onClick={() => selectedElement && deleteElement(selectedElement)}
@@ -673,13 +689,28 @@ export default function CleanSlideEditor({
             </Button>
 
             {selectedElement && !isMobile && (
-              <Button
-                size="sm"
-                onClick={() => deleteElement(selectedElement)}
-                className="bg-red-600 hover:bg-red-700 text-white"
-              >
-                <Trash className="h-4 w-4" />
-              </Button>
+              <>
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    setSelectedElement(null);
+                    setPersistentSelection(false);
+                    showMobileToolbarStable(false);
+                  }}
+                  className="bg-gray-600 hover:bg-gray-700 text-white"
+                  title="Deselect element"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+                
+                <Button
+                  size="sm"
+                  onClick={() => deleteElement(selectedElement)}
+                  className="bg-red-600 hover:bg-red-700 text-white"
+                >
+                  <Trash className="h-4 w-4" />
+                </Button>
+              </>
             )}
             
             {!isMobile && <div className="h-6 w-px bg-gray-300"></div>}
@@ -775,6 +806,20 @@ export default function CleanSlideEditor({
               <Button
                 size="sm"
                 variant="outline"
+                onClick={() => {
+                  setSelectedElement(null);
+                  setPersistentSelection(false);
+                  showMobileToolbarStable(false);
+                }}
+                className="text-gray-600 border-gray-300 hover:bg-gray-50"
+              >
+                <X className="h-3 w-3 mr-1" />
+                Deselect
+              </Button>
+              
+              <Button
+                size="sm"
+                variant="outline"
                 onClick={() => selectedElement && deleteElement(selectedElement)}
                 className="text-red-600 border-red-300 hover:bg-red-50"
               >
@@ -859,8 +904,13 @@ export default function CleanSlideEditor({
                 paddingBottom: '120px' // Extra space for floating elements
               } : {}}
               onClick={(e) => {
-                // Only deselect if clicking on empty canvas area AND not within 100px of toolbar areas
+                // Only deselect if clicking on empty canvas area AND selection is not persistent
                 if (e.target === e.currentTarget) {
+                  // Don't deselect if we have persistent selection
+                  if (persistentSelection) {
+                    return;
+                  }
+                  
                   const rect = e.currentTarget.getBoundingClientRect();
                   const clickX = e.clientX - rect.left;
                   const clickY = e.clientY - rect.top;
@@ -874,6 +924,15 @@ export default function CleanSlideEditor({
                     setPersistentSelection(false);
                     showMobileToolbarStable(false);
                   }
+                }
+              }}
+              onDoubleClick={(e) => {
+                // Double click to clear persistent selection
+                if (e.target === e.currentTarget) {
+                  setSelectedElement(null);
+                  setEditingElement(null);
+                  setPersistentSelection(false);
+                  showMobileToolbarStable(false);
                 }
               }}
             >
@@ -957,7 +1016,7 @@ export default function CleanSlideEditor({
               
               {selectedElement && !editingElement && (
                 <div className={`absolute ${isMobile ? 'top-2 left-2 text-xs' : 'top-4 right-4 text-sm'} bg-blue-600 text-white px-3 py-1 rounded`}>
-                  Selected • {isMobile ? 'Tap again to edit • Drag to move' : 'Click again to edit • Drag to move'}
+                  Selected • {isMobile ? 'Tap again to edit • Double-tap canvas to deselect' : 'Click again to edit • Double-click canvas to deselect'}
                 </div>
               )}
               
