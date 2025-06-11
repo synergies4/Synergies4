@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
 
+// HR Assessment PDF Generator - Enhanced with comprehensive error handling and debugging
 interface AssessmentData {
   overallPercentage: number;
   categoryScores: Record<string, { score: number; maxScore: number; percentage: number }>;
