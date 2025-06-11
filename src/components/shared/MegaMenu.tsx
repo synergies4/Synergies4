@@ -186,6 +186,8 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
     };
   }, [isMobileMenuOpen]);
 
+  const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
+
   // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
@@ -194,8 +196,6 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
       }
     };
   }, [hoverTimeout]);
-
-  const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
 
   const handleCategoryEnter = (categoryId: string) => {
     if (hoverTimeout) {
