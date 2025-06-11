@@ -1316,27 +1316,27 @@ export default function CreateCourse() {
                   <div className={`flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full font-bold text-xs sm:text-sm transition-all duration-300 ${
                     currentStep === step.number 
                       ? 'bg-gradient-to-r from-teal-600 to-emerald-600 text-white shadow-lg' 
-                      : currentStep > step.number 
+                      : step.number < currentStep 
                       ? 'bg-green-500 text-white shadow-md' 
                       : 'bg-gray-200 text-gray-500'
                   }`}>
-                    {currentStep > step.number ? (
+                    {step.number < currentStep ? (
                       <CheckCircle className="w-4 h-4 sm:w-6 sm:h-6" />
                     ) : (
                       <step.icon className="w-4 h-4 sm:w-6 sm:h-6" />
                     )}
                   </div>
                   <div className="ml-2 sm:ml-3 hidden md:block min-w-0">
-                    <p className={`text-xs sm:text-sm font-semibold truncate ${currentStep >= step.number ? 'text-gray-900' : 'text-gray-700'}`}>
+                    <p className={`text-xs sm:text-sm font-semibold truncate ${step.number <= currentStep ? 'text-gray-900' : 'text-gray-700'}`}>
                       {step.title}
                     </p>
-                    <p className={`text-xs truncate ${currentStep >= step.number ? 'text-gray-700' : 'text-gray-600'}`}>
+                    <p className={`text-xs truncate ${step.number <= currentStep ? 'text-gray-700' : 'text-gray-600'}`}>
                       {step.description}
                     </p>
                   </div>
                   {index < steps.length - 1 && (
                     <div className={`w-8 sm:w-16 h-1 mx-2 sm:mx-4 rounded-full transition-all duration-300 flex-shrink-0 ${
-                      currentStep > step.number ? 'bg-green-500' : 'bg-gray-200'
+                      step.number < currentStep ? 'bg-green-500' : 'bg-gray-200'
                     }`} />
                   )}
                 </div>

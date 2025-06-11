@@ -235,92 +235,91 @@ Provide helpful, actionable advice tailored to their specific role and challenge
 
 async function generateAIResponse(message: string, context: string): Promise<string> {
   try {
-    // This would integrate with your AI service (OpenAI, Claude, etc.)
-    // For now, providing contextual responses based on keywords
+    // Try Anthropic first, then fallback to OpenAI
+    const anthropicKey = process.env.ANTHROPIC_API_KEY;
+    const openaiKey = process.env.OPENAI_API_KEY;
     
-    const lowerMessage = message.toLowerCase();
-    
-    if (lowerMessage.includes('stress') || lowerMessage.includes('overwhelm')) {
-      return `I understand you're feeling stressed. Here are some immediate strategies that can help:
-
-1. **Take a breath**: Try the 4-7-8 breathing technique (inhale for 4, hold for 7, exhale for 8)
-2. **Prioritize ruthlessly**: What are the top 3 things that absolutely must get done today?
-3. **Time-box your work**: Set specific time limits for tasks to prevent them from expanding
-4. **Communicate boundaries**: Let your team know your current capacity
-
-What's the biggest source of stress right now? I can help you create a specific action plan.`;
-    }
-    
-    if (lowerMessage.includes('meeting') || lowerMessage.includes('standup')) {
-      return `Meetings can be challenging! Here are some strategies to make them more effective:
-
-**Before the meeting:**
-- Set a clear agenda with time limits
-- Share materials in advance
-- Define the decision-making process
-
-**During the meeting:**
-- Start with the outcome you want
-- Use time-boxing for discussions
-- Park off-topic items in a "parking lot"
-- Summarize decisions and action items
-
-**After the meeting:**
-- Send a quick recap with action items
-- Set deadlines and owners for each item
-
-What specific meeting challenge are you facing? I can give you more targeted advice.`;
-    }
-    
-    if (lowerMessage.includes('team') || lowerMessage.includes('conflict')) {
-      return `Team dynamics can be complex. Here's a framework to address team challenges:
-
-**Listen first**: Understand all perspectives before jumping to solutions
-**Focus on behavior, not personality**: Address specific actions and their impact
-**Find common ground**: What does everyone agree on?
-**Collaborative problem-solving**: Involve the team in finding solutions
-
-For immediate action:
-1. Have one-on-one conversations with key stakeholders
-2. Identify the root cause (process, communication, or expectations?)
-3. Create a safe space for open dialogue
-
-What's the specific team challenge you're dealing with? I can help you navigate it step by step.`;
+    if (!anthropicKey && !openaiKey) {
+      console.error('No AI API keys configured');
+      return "I'm currently unable to provide AI responses. Please contact support to configure API keys.";
     }
 
-    if (lowerMessage.includes('goal') || lowerMessage.includes('plan')) {
-      return `Great that you're thinking about goals! Let's break this down:
+    // Prefer Anthropic if available
+    if (anthropicKey) {
+      try {
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': anthropicKey,
+            'anthropic-version': '2023-06-01'
+          },
+          body: JSON.stringify({
+            model: 'claude-3-sonnet-20240229',
+            max_tokens: 1000,
+            system: context,
+            messages: [
+              {
+                role: 'user',
+                content: message
+              }
+            ]
+          })
+        });
 
-**SMART Goals Framework:**
-- **Specific**: What exactly do you want to achieve?
-- **Measurable**: How will you track progress?
-- **Achievable**: Is this realistic given your resources?
-- **Relevant**: Does this align with your bigger picture?
-- **Time-bound**: When do you want to achieve this?
-
-**Next steps:**
-1. Write down your goal in one clear sentence
-2. Identify 3-5 key milestones
-3. Break each milestone into weekly actions
-4. Schedule regular check-ins with yourself
-
-What goal are you working on? I can help you create a specific action plan.`;
+        if (response.ok) {
+          const data = await response.json();
+          if (data.content && data.content[0] && data.content[0].text) {
+            return data.content[0].text;
+          }
+        } else {
+          console.error('Anthropic API error:', response.status, await response.text());
+        }
+      } catch (error) {
+        console.error('Anthropic API call failed:', error);
+      }
     }
 
-    // Default response
-    return `Thank you for sharing that with me. Based on what you've told me, here are some thoughts:
+    // Fallback to OpenAI if Anthropic fails or isn't available
+    if (openaiKey) {
+      try {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${openaiKey}`
+          },
+          body: JSON.stringify({
+            model: 'gpt-4',
+            max_tokens: 1000,
+            messages: [
+              {
+                role: 'system',
+                content: context
+              },
+              {
+                role: 'user',
+                content: message
+              }
+            ]
+          })
+        });
 
-Every challenge is an opportunity to grow and improve. The fact that you're actively seeking guidance shows great self-awareness and commitment to your development.
+        if (response.ok) {
+          const data = await response.json();
+          if (data.choices && data.choices[0] && data.choices[0].message) {
+            return data.choices[0].message.content;
+          }
+        } else {
+          console.error('OpenAI API error:', response.status, await response.text());
+        }
+      } catch (error) {
+        console.error('OpenAI API call failed:', error);
+      }
+    }
 
-Here's what I'd suggest as immediate next steps:
-1. **Clarify the specific outcome** you want to achieve
-2. **Identify what's within your control** vs. what isn't
-3. **Take one small action** today that moves you forward
-4. **Reflect on what you learn** from each step
-
-I'm here to help you work through this. Can you tell me more about the specific situation or challenge you're facing? The more context you provide, the more tailored my guidance can be.
-
-What would be most helpful for you right now?`;
+    // If both APIs fail, return a helpful fallback message
+    return "I'm experiencing some technical difficulties connecting to my AI services right now. Please try again in a moment, or feel free to contact our support team for immediate assistance.";
 
   } catch (error) {
     console.error('Error generating AI response:', error);
