@@ -30,7 +30,13 @@ import {
   Star,
   CheckCircle,
   AlertCircle,
-  Sparkles
+  Sparkles,
+  Target,
+  Plus,
+  X,
+  Video,
+  Link as LinkIcon,
+  File
 } from 'lucide-react';
 
 interface CourseFormData {
@@ -52,12 +58,46 @@ interface CourseFormData {
   prerequisites: string;
 }
 
+interface ModuleFormData {
+  title: string;
+  description: string;
+  order: number;
+  contents: {
+    title: string;
+    type: 'video' | 'text' | 'link' | 'document';
+    content: string;
+    duration?: string;
+  }[];
+}
+
+interface QuizQuestion {
+  question: string;
+  options: string[];
+  correctAnswer: number;
+}
+
 export default function CreateCourse() {
   const { user, userProfile, loading: authLoading } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  
+  // Module and quiz state
+  const [modules, setModules] = useState<ModuleFormData[]>([]);
+  const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>([]);
+  const [quizTitle, setQuizTitle] = useState('');
+  const [quizDescription, setQuizDescription] = useState('');
+  
+  // Modal state
+  const [showModuleModal, setShowModuleModal] = useState(false);
+  const [editingModuleIndex, setEditingModuleIndex] = useState<number | null>(null);
+  const [moduleForm, setModuleForm] = useState<ModuleFormData>({
+    title: '',
+    description: '',
+    order: 1,
+    contents: []
+  });
 
   const [formData, setFormData] = useState<CourseFormData>({
     title: '',
@@ -82,7 +122,9 @@ export default function CreateCourse() {
     { number: 1, title: 'Basic Info', description: 'Course fundamentals', icon: BookOpen },
     { number: 2, title: 'Details', description: 'Pricing & specifics', icon: FileText },
     { number: 3, title: 'Content', description: 'Description & media', icon: Sparkles },
-    { number: 4, title: 'Review', description: 'Final review', icon: CheckCircle }
+    { number: 4, title: 'Modules', description: 'Course modules & lessons', icon: BookOpen },
+    { number: 5, title: 'Quiz', description: 'Optional course quiz', icon: Target },
+    { number: 6, title: 'Review', description: 'Final review', icon: CheckCircle }
   ];
 
   const categories = [
@@ -203,6 +245,158 @@ export default function CreateCourse() {
     }
   };
 
+  // Module management functions
+  const addModule = () => {
+    setEditingModuleIndex(null);
+    setModuleForm({
+      title: '',
+      description: '',
+      order: modules.length + 1,
+      contents: []
+    });
+    setShowModuleModal(true);
+  };
+
+  const editModule = (index: number) => {
+    setEditingModuleIndex(index);
+    setModuleForm({ ...modules[index] });
+    setShowModuleModal(true);
+  };
+
+  const saveModule = () => {
+    if (editingModuleIndex !== null) {
+      // Edit existing module
+      setModules(modules.map((module, i) => 
+        i === editingModuleIndex ? { ...moduleForm } : module
+      ));
+    } else {
+      // Add new module
+      setModules([...modules, { ...moduleForm }]);
+    }
+    setShowModuleModal(false);
+  };
+
+  const addContentToModuleForm = () => {
+    setModuleForm(prev => ({
+      ...prev,
+      contents: [...prev.contents, { title: '', type: 'text', content: '', duration: '' }]
+    }));
+  };
+
+  const removeContentFromModuleForm = (index: number) => {
+    setModuleForm(prev => ({
+      ...prev,
+      contents: prev.contents.filter((_, i) => i !== index)
+    }));
+  };
+
+  const updateModuleFormContent = (index: number, field: string, value: string) => {
+    setModuleForm(prev => ({
+      ...prev,
+      contents: prev.contents.map((content, i) => 
+        i === index ? { ...content, [field]: value } : content
+      )
+    }));
+  };
+
+  const removeModule = (index: number) => {
+    setModules(modules.filter((_, i) => i !== index));
+  };
+
+  const updateModule = (index: number, field: keyof ModuleFormData, value: any) => {
+    setModules(modules.map((module, i) => 
+      i === index ? { ...module, [field]: value } : module
+    ));
+  };
+
+  const addContentToModule = (moduleIndex: number) => {
+    const newContent = {
+      title: '',
+      type: 'text' as const,
+      content: '',
+      duration: ''
+    };
+    
+    setModules(modules.map((module, i) => 
+      i === moduleIndex 
+        ? { ...module, contents: [...module.contents, newContent] }
+        : module
+    ));
+  };
+
+  const removeContentFromModule = (moduleIndex: number, contentIndex: number) => {
+    setModules(modules.map((module, i) => 
+      i === moduleIndex 
+        ? { ...module, contents: module.contents.filter((_, ci) => ci !== contentIndex) }
+        : module
+    ));
+  };
+
+  const updateModuleContent = (moduleIndex: number, contentIndex: number, field: string, value: string) => {
+    setModules(modules.map((module, i) => 
+      i === moduleIndex 
+        ? {
+            ...module,
+            contents: module.contents.map((content, ci) => 
+              ci === contentIndex ? { ...content, [field]: value } : content
+            )
+          }
+        : module
+    ));
+  };
+
+  // Quiz management functions
+  const addQuizQuestion = () => {
+    const newQuestion: QuizQuestion = {
+      question: '',
+      options: ['', '', '', ''],
+      correctAnswer: 0
+    };
+    setQuizQuestions([...quizQuestions, newQuestion]);
+  };
+
+  const removeQuizQuestion = (index: number) => {
+    setQuizQuestions(quizQuestions.filter((_, i) => i !== index));
+  };
+
+  const updateQuizQuestion = (index: number, field: keyof QuizQuestion, value: any) => {
+    setQuizQuestions(quizQuestions.map((question, i) => 
+      i === index ? { ...question, [field]: value } : question
+    ));
+  };
+
+  const updateQuizQuestionOption = (questionIndex: number, optionIndex: number, value: string) => {
+    setQuizQuestions(quizQuestions.map((question, i) => 
+      i === questionIndex 
+        ? {
+            ...question,
+            options: question.options.map((option, oi) => 
+              oi === optionIndex ? value : option
+            )
+          }
+        : question
+    ));
+  };
+
+  // Helper functions for content types
+  const getContentTypeIcon = (type: string) => {
+    switch (type) {
+      case 'video': return <Video className="w-4 h-4" />;
+      case 'link': return <LinkIcon className="w-4 h-4" />;
+      case 'document': return <File className="w-4 h-4" />;
+      default: return <FileText className="w-4 h-4" />;
+    }
+  };
+
+  const getContentTypeColor = (type: string) => {
+    switch (type) {
+      case 'video': return 'text-red-600 bg-red-50';
+      case 'link': return 'text-blue-600 bg-blue-50';
+      case 'document': return 'text-green-600 bg-green-50';
+      default: return 'text-gray-600 bg-gray-50';
+    }
+  };
+
   const handleSubmit = async (status: string) => {
     if (!validateStep(currentStep)) return;
     
@@ -252,6 +446,57 @@ export default function CreateCourse() {
 
       const course = await response.json();
       console.log('Course created:', course);
+      
+      // Now create modules and quiz if they exist
+      if (formData.course_type === 'digital' && modules.length > 0) {
+        await Promise.all(modules.map(async (module) => {
+          try {
+            const moduleResponse = await fetch(`/api/courses/${course.id}/modules`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session.access_token}`,
+              },
+              body: JSON.stringify({
+                title: module.title,
+                description: module.description,
+                order: module.order,
+                contents: module.contents
+              }),
+            });
+            
+            if (!moduleResponse.ok) {
+              console.error('Failed to create module:', module.title);
+            }
+          } catch (error) {
+            console.error('Error creating module:', error);
+          }
+        }));
+      }
+      
+      // Create quiz if questions exist
+      if (quizQuestions.length > 0) {
+        try {
+          const quizResponse = await fetch(`/api/courses/${course.id}/quiz`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session.access_token}`,
+            },
+            body: JSON.stringify({
+              title: quizTitle || 'Course Quiz',
+              description: quizDescription || 'Test your knowledge',
+              questions: quizQuestions
+            }),
+          });
+          
+          if (!quizResponse.ok) {
+            console.error('Failed to create quiz');
+          }
+        } catch (error) {
+          console.error('Error creating quiz:', error);
+        }
+      }
       
       router.push('/admin/courses');
     } catch (error) {
@@ -620,6 +865,228 @@ export default function CreateCourse() {
         );
       
       case 4:
+        return (
+          <div className="space-y-6">
+            {/* Only show modules for digital courses */}
+            {formData.course_type === 'digital' && (
+              <>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900 flex items-center">
+                      <BookOpen className="w-5 h-5 mr-2 text-teal-600" />
+                      Course Modules
+                    </h3>
+                    <p className="text-gray-600">Add modules and lessons to your course curriculum</p>
+                  </div>
+                  <Button onClick={() => addModule()} className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Module
+                  </Button>
+                </div>
+
+                {modules.length === 0 ? (
+                  <Card className="bg-gradient-to-r from-gray-50 to-blue-50 border-2 border-gray-200">
+                    <CardContent className="text-center py-12">
+                      <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">No modules yet</h3>
+                      <p className="text-gray-600 mb-4">Start building your course by adding your first module.</p>
+                      <Button onClick={() => addModule()} variant="outline">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add First Module
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <div className="space-y-4">
+                    {modules.map((module, index) => (
+                      <Card key={index} className="border-2 border-gray-200">
+                                                 <CardHeader className="pb-4">
+                           <div className="flex justify-between items-start">
+                             <div>
+                               <CardTitle className="flex items-center space-x-2">
+                                 <Badge variant="outline">Module {module.order}</Badge>
+                                 <span>{module.title}</span>
+                               </CardTitle>
+                               <CardDescription className="mt-1">{module.description}</CardDescription>
+                             </div>
+                             <div className="flex space-x-2">
+                               <Button variant="outline" size="sm" onClick={() => editModule(index)}>
+                                 <FileText className="w-4 h-4" />
+                               </Button>
+                               <Button variant="outline" size="sm" onClick={() => removeModule(index)}>
+                                 <X className="w-4 h-4" />
+                               </Button>
+                             </div>
+                           </div>
+                         </CardHeader>
+                                                 <CardContent>
+                           <div className="space-y-3">
+                             <div className="flex justify-between items-center">
+                               <h4 className="font-medium text-gray-900">Contents ({module.contents.length})</h4>
+                             </div>
+                             
+                             {module.contents.length > 0 ? (
+                               <div className="space-y-2">
+                                 {module.contents.map((content, contentIndex) => (
+                                   <div key={contentIndex} className="flex items-center p-3 bg-gray-50 rounded-lg">
+                                     <div className="flex items-center space-x-3">
+                                       <div className={`p-2 rounded ${getContentTypeColor(content.type)}`}>
+                                         {getContentTypeIcon(content.type)}
+                                       </div>
+                                       <div>
+                                         <p className="font-medium text-gray-900">{content.title}</p>
+                                         <p className="text-sm text-gray-600">
+                                           {content.duration && `${content.duration} • `}
+                                           {content.type.charAt(0).toUpperCase() + content.type.slice(1)}
+                                         </p>
+                                       </div>
+                                     </div>
+                                   </div>
+                                 ))}
+                               </div>
+                             ) : (
+                               <p className="text-gray-500 text-sm">No content in this module yet. Click edit to add content.</p>
+                             )}
+                           </div>
+                         </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* For in-person courses, show a note */}
+            {formData.course_type === 'in_person' && (
+              <Card className="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200">
+                <CardContent className="text-center py-12">
+                  <Users className="h-12 w-12 text-amber-600 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-amber-900 mb-2">In-Person Course</h3>
+                  <p className="text-amber-700">
+                    In-person courses don't require digital modules. The course content will be delivered during the live sessions.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        );
+      
+      case 5:
+        return (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 flex items-center">
+                  <Target className="w-5 h-5 mr-2 text-purple-600" />
+                  Course Quiz (Optional)
+                </h3>
+                <p className="text-gray-600">Add a quiz to test student knowledge</p>
+              </div>
+              <Button onClick={() => addQuizQuestion()} variant="outline" className="border-purple-300 text-purple-700 hover:bg-purple-50">
+                <Plus className="w-4 h-4 mr-2" />
+                Add Question
+              </Button>
+            </div>
+
+            {/* Quiz Title and Description */}
+            <Card className="border-2 border-purple-200">
+              <CardHeader>
+                <CardTitle>Quiz Settings</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="quiz_title">Quiz Title</Label>
+                  <Input
+                    id="quiz_title"
+                    value={quizTitle}
+                    onChange={(e) => setQuizTitle(e.target.value)}
+                    placeholder="e.g., Final Assessment"
+                    className="bg-white border-2 border-gray-200 focus:border-purple-500"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="quiz_description">Quiz Description</Label>
+                  <Textarea
+                    id="quiz_description"
+                    value={quizDescription}
+                    onChange={(e) => setQuizDescription(e.target.value)}
+                    placeholder="Test your understanding of the course material..."
+                    className="bg-white border-2 border-gray-200 focus:border-purple-500"
+                    rows={3}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Quiz Questions */}
+            {quizQuestions.length === 0 ? (
+              <Card className="bg-gradient-to-r from-purple-50 to-indigo-50 border-2 border-purple-200">
+                <CardContent className="text-center py-12">
+                  <Target className="h-12 w-12 text-purple-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No quiz questions yet</h3>
+                  <p className="text-gray-600 mb-4">Add questions to create a quiz for this course.</p>
+                  <Button onClick={() => addQuizQuestion()} variant="outline" className="border-purple-300 text-purple-700 hover:bg-purple-50">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add First Question
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-4">
+                {quizQuestions.map((question, index) => (
+                  <Card key={index} className="border-2 border-purple-200">
+                    <CardHeader className="pb-4">
+                      <div className="flex justify-between items-start">
+                        <CardTitle className="flex items-center space-x-2">
+                          <Badge variant="outline" className="border-purple-300 text-purple-700">Question {index + 1}</Badge>
+                        </CardTitle>
+                        <Button variant="outline" size="sm" onClick={() => removeQuizQuestion(index)}>
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-2">
+                        <Label>Question</Label>
+                        <Textarea
+                          value={question.question}
+                          onChange={(e) => updateQuizQuestion(index, 'question', e.target.value)}
+                          placeholder="Enter your question..."
+                          className="bg-white border-2 border-gray-200 focus:border-purple-500"
+                          rows={2}
+                        />
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <Label>Answer Options</Label>
+                        {question.options.map((option, optionIndex) => (
+                          <div key={optionIndex} className="flex items-center space-x-3">
+                            <input
+                              type="radio"
+                              name={`correct-${index}`}
+                              checked={question.correctAnswer === optionIndex}
+                              onChange={() => updateQuizQuestion(index, 'correctAnswer', optionIndex)}
+                              className="w-4 h-4 text-purple-600 border-gray-300 focus:ring-purple-500"
+                            />
+                            <Input
+                              value={option}
+                              onChange={(e) => updateQuizQuestionOption(index, optionIndex, e.target.value)}
+                              placeholder={`Option ${optionIndex + 1}`}
+                              className="flex-1 bg-white border-2 border-gray-200 focus:border-purple-500"
+                            />
+                          </div>
+                        ))}
+                        <p className="text-xs text-gray-500">Select the radio button next to the correct answer</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      
+      case 6:
         const selectedCategory = categories.find(cat => cat.value === formData.category);
         return (
           <div className="space-y-6">
@@ -816,6 +1283,150 @@ export default function CreateCourse() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Module Modal */}
+        {showModuleModal && (
+          <div className="fixed inset-0 bg-gray-900/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-semibold">
+                    {editingModuleIndex !== null ? 'Edit Module' : 'Add New Module'}
+                  </h2>
+                  <Button variant="ghost" size="sm" onClick={() => setShowModuleModal(false)}>
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="module_title">Module Title</Label>
+                      <Input
+                        id="module_title"
+                        value={moduleForm.title}
+                        onChange={(e) => setModuleForm(prev => ({ ...prev, title: e.target.value }))}
+                        placeholder="e.g., Introduction to React"
+                        className="bg-white border-2 border-gray-200 focus:border-teal-500"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="module_order">Module Order</Label>
+                      <Input
+                        id="module_order"
+                        type="number"
+                        value={moduleForm.order}
+                        onChange={(e) => setModuleForm(prev => ({ ...prev, order: parseInt(e.target.value) || 1 }))}
+                        placeholder="1"
+                        className="bg-white border-2 border-gray-200 focus:border-teal-500"
+                        min="1"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="module_description">Module Description</Label>
+                    <Textarea
+                      id="module_description"
+                      value={moduleForm.description}
+                      onChange={(e) => setModuleForm(prev => ({ ...prev, description: e.target.value }))}
+                      placeholder="Describe what students will learn in this module..."
+                      className="bg-white border-2 border-gray-200 focus:border-teal-500"
+                      rows={3}
+                    />
+                  </div>
+
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <Label>Module Contents</Label>
+                      <Button type="button" variant="outline" size="sm" onClick={addContentToModuleForm}>
+                        <Plus className="w-4 h-4 mr-1" />
+                        Add Content
+                      </Button>
+                    </div>
+                    
+                    {moduleForm.contents.map((content, index) => (
+                      <div key={index} className="border rounded-lg p-4 mb-3">
+                        <div className="flex justify-between items-center mb-3">
+                          <h4 className="font-medium">Content {index + 1}</h4>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeContentFromModuleForm(index)}
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                          <div>
+                            <Label>Content Title</Label>
+                            <Input
+                              value={content.title}
+                              onChange={(e) => updateModuleFormContent(index, 'title', e.target.value)}
+                              placeholder="e.g., Introduction Video"
+                              className="mt-1 bg-white border-2 border-gray-200 focus:border-teal-500"
+                            />
+                          </div>
+                          <div>
+                            <Label>Content Type</Label>
+                            <Select value={content.type} onValueChange={(value) => updateModuleFormContent(index, 'type', value)}>
+                              <SelectTrigger className="mt-1 bg-white border-2 border-gray-200 focus:border-teal-500">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="video">📹 Video</SelectItem>
+                                <SelectItem value="text">📝 Text</SelectItem>
+                                <SelectItem value="link">🔗 Link</SelectItem>
+                                <SelectItem value="document">📄 Document</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                        
+                        <div className="mt-3">
+                          <Label>Content</Label>
+                          <Textarea
+                            value={content.content}
+                            onChange={(e) => updateModuleFormContent(index, 'content', e.target.value)}
+                            placeholder={
+                              content.type === 'video' ? 'Enter video URL' :
+                              content.type === 'link' ? 'Enter link URL' :
+                              content.type === 'document' ? 'Enter document URL or description' :
+                              'Enter text content'
+                            }
+                            rows={3}
+                            className="mt-1 bg-white border-2 border-gray-200 focus:border-teal-500"
+                          />
+                        </div>
+                        
+                        <div className="mt-3">
+                          <Label>Duration (optional)</Label>
+                          <Input
+                            value={content.duration || ''}
+                            onChange={(e) => updateModuleFormContent(index, 'duration', e.target.value)}
+                            placeholder="e.g., 10 minutes"
+                            className="mt-1 bg-white border-2 border-gray-200 focus:border-teal-500"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="flex justify-end space-x-3 mt-6 pt-4 border-t">
+                  <Button variant="outline" onClick={() => setShowModuleModal(false)}>
+                    Cancel
+                  </Button>
+                  <Button onClick={saveModule} className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700">
+                    {editingModuleIndex !== null ? 'Update Module' : 'Add Module'}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </PageLayout>
   );
