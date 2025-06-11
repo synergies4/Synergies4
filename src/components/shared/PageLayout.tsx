@@ -84,7 +84,7 @@ function ScrollToTop() {
   return (
     <button
       onClick={scrollToTop}
-      className={`fixed bottom-6 right-20 z-40 p-3 rounded-full shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-110 group backdrop-blur-sm border-2 ${
+      className={`fixed bottom-6 right-6 z-40 p-3 rounded-full shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-110 group backdrop-blur-sm border-2 ${
         isDarkBackground 
           ? 'bg-white/90 hover:bg-white text-gray-900 border-white/30 shadow-white/20' 
           : 'bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white border-teal-500/30 shadow-teal-500/20'
