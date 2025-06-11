@@ -222,48 +222,104 @@ function ResultsContent() {
     try {
       console.log('🚀 Starting PDF generation process...');
       
-      // Simple test first
-      const testPDF = async () => {
-        console.log('📄 Creating simple test PDF...');
-        const jsPDF = (await import('jspdf')).default;
-        const doc = new jsPDF();
-        doc.text('Test PDF Generation', 10, 10);
-        doc.text('HR Assessment Results', 10, 20);
-        doc.text(`Score: ${resultsData.overallPercentage}%`, 10, 30);
-        doc.text(`Company: ${resultsData.contactInfo.company || 'N/A'}`, 10, 40);
-        doc.text(`Name: ${resultsData.contactInfo.name || 'N/A'}`, 10, 50);
-        doc.save('test-assessment-report.pdf');
-        console.log('✅ Simple PDF test completed and downloaded!');
+      // Basic jsPDF test first
+      const basicTest = async () => {
+        console.log('🧪 Testing basic jsPDF functionality...');
+        try {
+          const jsPDF = (await import('jspdf')).default;
+          console.log('📦 jsPDF imported successfully:', jsPDF);
+          
+          const doc = new jsPDF();
+          console.log('📄 PDF document created:', doc);
+          
+          doc.text('Basic Test PDF', 10, 10);
+          console.log('✏️ Text added to PDF');
+          
+          // Try multiple download methods
+          console.log('💾 Attempting to save PDF...');
+          
+          // Method 1: Standard save
+          try {
+            doc.save('basic-test.pdf');
+            console.log('✅ Method 1 (doc.save) executed');
+          } catch (saveError) {
+            console.error('❌ Method 1 failed:', saveError);
+          }
+          
+          // Method 2: Manual blob download
+          try {
+            const pdfBlob = doc.output('blob');
+            const url = URL.createObjectURL(pdfBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'basic-test-manual.pdf';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            console.log('✅ Method 2 (manual blob) executed');
+          } catch (blobError) {
+            console.error('❌ Method 2 failed:', blobError);
+          }
+          
+          // Method 3: Direct download with window.open
+          try {
+            const pdfDataUri = doc.output('datauristring');
+            const newWindow = window.open();
+            if (newWindow) {
+              newWindow.document.write(`<iframe width='100%' height='100%' src='${pdfDataUri}'></iframe>`);
+              console.log('✅ Method 3 (window.open) executed');
+            } else {
+              console.log('⚠️ Method 3 blocked by popup blocker');
+            }
+          } catch (windowError) {
+            console.error('❌ Method 3 failed:', windowError);
+          }
+          
+        } catch (importError) {
+          console.error('❌ jsPDF import failed:', importError);
+        }
       };
       
-      // Try simple test first
-      await testPDF();
+      // Run basic test
+      await basicTest();
       
-      // If simple test works, try full PDF after delay
+      // Wait a bit then try the full assessment PDF
       setTimeout(async () => {
+        console.log('🎨 Attempting full assessment PDF...');
         try {
-          console.log('🎨 Generating full branded PDF...');
-          const { generateAssessmentPDF } = await import('@/lib/pdfGenerator');
-          
-          const recommendations = getRecommendations(resultsData.overallPercentage, resultsData.categoryScores);
-          console.log('📋 Recommendations generated:', recommendations);
-          
-          const pdfData = {
-            overallPercentage: resultsData.overallPercentage,
-            categoryScores: resultsData.categoryScores,
-            readinessLevel: resultsData.readinessLevel,
-            contactInfo: resultsData.contactInfo,
-            recommendations: recommendations
+          const testPDF = async () => {
+            console.log('📄 Creating assessment test PDF...');
+            const jsPDF = (await import('jspdf')).default;
+            const doc = new jsPDF();
+            
+            // Add content
+            doc.text('HR Assessment Results', 10, 10);
+            doc.text(`Score: ${resultsData.overallPercentage}%`, 10, 20);
+            doc.text(`Company: ${resultsData.contactInfo.company || 'N/A'}`, 10, 30);
+            doc.text(`Name: ${resultsData.contactInfo.name || 'N/A'}`, 10, 40);
+            
+            // Try blob download method (most reliable)
+            const pdfBlob = doc.output('blob');
+            const url = URL.createObjectURL(pdfBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${resultsData.contactInfo.company || 'Assessment'}_Results.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            console.log('✅ Assessment PDF download attempted');
+            alert('PDF download attempted! Check your downloads folder.');
           };
           
-          console.log('📊 Full PDF data prepared:', pdfData);
-          generateAssessmentPDF(pdfData);
-          console.log('🎉 Full PDF generation completed!');
+          await testPDF();
+          
         } catch (fullPdfError) {
-          console.error('❌ Full PDF generation failed:', fullPdfError);
-          alert('Simple PDF worked, but there was an issue with the full branded PDF. Please check console for details.');
+          console.error('❌ Full assessment PDF failed:', fullPdfError);
         }
-      }, 2000);
+      }, 3000);
       
     } catch (error) {
       console.error('💥 Error in PDF generation process:', error);
