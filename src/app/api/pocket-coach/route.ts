@@ -220,12 +220,7 @@ async function generateAIResponse(message: string, context: string): Promise<str
     const anthropicKey = process.env.ANTHROPIC_API_KEY;
     const openaiKey = process.env.OPENAI_API_KEY;
     
-    console.log('API Key check:', {
-      hasAnthropic: !!anthropicKey,
-      hasOpenAI: !!openaiKey,
-      anthropicLength: anthropicKey?.length || 0,
-      openaiLength: openaiKey?.length || 0
-    });
+
     
     if (!anthropicKey && !openaiKey) {
       console.error('No AI API keys configured');

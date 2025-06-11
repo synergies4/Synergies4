@@ -106,17 +106,8 @@ How can I support you right now?`,
 
   const loadRecentSessions = async () => {
     try {
-      const { createClient } = await import('@/lib/supabase/client');
-      const supabase = createClient();
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) return;
-
-      const response = await fetch('/api/pocket-coach', {
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-        },
-      });
+      // Use same pattern as working chat API - no Authorization header needed
+      const response = await fetch('/api/pocket-coach');
       if (response.ok) {
         const data = await response.json();
         setSessions(data.sessions || []);
@@ -142,19 +133,11 @@ How can I support you right now?`,
     setIsLoading(true);
 
     try {
-      const { createClient } = await import('@/lib/supabase/client');
-      const supabase = createClient();
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        throw new Error('Authentication required');
-      }
-
+      // Use same pattern as working chat API - no Authorization header needed
       const response = await fetch('/api/pocket-coach', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
           message: text,
