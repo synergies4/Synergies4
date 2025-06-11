@@ -1,36 +1,16 @@
-import { createClient } from '@/lib/supabase/server';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
-
-async function getAuthenticatedUser(request: NextRequest) {
-  try {
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return null;
-    }
-
-    const token = authHeader.substring(7);
-    const supabase = await createClient();
-    
-    const { data: { user }, error } = await supabase.auth.getUser(token);
-    if (error || !user) {
-      return null;
-    }
-
-    return user;
-  } catch (error) {
-    console.error('Auth error:', error);
-    return null;
-  }
-}
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await getAuthenticatedUser(request);
+    // Get user's session using the same method as the working chat API
+    const supabase = createRouteHandlerClient({ cookies });
+    const { data: { user } } = await supabase.auth.getUser();
+    
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
-    const supabase = await createClient();
 
     const { message, sessionId, context } = await request.json();
 
@@ -136,12 +116,13 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await getAuthenticatedUser(request);
+    // Get user's session using the same method as the working chat API
+    const supabase = createRouteHandlerClient({ cookies });
+    const { data: { user } } = await supabase.auth.getUser();
+    
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
-    const supabase = await createClient();
 
     const { searchParams } = new URL(request.url);
     const sessionId = searchParams.get('sessionId');
@@ -238,6 +219,13 @@ async function generateAIResponse(message: string, context: string): Promise<str
     // Try Anthropic first, then fallback to OpenAI
     const anthropicKey = process.env.ANTHROPIC_API_KEY;
     const openaiKey = process.env.OPENAI_API_KEY;
+    
+    console.log('API Key check:', {
+      hasAnthropic: !!anthropicKey,
+      hasOpenAI: !!openaiKey,
+      anthropicLength: anthropicKey?.length || 0,
+      openaiLength: openaiKey?.length || 0
+    });
     
     if (!anthropicKey && !openaiKey) {
       console.error('No AI API keys configured');
