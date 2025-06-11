@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -34,7 +34,31 @@ interface ResultsData {
   };
 }
 
-export default function AssessmentResults() {
+// Loading component for Suspense fallback
+function ResultsLoading() {
+  return (
+    <PageLayout>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 py-12">
+        <div className="container mx-auto px-4">
+          <div className="max-w-2xl mx-auto text-center">
+            <div className="bg-white rounded-xl shadow-lg p-8">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <h1 className="text-2xl font-bold text-gray-900 mb-4">
+                Loading Your Results...
+              </h1>
+              <p className="text-gray-600">
+                Please wait while we retrieve your assessment results.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </PageLayout>
+  );
+}
+
+// Component that uses useSearchParams - needs to be wrapped in Suspense
+function ResultsContent() {
   const searchParams = useSearchParams();
   const [resultsData, setResultsData] = useState<ResultsData | null>(null);
 
@@ -394,5 +418,14 @@ export default function AssessmentResults() {
         </div>
       </div>
     </PageLayout>
+  );
+}
+
+// Main component with Suspense wrapper
+export default function AssessmentResults() {
+  return (
+    <Suspense fallback={<ResultsLoading />}>
+      <ResultsContent />
+    </Suspense>
   );
 } 
