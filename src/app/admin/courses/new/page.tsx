@@ -893,181 +893,180 @@ export default function CreateCourse() {
           return (
             <div className="space-y-6">
               {/* Show modules for digital/hybrid courses */}
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900 flex items-center">
-                      <BookOpen className="w-5 h-5 mr-2 text-teal-600" />
-                      Course Modules
-                    </h3>
-                    <p className="text-gray-600">Add modules and lessons to your course curriculum</p>
-                  </div>
-                  <Button onClick={() => addModule()} className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Module
-                  </Button>
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 flex items-center">
+                    <BookOpen className="w-5 h-5 mr-2 text-teal-600" />
+                    Course Modules
+                  </h3>
+                  <p className="text-gray-600">Add modules and lessons to your course curriculum</p>
                 </div>
-
-                {modules.length === 0 ? (
-                  <Card className="bg-gradient-to-r from-gray-50 to-blue-50 border-2 border-gray-200">
-                    <CardContent className="text-center py-12">
-                      <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">No modules yet</h3>
-                      <p className="text-gray-600 mb-4">Start building your course by adding your first module.</p>
-                      <Button onClick={() => addModule()} variant="outline">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add First Module
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ) : (
-                  <div className="space-y-4">
-                    {modules.map((module, index) => (
-                      <Card key={index} className="border-2 border-gray-200">
-                                                 <CardHeader className="pb-4">
-                           <div className="flex justify-between items-start">
-                             <div>
-                               <CardTitle className="flex items-center space-x-2">
-                                 <Badge variant="outline">Module {module.order}</Badge>
-                                 <span>{module.title}</span>
-                               </CardTitle>
-                               <CardDescription className="mt-1">{module.description}</CardDescription>
-                             </div>
-                             <div className="flex space-x-2">
-                               <Button variant="outline" size="sm" onClick={() => editModule(index)}>
-                                 <FileText className="w-4 h-4" />
-                               </Button>
-                               <Button variant="outline" size="sm" onClick={() => removeModule(index)}>
-                                 <X className="w-4 h-4" />
-                               </Button>
-                             </div>
-                           </div>
-                         </CardHeader>
-                                                 <CardContent>
-                           <div className="space-y-3">
-                             <div className="flex justify-between items-center">
-                               <h4 className="font-medium text-gray-900">Contents ({module.contents.length})</h4>
-                             </div>
-                             
-                             {module.contents.length > 0 ? (
-                               <div className="space-y-2">
-                                 {module.contents.map((content, contentIndex) => (
-                                   <div key={contentIndex} className="flex items-center p-3 bg-gray-50 rounded-lg">
-                                     <div className="flex items-center space-x-3">
-                                       <div className={`p-2 rounded ${getContentTypeColor(content.type)}`}>
-                                         {getContentTypeIcon(content.type)}
-                                       </div>
-                                       <div>
-                                         <p className="font-medium text-gray-900">{content.title}</p>
-                                         <p className="text-sm text-gray-600">
-                                           {content.duration && `${content.duration} • `}
-                                           {content.type.charAt(0).toUpperCase() + content.type.slice(1)}
-                                         </p>
-                                       </div>
-                                 ))}
-                               </div>
-                             ) : (
-                               <p className="text-gray-500 text-sm">No content in this module yet. Click edit to add content.</p>
-                             )}
-                           </div>
-                         </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-
-              </Card>
-            )}
-          </div>
-        );
-      } else {
-        // For in-person courses, step 4 is Review
-        const selectedCategory = categories.find(cat => cat.value === formData.category);
-        return (
-          <div className="space-y-6">
-            <div className="bg-gradient-to-r from-teal-50 to-emerald-50 p-6 rounded-xl border-2 border-teal-200">
-              <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                <CheckCircle className="w-5 h-5 mr-2 text-teal-600" />
-                Course Review
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-sm font-semibold text-gray-600">Title</p>
-                    <p className="text-lg font-bold text-gray-900">{formData.title || 'Untitled Course'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-600">Category</p>
-                    {selectedCategory && (
-                      <Badge className={`${selectedCategory.color} text-sm`}>
-                        {selectedCategory.label}
-                      </Badge>
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-600">Level</p>
-                    <p className="text-gray-900 font-medium">{formData.level}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-600">Type</p>
-                    <p className="text-gray-900 font-medium capitalize">{formData.course_type.replace('_', ' ')}</p>
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-sm font-semibold text-gray-600">Price</p>
-                    <p className="text-2xl font-bold text-emerald-600">${formData.price || '0.00'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-600">Duration</p>
-                    <p className="text-gray-900 font-medium">{formData.duration || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-600">Featured</p>
-                    <p className="text-gray-900 font-medium">{formData.featured ? 'Yes' : 'No'}</p>
-                  </div>
-                </div>
+                <Button onClick={() => addModule()} className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Module
+                </Button>
               </div>
-              
-              {formData.description && (
-                <div className="mt-6">
-                  <p className="text-sm font-semibold text-gray-600 mb-2">Description Preview</p>
-                  <div className="bg-white p-4 rounded-lg border max-h-32 overflow-y-auto">
-                    <p className="text-gray-900 text-sm">{formData.description}</p>
-                  </div>
-                </div>
-              )}
 
-              {/* Show modules and quiz summary for digital/hybrid courses */}
-              {(formData.course_type === 'digital' || formData.course_type === 'hybrid') && (
-                <div className="mt-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm font-semibold text-gray-600 mb-2">Modules</p>
-                      <div className="bg-white p-3 rounded-lg border">
-                        <p className="text-gray-900 text-sm">{modules.length} modules created</p>
-                        <p className="text-xs text-gray-500">
-                          {modules.reduce((total, module) => total + module.contents.length, 0)} total lessons
-                        </p>
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-gray-600 mb-2">Quiz</p>
-                      <div className="bg-white p-3 rounded-lg border">
-                        <p className="text-gray-900 text-sm">
-                          {quizQuestions.length > 0 ? `${quizQuestions.length} questions` : 'No quiz'}
-                        </p>
-                        {quizTitle && (
-                          <p className="text-xs text-gray-500">{quizTitle}</p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+              {modules.length === 0 ? (
+                <Card className="bg-gradient-to-r from-gray-50 to-blue-50 border-2 border-gray-200">
+                  <CardContent className="text-center py-12">
+                    <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No modules yet</h3>
+                    <p className="text-gray-600 mb-4">Start building your course by adding your first module.</p>
+                    <Button onClick={() => addModule()} variant="outline">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add First Module
+                    </Button>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-4">
+                  {modules.map((module, index) => (
+                    <Card key={index} className="border-2 border-gray-200">
+                      <CardHeader className="pb-4">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <CardTitle className="flex items-center space-x-2">
+                              <Badge variant="outline">Module {module.order}</Badge>
+                              <span>{module.title}</span>
+                            </CardTitle>
+                            <CardDescription className="mt-1">{module.description}</CardDescription>
+                          </div>
+                          <div className="flex space-x-2">
+                            <Button variant="outline" size="sm" onClick={() => editModule(index)}>
+                              <FileText className="w-4 h-4" />
+                            </Button>
+                            <Button variant="outline" size="sm" onClick={() => removeModule(index)}>
+                              <X className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-center">
+                            <h4 className="font-medium text-gray-900">Contents ({module.contents.length})</h4>
+                          </div>
+                          
+                          {module.contents.length > 0 ? (
+                            <div className="space-y-2">
+                              {module.contents.map((content, contentIndex) => (
+                                <div key={contentIndex} className="flex items-center p-3 bg-gray-50 rounded-lg">
+                                  <div className="flex items-center space-x-3">
+                                    <div className={`p-2 rounded ${getContentTypeColor(content.type)}`}>
+                                      {getContentTypeIcon(content.type)}
+                                    </div>
+                                    <div>
+                                      <p className="font-medium text-gray-900">{content.title}</p>
+                                      <p className="text-sm text-gray-600">
+                                        {content.duration && `${content.duration} • `}
+                                        {content.type.charAt(0).toUpperCase() + content.type.slice(1)}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-gray-500 text-sm">No content in this module yet. Click edit to add content.</p>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
               )}
             </div>
-          </div>
-        );
-      }
+          );
+        } else {
+          // For in-person courses, step 4 is Review
+          const selectedCategory = categories.find(cat => cat.value === formData.category);
+          return (
+            <div className="space-y-6">
+              <div className="bg-gradient-to-r from-teal-50 to-emerald-50 p-6 rounded-xl border-2 border-teal-200">
+                <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                  <CheckCircle className="w-5 h-5 mr-2 text-teal-600" />
+                  Course Review
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-sm font-semibold text-gray-600">Title</p>
+                      <p className="text-lg font-bold text-gray-900">{formData.title || 'Untitled Course'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-600">Category</p>
+                      {selectedCategory && (
+                        <Badge className={`${selectedCategory.color} text-sm`}>
+                          {selectedCategory.label}
+                        </Badge>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-600">Level</p>
+                      <p className="text-gray-900 font-medium">{formData.level}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-600">Type</p>
+                      <p className="text-gray-900 font-medium capitalize">{formData.course_type.replace('_', ' ')}</p>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-sm font-semibold text-gray-600">Price</p>
+                      <p className="text-2xl font-bold text-emerald-600">${formData.price || '0.00'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-600">Duration</p>
+                      <p className="text-gray-900 font-medium">{formData.duration || 'Not specified'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-600">Featured</p>
+                      <p className="text-gray-900 font-medium">{formData.featured ? 'Yes' : 'No'}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                {formData.description && (
+                  <div className="mt-6">
+                    <p className="text-sm font-semibold text-gray-600 mb-2">Description Preview</p>
+                    <div className="bg-white p-4 rounded-lg border max-h-32 overflow-y-auto">
+                      <p className="text-gray-900 text-sm">{formData.description}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Show modules and quiz summary for digital/hybrid courses */}
+                {(formData.course_type === 'digital' || formData.course_type === 'hybrid') && (
+                  <div className="mt-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm font-semibold text-gray-600 mb-2">Modules</p>
+                        <div className="bg-white p-3 rounded-lg border">
+                          <p className="text-gray-900 text-sm">{modules.length} modules created</p>
+                          <p className="text-xs text-gray-500">
+                            {modules.reduce((total, module) => total + module.contents.length, 0)} total lessons
+                          </p>
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-gray-600 mb-2">Quiz</p>
+                        <div className="bg-white p-3 rounded-lg border">
+                          <p className="text-gray-900 text-sm">
+                            {quizQuestions.length > 0 ? `${quizQuestions.length} questions` : 'No quiz'}
+                          </p>
+                          {quizTitle && (
+                            <p className="text-xs text-gray-500">{quizTitle}</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        }
       
       case 5:
         return (
