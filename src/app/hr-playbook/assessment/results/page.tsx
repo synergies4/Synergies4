@@ -191,22 +191,43 @@ function ResultsContent() {
     try {
       console.log('Starting PDF generation...', resultsData);
       
-      // Dynamic import to ensure client-side only
-      const { generateAssessmentPDF } = await import('@/lib/pdfGenerator');
-      
-      const recommendations = getRecommendations(resultsData.overallPercentage, resultsData.categoryScores);
-      
-      const pdfData = {
-        overallPercentage: resultsData.overallPercentage,
-        categoryScores: resultsData.categoryScores,
-        readinessLevel: resultsData.readinessLevel,
-        contactInfo: resultsData.contactInfo,
-        recommendations: recommendations
+      // Simple test first
+      const testPDF = async () => {
+        const jsPDF = (await import('jspdf')).default;
+        const doc = new jsPDF();
+        doc.text('Test PDF Generation', 10, 10);
+        doc.text('HR Assessment Results', 10, 20);
+        doc.text(`Score: ${resultsData.overallPercentage}%`, 10, 30);
+        doc.save('test-assessment-report.pdf');
+        console.log('Simple PDF test completed');
       };
       
-      console.log('PDF data prepared:', pdfData);
-      generateAssessmentPDF(pdfData);
-      console.log('PDF generation completed');
+      // Try simple test first
+      await testPDF();
+      
+      // If simple test works, try full PDF
+      setTimeout(async () => {
+        try {
+          const { generateAssessmentPDF } = await import('@/lib/pdfGenerator');
+          
+          const recommendations = getRecommendations(resultsData.overallPercentage, resultsData.categoryScores);
+          
+          const pdfData = {
+            overallPercentage: resultsData.overallPercentage,
+            categoryScores: resultsData.categoryScores,
+            readinessLevel: resultsData.readinessLevel,
+            contactInfo: resultsData.contactInfo,
+            recommendations: recommendations
+          };
+          
+          console.log('PDF data prepared:', pdfData);
+          generateAssessmentPDF(pdfData);
+          console.log('Full PDF generation completed');
+        } catch (fullPdfError) {
+          console.error('Full PDF generation failed:', fullPdfError);
+        }
+      }, 1000);
+      
     } catch (error) {
       console.error('Error generating PDF:', error);
       alert('Sorry, there was an error generating the PDF report. Please try again.');

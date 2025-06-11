@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -150,7 +151,13 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
   const { user, userProfile, signOut } = useAuth();
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  // Handle mounting for portal
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Close mega menu when clicking outside
   useEffect(() => {
@@ -382,8 +389,8 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
       </div>
 
       {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 z-50 bg-black bg-opacity-50" onClick={closeMobileMenu}>
+      {isMobileMenuOpen && isMounted && createPortal(
+        <div className="lg:hidden fixed inset-0 z-[9999] bg-black bg-opacity-50" onClick={closeMobileMenu}>
           <div 
             className="fixed top-0 right-0 w-full max-w-sm h-full bg-white shadow-2xl overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
@@ -519,7 +526,8 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
