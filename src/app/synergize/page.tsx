@@ -3043,13 +3043,30 @@ const EditableSlidePresentation = ({
 
       {/* Main Editor Area */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Slide Thumbnails - Mobile optimized */}
-        <div className={`${isMobile ? 'w-20' : 'w-64'} bg-white border-r border-gray-200 overflow-y-auto`}>
-          <div className={`${isMobile ? 'p-2' : 'p-4'}`}>
-            <h3 className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-700 mb-3 ${isMobile ? 'text-center' : ''}`}>
-              {isMobile ? 'Slides' : 'Slides'}
-            </h3>
-            <div className={`${isMobile ? 'space-y-2' : 'space-y-3'}`}>
+        {/* Slide Thumbnails - Mobile optimized with proper scrolling */}
+        <div className={`${isMobile ? 'w-20' : 'w-64'} bg-white border-r border-gray-200 flex flex-col`}>
+          <div className={`${isMobile ? 'p-2' : 'p-4'} border-b border-gray-100`}>
+            <div className="flex items-center justify-between">
+              <h3 className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-700 ${isMobile ? 'text-center' : ''}`}>
+                {isMobile ? 'Slides' : 'Slides'}
+              </h3>
+              {!isMobile && (
+                <Button
+                  size="sm"
+                  onClick={addNewSlide}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white h-6 w-6 p-0 rounded flex items-center justify-center"
+                  title="Add new slide"
+                >
+                  <Plus className="h-3 w-3" />
+                </Button>
+              )}
+            </div>
+            <div className="text-xs text-gray-500 mt-1">
+              {editableSlides.length} slide{editableSlides.length !== 1 ? 's' : ''}
+            </div>
+          </div>
+          <div className="flex-1 overflow-y-auto slide-thumbnails-scroll">
+            <div className={`${isMobile ? 'p-2 space-y-2' : 'p-4 space-y-3'} relative slide-container`}>
               {editableSlides.map((slide, index) => (
                 <motion.div
                   key={index}
@@ -3085,6 +3102,19 @@ const EditableSlidePresentation = ({
                   </div>
                 </motion.div>
               ))}
+              
+              {/* Add slide button for mobile */}
+              {isMobile && (
+                <motion.div
+                  onClick={addNewSlide}
+                  className="p-2 rounded-lg border-2 border-dashed border-gray-300 hover:border-gray-400 cursor-pointer transition-all duration-200 touch-manipulation flex items-center justify-center"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  title="Add new slide"
+                >
+                  <Plus className="h-4 w-4 text-gray-600" />
+                </motion.div>
+              )}
             </div>
           </div>
         </div>
