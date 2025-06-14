@@ -106,14 +106,29 @@ body {
   color: #374151 !important;
 }
 
-/* Force white text on ALL dark gradient backgrounds */
-[class*="bg-gradient-to-br"][class*="from-blue-"] *:not([class*="bg-white"]):not([class*="bg-gray-"]):not([class*="bg-slate-"]):not(button[class*="bg-"]),
-[class*="bg-gradient-to-r"][class*="from-blue-"] *:not([class*="bg-white"]):not([class*="bg-gray-"]):not([class*="bg-slate-"]):not(button[class*="bg-"]),
-[class*="bg-gradient-to-br"][class*="from-purple-"] *:not([class*="bg-white"]):not([class*="bg-gray-"]):not([class*="bg-slate-"]):not(button[class*="bg-"]),
-[class*="bg-gradient-to-r"][class*="from-purple-"] *:not([class*="bg-white"]):not([class*="bg-gray-"]):not([class*="bg-slate-"]):not(button[class*="bg-"]),
-[class*="bg-gradient-to-br"][class*="via-blue-"] *:not([class*="bg-white"]):not([class*="bg-gray-"]):not([class*="bg-slate-"]):not(button[class*="bg-"]),
-[class*="bg-gradient-to-br"][class*="to-purple-"] *:not([class*="bg-white"]):not([class*="bg-gray-"]):not([class*="bg-slate-"]):not(button[class*="bg-"]) {
+/* Force white text on dark gradient backgrounds but exclude navigation elements */
+[class*="bg-gradient-to-br"][class*="from-blue-"] h1,
+[class*="bg-gradient-to-br"][class*="from-blue-"] h2,
+[class*="bg-gradient-to-br"][class*="from-blue-"] h3,
+[class*="bg-gradient-to-br"][class*="from-blue-"] h4,
+[class*="bg-gradient-to-br"][class*="from-blue-"] h5,
+[class*="bg-gradient-to-br"][class*="from-blue-"] h6,
+[class*="bg-gradient-to-br"][class*="from-purple-"] h1,
+[class*="bg-gradient-to-br"][class*="from-purple-"] h2,
+[class*="bg-gradient-to-br"][class*="from-purple-"] h3,
+[class*="bg-gradient-to-br"][class*="from-purple-"] h4,
+[class*="bg-gradient-to-br"][class*="from-purple-"] h5,
+[class*="bg-gradient-to-br"][class*="from-purple-"] h6 {
   color: #ffffff !important;
+}
+
+[class*="bg-gradient-to-br"][class*="from-blue-"] p:not([class*="bg-"]),
+[class*="bg-gradient-to-br"][class*="from-blue-"] span:not([class*="text-"]):not([class*="bg-"]):not(button *),
+[class*="bg-gradient-to-br"][class*="from-blue-"] div:not([class*="text-"]):not([class*="bg-"]):not([class*="flex"]):not([class*="grid"]),
+[class*="bg-gradient-to-br"][class*="from-purple-"] p:not([class*="bg-"]),
+[class*="bg-gradient-to-br"][class*="from-purple-"] span:not([class*="text-"]):not([class*="bg-"]):not(button *),
+[class*="bg-gradient-to-br"][class*="from-purple-"] div:not([class*="text-"]):not([class*="bg-"]):not([class*="flex"]):not([class*="grid"]) {
+  color: #e2e8f0 !important;
 }
 
 /* Specific dark gradient text colors for hero sections */
@@ -137,6 +152,32 @@ section[class*="bg-gradient-to-br"][class*="from-blue-"] span:not([class*="text-
 section[class*="bg-gradient-to-br"][class*="from-purple-"] p,
 section[class*="bg-gradient-to-br"][class*="from-purple-"] span:not([class*="text-"]):not([class*="bg-"]) {
   color: #e2e8f0 !important;
+}
+
+/* Fix navigation elements on dark gradient backgrounds */
+[class*="bg-gradient-to-br"][class*="from-blue-"] button[class*="variant-outline"],
+[class*="bg-gradient-to-br"][class*="from-blue-"] button[class*="bg-white"],
+[class*="bg-gradient-to-br"][class*="from-purple-"] button[class*="variant-outline"],
+[class*="bg-gradient-to-br"][class*="from-purple-"] button[class*="bg-white"] {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  color: #1f2937 !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+[class*="bg-gradient-to-br"][class*="from-blue-"] button[class*="variant-outline"]:hover,
+[class*="bg-gradient-to-br"][class*="from-blue-"] button[class*="bg-white"]:hover,
+[class*="bg-gradient-to-br"][class*="from-purple-"] button[class*="variant-outline"]:hover,
+[class*="bg-gradient-to-br"][class*="from-purple-"] button[class*="bg-white"]:hover {
+  background-color: rgba(255, 255, 255, 1) !important;
+  color: #1f2937 !important;
+}
+
+/* Badges on dark gradient backgrounds */
+[class*="bg-gradient-to-br"][class*="from-blue-"] [class*="badge"],
+[class*="bg-gradient-to-br"][class*="from-purple-"] [class*="badge"] {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
 }
 
 /* Card text only on light card backgrounds */
