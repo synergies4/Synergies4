@@ -196,13 +196,83 @@ section[class*="to-cyan-50"] h1 span:not(.text-transparent) {
   color: #000000 !important;
 }
 
-/* Ensure header navigation text is visible */
+/* Fix header navigation completely */
 nav, header {
-  color: #1f2937;
+  color: #1f2937 !important;
 }
 
-nav *, header * {
-  color: inherit;
+/* Force all navigation text to be dark */
+nav *, header *, 
+nav button, header button,
+nav button *, header button *,
+nav a, header a,
+nav a *, header a *,
+nav span, header span,
+nav div, header div {
+  color: #1f2937 !important;
+}
+
+/* Fix mega menu dropdown specifically */
+nav [class*="bg-white"],
+nav [class*="shadow"],
+header [class*="bg-white"],
+header [class*="shadow"] {
+  background-color: #ffffff !important;
+  color: #1f2937 !important;
+}
+
+nav [class*="bg-white"] *,
+nav [class*="shadow"] *,
+header [class*="bg-white"] *,
+header [class*="shadow"] * {
+  color: #1f2937 !important;
+}
+
+/* Fix dropdown menu items */
+nav .bg-white a,
+nav .bg-white button,
+nav .bg-white span,
+nav .bg-white div,
+header .bg-white a,
+header .bg-white button, 
+header .bg-white span,
+header .bg-white div {
+  color: #1f2937 !important;
+}
+
+/* Ensure hover states work */
+nav button:hover,
+header button:hover,
+nav a:hover,
+header a:hover {
+  color: #0d9488 !important;
+}
+
+/* Fix dropdown positioning and visibility */
+nav [class*="absolute"],
+header [class*="absolute"] {
+  z-index: 9999 !important;
+  background-color: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+}
+
+/* Force text colors in dropdowns */
+nav [class*="absolute"] h3,
+nav [class*="absolute"] h4,
+nav [class*="absolute"] p,
+nav [class*="absolute"] span,
+header [class*="absolute"] h3,
+header [class*="absolute"] h4,
+header [class*="absolute"] p,
+header [class*="absolute"] span {
+  color: #1f2937 !important;
+}
+
+/* Fix badge colors in navigation */
+nav [class*="badge"],
+header [class*="badge"] {
+  background-color: #10b981 !important;
+  color: #ffffff !important;
 }
 
 /* Fix any potential layout issues */
@@ -218,6 +288,30 @@ nav *, header * {
   .lg\:hidden {
     display: none !important;
   }
+}
+
+/* Fix header layout and icon alignment */
+nav button svg,
+header button svg,
+nav a svg,
+header a svg {
+  color: #1f2937 !important;
+  fill: currentColor !important;
+}
+
+/* Ensure proper spacing and no overlapping */
+nav .flex,
+header .flex {
+  align-items: center !important;
+  gap: 0.5rem !important;
+}
+
+/* Fix chevron icons specifically */
+nav [class*="chevron"],
+header [class*="chevron"],
+nav svg[class*="w-4"],
+header svg[class*="w-4"] {
+  color: #1f2937 !important;
 }
 
 /* Preserve intentional colored text */
