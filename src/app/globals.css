@@ -172,12 +172,38 @@ section[class*="bg-gradient-to-br"][class*="from-purple-"] span:not([class*="tex
   color: #1f2937 !important;
 }
 
-/* Badges on dark gradient backgrounds */
+/* Badges on dark gradient backgrounds - comprehensive coverage */
 [class*="bg-gradient-to-br"][class*="from-blue-"] [class*="badge"],
-[class*="bg-gradient-to-br"][class*="from-purple-"] [class*="badge"] {
+[class*="bg-gradient-to-br"][class*="from-purple-"] [class*="badge"],
+[class*="bg-gradient-to-r"][class*="from-blue-"] [class*="badge"],
+[class*="bg-gradient-to-r"][class*="from-purple-"] [class*="badge"],
+section[class*="bg-gradient-to-br"] [class*="badge"],
+section[class*="bg-gradient-to-r"] [class*="badge"] {
   background-color: rgba(255, 255, 255, 0.2) !important;
   color: #ffffff !important;
   border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Course cards and container badges - dark backgrounds */
+[class*="bg-slate-"][class*="from-"] [class*="badge"],
+[class*="bg-gray-"][class*="from-"] [class*="badge"],
+.bg-slate-800 [class*="badge"],
+.bg-gray-800 [class*="badge"],
+.bg-slate-900 [class*="badge"],
+.bg-gray-900 [class*="badge"] {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  color: #1f2937 !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Specific badge fixes for course level indicators */
+[class*="bg-slate-"][class*="from-"] span[class*="text-xs"],
+[class*="bg-gray-"][class*="from-"] span[class*="text-xs"],
+section[class*="bg-gradient-to-br"] span[class*="text-xs"]:not([class*="text-"]) {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  color: #1f2937 !important;
+  padding: 4px 8px !important;
+  border-radius: 4px !important;
 }
 
 /* Card text only on light card backgrounds */
@@ -220,6 +246,31 @@ main:not([class*="bg-gradient-to-"]) div:not([class*="bg-gradient-to-"]):not([cl
   color: #374151;
 }
 
+/* Comprehensive dark section coverage */
+section[class*="bg-slate-8"],
+section[class*="bg-gray-8"],
+section[class*="bg-slate-9"],  
+section[class*="bg-gray-9"],
+[class*="bg-slate-8"][class*="via-"],
+[class*="bg-gray-8"][class*="via-"],
+[class*="bg-slate-8"][class*="to-"],
+[class*="bg-gray-8"][class*="to-"] {
+  color: #ffffff !important;
+}
+
+section[class*="bg-slate-8"] *:not([class*="bg-white"]):not([class*="bg-gray-5"]):not([class*="bg-slate-5"]),
+section[class*="bg-gray-8"] *:not([class*="bg-white"]):not([class*="bg-gray-5"]):not([class*="bg-slate-5"]),
+section[class*="bg-slate-9"] *:not([class*="bg-white"]):not([class*="bg-gray-5"]):not([class*="bg-slate-5"]),  
+section[class*="bg-gray-9"] *:not([class*="bg-white"]):not([class*="bg-gray-5"]):not([class*="bg-slate-5"]) {
+  color: #e2e8f0 !important;
+}
+
+/* Dark background course cards */
+[class*="bg-slate-"][class*="from-"]:not([class*="to-white"]) *:not([class*="bg-white"]):not(button[class*="bg-"]),
+[class*="bg-gray-"][class*="from-"]:not([class*="to-white"]) *:not([class*="bg-white"]):not(button[class*="bg-"]) {
+  color: #e2e8f0 !important;
+}
+
 /* Preserve intentional colored text */
 .text-green-600, .text-green-700, .text-green-800 {
   color: #16a34a !important;
@@ -255,6 +306,40 @@ main:not([class*="bg-gradient-to-"]) div:not([class*="bg-gradient-to-"]):not([cl
 [class*="bg-gradient-to-r"][class*="from-blue-6"] *,
 [class*="bg-gradient-to-r"][class*="from-emerald-6"] * {
   color: #ffffff !important;
+}
+
+/* Catch any remaining small text elements on dark backgrounds */
+section[class*="bg-gradient-to-br"] .text-xs,
+section[class*="bg-gradient-to-br"] .text-sm,
+section[class*="bg-slate-"] .text-xs,
+section[class*="bg-slate-"] .text-sm,
+section[class*="bg-gray-"] .text-xs,
+section[class*="bg-gray-"] .text-sm {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  color: #1f2937 !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  display: inline-block !important;
+}
+
+/* Force visibility for any invisible elements */
+[style*="color: transparent"],
+[style*="color: rgba(0, 0, 0, 0)"],
+[style*="color: rgba(255, 255, 255, 0)"] {
+  color: #1f2937 !important;
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  padding: 2px 4px !important;
+  border-radius: 2px !important;
+}
+
+/* Ensure breadcrumb and navigation elements are always visible */
+.breadcrumb, [class*="breadcrumb"], nav [class*="text-"], 
+section[class*="bg-"] nav, section[class*="bg-"] [role="navigation"] {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  color: #1f2937 !important;
+  padding: 4px 8px !important;
+  border-radius: 6px !important;
+  display: inline-block !important;
 }
 
 /* Enhanced Smooth Scrolling */
