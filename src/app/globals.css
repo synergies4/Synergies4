@@ -172,6 +172,30 @@ section[class*="bg-gray-8"] *, section[class*="bg-gray-9"] * {
   color: transparent !important;
 }
 
+/* FORCE hero text to be dark and visible */
+h1 span:not(.text-transparent) {
+  color: #000000 !important;
+}
+
+/* Ensure all headings are dark on light backgrounds */
+section[class*="from-slate-1"] h1,
+section[class*="from-slate-1"] h2,
+section[class*="from-slate-1"] h3,
+section[class*="via-blue-50"] h1,
+section[class*="via-blue-50"] h2,
+section[class*="via-blue-50"] h3,
+section[class*="to-cyan-50"] h1,
+section[class*="to-cyan-50"] h2,
+section[class*="to-cyan-50"] h3 {
+  color: #000000 !important;
+}
+
+section[class*="from-slate-1"] h1 span:not(.text-transparent),
+section[class*="via-blue-50"] h1 span:not(.text-transparent),
+section[class*="to-cyan-50"] h1 span:not(.text-transparent) {
+  color: #000000 !important;
+}
+
 /* Ensure header navigation text is visible */
 nav, header {
   color: #1f2937;
