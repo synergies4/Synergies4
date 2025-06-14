@@ -10,6 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { UserAvatar } from '@/components/UserAvatar';
 import { useAuth } from '@/contexts/AuthContext';
 import PageLayout from '@/components/shared/PageLayout';
+import CourseROIWidget from '@/components/CourseROIWidget';
 import { 
   ArrowLeft,
   ArrowRight, 
@@ -626,6 +627,17 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
 
               {/* Sidebar - Fixed positioning removed */}
               <div className="space-y-8">
+                {/* ROI Widget */}
+                <div className="animate-fade-in-up animation-delay-300">
+                  <CourseROIWidget
+                    courseId={course.id}
+                    courseTitle={course.title}
+                    courseCost={course.price || 0}
+                    courseDuration={course.duration || ''}
+                    courseSkills={course.category ? [course.category, course.level] : []}
+                  />
+                </div>
+
                 {/* Course Details */}
                 <div className="animate-fade-in-up animation-delay-400">
                   <div className="relative group">

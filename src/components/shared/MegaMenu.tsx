@@ -75,6 +75,13 @@ const menuCategories: MenuCategory[] = [
         href: '/synergize',
         icon: Sparkles,
         badge: 'Popular'
+      },
+      {
+        title: 'ROI Engine',
+        description: 'Calculate personalized course ROI & value projections',
+        href: '/roi-engine',
+        icon: Calculator,
+        isNew: true
       }
     ]
   },
@@ -392,8 +399,9 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
       {isMobileMenuOpen && isMounted && createPortal(
         <div className="lg:hidden fixed inset-0 z-[9999] bg-black bg-opacity-50" onClick={closeMobileMenu}>
           <div 
-            className="fixed top-0 right-0 w-full max-w-sm h-full bg-white shadow-2xl overflow-y-auto"
+            className="fixed top-0 right-0 w-full max-w-sm h-full bg-white shadow-2xl overflow-y-auto touch-manipulation"
             onClick={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
           >
             <div className="p-5">
               {/* Mobile Menu Header */}
@@ -441,8 +449,9 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                               <Link
                                 key={item.href}
                                 href={item.href}
-                                className="flex items-center space-x-3 p-2.5 rounded-md hover:bg-gray-50 transition-colors"
+                                className="flex items-center space-x-3 p-2.5 rounded-md hover:bg-gray-50 transition-colors touch-manipulation active:bg-gray-100"
                                 onClick={closeMobileMenu}
+                                onTouchEnd={closeMobileMenu}
                               >
                                 <div className="w-7 h-7 bg-gray-100 rounded-md flex items-center justify-center flex-shrink-0">
                                   <ItemIcon className="w-3.5 h-3.5 text-gray-600" />
@@ -481,8 +490,9 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                     </div>
                     <Link
                       href={userProfile?.role === 'ADMIN' ? '/admin' : '/dashboard'}
-                      className="flex items-center space-x-3 p-3 rounded-md hover:bg-gray-50 transition-colors"
+                      className="flex items-center space-x-3 p-3 rounded-md hover:bg-gray-50 transition-colors touch-manipulation active:bg-gray-100"
                       onClick={closeMobileMenu}
+                      onTouchEnd={closeMobileMenu}
                     >
                       <div className="w-8 h-8 bg-gray-100 rounded-md flex items-center justify-center">
                         <BarChart3 className="w-4 h-4 text-gray-600" />
@@ -508,16 +518,18 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                   <div className="space-y-2">
                     <Link
                       href="/login"
-                      className="flex items-center justify-center space-x-2 p-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                      className="flex items-center justify-center space-x-2 p-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors touch-manipulation active:bg-gray-100"
                       onClick={closeMobileMenu}
+                      onTouchEnd={closeMobileMenu}
                     >
                       <User className="w-4 h-4 text-gray-600" />
                       <span className="font-medium text-gray-900 text-sm">Login</span>
                     </Link>
                     <Link
                       href="/signup"
-                      className="flex items-center justify-center space-x-2 p-3 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors"
+                      className="flex items-center justify-center space-x-2 p-3 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors touch-manipulation active:bg-teal-800"
                       onClick={closeMobileMenu}
+                      onTouchEnd={closeMobileMenu}
                     >
                       <span className="font-medium text-sm">Sign Up</span>
                     </Link>
