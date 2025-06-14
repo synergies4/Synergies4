@@ -201,14 +201,13 @@ nav, header {
   color: #1f2937 !important;
 }
 
-/* Force all navigation text to be dark */
-nav *, header *, 
-nav button, header button,
-nav button *, header button *,
-nav a, header a,
-nav a *, header a *,
-nav span, header span,
-nav div, header div {
+/* Force navigation text to be dark but preserve layout */
+nav button,
+nav a,
+nav span:not([class*="bg-gradient"]),
+header button,
+header a, 
+header span:not([class*="bg-gradient"]) {
   color: #1f2937 !important;
 }
 
@@ -299,11 +298,39 @@ header a svg {
   fill: currentColor !important;
 }
 
-/* Ensure proper spacing and no overlapping */
+/* Ensure proper flex layout for navigation */
 nav .flex,
 header .flex {
+  display: flex !important;
   align-items: center !important;
-  gap: 0.5rem !important;
+  flex-direction: row !important;
+}
+
+/* Fix mega menu container specifically */
+nav div[class*="hidden lg:flex"],
+header div[class*="hidden lg:flex"] {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 0.25rem !important;
+}
+
+/* Force horizontal layout for navigation items */
+nav div[class*="space-x"],
+header div[class*="space-x"] {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+}
+
+/* Ensure responsive classes work */
+@media (min-width: 1024px) {
+  .lg\\:flex {
+    display: flex !important;
+  }
+  .lg\\:hidden {
+    display: none !important;
+  }
 }
 
 /* Fix chevron icons specifically */
