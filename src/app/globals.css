@@ -30,13 +30,15 @@
   --radius: 0.5rem;
 }
 
+/* Dark mode detection disabled - using light theme only for consistency */
+/*
 @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
     --background-start-rgb: 0, 0, 0;
     --background-end-rgb: 0, 0, 0;
 
-    /* Dark Mode Colors */
+    Dark Mode Colors
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
     --card: 222.2 84% 4.9%;
@@ -58,21 +60,109 @@
     --ring: 142.4 71.8% 29.2%;
   }
 }
+*/
 
 body {
-  color: rgb(var(--foreground-rgb));
+  color: #1f2937; /* Force dark text for light theme */
   background: linear-gradient(
       to bottom,
       transparent,
-      rgb(var(--background-end-rgb))
+      rgb(255, 255, 255)
     )
-    rgb(var(--background-start-rgb));
+    rgb(214, 219, 220);
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+/* CRITICAL FIX: Ensure all text is visible on light backgrounds */
+* {
+  color: inherit;
+}
+
+/* Force proper text colors for all components */
+h1, h2, h3, h4, h5, h6 {
+  color: #1f2937 !important;
+}
+
+p, span, div, li, label {
+  color: #374151 !important;
+}
+
+/* Override any problematic button text */
+button:not([class*="bg-gray-9"]):not([class*="bg-slate-9"]):not([class*="bg-black"]) {
+  color: #1f2937 !important;
+}
+
+/* Specific button types */
+button[class*="variant-outline"], 
+button[class*="variant-ghost"] {
+  color: #1f2937 !important;
+}
+
+/* Card and container text */
+[class*="card"] * {
+  color: #1f2937 !important;
+}
+
+/* Navigation and breadcrumb text */
+nav *, [class*="breadcrumb"] * {
+  color: #374151 !important;
+}
+
+/* Input and form text */
+input, textarea, select, label {
+  color: #1f2937 !important;
+}
+
+/* Badge and small text */
+[class*="badge"] {
+  color: inherit !important;
+}
+
+/* Progress component text */
+[class*="progress"] * {
+  color: #374151 !important;
+}
+
+/* Preserve intentional colored text */
+.text-green-600, .text-green-700, .text-green-800 {
+  color: #16a34a !important;
+}
+
+.text-blue-600, .text-blue-700, .text-blue-800 {
+  color: #2563eb !important;
+}
+
+.text-red-600, .text-red-700, .text-red-800 {
+  color: #dc2626 !important;
+}
+
+.text-orange-600, .text-orange-700, .text-orange-800 {
+  color: #ea580c !important;
+}
+
+.text-purple-600, .text-purple-700, .text-purple-800 {
+  color: #9333ea !important;
+}
+
+.text-teal-600, .text-teal-700, .text-teal-800 {
+  color: #0d9488 !important;
+}
+
+/* Preserve white text on dark backgrounds */
+.text-white {
+  color: #ffffff !important;
+}
+
+/* Preserve text for gradient backgrounds that need light text */
+[class*="bg-gradient-to-r"][class*="from-teal-6"] *,
+[class*="bg-gradient-to-r"][class*="from-blue-6"] *,
+[class*="bg-gradient-to-r"][class*="from-emerald-6"] * {
+  color: #ffffff !important;
 }
 
 /* Enhanced Smooth Scrolling */
