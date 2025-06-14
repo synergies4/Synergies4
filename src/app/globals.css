@@ -196,149 +196,28 @@ section[class*="to-cyan-50"] h1 span:not(.text-transparent) {
   color: #000000 !important;
 }
 
-/* Fix header navigation completely */
-nav, header {
+/* Let navigation use natural colors */
+
+/* Simple navigation text fix - minimal interference */
+nav button span,
+nav a span,
+header button span,
+header a span {
   color: #1f2937 !important;
 }
 
-/* Force navigation text to be dark but preserve layout */
-nav button,
-nav a,
-nav span:not([class*="bg-gradient"]),
-header button,
-header a, 
-header span:not([class*="bg-gradient"]) {
+/* Minimal dropdown fixes only */
+nav .bg-white h3,
+nav .bg-white h4,
+nav .bg-white p,
+nav .bg-white span {
   color: #1f2937 !important;
 }
 
-/* Fix mega menu dropdown specifically */
-nav [class*="bg-white"],
-nav [class*="shadow"],
-header [class*="bg-white"],
-header [class*="shadow"] {
-  background-color: #ffffff !important;
-  color: #1f2937 !important;
-}
-
-nav [class*="bg-white"] *,
-nav [class*="shadow"] *,
-header [class*="bg-white"] *,
-header [class*="shadow"] * {
-  color: #1f2937 !important;
-}
-
-/* Fix dropdown menu items */
-nav .bg-white a,
-nav .bg-white button,
-nav .bg-white span,
-nav .bg-white div,
-header .bg-white a,
-header .bg-white button, 
-header .bg-white span,
-header .bg-white div {
-  color: #1f2937 !important;
-}
-
-/* Ensure hover states work */
-nav button:hover,
-header button:hover,
-nav a:hover,
-header a:hover {
-  color: #0d9488 !important;
-}
-
-/* Fix dropdown positioning and visibility */
-nav [class*="absolute"],
-header [class*="absolute"] {
-  z-index: 9999 !important;
-  background-color: #ffffff !important;
-  border: 1px solid #e5e7eb !important;
-}
-
-/* Force text colors in dropdowns */
-nav [class*="absolute"] h3,
-nav [class*="absolute"] h4,
-nav [class*="absolute"] p,
-nav [class*="absolute"] span,
-header [class*="absolute"] h3,
-header [class*="absolute"] h4,
-header [class*="absolute"] p,
-header [class*="absolute"] span {
-  color: #1f2937 !important;
-}
-
-/* Fix badge colors in navigation */
-nav [class*="badge"],
-header [class*="badge"] {
-  background-color: #10b981 !important;
-  color: #ffffff !important;
-}
-
-/* Fix any potential layout issues */
-.hidden {
-  display: none !important;
-}
-
-.lg\:flex {
-  display: flex !important;
-}
-
-@media (min-width: 1024px) {
-  .lg\:hidden {
-    display: none !important;
-  }
-}
-
-/* Fix header layout and icon alignment */
-nav button svg,
-header button svg,
-nav a svg,
-header a svg {
-  color: #1f2937 !important;
-  fill: currentColor !important;
-}
-
-/* Ensure proper flex layout for navigation */
-nav .flex,
-header .flex {
-  display: flex !important;
-  align-items: center !important;
-  flex-direction: row !important;
-}
-
-/* Fix mega menu container specifically */
-nav div[class*="hidden lg:flex"],
-header div[class*="hidden lg:flex"] {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  gap: 0.25rem !important;
-}
-
-/* Force horizontal layout for navigation items */
-nav div[class*="space-x"],
-header div[class*="space-x"] {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-}
-
-/* Ensure responsive classes work */
-@media (min-width: 1024px) {
-  .lg\\:flex {
-    display: flex !important;
-  }
-  .lg\\:hidden {
-    display: none !important;
-  }
-}
-
-/* Fix chevron icons specifically */
-nav [class*="chevron"],
-header [class*="chevron"],
-nav svg[class*="w-4"],
-header svg[class*="w-4"] {
-  color: #1f2937 !important;
+/* Minimal icon color fix only */
+nav svg,
+header svg {
+  color: currentColor !important;
 }
 
 /* Preserve intentional colored text */
