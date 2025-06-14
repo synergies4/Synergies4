@@ -196,29 +196,7 @@ section[class*="to-cyan-50"] h1 span:not(.text-transparent) {
   color: #000000 !important;
 }
 
-/* Let navigation use natural colors */
-
-/* Simple navigation text fix - minimal interference */
-nav button span,
-nav a span,
-header button span,
-header a span {
-  color: #1f2937 !important;
-}
-
-/* Minimal dropdown fixes only */
-nav .bg-white h3,
-nav .bg-white h4,
-nav .bg-white p,
-nav .bg-white span {
-  color: #1f2937 !important;
-}
-
-/* Minimal icon color fix only */
-nav svg,
-header svg {
-  color: currentColor !important;
-}
+/* NO NAVIGATION CSS - LET TAILWIND WORK */
 
 /* Preserve intentional colored text */
 .text-green-600, .text-green-700, .text-green-800 {
@@ -281,15 +259,7 @@ section[class*="bg-gray-"] .text-sm {
   border-radius: 2px !important;
 }
 
-/* Ensure breadcrumb and navigation elements are always visible */
-.breadcrumb, [class*="breadcrumb"], nav [class*="text-"], 
-section[class*="bg-"] nav, section[class*="bg-"] [role="navigation"] {
-  background-color: rgba(255, 255, 255, 0.9) !important;
-  color: #1f2937 !important;
-  padding: 4px 8px !important;
-  border-radius: 6px !important;
-  display: inline-block !important;
-}
+/* REMOVED BREADCRUMB INTERFERENCE */
 
 /* Enhanced Smooth Scrolling */
 * {
@@ -472,12 +442,7 @@ a[role="button"]:not([class*="bg-gradient-to-r"]):not([class*="bg-gray-9"]):not(
   color: #1f2937 !important;
 }
 
-/* Fix breadcrumb and navigation text */
-nav *:not([class*="bg-gradient-to-r"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]),
-[aria-label*="breadcrumb"] *:not([class*="bg-gradient-to-r"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]),
-.breadcrumb *:not([class*="bg-gradient-to-r"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]) {
-  color: #374151 !important;
-}
+/* REMOVED NAV TEXT INTERFERENCE */
 
 /* Enhanced Button Text Contrast */
 button,
@@ -671,17 +636,7 @@ p, li, ul li, ol li, span:not([class*="text-"]):not([class*="bg-gradient"]) {
   font-weight: 600 !important;
 }
 
-/* Enhanced Navigation Text */
-nav a,
-.nav-link {
-  color: #374151 !important;
-  font-weight: 500 !important;
-}
-
-nav a:hover,
-.nav-link:hover {
-  color: #0d9488 !important;
-}
+/* REMOVED NAV CSS INTERFERENCE */
 
 /* Improved Color Contrast */
 .text-gray-600 {
