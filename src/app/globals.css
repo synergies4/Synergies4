@@ -114,9 +114,9 @@ section[class*="bg-gray-8"] *, section[class*="bg-gray-9"] * {
   color: #ffffff !important;
 }
 
-[class*="from-slate-8"] *, [class*="from-gray-8"] *, [class*="from-slate-9"] *, [class*="from-gray-9"] *,
-[class*="via-slate-8"] *, [class*="via-gray-8"] *, [class*="via-slate-9"] *, [class*="via-gray-9"] *,
-[class*="to-slate-8"] *, [class*="to-gray-8"] *, [class*="to-slate-9"] *, [class*="to-gray-9"] * {
+[class*="from-slate-8"] *:not(.text-transparent), [class*="from-gray-8"] *:not(.text-transparent), [class*="from-slate-9"] *:not(.text-transparent), [class*="from-gray-9"] *:not(.text-transparent),
+[class*="via-slate-8"] *:not(.text-transparent), [class*="via-gray-8"] *:not(.text-transparent), [class*="via-slate-9"] *:not(.text-transparent), [class*="via-gray-9"] *:not(.text-transparent),
+[class*="to-slate-8"] *:not(.text-transparent), [class*="to-gray-8"] *:not(.text-transparent), [class*="to-slate-9"] *:not(.text-transparent), [class*="to-gray-9"] *:not(.text-transparent) {
   color: #ffffff !important;
 }
 
@@ -126,8 +126,11 @@ section[class*="bg-gray-8"] *, section[class*="bg-gray-9"] * {
   color: #1f2937 !important;
 }
 
-[class*="from-slate-1"] *, [class*="from-slate-2"] *, [class*="from-slate-5"] *, [class*="from-gray-1"] *, [class*="from-gray-2"] *, [class*="from-gray-5"] *,
-[class*="from-blue-50"] *, [class*="from-cyan-50"] *, [class*="via-blue-50"] *, [class*="via-cyan-50"] *, [class*="to-blue-50"] *, [class*="to-cyan-50"] * {
+[class*="from-slate-1"] *:not(.text-transparent), [class*="from-slate-2"] *:not(.text-transparent), [class*="from-slate-5"] *:not(.text-transparent), 
+[class*="from-gray-1"] *:not(.text-transparent), [class*="from-gray-2"] *:not(.text-transparent), [class*="from-gray-5"] *:not(.text-transparent),
+[class*="from-blue-50"] *:not(.text-transparent), [class*="from-cyan-50"] *:not(.text-transparent), 
+[class*="via-blue-50"] *:not(.text-transparent), [class*="via-cyan-50"] *:not(.text-transparent), 
+[class*="to-blue-50"] *:not(.text-transparent), [class*="to-cyan-50"] *:not(.text-transparent) {
   color: #1f2937 !important;
 }
 
@@ -137,8 +140,10 @@ section[class*="bg-gray-8"] *, section[class*="bg-gray-9"] * {
   color: #ffffff !important;
 }
 
-[class*="from-teal-"] *, [class*="from-emerald-"] *, [class*="from-cyan-"] *, [class*="from-blue-6"] *, [class*="from-purple-"] *,
-[class*="to-teal-"] *, [class*="to-emerald-"] *, [class*="to-cyan-"] *, [class*="to-blue-6"] *, [class*="to-purple-"] * {
+[class*="from-teal-"] *:not(.text-transparent), [class*="from-emerald-"] *:not(.text-transparent), [class*="from-cyan-"] *:not(.text-transparent), 
+[class*="from-blue-6"] *:not(.text-transparent), [class*="from-purple-"] *:not(.text-transparent),
+[class*="to-teal-"] *:not(.text-transparent), [class*="to-emerald-"] *:not(.text-transparent), [class*="to-cyan-"] *:not(.text-transparent), 
+[class*="to-blue-6"] *:not(.text-transparent), [class*="to-purple-"] *:not(.text-transparent) {
   color: #ffffff !important;
 }
 
@@ -151,6 +156,44 @@ section[class*="bg-gray-8"] *, section[class*="bg-gray-9"] * {
 [class*="from-teal-"] .bg-white *, [class*="from-emerald-"] .bg-white *, [class*="from-cyan-"] .bg-white *,
 [class*="to-teal-"] .bg-white *, [class*="to-emerald-"] .bg-white *, [class*="to-cyan-"] .bg-white * {
   color: #1f2937 !important;
+}
+
+/* Ensure specific text color classes work properly */
+.text-gray-900, .text-gray-800, .text-gray-700 {
+  color: #1f2937 !important;
+}
+
+.text-gray-600 {
+  color: #4b5563 !important;
+}
+
+/* Ensure text-transparent works for gradient text */
+.text-transparent {
+  color: transparent !important;
+}
+
+/* Ensure header navigation text is visible */
+nav, header {
+  color: #1f2937;
+}
+
+nav *, header * {
+  color: inherit;
+}
+
+/* Fix any potential layout issues */
+.hidden {
+  display: none !important;
+}
+
+.lg\:flex {
+  display: flex !important;
+}
+
+@media (min-width: 1024px) {
+  .lg\:hidden {
+    display: none !important;
+  }
 }
 
 /* Preserve intentional colored text */
