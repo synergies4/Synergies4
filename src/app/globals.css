@@ -78,197 +78,55 @@ body {
   }
 }
 
-/* CRITICAL FIX: Ensure text is visible based on background context */
-* {
-  color: inherit;
-}
+/* SIMPLE FIX: Basic color contrast rules */
 
-/* Default text colors only for containers without explicit backgrounds */
-:not([class*="bg-gradient-to-"]):not([class*="bg-gray-"]):not([class*="bg-slate-"]):not([class*="bg-blue-"]):not([class*="bg-purple-"]) h1,
-:not([class*="bg-gradient-to-"]):not([class*="bg-gray-"]):not([class*="bg-slate-"]):not([class*="bg-blue-"]):not([class*="bg-purple-"]) h2,
-:not([class*="bg-gradient-to-"]):not([class*="bg-gray-"]):not([class*="bg-slate-"]):not([class*="bg-blue-"]):not([class*="bg-purple-"]) h3,
-:not([class*="bg-gradient-to-"]):not([class*="bg-gray-"]):not([class*="bg-slate-"]):not([class*="bg-blue-"]):not([class*="bg-purple-"]) h4,
-:not([class*="bg-gradient-to-"]):not([class*="bg-gray-"]):not([class*="bg-slate-"]):not([class*="bg-blue-"]):not([class*="bg-purple-"]) h5,
-:not([class*="bg-gradient-to-"]):not([class*="bg-gray-"]):not([class*="bg-slate-"]):not([class*="bg-blue-"]):not([class*="bg-purple-"]) h6 {
+/* Default: Dark text on light/default backgrounds */
+body, * {
   color: #1f2937;
 }
 
-/* Force dark text ONLY on light backgrounds */
-.bg-white h1, .bg-white h2, .bg-white h3, .bg-white h4, .bg-white h5, .bg-white h6,
-.bg-gray-50 h1, .bg-gray-50 h2, .bg-gray-50 h3, .bg-gray-50 h4, .bg-gray-50 h5, .bg-gray-50 h6,
-.bg-slate-50 h1, .bg-slate-50 h2, .bg-slate-50 h3, .bg-slate-50 h4, .bg-slate-50 h5, .bg-slate-50 h6 {
-  color: #1f2937 !important;
-}
-
-.bg-white p, .bg-white span, .bg-white div, .bg-white li, .bg-white label,
-.bg-gray-50 p, .bg-gray-50 span, .bg-gray-50 div, .bg-gray-50 li, .bg-gray-50 label,
-.bg-slate-50 p, .bg-slate-50 span, .bg-slate-50 div, .bg-slate-50 li, .bg-slate-50 label {
-  color: #374151 !important;
-}
-
-/* Force white text on dark gradient backgrounds but exclude navigation elements */
-[class*="bg-gradient-to-br"][class*="from-blue-"] h1,
-[class*="bg-gradient-to-br"][class*="from-blue-"] h2,
-[class*="bg-gradient-to-br"][class*="from-blue-"] h3,
-[class*="bg-gradient-to-br"][class*="from-blue-"] h4,
-[class*="bg-gradient-to-br"][class*="from-blue-"] h5,
-[class*="bg-gradient-to-br"][class*="from-blue-"] h6,
-[class*="bg-gradient-to-br"][class*="from-purple-"] h1,
-[class*="bg-gradient-to-br"][class*="from-purple-"] h2,
-[class*="bg-gradient-to-br"][class*="from-purple-"] h3,
-[class*="bg-gradient-to-br"][class*="from-purple-"] h4,
-[class*="bg-gradient-to-br"][class*="from-purple-"] h5,
-[class*="bg-gradient-to-br"][class*="from-purple-"] h6 {
+/* White text on clearly dark backgrounds */
+.bg-slate-800, .bg-slate-900, .bg-gray-800, .bg-gray-900, .bg-black,
+section[class*="bg-slate-8"], section[class*="bg-slate-9"], 
+section[class*="bg-gray-8"], section[class*="bg-gray-9"] {
   color: #ffffff !important;
 }
 
-[class*="bg-gradient-to-br"][class*="from-blue-"] p:not([class*="bg-"]),
-[class*="bg-gradient-to-br"][class*="from-blue-"] span:not([class*="text-"]):not([class*="bg-"]):not(button *),
-[class*="bg-gradient-to-br"][class*="from-blue-"] div:not([class*="text-"]):not([class*="bg-"]):not([class*="flex"]):not([class*="grid"]),
-[class*="bg-gradient-to-br"][class*="from-purple-"] p:not([class*="bg-"]),
-[class*="bg-gradient-to-br"][class*="from-purple-"] span:not([class*="text-"]):not([class*="bg-"]):not(button *),
-[class*="bg-gradient-to-br"][class*="from-purple-"] div:not([class*="text-"]):not([class*="bg-"]):not([class*="flex"]):not([class*="grid"]) {
-  color: #e2e8f0 !important;
-}
-
-/* Specific dark gradient text colors for hero sections */
-section[class*="bg-gradient-to-br"][class*="from-blue-"] h1,
-section[class*="bg-gradient-to-br"][class*="from-blue-"] h2,
-section[class*="bg-gradient-to-br"][class*="from-blue-"] h3,
-section[class*="bg-gradient-to-br"][class*="from-blue-"] h4,
-section[class*="bg-gradient-to-br"][class*="from-blue-"] h5,
-section[class*="bg-gradient-to-br"][class*="from-blue-"] h6,
-section[class*="bg-gradient-to-br"][class*="from-purple-"] h1,
-section[class*="bg-gradient-to-br"][class*="from-purple-"] h2,
-section[class*="bg-gradient-to-br"][class*="from-purple-"] h3,
-section[class*="bg-gradient-to-br"][class*="from-purple-"] h4,
-section[class*="bg-gradient-to-br"][class*="from-purple-"] h5,
-section[class*="bg-gradient-to-br"][class*="from-purple-"] h6 {
+.bg-slate-800 *, .bg-slate-900 *, .bg-gray-800 *, .bg-gray-900 *, .bg-black *,
+section[class*="bg-slate-8"] *, section[class*="bg-slate-9"] *, 
+section[class*="bg-gray-8"] *, section[class*="bg-gray-9"] * {
   color: #ffffff !important;
 }
 
-section[class*="bg-gradient-to-br"][class*="from-blue-"] p,
-section[class*="bg-gradient-to-br"][class*="from-blue-"] span:not([class*="text-"]):not([class*="bg-"]),
-section[class*="bg-gradient-to-br"][class*="from-purple-"] p,
-section[class*="bg-gradient-to-br"][class*="from-purple-"] span:not([class*="text-"]):not([class*="bg-"]) {
-  color: #e2e8f0 !important;
-}
-
-/* Fix navigation elements on dark gradient backgrounds */
-[class*="bg-gradient-to-br"][class*="from-blue-"] button[class*="variant-outline"],
-[class*="bg-gradient-to-br"][class*="from-blue-"] button[class*="bg-white"],
-[class*="bg-gradient-to-br"][class*="from-purple-"] button[class*="variant-outline"],
-[class*="bg-gradient-to-br"][class*="from-purple-"] button[class*="bg-white"] {
-  background-color: rgba(255, 255, 255, 0.9) !important;
-  color: #1f2937 !important;
-  border-color: rgba(255, 255, 255, 0.3) !important;
-}
-
-[class*="bg-gradient-to-br"][class*="from-blue-"] button[class*="variant-outline"]:hover,
-[class*="bg-gradient-to-br"][class*="from-blue-"] button[class*="bg-white"]:hover,
-[class*="bg-gradient-to-br"][class*="from-purple-"] button[class*="variant-outline"]:hover,
-[class*="bg-gradient-to-br"][class*="from-purple-"] button[class*="bg-white"]:hover {
-  background-color: rgba(255, 255, 255, 1) !important;
+/* Dark text on clearly light backgrounds */
+.bg-white, .bg-gray-50, .bg-gray-100, .bg-slate-50, .bg-slate-100 {
   color: #1f2937 !important;
 }
 
-/* Badges on dark gradient backgrounds - comprehensive coverage */
-[class*="bg-gradient-to-br"][class*="from-blue-"] [class*="badge"],
-[class*="bg-gradient-to-br"][class*="from-purple-"] [class*="badge"],
-[class*="bg-gradient-to-r"][class*="from-blue-"] [class*="badge"],
-[class*="bg-gradient-to-r"][class*="from-purple-"] [class*="badge"],
-section[class*="bg-gradient-to-br"] [class*="badge"],
-section[class*="bg-gradient-to-r"] [class*="badge"] {
-  background-color: rgba(255, 255, 255, 0.2) !important;
-  color: #ffffff !important;
-  border-color: rgba(255, 255, 255, 0.3) !important;
-}
-
-/* Course cards and container badges - dark backgrounds */
-[class*="bg-slate-"][class*="from-"] [class*="badge"],
-[class*="bg-gray-"][class*="from-"] [class*="badge"],
-.bg-slate-800 [class*="badge"],
-.bg-gray-800 [class*="badge"],
-.bg-slate-900 [class*="badge"],
-.bg-gray-900 [class*="badge"] {
-  background-color: rgba(255, 255, 255, 0.9) !important;
-  color: #1f2937 !important;
-  border-color: rgba(255, 255, 255, 0.3) !important;
-}
-
-/* Specific badge fixes for course level indicators */
-[class*="bg-slate-"][class*="from-"] span[class*="text-xs"],
-[class*="bg-gray-"][class*="from-"] span[class*="text-xs"],
-section[class*="bg-gradient-to-br"] span[class*="text-xs"]:not([class*="text-"]) {
-  background-color: rgba(255, 255, 255, 0.9) !important;
-  color: #1f2937 !important;
-  padding: 4px 8px !important;
-  border-radius: 4px !important;
-}
-
-/* Card text only on light card backgrounds */
-.bg-white [class*="card"] *,
-.bg-gray-50 [class*="card"] * {
+.bg-white *, .bg-gray-50 *, .bg-gray-100 *, .bg-slate-50 *, .bg-slate-100 * {
   color: #1f2937 !important;
 }
 
-/* Navigation text only on light nav backgrounds */
-.bg-white nav *, 
-.bg-gray-50 nav *,
-.bg-white [class*="breadcrumb"] *, 
-.bg-gray-50 [class*="breadcrumb"] * {
-  color: #374151 !important;
-}
-
-/* Input and form text - generally on light backgrounds */
-input:not([class*="bg-gray-9"]):not([class*="bg-slate-9"]), 
-textarea:not([class*="bg-gray-9"]):not([class*="bg-slate-9"]), 
-select:not([class*="bg-gray-9"]):not([class*="bg-slate-9"]), 
-label:not([class*="bg-gray-9"]):not([class*="bg-slate-9"]) {
-  color: #1f2937 !important;
-}
-
-/* Button text - context dependent */
-.bg-white button:not([class*="bg-gradient-to-r"]):not([class*="bg-teal"]):not([class*="bg-blue"]),
-.bg-gray-50 button:not([class*="bg-gradient-to-r"]):not([class*="bg-teal"]):not([class*="bg-blue"]) {
-  color: #1f2937 !important;
-}
-
-/* Badge and small components - preserve their intended colors */
-[class*="badge"] {
-  color: inherit !important;
-}
-
-/* Override problematic default text on general containers but not on dark backgrounds */
-main:not([class*="bg-gradient-to-"]) p,
-main:not([class*="bg-gradient-to-"]) span:not([class*="text-"]):not([class*="bg-"]),
-main:not([class*="bg-gradient-to-"]) div:not([class*="bg-gradient-to-"]):not([class*="text-"]) {
-  color: #374151;
-}
-
-/* Comprehensive dark section coverage */
-section[class*="bg-slate-8"],
-section[class*="bg-gray-8"],
-section[class*="bg-slate-9"],  
-section[class*="bg-gray-9"],
-[class*="bg-slate-8"][class*="via-"],
-[class*="bg-gray-8"][class*="via-"],
-[class*="bg-slate-8"][class*="to-"],
-[class*="bg-gray-8"][class*="to-"] {
+/* White text on colored gradient backgrounds */
+[class*="bg-gradient-to-"], [class*="bg-teal-"], [class*="bg-blue-"], [class*="bg-green-"], [class*="bg-purple-"] {
   color: #ffffff !important;
 }
 
-section[class*="bg-slate-8"] *:not([class*="bg-white"]):not([class*="bg-gray-5"]):not([class*="bg-slate-5"]),
-section[class*="bg-gray-8"] *:not([class*="bg-white"]):not([class*="bg-gray-5"]):not([class*="bg-slate-5"]),
-section[class*="bg-slate-9"] *:not([class*="bg-white"]):not([class*="bg-gray-5"]):not([class*="bg-slate-5"]),  
-section[class*="bg-gray-9"] *:not([class*="bg-white"]):not([class*="bg-gray-5"]):not([class*="bg-slate-5"]) {
-  color: #e2e8f0 !important;
+[class*="bg-gradient-to-"] *, [class*="bg-teal-"] *, [class*="bg-blue-"] *, [class*="bg-green-"] *, [class*="bg-purple-"] * {
+  color: #ffffff !important;
 }
 
-/* Dark background course cards */
-[class*="bg-slate-"][class*="from-"]:not([class*="to-white"]) *:not([class*="bg-white"]):not(button[class*="bg-"]),
-[class*="bg-gray-"][class*="from-"]:not([class*="to-white"]) *:not([class*="bg-white"]):not(button[class*="bg-"]) {
-  color: #e2e8f0 !important;
+/* But dark text on light content areas within cards */
+[class*="bg-gradient-to-"] .bg-white,
+[class*="bg-gradient-to-"] .bg-gray-50,
+[class*="bg-gradient-to-"] .bg-gray-100 {
+  color: #1f2937 !important;
+}
+
+[class*="bg-gradient-to-"] .bg-white *,
+[class*="bg-gradient-to-"] .bg-gray-50 *,
+[class*="bg-gradient-to-"] .bg-gray-100 * {
+  color: #1f2937 !important;
 }
 
 /* Preserve intentional colored text */
