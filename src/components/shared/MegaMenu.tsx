@@ -26,7 +26,8 @@ import {
   LogOut,
   User,
   BarChart3,
-  Settings
+  Settings,
+  Calculator
 } from 'lucide-react';
 
 interface MenuCategory {
