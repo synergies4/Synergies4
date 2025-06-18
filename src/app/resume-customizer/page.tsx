@@ -511,10 +511,9 @@ export default function ResumeCustomizer() {
                   </Button>
                   <Button 
                     onClick={analyzeJobFit}
-                    disabled={!jobApplication.job_title || !jobApplication.job_description}
-                    loading={loading}
+                    disabled={!jobApplication.job_title || !jobApplication.job_description || loading}
                   >
-                    Analyze Job Fit
+                    {loading ? 'Analyzing...' : 'Analyze Job Fit'}
                   </Button>
                 </div>
               </div>
@@ -631,10 +630,10 @@ export default function ResumeCustomizer() {
                   <div className="text-center">
                     <Button 
                       onClick={generateTailoredResume}
-                      loading={loading}
+                      disabled={loading}
                       size="lg"
                     >
-                      Generate Tailored Resume
+                      {loading ? 'Generating...' : 'Generate Tailored Resume'}
                     </Button>
                   </div>
                 ) : (
@@ -679,10 +678,10 @@ export default function ResumeCustomizer() {
                   <div className="text-center">
                     <Button 
                       onClick={generateCoverLetter}
-                      loading={loading}
+                      disabled={loading}
                       size="lg"
                     >
-                      Generate Cover Letter
+                      {loading ? 'Generating...' : 'Generate Cover Letter'}
                     </Button>
                   </div>
                 ) : (
@@ -730,10 +729,10 @@ export default function ResumeCustomizer() {
                   <div className="text-center">
                     <Button 
                       onClick={generateInterviewQuestions}
-                      loading={loading}
+                      disabled={loading}
                       size="lg"
                     >
-                      Generate Interview Questions
+                      {loading ? 'Generating...' : 'Generate Interview Questions'}
                     </Button>
                   </div>
                 ) : (
