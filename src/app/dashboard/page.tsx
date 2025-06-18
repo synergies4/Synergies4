@@ -866,7 +866,7 @@ function DashboardContent() {
                 </Card>
 
                 {/* Quick Actions */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   <Card className="bg-gradient-to-br from-teal-50 to-emerald-50 border-teal-200">
                     <CardContent className="p-6">
                       <div className="flex items-center gap-3 mb-4">
@@ -905,6 +905,23 @@ function DashboardContent() {
                         }}
                       >
                         Add Recorder Bot
+                      </Button>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                          <FileText className="h-5 w-5 text-purple-600" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-purple-900">Resume Customizer</h3>
+                          <p className="text-sm text-purple-700">AI-powered resume & interview prep</p>
+                        </div>
+                      </div>
+                      <Button asChild className="w-full bg-purple-600 hover:bg-purple-700">
+                        <Link href="/resume-customizer">Start Customizing</Link>
                       </Button>
                     </CardContent>
                   </Card>
