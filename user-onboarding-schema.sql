@@ -11,6 +11,14 @@ CREATE TABLE IF NOT EXISTS user_onboarding (
   years_experience INTEGER,
   team_size INTEGER,
   
+  -- Resume Storage
+  resume_filename VARCHAR(500),
+  resume_content TEXT, -- Extracted text content from resume
+  resume_file_url TEXT, -- URL to stored resume file
+  resume_uploaded_at TIMESTAMP WITH TIME ZONE,
+  resume_file_size INTEGER,
+  resume_file_type VARCHAR(50),
+  
   -- Role and Responsibilities
   primary_role VARCHAR(100) CHECK (primary_role IN ('developer', 'product_manager', 'scrum_master', 'designer', 'qa_engineer', 'tech_lead', 'engineering_manager', 'cto', 'founder', 'consultant', 'other')),
   secondary_roles TEXT[], -- Array of additional roles

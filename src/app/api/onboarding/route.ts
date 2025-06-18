@@ -53,6 +53,14 @@ export async function POST(request: NextRequest) {
       industry,
       years_experience,
       team_size,
+      // Resume fields
+      resume_filename,
+      resume_content,
+      resume_file_url,
+      resume_uploaded_at,
+      resume_file_size,
+      resume_file_type,
+      // Role and responsibilities
       primary_role,
       secondary_roles,
       management_level,
@@ -97,6 +105,14 @@ export async function POST(request: NextRequest) {
           industry,
           years_experience,
           team_size,
+          // Resume fields
+          resume_filename,
+          resume_content,
+          resume_file_url,
+          resume_uploaded_at,
+          resume_file_size,
+          resume_file_type,
+          // Role and responsibilities
           primary_role,
           secondary_roles,
           management_level,
@@ -144,6 +160,14 @@ export async function POST(request: NextRequest) {
           industry,
           years_experience,
           team_size,
+          // Resume fields
+          resume_filename,
+          resume_content,
+          resume_file_url,
+          resume_uploaded_at,
+          resume_file_size,
+          resume_file_type,
+          // Role and responsibilities
           primary_role,
           secondary_roles,
           management_level,
