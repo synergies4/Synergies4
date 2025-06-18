@@ -28,7 +28,8 @@ import {
   GraduationCap,
   Globe,
   BarChart3,
-  ArrowDown
+  ArrowDown,
+  FileText
 } from 'lucide-react';
 import HeroSection from '@/components/shared/HeroSection';
 
@@ -140,6 +141,19 @@ export default function HomePage() {
                 <span className="flex items-center justify-center text-white group-hover:text-white">
                   <MessageSquare className="h-4 sm:h-5 w-4 sm:w-5 mr-2 group-hover:scale-110 transition-transform text-white group-hover:text-white" />
                   Pocket Coach
+                </span>
+              </Link>
+            </Button>
+
+            <Button 
+              size="lg" 
+              className="w-full sm:w-auto text-base sm:text-lg px-8 sm:px-10 py-3 sm:py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 transition-all font-semibold rounded-xl shadow-2xl hover:shadow-blue-500/25 hover:scale-105 border-0 group h-auto" 
+              asChild
+            >
+              <Link href="/resume-customizer">
+                <span className="flex items-center justify-center text-white group-hover:text-white">
+                  <FileText className="h-4 sm:h-5 w-4 sm:w-5 mr-2 group-hover:scale-110 transition-transform text-white group-hover:text-white" />
+                  Resume Customizer
                 </span>
               </Link>
             </Button>

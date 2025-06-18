@@ -83,6 +83,14 @@ const menuCategories: MenuCategory[] = [
         href: '/roi-engine',
         icon: Calculator,
         isNew: true
+      },
+      {
+        title: 'Resume Customizer',
+        description: 'AI-powered resume tailoring and interview prep',
+        href: '/resume-customizer',
+        icon: FileText,
+        isNew: true,
+        badge: 'Public'
       }
     ]
   },
