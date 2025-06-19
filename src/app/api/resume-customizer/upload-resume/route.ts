@@ -5,20 +5,41 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function POST(request: NextRequest) {
   try {
     console.log('Resume upload endpoint called');
+    console.log('Request headers:', Object.fromEntries(request.headers.entries()));
+    
+    const cookieStore = cookies();
+    console.log('Available cookies:', cookieStore.getAll().map(c => ({ name: c.name, value: c.value?.substring(0, 10) + '...' })));
     
     const supabase = createRouteHandlerClient({ cookies });
     
-    // Get current user
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    // Get current user with more detailed error logging
+    const { data, error: userError } = await supabase.auth.getUser();
+    const user = data?.user;
     
     console.log('Auth check - User error:', userError);
+    console.log('Auth check - User data:', data);
     console.log('Auth check - User:', user ? { id: user.id, email: user.email } : null);
+    
+    if (userError) {
+      console.log('Authentication error details:', {
+        name: userError.name,
+        message: userError.message,
+        status: userError.status,
+        stack: userError.stack
+      });
+    }
     
     if (userError || !user) {
       console.log('Authentication failed:', userError?.message || 'No user found');
       return NextResponse.json({ 
         error: 'Unauthorized',
-        details: userError?.message || 'No user found'
+        details: userError?.message || 'No user found',
+        debug: {
+          hasUserError: !!userError,
+          hasUser: !!user,
+          errorName: userError?.name,
+          errorStatus: userError?.status
+        }
       }, { status: 401 });
     }
 
