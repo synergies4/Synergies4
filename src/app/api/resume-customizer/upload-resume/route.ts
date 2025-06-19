@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     console.log('Resume upload endpoint called');
     console.log('Request headers:', Object.fromEntries(request.headers.entries()));
     
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     console.log('Available cookies:', cookieStore.getAll().map(c => ({ name: c.name, value: c.value?.substring(0, 10) + '...' })));
     
     const supabase = createRouteHandlerClient({ cookies });

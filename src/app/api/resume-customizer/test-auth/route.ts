@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     console.log('Request URL:', request.url);
     console.log('Request headers:', Object.fromEntries(request.headers.entries()));
     
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const allCookies = cookieStore.getAll();
     console.log('Available cookies:', allCookies.map(c => ({ 
       name: c.name, 
