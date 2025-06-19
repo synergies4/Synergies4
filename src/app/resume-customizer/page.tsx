@@ -120,6 +120,7 @@ export default function ResumeCustomizer() {
     try {
       const response = await fetch('/api/resume-customizer/upload-resume', {
         method: 'POST',
+        credentials: 'include',
         body: formData,
       });
 
@@ -152,6 +153,7 @@ export default function ResumeCustomizer() {
     try {
       const response = await fetch('/api/resume-customizer/analyze-fit', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           resume_content: resumeData.content,
@@ -194,6 +196,7 @@ export default function ResumeCustomizer() {
     try {
       const response = await fetch('/api/resume-customizer/company-intelligence', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ company_name: companyName })
       });
@@ -214,6 +217,7 @@ export default function ResumeCustomizer() {
     try {
       const response = await fetch('/api/resume-customizer/tailor-resume', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           original_resume: resumeData.content,
@@ -243,6 +247,7 @@ export default function ResumeCustomizer() {
     try {
       const response = await fetch('/api/resume-customizer/generate-cover-letter', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           resume_content: resumeData.content,
@@ -274,6 +279,7 @@ export default function ResumeCustomizer() {
     try {
       const response = await fetch('/api/resume-customizer/generate-interview-questions', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           job_description: jobApplication.job_description,
