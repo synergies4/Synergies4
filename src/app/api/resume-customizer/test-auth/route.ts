@@ -1,33 +1,11 @@
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
   try {
     console.log('Test auth endpoint called');
-    console.log('Request URL:', request.url);
-    console.log('Request headers:', Object.fromEntries(request.headers.entries()));
     
-    const cookieStore = await cookies();
-    const allCookies = cookieStore.getAll();
-    console.log('Available cookies:', allCookies.map(c => ({ 
-      name: c.name, 
-      value: c.value?.substring(0, 20) + '...',
-      hasValue: !!c.value 
-    })));
-    
-    // Check for specific Supabase cookies
-    const accessToken = cookieStore.get('sb-access-token');
-    const refreshToken = cookieStore.get('sb-refresh-token');
-    const authToken = cookieStore.get('supabase-auth-token');
-    
-    console.log('Supabase cookies found:', {
-      accessToken: !!accessToken?.value,
-      refreshToken: !!refreshToken?.value,
-      authToken: !!authToken?.value
-    });
-    
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = await createClient();
     
     // Get current user
     const { data, error: userError } = await supabase.auth.getUser();
@@ -50,17 +28,11 @@ export async function GET(request: NextRequest) {
         error: 'Unauthorized',
         userError: userError?.message || 'No user',
         user: null,
-        debug: {
-          hasAccessToken: !!accessToken?.value,
-          hasRefreshToken: !!refreshToken?.value,
-          hasAuthToken: !!authToken?.value,
-          cookieCount: allCookies.length,
-          errorDetails: userError ? {
-            name: userError.name,
-            message: userError.message,
-            status: userError.status
-          } : null
-        }
+        errorDetails: userError ? {
+          name: userError.name,
+          message: userError.message,
+          status: userError.status
+        } : null
       }, { status: 401 });
     }
 
@@ -70,13 +42,7 @@ export async function GET(request: NextRequest) {
         id: user.id,
         email: user.email
       },
-      message: 'Authentication working',
-      debug: {
-        hasAccessToken: !!accessToken?.value,
-        hasRefreshToken: !!refreshToken?.value,
-        hasAuthToken: !!authToken?.value,
-        cookieCount: allCookies.length
-      }
+      message: 'Authentication working - using new server client'
     });
 
   } catch (error) {

@@ -1,16 +1,11 @@
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
     console.log('Resume upload endpoint called');
-    console.log('Request headers:', Object.fromEntries(request.headers.entries()));
     
-    const cookieStore = await cookies();
-    console.log('Available cookies:', cookieStore.getAll().map(c => ({ name: c.name, value: c.value?.substring(0, 10) + '...' })));
-    
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = await createClient();
     
     // Get current user with more detailed error logging
     const { data, error: userError } = await supabase.auth.getUser();
