@@ -4,12 +4,22 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('Resume upload endpoint called');
+    
     const supabase = createRouteHandlerClient({ cookies });
     
     // Get current user
     const { data: { user }, error: userError } = await supabase.auth.getUser();
+    
+    console.log('Auth check - User error:', userError);
+    console.log('Auth check - User:', user ? { id: user.id, email: user.email } : null);
+    
     if (userError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      console.log('Authentication failed:', userError?.message || 'No user found');
+      return NextResponse.json({ 
+        error: 'Unauthorized',
+        details: userError?.message || 'No user found'
+      }, { status: 401 });
     }
 
     const formData = await request.formData();
@@ -48,6 +58,8 @@ export async function POST(request: NextRequest) {
     const fileUrl = `/uploads/resumes/${fileName}`; // This would be actual cloud storage URL
 
     // Update user onboarding with resume data
+    console.log('Attempting to save resume data for user:', user.id);
+    
     const { error: updateError } = await supabase
       .from('user_onboarding')
       .upsert({
@@ -65,7 +77,25 @@ export async function POST(request: NextRequest) {
 
     if (updateError) {
       console.error('Error updating user profile with resume:', updateError);
-      return NextResponse.json({ error: 'Failed to save resume data' }, { status: 500 });
+      console.error('Error details:', {
+        code: updateError.code,
+        message: updateError.message,
+        details: updateError.details,
+        hint: updateError.hint
+      });
+      
+      // Check if it's a column doesn't exist error
+      if (updateError.message?.includes('column') && updateError.message?.includes('does not exist')) {
+        return NextResponse.json({ 
+          error: 'Database migration required. Please run the resume storage migration.',
+          details: updateError.message
+        }, { status: 500 });
+      }
+      
+      return NextResponse.json({ 
+        error: 'Failed to save resume data',
+        details: updateError.message
+      }, { status: 500 });
     }
 
     return NextResponse.json({

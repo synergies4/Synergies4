@@ -406,7 +406,30 @@ export default function ResumeCustomizer() {
                   </div>
                 )}
 
-                <div className="text-center">
+                <div className="text-center space-y-4">
+                  <Button 
+                    onClick={async () => {
+                      try {
+                        const response = await fetch('/api/resume-customizer/test-auth', {
+                          credentials: 'include'
+                        });
+                        const result = await response.json();
+                        console.log('Auth test result:', result);
+                        if (response.ok) {
+                          toast.success('Authentication working!');
+                        } else {
+                          toast.error('Auth failed: ' + result.error);
+                        }
+                      } catch (error) {
+                        console.error('Auth test error:', error);
+                        toast.error('Auth test failed');
+                      }
+                    }}
+                    variant="outline"
+                    className="mr-4"
+                  >
+                    Test Auth
+                  </Button>
                   <Button 
                     onClick={nextStep} 
                     disabled={!resumeData.content}
