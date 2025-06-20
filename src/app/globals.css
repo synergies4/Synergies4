@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ================================
+   CLEAN CSS RESET & BASE STYLES
+   ================================ */
+
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
@@ -30,238 +34,10 @@
   --radius: 0.5rem;
 }
 
-/* Dark mode detection disabled - using light theme only for consistency */
-/*
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+/* ================================
+   BASE STYLES
+   ================================ */
 
-    Dark Mode Colors
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 142.1 70.6% 45.3%;
-    --primary-foreground: 144.9 80.4% 10%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 142.4 71.8% 29.2%;
-  }
-}
-*/
-
-body {
-  color: #1f2937; /* Force dark text for light theme */
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(255, 255, 255)
-    )
-    rgb(214, 219, 220);
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-}
-
-/* SIMPLE FIX: Basic color contrast rules */
-
-/* Default: Dark text on body only, let components inherit naturally */
-body {
-  color: #1f2937;
-}
-
-/* White text on clearly dark backgrounds */
-.bg-slate-800, .bg-slate-900, .bg-gray-800, .bg-gray-900, .bg-black,
-section[class*="bg-slate-8"], section[class*="bg-slate-9"], 
-section[class*="bg-gray-8"], section[class*="bg-gray-9"] {
-  color: #ffffff !important;
-}
-
-.bg-slate-800 *, .bg-slate-900 *, .bg-gray-800 *, .bg-gray-900 *, .bg-black *,
-section[class*="bg-slate-8"] *, section[class*="bg-slate-9"] *, 
-section[class*="bg-gray-8"] *, section[class*="bg-gray-9"] * {
-  color: #ffffff !important;
-}
-
-/* Dark text on clearly light backgrounds */
-.bg-white, .bg-gray-50, .bg-gray-100, .bg-slate-50, .bg-slate-100 {
-  color: #1f2937 !important;
-}
-
-.bg-white *, .bg-gray-50 *, .bg-gray-100 *, .bg-slate-50 *, .bg-slate-100 * {
-  color: #1f2937 !important;
-}
-
-/* White text ONLY on dark gradient backgrounds */
-[class*="from-slate-8"], [class*="from-gray-8"], [class*="from-slate-9"], [class*="from-gray-9"],
-[class*="via-slate-8"], [class*="via-gray-8"], [class*="via-slate-9"], [class*="via-gray-9"],
-[class*="to-slate-8"], [class*="to-gray-8"], [class*="to-slate-9"], [class*="to-gray-9"] {
-  color: #ffffff !important;
-}
-
-[class*="from-slate-8"] *:not(.text-transparent), [class*="from-gray-8"] *:not(.text-transparent), [class*="from-slate-9"] *:not(.text-transparent), [class*="from-gray-9"] *:not(.text-transparent),
-[class*="via-slate-8"] *:not(.text-transparent), [class*="via-gray-8"] *:not(.text-transparent), [class*="via-slate-9"] *:not(.text-transparent), [class*="via-gray-9"] *:not(.text-transparent),
-[class*="to-slate-8"] *:not(.text-transparent), [class*="to-gray-8"] *:not(.text-transparent), [class*="to-slate-9"] *:not(.text-transparent), [class*="to-gray-9"] *:not(.text-transparent) {
-  color: #ffffff !important;
-}
-
-/* Dark text on light gradient backgrounds */
-[class*="from-slate-1"], [class*="from-slate-2"], [class*="from-slate-5"], [class*="from-gray-1"], [class*="from-gray-2"], [class*="from-gray-5"],
-[class*="from-blue-50"], [class*="from-cyan-50"], [class*="via-blue-50"], [class*="via-cyan-50"], [class*="to-blue-50"], [class*="to-cyan-50"] {
-  color: #1f2937 !important;
-}
-
-[class*="from-slate-1"] *:not(.text-transparent), [class*="from-slate-2"] *:not(.text-transparent), [class*="from-slate-5"] *:not(.text-transparent), 
-[class*="from-gray-1"] *:not(.text-transparent), [class*="from-gray-2"] *:not(.text-transparent), [class*="from-gray-5"] *:not(.text-transparent),
-[class*="from-blue-50"] *:not(.text-transparent), [class*="from-cyan-50"] *:not(.text-transparent), 
-[class*="via-blue-50"] *:not(.text-transparent), [class*="via-cyan-50"] *:not(.text-transparent), 
-[class*="to-blue-50"] *:not(.text-transparent), [class*="to-cyan-50"] *:not(.text-transparent) {
-  color: #1f2937 !important;
-}
-
-/* White text on colored gradients (teal, emerald, cyan, etc.) */
-[class*="from-teal-"], [class*="from-emerald-"], [class*="from-cyan-"], [class*="from-blue-6"], [class*="from-purple-"],
-[class*="to-teal-"], [class*="to-emerald-"], [class*="to-cyan-"], [class*="to-blue-6"], [class*="to-purple-"] {
-  color: #ffffff !important;
-}
-
-[class*="from-teal-"] *:not(.text-transparent), [class*="from-emerald-"] *:not(.text-transparent), [class*="from-cyan-"] *:not(.text-transparent), 
-[class*="from-blue-6"] *:not(.text-transparent), [class*="from-purple-"] *:not(.text-transparent),
-[class*="to-teal-"] *:not(.text-transparent), [class*="to-emerald-"] *:not(.text-transparent), [class*="to-cyan-"] *:not(.text-transparent), 
-[class*="to-blue-6"] *:not(.text-transparent), [class*="to-purple-"] *:not(.text-transparent) {
-  color: #ffffff !important;
-}
-
-/* But preserve white backgrounds within gradient containers */
-[class*="from-teal-"] .bg-white, [class*="from-emerald-"] .bg-white, [class*="from-cyan-"] .bg-white,
-[class*="to-teal-"] .bg-white, [class*="to-emerald-"] .bg-white, [class*="to-cyan-"] .bg-white {
-  color: #1f2937 !important;
-}
-
-[class*="from-teal-"] .bg-white *, [class*="from-emerald-"] .bg-white *, [class*="from-cyan-"] .bg-white *,
-[class*="to-teal-"] .bg-white *, [class*="to-emerald-"] .bg-white *, [class*="to-cyan-"] .bg-white * {
-  color: #1f2937 !important;
-}
-
-/* Ensure specific text color classes work properly */
-.text-gray-900, .text-gray-800, .text-gray-700 {
-  color: #1f2937 !important;
-}
-
-.text-gray-600 {
-  color: #4b5563 !important;
-}
-
-/* Ensure text-transparent works for gradient text */
-.text-transparent {
-  color: transparent !important;
-}
-
-/* FORCE hero text to be dark and visible */
-h1 span:not(.text-transparent) {
-  color: #000000 !important;
-}
-
-/* Ensure all headings are dark on light backgrounds */
-section[class*="from-slate-1"] h1,
-section[class*="from-slate-1"] h2,
-section[class*="from-slate-1"] h3,
-section[class*="via-blue-50"] h1,
-section[class*="via-blue-50"] h2,
-section[class*="via-blue-50"] h3,
-section[class*="to-cyan-50"] h1,
-section[class*="to-cyan-50"] h2,
-section[class*="to-cyan-50"] h3 {
-  color: #000000 !important;
-}
-
-section[class*="from-slate-1"] h1 span:not(.text-transparent),
-section[class*="via-blue-50"] h1 span:not(.text-transparent),
-section[class*="to-cyan-50"] h1 span:not(.text-transparent) {
-  color: #000000 !important;
-}
-
-/* NO NAVIGATION CSS - LET TAILWIND WORK */
-
-/* Preserve intentional colored text */
-.text-green-600, .text-green-700, .text-green-800 {
-  color: #16a34a !important;
-}
-
-.text-blue-600, .text-blue-700, .text-blue-800 {
-  color: #2563eb !important;
-}
-
-.text-red-600, .text-red-700, .text-red-800 {
-  color: #dc2626 !important;
-}
-
-.text-orange-600, .text-orange-700, .text-orange-800 {
-  color: #ea580c !important;
-}
-
-.text-purple-600, .text-purple-700, .text-purple-800 {
-  color: #9333ea !important;
-}
-
-.text-teal-600, .text-teal-700, .text-teal-800 {
-  color: #0d9488 !important;
-}
-
-/* Preserve white text on dark backgrounds */
-.text-white {
-  color: #ffffff !important;
-}
-
-/* Preserve text for gradient backgrounds that need light text */
-[class*="bg-gradient-to-r"][class*="from-teal-6"] *,
-[class*="bg-gradient-to-r"][class*="from-blue-6"] *,
-[class*="bg-gradient-to-r"][class*="from-emerald-6"] * {
-  color: #ffffff !important;
-}
-
-/* Catch any remaining small text elements on dark backgrounds */
-section[class*="bg-gradient-to-br"] .text-xs,
-section[class*="bg-gradient-to-br"] .text-sm,
-section[class*="bg-slate-"] .text-xs,
-section[class*="bg-slate-"] .text-sm,
-section[class*="bg-gray-"] .text-xs,
-section[class*="bg-gray-"] .text-sm {
-  background-color: rgba(255, 255, 255, 0.9) !important;
-  color: #1f2937 !important;
-  padding: 2px 6px !important;
-  border-radius: 4px !important;
-  display: inline-block !important;
-}
-
-/* Force visibility for any invisible elements */
-[style*="color: transparent"],
-[style*="color: rgba(0, 0, 0, 0)"],
-[style*="color: rgba(255, 255, 255, 0)"] {
-  color: #1f2937 !important;
-  background-color: rgba(255, 255, 255, 0.9) !important;
-  padding: 2px 4px !important;
-  border-radius: 2px !important;
-}
-
-/* REMOVED BREADCRUMB INTERFERENCE */
-
-/* Enhanced Smooth Scrolling */
 * {
   scroll-behavior: smooth;
 }
@@ -274,35 +50,88 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Mobile-First Responsive Design */
 body {
+  color: #1f2937;
+  background: linear-gradient(to bottom, transparent, rgb(255, 255, 255)) rgb(214, 219, 220);
   line-height: 1.6;
   overflow-x: hidden;
-  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  -webkit-overflow-scrolling: touch;
 }
 
-/* Mobile Touch Targets - Ensure minimum 44px touch targets */
-@media (max-width: 768px) {
-  button,
-  [role="button"],
-  input[type="button"],
-  input[type="submit"],
-  .cursor-pointer {
-    min-height: 44px;
-    min-width: 44px;
-  }
-  
-  /* Improved input styling for mobile */
-  input,
-  textarea,
-  select {
-    font-size: 16px; /* Prevents zoom on iOS */
-    border-radius: 8px;
-    padding: 12px;
-  }
+/* ================================
+   TYPOGRAPHY
+   ================================ */
+
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.3;
+  font-weight: 600;
+  color: #1f2937;
 }
 
-/* Custom Scrollbar Styling */
+p, li, span {
+  color: #374151;
+}
+
+/* ================================
+   FORM ELEMENTS
+   ================================ */
+
+input, textarea, select {
+  font-size: 16px;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #6b7280;
+  opacity: 1;
+}
+
+label {
+  color: #1f2937;
+  font-weight: 500;
+}
+
+/* ================================
+   BUTTONS & INTERACTIVE ELEMENTS
+   ================================ */
+
+button, [role="button"] {
+  font-weight: 500;
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* ================================
+   FOCUS STATES
+   ================================ */
+
+*:focus {
+  outline: 3px solid #14b8a6;
+  outline-offset: 2px;
+  transition: outline-color 0.2s ease;
+}
+
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+button:focus,
+[role="button"]:focus,
+input:focus,
+textarea:focus,
+select:focus,
+a:focus {
+  outline: 3px solid #14b8a6;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.2);
+}
+
+/* ================================
+   SCROLLBAR STYLING
+   ================================ */
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -323,7 +152,6 @@ body {
   background: linear-gradient(135deg, #0f766e, #059669);
 }
 
-/* Mobile-specific scrollbar */
 @media (max-width: 768px) {
   ::-webkit-scrollbar {
     width: 4px;
@@ -331,437 +159,34 @@ body {
   }
 }
 
-/* Enhanced Accessibility Focus States */
-*:focus {
-  outline: 3px solid #14b8a6;
-  outline-offset: 2px;
-  transition: outline-color 0.2s ease;
-}
+/* ================================
+   ANIMATION UTILITIES
+   ================================ */
 
-*:focus:not(:focus-visible) {
-  outline: none;
-}
-
-/* High visibility focus for interactive elements */
-button:focus,
-[role="button"]:focus,
-input:focus,
-textarea:focus,
-select:focus,
-a:focus {
-  outline: 3px solid #14b8a6;
-  outline-offset: 2px;
-  box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.2);
-}
-
-/* Enhanced Typography Accessibility */
-h1, h2, h3, h4, h5, h6 {
-  line-height: 1.3;
-  font-weight: 600;
-}
-
-/* Light backgrounds - use dark text */
-.bg-white h1, .bg-white h2, .bg-white h3, .bg-white h4, .bg-white h5, .bg-white h6,
-.bg-gray-50 h1, .bg-gray-50 h2, .bg-gray-50 h3, .bg-gray-50 h4, .bg-gray-50 h5, .bg-gray-50 h6,
-.bg-slate-50 h1, .bg-slate-50 h2, .bg-slate-50 h3, .bg-slate-50 h4, .bg-slate-50 h5, .bg-slate-50 h6 {
-  color: #1f2937 !important;
-}
-
-.bg-white p, .bg-white li, .bg-white span:not([class*="text-"]):not([class*="bg-gradient"]),
-.bg-gray-50 p, .bg-gray-50 li, .bg-gray-50 span:not([class*="text-"]):not([class*="bg-gradient"]),
-.bg-slate-50 p, .bg-slate-50 li, .bg-slate-50 span:not([class*="text-"]):not([class*="bg-gradient"]) {
-  color: #374151 !important;
-}
-
-/* ENHANCED TEXT CONTRAST - Simpler approach */
-.text-gray-600 {
-  color: #4b5563 !important;
-}
-
-.text-gray-500 {
-  color: #6b7280 !important;
-}
-
-.text-gray-400 {
-  color: #9ca3af !important;
-}
-
-.text-gray-300 {
-  color: #d1d5db !important;
-}
-
-/* Enhanced Input and Form Controls Contrast */
-input::placeholder,
-textarea::placeholder {
-  color: #6b7280 !important; /* Much darker placeholder text */
-  opacity: 1 !important;
-}
-
-/* Form Labels - Ensure they're always dark enough */
-label {
-  color: #1f2937 !important;
-  font-weight: 500 !important;
-}
-
-/* Enhanced Modal and Card Text */
-.modal-text,
-.card-text,
-.modal-content *,
-.card-content * {
-  color: #1f2937 !important;
-}
-
-/* Force dark text for descriptions and helper text */
-.text-muted,
-.text-muted-foreground,
-[class*="text-muted"] {
-  color: #4b5563 !important;
-}
-
-/* CRITICAL FIX: Override transparent text that becomes invisible */
-button:not([class*="bg-gradient-to-r"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]) .text-transparent,
-a:not([class*="bg-gradient-to-r"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]) .text-transparent,
-span:not([class*="bg-gradient-to-r"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]) .text-transparent {
-  color: #1f2937 !important;
-  -webkit-text-fill-color: #1f2937 !important;
-  background: none !important;
-  background-clip: unset !important;
-  -webkit-background-clip: unset !important;
-}
-
-/* Fix white text on light backgrounds */
-.bg-white *:not([class*="text-"]):not([class*="bg-gradient-to-r"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]),
-.bg-gray-50 *:not([class*="text-"]):not([class*="bg-gradient-to-r"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]),
-.bg-slate-50 *:not([class*="text-"]):not([class*="bg-gradient-to-r"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]) {
-  color: #1f2937 !important;
-}
-
-/* Force proper button text visibility */
-button:not([class*="bg-gradient-to-r"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]):not([class*="bg-black"]),
-a[role="button"]:not([class*="bg-gradient-to-r"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]):not([class*="bg-black"]) {
-  color: #1f2937 !important;
-}
-
-/* REMOVED NAV TEXT INTERFERENCE */
-
-/* Enhanced Button Text Contrast */
-button,
-[role="button"] {
-  font-weight: 500;
-}
-
-/* Fix outline and ghost button text visibility */
-button[class*="variant-outline"]:not([class*="bg-gradient-to-r"]),
-button[class*="variant-ghost"]:not([class*="bg-gradient-to-r"]),
-button[class*="border"]:not([class*="bg-gradient-to-r"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]) {
-  color: #1f2937 !important;
-}
-
-/* Fix specific button and link text issues */
-.bg-white button:not([class*="bg-gradient-to-r"]):not([class*="bg-teal"]):not([class*="bg-blue"]),
-.bg-gray-50 button:not([class*="bg-gradient-to-r"]):not([class*="bg-teal"]):not([class*="bg-blue"]),
-.bg-slate-50 button:not([class*="bg-gradient-to-r"]):not([class*="bg-teal"]):not([class*="bg-blue"]) {
-  color: #1f2937 !important;
-}
-
-/* Fix invisible hover states */
-button:hover:not([class*="bg-gradient-to-r"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]),
-a:hover:not([class*="bg-gradient-to-r"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]) {
-  color: #0d9488 !important;
-}
-
-/* Ensure text visibility in cards and containers */
-.bg-white .card *:not([class*="bg-gradient-to-r"]),
-.bg-gray-50 .card *:not([class*="bg-gradient-to-r"]),
-.bg-slate-50 .card *:not([class*="bg-gradient-to-r"]) {
-  color: #1f2937 !important;
-}
-
-/* Simplified background-based text color rules */
-.bg-gray-900, .bg-slate-900, .bg-black {
-  color: #f9fafb;
-}
-
-.bg-gray-900 *, .bg-slate-900 *, .bg-black * {
-  color: inherit;
-}
-
-/* ENHANCED DARK BACKGROUND SUPPORT */
-/* Comprehensive dark background detection and light text enforcement */
-[class*="bg-slate-8"] *,
-[class*="bg-gray-8"] *,
-[class*="bg-slate-9"] *,
-[class*="bg-gray-9"] *,
-[class*="bg-black"] *,
-.bg-gradient-to-br.from-slate-800 *,
-.bg-gradient-to-br.from-gray-800 *,
-.bg-gradient-to-r.from-slate-800 *,
-.bg-gradient-to-r.from-gray-800 * {
-  color: #f8fafc !important;
-}
-
-/* Dark gradient backgrounds need light text */
-.bg-gradient-to-br.from-slate-800.via-gray-800.to-slate-900 *,
-.bg-gradient-to-br.from-slate-800.via-gray-800.to-slate-700 *,
-.bg-gradient-to-br.from-gray-800.via-slate-800.to-gray-900 * {
-  color: #f1f5f9 !important;
-}
-
-/* Specific overrides for dark sections */
-.bg-gradient-to-br.from-slate-800 h1,
-.bg-gradient-to-br.from-slate-800 h2,
-.bg-gradient-to-br.from-slate-800 h3,
-.bg-gradient-to-br.from-slate-800 h4,
-.bg-gradient-to-br.from-slate-800 h5,
-.bg-gradient-to-br.from-slate-800 h6,
-.bg-gradient-to-br.from-gray-800 h1,
-.bg-gradient-to-br.from-gray-800 h2,
-.bg-gradient-to-br.from-gray-800 h3,
-.bg-gradient-to-br.from-gray-800 h4,
-.bg-gradient-to-br.from-gray-800 h5,
-.bg-gradient-to-br.from-gray-800 h6 {
-  color: #ffffff !important;
-}
-
-.bg-gradient-to-br.from-slate-800 p,
-.bg-gradient-to-br.from-slate-800 li,
-.bg-gradient-to-br.from-slate-800 span:not([class*="text-"]):not([class*="bg-gradient"]),
-.bg-gradient-to-br.from-gray-800 p,
-.bg-gradient-to-br.from-gray-800 li,
-.bg-gradient-to-br.from-gray-800 span:not([class*="text-"]):not([class*="bg-gradient"]) {
-  color: #e2e8f0 !important;
-}
-
-/* Dark background buttons need light text */
-.bg-gradient-to-br.from-slate-800 button:not([class*="bg-white"]):not([class*="bg-gradient-to-r"]),
-.bg-gradient-to-br.from-gray-800 button:not([class*="bg-white"]):not([class*="bg-gradient-to-r"]) {
-  color: #ffffff !important;
-}
-
-/* Override dark background sections to use light text for better contrast */
-section[class*="bg-slate-8"] *:not([class*="text-"]):not([class*="bg-gradient"]):not([class*="bg-white"]),
-section[class*="bg-gray-8"] *:not([class*="text-"]):not([class*="bg-gradient"]):not([class*="bg-white"]),
-section[class*="bg-slate-9"] *:not([class*="text-"]):not([class*="bg-gradient"]):not([class*="bg-white"]) {
-  color: #f1f5f9 !important;
-}
-
-/* Buttons with dark backgrounds should have light text */
-button[class*="bg-slate-8"],
-button[class*="bg-gray-8"],
-button[class*="bg-slate-9"],
-button[class*="bg-gray-9"],
-button[class*="bg-black"],
-.bg-gradient-to-r.from-slate-600,
-.bg-gradient-to-r.from-gray-600,
-.bg-gradient-to-r.from-slate-700,
-.bg-gradient-to-r.from-gray-700,
-.bg-gradient-to-r.from-slate-800,
-.bg-gradient-to-r.from-gray-800,
-.bg-gradient-to-r.from-slate-900,
-.bg-gradient-to-r.from-gray-900 {
-  color: #ffffff !important;
-}
-
-/* Ensure link colors work well on dark backgrounds */
-.bg-gradient-to-br.from-slate-800 a:not([class*="bg-"]),
-.bg-gradient-to-br.from-gray-800 a:not([class*="bg-"]) {
-  color: #7dd3fc !important;
-}
-
-.bg-gradient-to-br.from-slate-800 a:not([class*="bg-"]):hover,
-.bg-gradient-to-br.from-gray-800 a:not([class*="bg-"]):hover {
-  color: #38bdf8 !important;
-}
-
-/* Enhanced Focus States for Better Accessibility */
-input:focus,
-textarea:focus,
-select:focus,
-button:focus {
-  outline: 3px solid #14b8a6 !important;
-  outline-offset: 2px !important;
-  box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.2) !important;
-}
-
-/* Enhanced Select and Dropdown Text */
-select option {
-  color: #1f2937 !important;
-  background: white !important;
-}
-
-/* Enhanced Table Text */
-table,
-th,
-td {
-  color: #1f2937 !important;
-}
-
-/* Enhanced Alert and Notification Text */
-.alert,
-.notification,
-[role="alert"] {
-  color: #1f2937 !important;
-}
-
-/* Force Dark Text on Light Gradients */
-.bg-gradient-to-r.from-teal-50,
-.bg-gradient-to-r.from-emerald-50,
-.bg-gradient-to-r.from-blue-50,
-.bg-gradient-to-r.from-gray-50 {
-  color: #1f2937 !important;
-}
-
-/* Ensure readability for common text elements */
-p, li, ul li, ol li, span:not([class*="text-"]):not([class*="bg-gradient"]) {
-  color: #374151;
-}
-
-/* Only override specific gray text classes that are too light */
-.text-gray-200, .text-gray-100 {
-  color: #6b7280 !important;
-}
-
-/* Enhanced Badge and Tag Text */
-.badge,
-[class*="badge"] {
-  font-weight: 600 !important;
-}
-
-/* Enhanced Card Headers and Titles */
-.card-header,
-.card-title,
-[class*="card-header"],
-[class*="card-title"] {
-  color: #1f2937 !important;
-  font-weight: 600 !important;
-}
-
-/* REMOVED NAV CSS INTERFERENCE */
-
-/* Improved Color Contrast */
-.text-gray-600 {
-  color: #4b5563 !important; /* Higher contrast than default */
-}
-
-.text-gray-500 {
-  color: #6b7280 !important;
-}
-
-/* Enhanced Mobile Navigation */
-@media (max-width: 1024px) {
-  .mobile-menu {
-    backdrop-filter: blur(12px);
-    background: rgba(255, 255, 255, 0.98);
-    border: 1px solid rgba(20, 184, 166, 0.1);
-  }
-  
-  .mobile-menu-item {
-    padding: 16px 20px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    transition: background-color 0.2s ease;
-    min-height: 52px;
-    display: flex;
-    align-items: center;
-  }
-  
-  .mobile-menu-item:hover {
-    background: rgba(20, 184, 166, 0.05);
-    color: #0d9488;
-  }
-}
-
-/* Animation Delay Classes */
-.animation-delay-200 {
-  animation-delay: 200ms;
-}
-
-.animation-delay-400 {
-  animation-delay: 400ms;
-}
-
-.animation-delay-600 {
-  animation-delay: 600ms;
-}
-
-.animation-delay-800 {
-  animation-delay: 800ms;
-}
-
-.animation-delay-1000 {
-  animation-delay: 1000ms;
-}
-
-.animation-delay-1500 {
-  animation-delay: 1500ms;
-}
-
-.animation-delay-2000 {
-  animation-delay: 2000ms;
-}
-
-/* Optimized Transitions - Replace transition-all */
 .transition-transform-smooth {
-  transition: transform 150ms ease-out;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .transition-colors-smooth {
-  transition: color 150ms ease-out, background-color 150ms ease-out;
+  transition: color 0.2s ease, background-color 0.2s ease;
 }
 
 .transition-opacity-smooth {
-  transition: opacity 150ms ease-out;
+  transition: opacity 0.3s ease;
 }
 
 .transition-shadow-smooth {
-  transition: box-shadow 150ms ease-out;
+  transition: box-shadow 0.3s ease;
 }
 
-/* Optimized Card Animation */
-.card-hover-optimized {
-  transition: transform 150ms ease-out, box-shadow 150ms ease-out;
-}
-
-.card-hover-optimized:hover {
-  transform: scale(1.05);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-}
-
-/* Replace backdrop-blur with simpler effects */
-.glass-effect-light {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-}
-
-.glass-effect-dark {
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-}
-
-/* Optimized Glow Effects */
-.glow-blue {
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
-}
-
-.glow-teal {
-  box-shadow: 0 0 20px rgba(20, 184, 166, 0.3);
-}
-
-.glow-emerald {
-  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
-}
-
-/* Performance-optimized hover states */
 .hover-lift {
-  transition: transform 150ms ease-out;
+  transition: transform 0.2s ease;
 }
 
 .hover-lift:hover {
-  transform: translateY(-4px);
+  transform: translateY(-2px);
 }
 
-/* Fade in animations */
 @keyframes fade-in-up {
   from {
     opacity: 0;
@@ -774,971 +199,28 @@ p, li, ul li, ol li, span:not([class*="text-"]):not([class*="bg-gradient"]) {
 }
 
 .animate-fade-in-up {
-  animation: fade-in-up 0.6s ease-out forwards;
+  animation: fade-in-up 0.6s ease-out;
 }
 
-/* Line Clamp Utilities */
-.line-clamp-1 {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
-}
-
-.line-clamp-2 {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-}
-
-.line-clamp-3 {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-}
-
-/* Force Light Mode Override */
-.light,
-.light * {
-  color-scheme: light !important;
-}
-
-.light {
-  --foreground-rgb: 0, 0, 0 !important;
-  --background-start-rgb: 248, 250, 252 !important;
-  --background-end-rgb: 255, 255, 255 !important;
-  
-  --background: 0 0% 100% !important;
-  --foreground: 222.2 84% 4.9% !important;
-  --card: 0 0% 100% !important;
-  --card-foreground: 222.2 84% 4.9% !important;
-  --popover: 0 0% 100% !important;
-  --popover-foreground: 222.2 84% 4.9% !important;
-  --secondary: 210 40% 98% !important;
-  --secondary-foreground: 222.2 84% 4.9% !important;
-  --muted: 210 40% 98% !important;
-  --muted-foreground: 215.4 16.3% 46.9% !important;
-  --accent: 210 40% 98% !important;
-  --accent-foreground: 222.2 84% 4.9% !important;
-  --border: 214.3 31.8% 91.4% !important;
-  --input: 214.3 31.8% 91.4% !important;
-  
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(255, 255, 255)
-    )
-    rgb(248, 250, 252) !important;
-}
-
-/* Ensure cards and components have proper light backgrounds */
-.light .bg-white,
-.light [class*="bg-white"] {
-  background-color: white !important;
-}
-
-.light .bg-gray-50,
-.light [class*="bg-gray-50"] {
-  background-color: #f9fafb !important;
-}
-
-.light .text-gray-900,
-.light [class*="text-gray-900"] {
-  color: #111827 !important;
-}
-
-.light .text-gray-700,
-.light [class*="text-gray-700"] {
-  color: #374151 !important;
-}
-
-.light .text-gray-600,
-.light [class*="text-gray-600"] {
-  color: #4b5563 !important;
-}
-
-/* Modal overlays and dark semi-transparent backgrounds */
-[class*="bg-gray-900/"] *,
-[class*="bg-slate-900/"] *,
-[class*="bg-gray-800/"] *,
-[class*="bg-slate-800/"] * {
-  color: #f8fafc !important;
-}
-
-/* Additional dark background button classes */
-.bg-gray-600,
-.bg-gray-700,
-.bg-gray-800,
-.bg-slate-600,
-.bg-slate-700,
-.bg-slate-800 {
-  color: #ffffff !important;
-}
-
-/* Footer and other dark sections */
-footer.bg-gray-900 *,
-footer[class*="bg-gray-9"] *,
-footer[class*="bg-slate-9"] * {
-  color: #f1f5f9 !important;
-}
-
-/* Specific dark background utility classes */
-.bg-gray-900 h1,
-.bg-gray-900 h2,
-.bg-gray-900 h3,
-.bg-gray-900 h4,
-.bg-gray-900 h5,
-.bg-gray-900 h6,
-.bg-slate-900 h1,
-.bg-slate-900 h2,
-.bg-slate-900 h3,
-.bg-slate-900 h4,
-.bg-slate-900 h5,
-.bg-slate-900 h6 {
-  color: #ffffff !important;
-}
-
-/* Dark background cards and containers */
-[class*="bg-gray-900"] *:not([class*="text-"]):not([class*="bg-gradient"]):not([class*="bg-white"]),
-[class*="bg-slate-900"] *:not([class*="text-"]):not([class*="bg-gradient"]):not([class*="bg-white"]) {
-  color: #e2e8f0 !important;
-}
-
-/* Presentation Editor Enhancements */
-.slide-thumbnails-scroll {
-  scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 #f8fafc;
-}
-
-.slide-thumbnails-scroll::-webkit-scrollbar {
-  width: 6px;
-}
-
-.slide-thumbnails-scroll::-webkit-scrollbar-track {
-  background: #f8fafc;
-  border-radius: 3px;
-}
-
-.slide-thumbnails-scroll::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 3px;
-  transition: background-color 0.2s ease;
-}
-
-.slide-thumbnails-scroll::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-/* Ensure proper touch scrolling on mobile */
-.slide-thumbnails-scroll {
-  -webkit-overflow-scrolling: touch;
-  scroll-behavior: smooth;
-}
-
-/* Add subtle visual indicators for scrollable areas */
-.slide-container:after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(to right, transparent, #e2e8f0, transparent);
-  opacity: 0.5;
-  pointer-events: none;
-}
-
-/* Clean Text Contrast Rules */
-/* Ensure all text has sufficient contrast */
-
-.text-gray-400 {
-  color: #6b7280 !important;
-}
-
-.text-gray-500 {
-  color: #4b5563 !important;
-}
-
-.text-gray-600 {
-  color: #374151 !important;
-}
-
-/* Clean up placeholder text */
-input::placeholder,
-textarea::placeholder {
-  color: #6b7280 !important;
-}
-
-/* Simple rule for footer text on dark backgrounds */
-footer {
-  color: #d1d5db;
-}
-
-footer a {
-  color: #d1d5db;
-}
-
-footer a:hover {
-  color: #f3f4f6;
-}
-
-/* Global text improvements */
-* {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Override Tailwind's lightest grays for better contrast */
-.text-gray-300 {
-  color: #9ca3af !important;
-}
-
-.text-gray-200 {
-  color: #6b7280 !important;
-}
-
-.text-gray-100 {
-  color: #4b5563 !important;
-}
-
-/* Ensure teal text is visible */
-.text-teal-700 {
-  color: #0f766e !important;
-}
-
-/* SAFER gradient text handling - only apply to elements that actually have gradients */
-[class*="bg-gradient-to-"][class*="bg-clip-text"][class*="text-transparent"] {
-  -webkit-background-clip: text !important;
-  background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  color: transparent !important;
-}
-
-/* CRITICAL: Remove text-transparent from elements without proper gradients */
-.text-transparent:not([class*="bg-gradient-to-"]) {
-  color: #1f2937 !important;
-  -webkit-text-fill-color: #1f2937 !important;
-  background-clip: unset !important;
-  -webkit-background-clip: unset !important;
-}
-
-/* Fix any remaining invisible text issues */
-*:not([class*="bg-gradient-to-"])[class*="text-transparent"] {
-  color: #1f2937 !important;
-  -webkit-text-fill-color: #1f2937 !important;
-}
-
-/* Dark background text should be light */
-[class*="bg-slate-8"] [class*="bg-gradient"][class*="bg-clip-text"][class*="text-transparent"],
-[class*="bg-gray-8"] [class*="bg-gradient"][class*="bg-clip-text"][class*="text-transparent"] {
-  color: #ffffff !important;
-}
-
-/* Enhanced visibility and contrast fixes */
-
-/* Force all text to have proper contrast - Override all white/light text on light backgrounds */
-.bg-gradient-to-br *,
-.bg-gradient-to-r *,
-.bg-slate-50 *,
-.bg-blue-50 *,
-.bg-cyan-50 *,
-.bg-white *,
-.bg-gray-50 * {
-  color: #1f2937 !important; /* Dark gray for readability */
-}
-
-/* Preserve white text ONLY on dark backgrounds */
-.bg-slate-800 *,
-.bg-gray-800 *,
-.bg-slate-900 *,
-.bg-gray-900 *,
-.bg-gradient-to-br.from-slate-800 *,
-.bg-gradient-to-br.from-gray-800 * {
-  color: #ffffff !important;
-}
-
-/* Fix specific hero section text visibility */
-.hero-section .text-gray-700,
-.hero-section .text-gray-600,
-.hero-section .text-gray-500 {
-  color: #374151 !important; /* Darker gray for better contrast */
-  font-weight: 500 !important;
-}
-
-/* Ensure button text is always visible */
-button *,
-.btn *,
-[role="button"] * {
-  color: inherit !important;
-}
-
-/* Dark button text should stay white */
-.bg-gray-800 button *,
-.bg-slate-800 button *,
-.bg-gray-900 button *,
-.bg-slate-900 button *,
-.bg-gradient-to-r.from-gray-800 button *,
-.bg-gradient-to-r.from-slate-800 button *,
-.bg-gradient-to-r.from-teal-600 button *,
-.bg-gradient-to-r.from-blue-600 button *,
-.bg-gradient-to-r.from-purple-600 button * {
-  color: #ffffff !important;
-}
-
-/* Mobile menu visibility fixes */
-@media (max-width: 1024px) {
-  /* Ensure mobile menu is always visible */
-  .mobile-menu,
-  .mobile-menu * {
-    background: rgba(255, 255, 255, 0.98) !important;
-    color: #1f2937 !important;
-    backdrop-filter: blur(12px) !important;
-  }
-  
-  /* Mobile menu button visibility */
-  .mobile-menu-button {
-    background: rgba(255, 255, 255, 0.9) !important;
-    color: #1f2937 !important;
-    border: 1px solid rgba(0, 0, 0, 0.1) !important;
-    padding: 8px !important;
-    border-radius: 8px !important;
-  }
-  
-  /* Mobile menu items */
-  .mobile-menu-item {
-    color: #1f2937 !important;
-    background: transparent !important;
-    min-height: 48px !important;
-    padding: 12px 16px !important;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
-  }
-  
-  .mobile-menu-item:hover {
-    background: rgba(20, 184, 166, 0.1) !important;
-    color: #0d9488 !important;
-  }
-}
-
-/* Breadcrumb fixes */
-nav[aria-label="Breadcrumb"] *,
-.breadcrumb *,
-[class*="breadcrumb"] * {
-  color: #4b5563 !important;
-  background: rgba(255, 255, 255, 0.9) !important;
-  padding: 2px 6px !important;
-  border-radius: 4px !important;
-  display: inline-block !important;
-  margin: 1px !important;
-}
-
-/* Navigation text fixes */
-nav *,
-.navigation *,
-header * {
-  color: #374151 !important;
-}
-
-/* Only preserve white text on explicitly dark nav backgrounds */
-nav.bg-slate-800 *,
-nav.bg-gray-800 *,
-nav.bg-slate-900 *,
-nav.bg-gray-900 *,
-header.bg-slate-800 *,
-header.bg-gray-800 *,
-header.bg-slate-900 *,
-header.bg-gray-900 * {
-  color: #ffffff !important;
-}
-
-/* Badge and tag fixes */
-.badge,
-[class*="badge"],
-.tag,
-[class*="tag"] {
-  font-weight: 600 !important;
-  color: inherit !important;
-  border: 1px solid rgba(0, 0, 0, 0.1) !important;
-}
-
-/* Card and content fixes */
-.card *,
-[class*="card"] *,
-.content * {
-  color: #1f2937 !important;
-}
-
-/* Link fixes */
-a {
-  color: #0d9488 !important;
-  text-decoration: none !important;
-}
-
-a:hover {
-  color: #0f766e !important;
-  text-decoration: underline !important;
-}
-
-/* Preserve link colors in dark sections */
-.bg-slate-800 a,
-.bg-gray-800 a,
-.bg-slate-900 a,
-.bg-gray-900 a {
-  color: #5eead4 !important;
-}
-
-/* Force visibility for any remaining invisible elements */
-[style*="color: transparent"],
-[style*="color: rgba(0, 0, 0, 0)"],
-[style*="color: rgba(255, 255, 255, 0)"],
-.text-transparent {
-  color: #1f2937 !important;
-  background: rgba(255, 255, 255, 0.9) !important;
-  padding: 2px 4px !important;
-  border-radius: 2px !important;
-  display: inline-block !important;
-}
-
-/* Enhanced mobile touch targets */
-@media (max-width: 768px) {
-  button,
-  [role="button"],
-  a {
-    min-height: 44px !important;
-    min-width: 44px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 8px 12px !important;
-  }
-}
-
-/* Z-index fixes for mobile menu */
-.mobile-menu-overlay {
-  z-index: 9999 !important;
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-}
-
-.mobile-menu-content {
-  z-index: 10000 !important;
-  position: relative !important;
-}
-
-/* Ensure mobile hamburger menu is always visible */
-.hamburger-menu,
-[aria-label="Toggle mobile menu"],
-[aria-label="Open mobile menu"] {
-  background: rgba(255, 255, 255, 0.95) !important;
-  color: #1f2937 !important;
-  border: 1px solid rgba(0, 0, 0, 0.1) !important;
-  padding: 8px !important;
-  border-radius: 6px !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-}
-
-/* ===== CRITICAL MOBILE MENU & TEXT VISIBILITY FIXES ===== */
-
-/* Fix mobile menu navigation issues - ensure proper touch handling */
-.mobile-menu-content {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 100%;
-  max-width: 400px;
-  height: 100vh;
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(12px);
-  z-index: 9999;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.mobile-menu-item {
-  display: block !important;
-  width: 100% !important;
-  text-align: left !important;
-  padding: 16px 20px !important;
-  color: #1f2937 !important;
-  text-decoration: none !important;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
-  transition: all 0.2s ease !important;
-  cursor: pointer !important;
-  -webkit-tap-highlight-color: rgba(20, 184, 166, 0.1) !important;
-  min-height: 52px !important;
-  display: flex !important;
-  align-items: center !important;
-}
-
-.mobile-menu-item:hover,
-.mobile-menu-item:active,
-.mobile-menu-item:focus {
-  background: rgba(20, 184, 166, 0.05) !important;
-  color: #0d9488 !important;
-  transform: translateX(4px) !important;
-}
-
-/* Fix mobile menu button interactions */
-.mobile-menu button,
-.mobile-menu a[role="button"] {
-  width: 100% !important;
-  text-align: left !important;
-  justify-content: flex-start !important;
-  color: #1f2937 !important;
-  background: transparent !important;
-  border: none !important;
-  padding: 16px 20px !important;
-  font-size: 14px !important;
-  font-weight: 500 !important;
-  -webkit-tap-highlight-color: rgba(20, 184, 166, 0.1) !important;
-}
-
-.mobile-menu button:hover,
-.mobile-menu button:active,
-.mobile-menu a[role="button"]:hover,
-.mobile-menu a[role="button"]:active {
-  background: rgba(20, 184, 166, 0.05) !important;
-  color: #0d9488 !important;
-}
-
-/* HOMEPAGE TEXT VISIBILITY FIXES */
-
-/* Fix hero section text visibility */
-.hero-section {
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
-}
-
-.hero-section * {
-  color: #1f2937 !important;
-}
-
-.hero-section h1 {
-  color: #111827 !important;
-  font-weight: 700 !important;
-}
-
-.hero-section p {
-  color: #374151 !important;
-}
-
-/* Fix light text on light backgrounds throughout homepage */
-.text-gray-400:not([class*="bg-gray-8"]):not([class*="bg-slate-8"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]) {
-  color: #4b5563 !important;
-}
-
-.text-gray-300:not([class*="bg-gray-8"]):not([class*="bg-slate-8"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]) {
-  color: #6b7280 !important;
-}
-
-.text-gray-200:not([class*="bg-gray-8"]):not([class*="bg-slate-8"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]) {
-  color: #9ca3af !important;
-}
-
-/* Fix transparent gradient text that becomes invisible */
-.bg-gradient-to-r.from-gray-300.to-gray-600.bg-clip-text.text-transparent {
-  background: linear-gradient(to right, #374151, #111827) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  background-clip: text !important;
-}
-
-/* Fix white/very light text on light backgrounds */
-section:not([class*="bg-gray-8"]):not([class*="bg-slate-8"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]) .text-white {
-  color: #1f2937 !important;
-}
-
-/* FOOTER TEXT CONTRAST FIXES */
-footer {
-  background: #1f2937 !important;
-  color: #e5e7eb !important;
-}
-
-footer * {
-  color: #e5e7eb !important;
-}
-
-footer h1,
-footer h2,
-footer h3,
-footer h4,
-footer h5,
-footer h6 {
-  color: #f9fafb !important;
-}
-
-footer a {
-  color: #d1d5db !important;
-  text-decoration: none !important;
-  transition: color 0.2s ease !important;
-}
-
-footer a:hover {
-  color: #10b981 !important;
-}
-
-footer .text-gray-600,
-footer .text-gray-500,
-footer .text-gray-400 {
-  color: #9ca3af !important;
-}
-
-/* BUTTON STYLING FIXES */
-
-/* Ensure all buttons have proper styling */
-button:not([class*="bg-gradient"]):not([class*="bg-teal"]):not([class*="bg-blue"]):not([class*="bg-green"]):not([class*="bg-red"]):not([class*="bg-orange"]):not([class*="bg-purple"]) {
-  background: #f3f4f6 !important;
-  color: #1f2937 !important;
-  border: 1px solid #d1d5db !important;
-  font-weight: 500 !important;
-  transition: all 0.2s ease !important;
-}
-
-button:not([class*="bg-gradient"]):not([class*="bg-teal"]):not([class*="bg-blue"]):not([class*="bg-green"]):not([class*="bg-red"]):not([class*="bg-orange"]):not([class*="bg-purple"]):hover {
-  background: #e5e7eb !important;
-  border-color: #9ca3af !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
-}
-
-/* Primary button styling */
-.btn-primary,
-button[class*="bg-teal"],
-button[class*="bg-blue"] {
-  font-weight: 600 !important;
-  transition: all 0.2s ease !important;
-}
-
-.btn-primary:hover,
-button[class*="bg-teal"]:hover,
-button[class*="bg-blue"]:hover {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
-}
-
-/* Outline button fixes */
-button[class*="variant-outline"],
-button[class*="border"] {
-  background: transparent !important;
-  color: #1f2937 !important;
-  border: 2px solid #d1d5db !important;
-  font-weight: 500 !important;
-}
-
-button[class*="variant-outline"]:hover,
-button[class*="border"]:hover {
-  background: #f9fafb !important;
-  border-color: #0d9488 !important;
-  color: #0d9488 !important;
-}
-
-/* ENHANCED CONTRAST FOR ALL SECTIONS */
-
-/* Light background sections */
-section[class*="bg-white"],
-section[class*="bg-gray-50"],
-section[class*="bg-slate-50"] {
-  color: #1f2937 !important;
-}
-
-section[class*="bg-white"] *:not([class*="text-"]):not([class*="bg-gradient"]),
-section[class*="bg-gray-50"] *:not([class*="text-"]):not([class*="bg-gradient"]),
-section[class*="bg-slate-50"] *:not([class*="text-"]):not([class*="bg-gradient"]) {
-  color: #374151 !important;
-}
-
-section[class*="bg-white"] h1,
-section[class*="bg-white"] h2,
-section[class*="bg-white"] h3,
-section[class*="bg-gray-50"] h1,
-section[class*="bg-gray-50"] h2,
-section[class*="bg-gray-50"] h3,
-section[class*="bg-slate-50"] h1,
-section[class*="bg-slate-50"] h2,
-section[class*="bg-slate-50"] h3 {
-  color: #111827 !important;
-  font-weight: 700 !important;
-}
-
-/* Gradient background fixes */
-.bg-gradient-to-br.from-blue-50.to-indigo-100 * {
-  color: #1f2937 !important;
-}
-
-.bg-gradient-to-br.from-blue-50.to-indigo-100 h1,
-.bg-gradient-to-br.from-blue-50.to-indigo-100 h2,
-.bg-gradient-to-br.from-blue-50.to-indigo-100 h3 {
-  color: #111827 !important;
-}
-
-/* CARD AND COMPONENT FIXES */
-
-/* Ensure cards have proper text contrast */
-.card,
-[class*="card"] {
-  color: #1f2937 !important;
-}
-
-.card *:not([class*="bg-gradient"]):not([class*="text-"]),
-[class*="card"] *:not([class*="bg-gradient"]):not([class*="text-"]) {
-  color: #374151 !important;
-}
-
-.card h1, .card h2, .card h3, .card h4, .card h5, .card h6,
-[class*="card"] h1, [class*="card"] h2, [class*="card"] h3, [class*="card"] h4, [class*="card"] h5, [class*="card"] h6 {
-  color: #111827 !important;
-  font-weight: 600 !important;
-}
-
-/* Badge text fixes */
-.badge,
-[class*="badge"] {
-  font-weight: 600 !important;
-  text-shadow: none !important;
-}
-
-.badge.bg-green-100,
-.badge.bg-blue-100,
-.badge.bg-purple-100,
-.badge.bg-orange-100 {
-  color: #1f2937 !important;
-}
-
-/* RESPONSIVE MOBILE FIXES */
-@media (max-width: 768px) {
-  /* Ensure mobile text is large enough and has good contrast */
-  body {
-    font-size: 16px !important;
-    line-height: 1.6 !important;
-  }
-  
-  h1, h2, h3 {
-    line-height: 1.3 !important;
-    font-weight: 700 !important;
-  }
-  
-  /* Mobile button sizing */
-  button {
-    min-height: 44px !important;
-    min-width: 44px !important;
-    font-size: 16px !important;
-  }
-  
-  /* Mobile menu specific fixes */
-  .mobile-menu-overlay {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    background: rgba(0, 0, 0, 0.5) !important;
-    z-index: 9998 !important;
-    backdrop-filter: blur(4px) !important;
-  }
-  
-  .mobile-menu-content {
-    position: fixed !important;
-    top: 0 !important;
-    right: 0 !important;
-    width: 100% !important;
-    max-width: 400px !important;
-    height: 100vh !important;
-    background: #ffffff !important;
-    z-index: 9999 !important;
-    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15) !important;
-  }
-}
-
-/* ACCESSIBILITY IMPROVEMENTS */
-
-/* Enhanced focus states */
-*:focus-visible {
-  outline: 3px solid #10b981 !important;
-  outline-offset: 2px !important;
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2) !important;
-}
-
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-  .text-gray-600 { color: #374151 !important; }
-  .text-gray-500 { color: #4b5563 !important; }
-  .text-gray-400 { color: #6b7280 !important; }
-  
-  button:not([class*="bg-gradient"]) {
-    border: 2px solid #1f2937 !important;
-  }
-}
-
-/* Reduced motion support */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-/* MOBILE NAVIGATION FIXES - PREVENT DISAPPEARING ON SCROLL */
-
-/* Ensure navigation header stays visible on scroll */
-nav, header, [role="navigation"] {
-  position: relative !important;
-  z-index: 1000 !important;
-}
-
-/* Fix mobile menu button visibility */
-@media (max-width: 1024px) {
-  .mobile-menu-button,
-  [aria-label="Toggle mobile menu"] {
-    position: relative !important;
-    z-index: 1001 !important;
-    display: block !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-  }
-  
-  /* Ensure mobile menu container stays visible */
-  .mobile-menu-container {
-    position: relative !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: flex-end !important;
-    z-index: 1001 !important;
-  }
-  
-  /* Fix mobile menu overlay positioning */
-  .mobile-menu-overlay {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    z-index: 9998 !important;
-    backdrop-filter: blur(4px) !important;
-  }
-  
-  /* Fix mobile menu content positioning */
-  .mobile-menu-content {
-    position: fixed !important;
-    top: 0 !important;
-    right: 0 !important;
-    width: 100% !important;
-    max-width: 400px !important;
-    height: 100vh !important;
-    background: #ffffff !important;
-    z-index: 9999 !important;
-    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15) !important;
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-  }
-}
-
-/* ENHANCED MOBILE MENU STYLING */
-.mobile-menu-item {
-  display: block !important;
-  width: 100% !important;
-  text-align: left !important;
-  padding: 16px 20px !important;
-  color: #1f2937 !important;
-  text-decoration: none !important;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
-  transition: all 0.2s ease !important;
-  cursor: pointer !important;
-  -webkit-tap-highlight-color: rgba(20, 184, 166, 0.1) !important;
-  min-height: 52px !important;
-  display: flex !important;
-  align-items: center !important;
-}
-
-.mobile-menu-item:hover,
-.mobile-menu-item:active,
-.mobile-menu-item:focus {
-  background: rgba(20, 184, 166, 0.05) !important;
-  color: #0d9488 !important;
-  transform: translateX(4px) !important;
-}
-
-/* Fix mobile menu button interactions */
-.mobile-menu button,
-.mobile-menu a[role="button"] {
-  width: 100% !important;
-  text-align: left !important;
-  justify-content: flex-start !important;
-  color: #1f2937 !important;
-  background: transparent !important;
-  border: none !important;
-  padding: 16px 20px !important;
-  font-size: 14px !important;
-  font-weight: 500 !important;
-  -webkit-tap-highlight-color: rgba(20, 184, 166, 0.1) !important;
-}
-
-.mobile-menu button:hover,
-.mobile-menu button:active,
-.mobile-menu a[role="button"]:hover,
-.mobile-menu a[role="button"]:active {
-  background: rgba(20, 184, 166, 0.05) !important;
-  color: #0d9488 !important;
-}
-
-/* Mobile Menu Animations */
 @keyframes slideInRight {
   from {
+    transform: translateX(100%);
     opacity: 0;
-    transform: translateX(30px);
   }
   to {
-    opacity: 1;
     transform: translateX(0);
-  }
-}
-
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
     opacity: 1;
-    transform: translateX(0);
   }
 }
 
 @keyframes slideDown {
   from {
-    opacity: 0;
     transform: translateY(-10px);
-    max-height: 0;
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-    max-height: 500px;
-  }
-}
-
-@keyframes fadeInUp {
-  from {
     opacity: 0;
-    transform: translateY(20px);
   }
   to {
-    opacity: 1;
     transform: translateY(0);
-  }
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
     opacity: 1;
-    transform: scale(1);
   }
 }
 
@@ -1751,185 +233,183 @@ nav, header, [role="navigation"] {
   }
 }
 
-/* Enhanced Mobile Menu Styles */
-.mobile-menu-overlay {
-  backdrop-filter: blur(8px);
-  animation: fadeInUp 0.3s ease-out;
+.shimmer {
+  background: linear-gradient(90deg, #f0f0f0 0px, #e0e0e0 40px, #f0f0f0 80px);
+  background-size: 200px;
+  animation: shimmer 1.5s infinite;
 }
 
-.mobile-menu-content {
-  animation: slideInRight 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
+/* ================================
+   COMPONENT UTILITIES
+   ================================ */
 
-/* Touch feedback enhancements */
-.mobile-menu-item:active {
-  transform: scale(0.98);
-  transition: transform 0.1s ease-out;
-}
-
-/* Glass morphism effect */
-.glass-morphism {
+.glass-effect-light {
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* Gradient animations */
-.gradient-animate {
-  background-size: 200% 200%;
-  animation: gradient 3s ease infinite;
-}
-
-@keyframes gradient {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-/* Loading shimmer effect */
-.shimmer {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200px 100%;
-  animation: shimmer 1.5s infinite;
-}
-
-/* Enhanced button styles */
-.btn-modern {
-  position: relative;
-  overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.btn-modern::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
-}
-
-.btn-modern:hover::before {
-  left: 100%;
-}
-
-/* Enhanced card styles */
-.card-modern {
-  background: rgba(255, 255, 255, 0.95);
+.glass-effect-dark {
+  background: rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.card-modern:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+.card-hover-optimized {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Progress indicator enhancements */
-.progress-step {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+.card-hover-optimized:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
-.progress-step.active {
-  transform: scale(1.1);
+/* ================================
+   MOBILE MENU STYLES
+   ================================ */
+
+@media (max-width: 1024px) {
+  .mobile-menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    animation: fadeIn 0.2s ease-out;
+  }
+
+  .mobile-menu-content {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 320px;
+    max-width: 90vw;
+    height: 100vh;
+    background: white;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
+    animation: slideInRight 0.3s ease-out;
+    overflow-y: auto;
+  }
+
+  .mobile-menu-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    color: #1f2937;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+  }
+
+  .mobile-menu-item:hover {
+    background-color: #f9fafb;
+    color: #0d9488;
+  }
+
+  .mobile-menu-item:active {
+    background-color: #f3f4f6;
+  }
 }
 
-.progress-step.completed {
-  animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-/* Form enhancements */
-.form-floating {
-  position: relative;
-}
+/* ================================
+   RESPONSIVE UTILITIES
+   ================================ */
 
-.form-floating input:focus + label,
-.form-floating input:not(:placeholder-shown) + label {
-  transform: translateY(-1.5rem) scale(0.8);
-  color: #14b8a6;
-}
-
-.form-floating label {
-  position: absolute;
-  top: 0.75rem;
-  left: 0.75rem;
-  transition: all 0.3s ease;
-  pointer-events: none;
-  color: #6b7280;
-}
-
-/* File upload enhancements */
-.file-upload-area {
-  border: 2px dashed #d1d5db;
-  transition: all 0.3s ease;
-}
-
-.file-upload-area:hover,
-.file-upload-area.drag-over {
-  border-color: #14b8a6;
-  background-color: rgba(20, 184, 166, 0.05);
-  transform: scale(1.02);
-}
-
-/* Score display enhancements */
-.score-circle {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.score-circle::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  padding: 3px;
-  background: linear-gradient(45deg, #14b8a6, #10b981);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask-composite: xor;
-}
-
-/* Responsive text scaling */
 @media (max-width: 640px) {
+  .text-responsive-xl {
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+
+  .text-responsive-2xl {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+  }
+
+  .text-responsive-3xl {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+  }
+}
+
+@media (min-width: 641px) {
   .text-responsive-xl {
     font-size: 1.25rem;
     line-height: 1.75rem;
   }
-  
+
   .text-responsive-2xl {
     font-size: 1.5rem;
     line-height: 2rem;
   }
-  
+
   .text-responsive-3xl {
     font-size: 1.875rem;
     line-height: 2.25rem;
   }
 }
 
-@media (min-width: 641px) {
-  .text-responsive-xl {
-    font-size: 1.5rem;
-    line-height: 2rem;
+/* ================================
+   TAILWIND UTILITIES
+   ================================ */
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
   }
-  
-  .text-responsive-2xl {
-    font-size: 2rem;
-    line-height: 2.5rem;
+
+  .line-clamp-1 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
   }
+
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .line-clamp-3 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+}
+
+/* ================================
+   HIGH CONTRAST MODE SUPPORT
+   ================================ */
+
+@media (prefers-contrast: high) {
+  .text-gray-600 { color: #374151; }
+  .text-gray-500 { color: #4b5563; }
+  .text-gray-400 { color: #6b7280; }
   
-  .text-responsive-3xl {
-    font-size: 2.5rem;
-    line-height: 3rem;
+  button:not([class*="bg-gradient"]) {
+    border: 2px solid currentColor;
+    font-weight: 600;
+  }
+}
+
+/* ================================
+   REDUCED MOTION SUPPORT
+   ================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 } 
