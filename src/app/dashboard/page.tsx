@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
-import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -36,11 +36,10 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useAuth } from '@/providers/AuthProvider';
-import { PageLayout } from '@/components/shared/PageLayout';
+import { useAuth } from '@/contexts/AuthContext';
+import PageLayout from '@/components/shared/PageLayout';
 import { UserAvatar } from '@/components/UserAvatar';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { formatDistanceToNow } from 'date-fns';
 
 interface Enrollment {
   id: string;
@@ -74,8 +73,30 @@ interface QuizAttempt {
   };
 }
 
+// Helper function to format relative time
+const formatRelativeTime = (date: string | Date) => {
+  const now = new Date();
+  const past = new Date(date);
+  const diffInMinutes = Math.floor((now.getTime() - past.getTime()) / (1000 * 60));
+  
+  if (diffInMinutes < 1) return 'just now';
+  if (diffInMinutes < 60) return `${diffInMinutes} minutes ago`;
+  
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  if (diffInHours < 24) return `${diffInHours} hours ago`;
+  
+  const diffInDays = Math.floor(diffInHours / 24);
+  if (diffInDays < 30) return `${diffInDays} days ago`;
+  
+  const diffInMonths = Math.floor(diffInDays / 30);
+  if (diffInMonths < 12) return `${diffInMonths} months ago`;
+  
+  const diffInYears = Math.floor(diffInMonths / 12);
+  return `${diffInYears} years ago`;
+};
+
 function DashboardContent() {
-  const { user, userProfile, authLoading, isLoggingOut } = useAuth();
+  const { user, userProfile, loading: authLoading, isLoggingOut } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
@@ -661,7 +682,7 @@ function DashboardContent() {
                           {activity.description || 'Activity completed'}
                         </p>
                         <p className="text-xs text-gray-500 mt-1">
-                          {formatDistanceToNow(new Date(activity.created_at || ''), { addSuffix: true })}
+                          {formatRelativeTime(activity.created_at || '')}
                         </p>
                       </div>
                     </div>
