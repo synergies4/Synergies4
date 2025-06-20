@@ -460,15 +460,14 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                           {category.items.map((item) => {
                             const ItemIcon = item.icon;
                             return (
-                              <Link
+                              <div
                                 key={item.href}
-                                href={item.href}
-                                className="flex items-center space-x-3 p-2.5 rounded-md hover:bg-gray-50 transition-colors mobile-menu-item"
-                                onClick={(e) => {
-                                  // Allow the Link navigation to happen first
-                                  setTimeout(() => {
-                                    closeMobileMenu();
-                                  }, 10);
+                                className="flex items-center space-x-3 p-2.5 rounded-md hover:bg-gray-50 transition-colors mobile-menu-item cursor-pointer"
+                                onClick={() => {
+                                  // Use programmatic navigation
+                                  router.push(item.href);
+                                  // Close menu after navigation
+                                  closeMobileMenu();
                                 }}
                               >
                                 <div className="w-7 h-7 bg-gray-100 rounded-md flex items-center justify-center flex-shrink-0">
@@ -486,7 +485,7 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                                   </div>
                                   <p className="text-xs text-gray-600 mt-0.5 truncate">{item.description}</p>
                                 </div>
-                              </Link>
+                              </div>
                             );
                           })}
                         </div>
@@ -506,14 +505,14 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                       </div>
                       <span className="font-medium text-gray-900 text-sm">Welcome back!</span>
                     </div>
-                    <Link
-                      href={userProfile?.role === 'ADMIN' ? '/admin' : '/dashboard'}
-                      className="flex items-center space-x-3 p-3 rounded-md hover:bg-gray-50 transition-colors mobile-menu-item"
+                    <div
+                      className="flex items-center space-x-3 p-3 rounded-md hover:bg-gray-50 transition-colors mobile-menu-item cursor-pointer"
                       onClick={() => {
-                        // Allow the Link navigation to happen first
-                        setTimeout(() => {
-                          closeMobileMenu();
-                        }, 10);
+                        // Use programmatic navigation
+                        const dashboardUrl = userProfile?.role === 'ADMIN' ? '/admin' : '/dashboard';
+                        router.push(dashboardUrl);
+                        // Close menu after navigation
+                        closeMobileMenu();
                       }}
                     >
                       <div className="w-8 h-8 bg-gray-100 rounded-md flex items-center justify-center">
@@ -522,7 +521,7 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                       <span className="font-medium text-gray-900 text-sm">
                         {userProfile?.role === 'ADMIN' ? 'Admin Dashboard' : 'Dashboard'}
                       </span>
-                    </Link>
+                    </div>
                     <button
                       onClick={() => {
                         signOut();
@@ -538,31 +537,29 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <Link
-                      href="/login"
-                      className="flex items-center justify-center space-x-2 p-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors mobile-menu-item"
+                    <div
+                      className="flex items-center justify-center space-x-2 p-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors mobile-menu-item cursor-pointer"
                       onClick={() => {
-                        // Allow the Link navigation to happen first
-                        setTimeout(() => {
-                          closeMobileMenu();
-                        }, 10);
+                        // Use programmatic navigation
+                        router.push('/login');
+                        // Close menu after navigation
+                        closeMobileMenu();
                       }}
                     >
                       <User className="w-4 h-4 text-gray-600" />
                       <span className="font-medium text-gray-900 text-sm">Login</span>
-                    </Link>
-                    <Link
-                      href="/signup"
-                      className="flex items-center justify-center space-x-2 p-3 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors mobile-menu-item"
+                    </div>
+                    <div
+                      className="flex items-center justify-center space-x-2 p-3 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors mobile-menu-item cursor-pointer"
                       onClick={() => {
-                        // Allow the Link navigation to happen first
-                        setTimeout(() => {
-                          closeMobileMenu();
-                        }, 10);
+                        // Use programmatic navigation
+                        router.push('/signup');
+                        // Close menu after navigation
+                        closeMobileMenu();
                       }}
                     >
                       <span className="font-medium text-sm">Sign Up</span>
-                    </Link>
+                    </div>
                   </div>
                 )}
               </div>
