@@ -517,7 +517,7 @@ Sincerely,
               })}
             </div>
 
-            {/* Mobile Progress Steps */}
+            {/* Mobile Progress Steps - Enhanced */}
             <div className="lg:hidden space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-gray-600">
@@ -527,30 +527,47 @@ Sincerely,
                   {Math.round((currentStep / steps.length) * 100)}% Complete
                 </span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full bg-gray-200 rounded-full h-3">
                 <div 
-                  className="bg-gradient-to-r from-teal-500 to-emerald-500 h-2 rounded-full transition-all duration-500 ease-out"
+                  className="bg-gradient-to-r from-teal-500 to-emerald-500 h-3 rounded-full transition-all duration-500 ease-out"
                   style={{ width: `${(currentStep / steps.length) * 100}%` }}
                 />
               </div>
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg">
-                  {React.createElement(steps[currentStep - 1]?.icon || Upload, { className: "w-5 h-5 text-white" })}
-                </div>
-                <div>
-                  <h3 className="font-semibold text-teal-700">{steps[currentStep - 1]?.title}</h3>
-                  <p className="text-sm text-teal-600">{steps[currentStep - 1]?.description}</p>
+              <div className="bg-white rounded-2xl p-4 border-2 border-teal-100 shadow-lg">
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg">
+                    {React.createElement(steps[currentStep - 1]?.icon || Upload, { className: "w-6 h-6 text-white" })}
+                  </div>
+                  <div className="flex-1">
+                    <h2 className="text-xl font-bold text-teal-700">{steps[currentStep - 1]?.title}</h2>
+                    <p className="text-sm text-teal-600">{steps[currentStep - 1]?.description}</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
+        {/* Mobile Step Header */}
+        <div className="lg:hidden mb-6">
+          <div className="bg-gradient-to-r from-teal-500 to-emerald-500 rounded-2xl p-6 text-white shadow-lg">
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                {React.createElement(steps[currentStep - 1]?.icon || Upload, { className: "w-6 h-6 text-white" })}
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold">{steps[currentStep - 1]?.title}</h1>
+                <p className="text-white/90">{steps[currentStep - 1]?.description}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Enhanced Step Content */}
-        <div className="card-modern rounded-3xl p-8 lg:p-12 shadow-xl">
+        <div className="card-modern rounded-3xl p-6 sm:p-8 lg:p-12 shadow-xl">
           {currentStep === 1 && (
             <div className="space-y-8">
-              <div className="text-center">
+              <div className="text-center hidden lg:block">
                 <div className="w-16 h-16 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                   <Upload className="w-8 h-8 text-white" />
                 </div>
@@ -561,49 +578,92 @@ Sincerely,
                   Upload your current resume to begin the AI-powered optimization process. We support PDF, DOCX, and TXT formats.
                 </p>
               </div>
+              
+              {/* Mobile Instructions */}
+              <div className="lg:hidden text-center">
+                <p className="text-base text-gray-600 mb-6">
+                  Upload your current resume to begin the AI-powered optimization process. We support PDF, DOCX, and TXT formats.
+                </p>
+              </div>
 
               <div className="max-w-2xl mx-auto">
-                <div
-                  className={`file-upload-area relative p-12 rounded-2xl text-center transition-all duration-300 ${
-                    isDragging ? 'drag-over' : ''
-                  }`}
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onDrop={handleDrop}
-                >
-                  <input
-                    type="file"
-                    accept=".pdf,.docx,.txt"
-                    onChange={handleFileUpload}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                    ref={fileInputRef}
-                  />
-                  
-                  <div className="space-y-6">
-                    <div className="w-20 h-20 bg-gradient-to-br from-teal-100 to-emerald-100 rounded-2xl flex items-center justify-center mx-auto">
-                      <FileText className="w-10 h-10 text-teal-600" />
-                    </div>
-                    
-                    <div>
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                        Drag & drop your resume here
-                      </h3>
-                      <p className="text-gray-600 mb-4">
-                        Or click to browse your files
+                {/* Mobile-First File Upload */}
+                <div className="space-y-4">
+                  {/* Mobile Upload Button */}
+                  <div className="block sm:hidden">
+                    <input
+                      type="file"
+                      accept=".pdf,.docx,.txt"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                      ref={fileInputRef}
+                      id="mobile-file-input"
+                    />
+                    <label
+                      htmlFor="mobile-file-input"
+                      className="flex flex-col items-center justify-center w-full p-8 border-2 border-dashed border-teal-300 rounded-2xl bg-teal-50 hover:bg-teal-100 transition-colors cursor-pointer"
+                    >
+                      <div className="w-16 h-16 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+                        <Upload className="w-8 h-8 text-white" />
+                      </div>
+                      <h3 className="text-lg font-bold text-teal-700 mb-2">Choose Resume File</h3>
+                      <p className="text-sm text-teal-600 text-center mb-4">
+                        Tap to select your resume file
                       </p>
-                      <div className="flex items-center justify-center space-x-4 text-sm text-gray-500">
-                        <span className="flex items-center space-x-1">
-                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                          <span>PDF</span>
-                        </span>
-                        <span className="flex items-center space-x-1">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                          <span>DOCX</span>
-                        </span>
-                        <span className="flex items-center space-x-1">
-                          <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                          <span>TXT</span>
-                        </span>
+                      <div className="flex items-center space-x-3 text-xs text-teal-500">
+                        <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full">PDF</span>
+                        <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full">DOCX</span>
+                        <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full">TXT</span>
+                      </div>
+                    </label>
+                  </div>
+
+                  {/* Desktop Drag & Drop */}
+                  <div className="hidden sm:block">
+                    <div
+                      className={`file-upload-area relative p-12 rounded-2xl text-center transition-all duration-300 ${
+                        isDragging ? 'drag-over' : ''
+                      }`}
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                      onDrop={handleDrop}
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <input
+                        type="file"
+                        accept=".pdf,.docx,.txt"
+                        onChange={handleFileUpload}
+                        className="hidden"
+                        ref={fileInputRef}
+                      />
+                      
+                      <div className="space-y-6 cursor-pointer">
+                        <div className="w-20 h-20 bg-gradient-to-br from-teal-100 to-emerald-100 rounded-2xl flex items-center justify-center mx-auto">
+                          <FileText className="w-10 h-10 text-teal-600" />
+                        </div>
+                        
+                        <div>
+                          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                            Drag & drop your resume here
+                          </h3>
+                          <p className="text-gray-600 mb-4">
+                            Or click to browse your files
+                          </p>
+                          <div className="flex items-center justify-center space-x-4 text-sm text-gray-500">
+                            <span className="flex items-center space-x-1">
+                              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                              <span>PDF</span>
+                            </span>
+                            <span className="flex items-center space-x-1">
+                              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                              <span>DOCX</span>
+                            </span>
+                            <span className="flex items-center space-x-1">
+                              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                              <span>TXT</span>
+                            </span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -648,7 +708,7 @@ Sincerely,
 
           {currentStep === 2 && (
             <div className="space-y-8">
-              <div className="text-center">
+              <div className="text-center hidden lg:block">
                 <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                   <Briefcase className="w-8 h-8 text-white" />
                 </div>
@@ -657,6 +717,13 @@ Sincerely,
                 </h2>
                 <p className="text-lg text-gray-600 max-w-2xl mx-auto">
                   Paste the job description you're interested in. Our AI will analyze it and provide insights about how well your resume matches.
+                </p>
+              </div>
+              
+              {/* Mobile Instructions */}
+              <div className="lg:hidden text-center">
+                <p className="text-base text-gray-600 mb-6">
+                  Enter the job details you're applying for. Our AI will analyze how well your resume matches the requirements.
                 </p>
               </div>
 
@@ -713,7 +780,7 @@ Sincerely,
 
           {currentStep === 3 && (
             <div className="space-y-8">
-              <div className="text-center">
+              <div className="text-center hidden lg:block">
                 <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                   <BarChart3 className="w-8 h-8 text-white" />
                 </div>
@@ -722,6 +789,13 @@ Sincerely,
                 </h2>
                 <p className="text-lg text-gray-600 max-w-2xl mx-auto">
                   See how well your current resume matches the job requirements and get actionable insights for improvement.
+                </p>
+              </div>
+              
+              {/* Mobile Instructions */}
+              <div className="lg:hidden text-center">
+                <p className="text-base text-gray-600 mb-6">
+                  See how well your resume matches this job and get insights for improvement.
                 </p>
               </div>
 
