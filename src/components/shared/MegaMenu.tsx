@@ -460,27 +460,35 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                           {category.items.map((item) => {
                             const ItemIcon = item.icon;
                             return (
-                              <div
+                              <Link
                                 key={item.href}
-                                className="flex items-center space-x-3 p-2.5 rounded-md hover:bg-gray-50 transition-colors mobile-menu-item cursor-pointer"
+                                href={item.href}
+                                className="flex items-center space-x-3 p-2.5 rounded-md hover:bg-gray-50 transition-colors mobile-menu-item cursor-pointer block"
                                 onClick={(e) => {
-                                  // Prevent event bubbling
-                                  e.preventDefault();
-                                  e.stopPropagation();
+                                  console.log('🚀 CLICKED:', item.title, item.href);
                                   
-                                  console.log('Mobile menu item clicked:', item.title, item.href);
-                                  
-                                  // Close menu first
+                                  // Close mobile menu
                                   setIsMobileMenuOpen(false);
                                   setActiveCategory(null);
                                   
-                                  // Use direct navigation - more reliable on mobile
-                                  window.location.href = item.href;
+                                  // Add visual feedback
+                                  const target = e.currentTarget;
+                                  target.style.backgroundColor = '#10b981';
+                                  target.style.color = 'white';
+                                  
+                                  // Let Link handle navigation naturally
+                                }}
+                                onTouchStart={(e) => {
+                                  console.log('👆 TOUCH START:', item.title);
+                                  // Add touch feedback
+                                  const target = e.currentTarget;
+                                  target.style.backgroundColor = '#e5e7eb';
                                 }}
                                 onTouchEnd={(e) => {
-                                  // Handle touch events specifically for mobile
-                                  e.preventDefault();
-                                  e.stopPropagation();
+                                  console.log('👆 TOUCH END:', item.title);
+                                  // Reset styling
+                                  const target = e.currentTarget;
+                                  target.style.backgroundColor = '';
                                 }}
                               >
                                 <div className="w-7 h-7 bg-gray-100 rounded-md flex items-center justify-center flex-shrink-0">
@@ -498,7 +506,7 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                                   </div>
                                   <p className="text-xs text-gray-600 mt-0.5 truncate">{item.description}</p>
                                 </div>
-                              </div>
+                              </Link>
                             );
                           })}
                         </div>
@@ -518,24 +526,22 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                       </div>
                       <span className="font-medium text-gray-900 text-sm">Welcome back!</span>
                     </div>
-                    <div
-                      className="flex items-center space-x-3 p-3 rounded-md hover:bg-gray-50 transition-colors mobile-menu-item cursor-pointer"
+                    <Link
+                      href={userProfile?.role === 'ADMIN' ? '/admin' : '/dashboard'}
+                      className="flex items-center space-x-3 p-3 rounded-md hover:bg-gray-50 transition-colors mobile-menu-item cursor-pointer block"
                       onClick={(e) => {
-                        // Prevent event bubbling
-                        e.preventDefault();
-                        e.stopPropagation();
-                        
-                        // Close menu first
+                        console.log('🚀 DASHBOARD CLICKED');
+                        // Close mobile menu
                         setIsMobileMenuOpen(false);
                         setActiveCategory(null);
-                        
-                        // Use direct navigation
-                        const dashboardUrl = userProfile?.role === 'ADMIN' ? '/admin' : '/dashboard';
-                        window.location.href = dashboardUrl;
+                      }}
+                      onTouchStart={(e) => {
+                        const target = e.currentTarget;
+                        target.style.backgroundColor = '#e5e7eb';
                       }}
                       onTouchEnd={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
+                        const target = e.currentTarget;
+                        target.style.backgroundColor = '';
                       }}
                     >
                       <div className="w-8 h-8 bg-gray-100 rounded-md flex items-center justify-center">
@@ -544,9 +550,10 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                       <span className="font-medium text-gray-900 text-sm">
                         {userProfile?.role === 'ADMIN' ? 'Admin Dashboard' : 'Dashboard'}
                       </span>
-                    </div>
+                    </Link>
                     <button
                       onClick={(e) => {
+                        console.log('🚀 SIGN OUT CLICKED');
                         e.preventDefault();
                         e.stopPropagation();
                         signOut();
@@ -563,49 +570,47 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <div
-                      className="flex items-center justify-center space-x-2 p-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors mobile-menu-item cursor-pointer"
+                    <Link
+                      href="/login"
+                      className="flex items-center justify-center space-x-2 p-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors mobile-menu-item cursor-pointer block"
                       onClick={(e) => {
-                        // Prevent event bubbling
-                        e.preventDefault();
-                        e.stopPropagation();
-                        
-                        // Close menu first
+                        console.log('🚀 LOGIN CLICKED');
+                        // Close mobile menu
                         setIsMobileMenuOpen(false);
                         setActiveCategory(null);
-                        
-                        // Use direct navigation
-                        window.location.href = '/login';
+                      }}
+                      onTouchStart={(e) => {
+                        const target = e.currentTarget;
+                        target.style.backgroundColor = '#e5e7eb';
                       }}
                       onTouchEnd={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
+                        const target = e.currentTarget;
+                        target.style.backgroundColor = '';
                       }}
                     >
                       <User className="w-4 h-4 text-gray-600" />
                       <span className="font-medium text-gray-900 text-sm">Login</span>
-                    </div>
-                    <div
-                      className="flex items-center justify-center space-x-2 p-3 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors mobile-menu-item cursor-pointer"
+                    </Link>
+                    <Link
+                      href="/signup"
+                      className="flex items-center justify-center space-x-2 p-3 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors mobile-menu-item cursor-pointer block"
                       onClick={(e) => {
-                        // Prevent event bubbling
-                        e.preventDefault();
-                        e.stopPropagation();
-                        
-                        // Close menu first
+                        console.log('🚀 SIGNUP CLICKED');
+                        // Close mobile menu
                         setIsMobileMenuOpen(false);
                         setActiveCategory(null);
-                        
-                        // Use direct navigation
-                        window.location.href = '/signup';
+                      }}
+                      onTouchStart={(e) => {
+                        const target = e.currentTarget;
+                        target.style.backgroundColor = '#0f766e';
                       }}
                       onTouchEnd={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
+                        const target = e.currentTarget;
+                        target.style.backgroundColor = '';
                       }}
                     >
                       <span className="font-medium text-sm">Sign Up</span>
-                    </div>
+                    </Link>
                   </div>
                 )}
               </div>
