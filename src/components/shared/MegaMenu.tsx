@@ -507,7 +507,7 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
 
                       {isActive && (
                         <div 
-                          className="ml-4 space-y-2 overflow-hidden"
+                          className="ml-4 space-y-2 overflow-hidden bg-white/90 backdrop-blur-sm rounded-xl p-2 border border-gray-200/50 shadow-lg"
                           style={{
                             animation: 'slideDown 0.3s ease-out'
                           }}
@@ -518,52 +518,41 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                               <Link
                                 key={item.href}
                                 href={item.href}
-                                className="flex items-center space-x-4 p-4 rounded-xl hover:bg-white/80 transition-all duration-200 mobile-menu-item cursor-pointer group hover:scale-[1.02] hover:shadow-md border border-transparent hover:border-gray-200/50"
-                                onClick={(e) => {
-                                  console.log('🚀 NAVIGATING TO:', item.title, item.href);
+                                className="flex items-center space-x-3 p-3 rounded-lg bg-white hover:bg-teal-50 transition-all duration-200 group hover:scale-[1.02] hover:shadow-sm border border-gray-100 hover:border-teal-200"
+                                onClick={() => {
+                                  // Close menu and navigate
                                   setIsMobileMenuOpen(false);
                                   setActiveCategory(null);
                                 }}
-                                onTouchStart={(e) => {
-                                  const target = e.currentTarget;
-                                  target.style.backgroundColor = 'rgba(20,184,166,0.1)';
-                                  target.style.transform = 'scale(0.98)';
-                                }}
-                                onTouchEnd={(e) => {
-                                  const target = e.currentTarget;
-                                  target.style.backgroundColor = '';
-                                  target.style.transform = '';
-                                }}
                                 style={{
-                                  animation: `slideInLeft 0.3s ease-out ${itemIndex * 0.05}s both`,
-                                  backdropFilter: 'blur(5px)'
+                                  animation: `slideInLeft 0.3s ease-out ${itemIndex * 0.05}s both`
                                 }}
                               >
-                                <div className="w-10 h-10 bg-gradient-to-br from-gray-100 to-gray-200 group-hover:from-teal-100 group-hover:to-emerald-100 rounded-lg flex items-center justify-center transition-all duration-200 group-hover:scale-110">
-                                  <ItemIcon className="w-5 h-5 text-gray-600 group-hover:text-teal-600 transition-colors duration-200" />
+                                <div className="w-8 h-8 bg-gray-100 group-hover:bg-teal-100 rounded-lg flex items-center justify-center transition-all duration-200 flex-shrink-0">
+                                  <ItemIcon className="w-4 h-4 text-gray-700 group-hover:text-teal-600 transition-colors duration-200" />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-center space-x-2 mb-1">
-                                    <span className="font-semibold text-gray-900 group-hover:text-teal-700 transition-colors duration-200">
+                                    <span className="font-semibold text-gray-900 group-hover:text-teal-700 transition-colors duration-200 text-sm">
                                       {item.title}
                                     </span>
                                     {item.isNew && (
-                                      <span className="px-2 py-1 bg-gradient-to-r from-green-400 to-emerald-400 text-white text-xs font-bold rounded-full shadow-sm animate-pulse">
+                                      <span className="px-1.5 py-0.5 bg-green-500 text-white text-xs font-bold rounded-full shadow-sm">
                                         NEW
                                       </span>
                                     )}
                                     {item.badge && (
-                                      <span className="px-2 py-1 bg-gradient-to-r from-blue-400 to-indigo-400 text-white text-xs font-bold rounded-full shadow-sm">
+                                      <span className="px-1.5 py-0.5 bg-blue-500 text-white text-xs font-bold rounded-full shadow-sm">
                                         {item.badge}
                                       </span>
                                     )}
                                   </div>
-                                  <p className="text-xs text-gray-500 group-hover:text-gray-600 transition-colors duration-200 leading-tight">
+                                  <p className="text-xs text-gray-600 group-hover:text-gray-700 transition-colors duration-200 leading-tight">
                                     {item.description}
                                   </p>
                                 </div>
-                                <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                  <svg className="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div className="opacity-60 group-hover:opacity-100 transition-opacity duration-200">
+                                  <svg className="w-4 h-4 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                   </svg>
                                 </div>
