@@ -630,7 +630,7 @@ export default function AIInterviewPractice() {
                           <span className="text-xs font-medium text-gray-600">
                             Question {session.currentQuestionIndex + index + 2}
                           </span>
-                          <Badge size="sm" className={getDifficultyColor(question.difficulty)}>
+                          <Badge className={getDifficultyColor(question.difficulty)}>
                             {question.difficulty}
                           </Badge>
                         </div>
