@@ -124,86 +124,96 @@ interface NavigationProps {
 
 function Navigation({ isSearchOpen, setIsSearchOpen, headerVisible, lastScrollY }: NavigationProps) {
   return (
-    <div className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      headerVisible 
-        ? 'translate-y-0 opacity-100' 
-        : '-translate-y-full opacity-0'
-    }`}>
-      {/* AI Assistant Promotion Banner */}
-      <div className={`bg-gradient-to-r from-teal-600 to-emerald-600 py-3 px-4 transition-all duration-300 ${
-        lastScrollY > 50 ? 'opacity-95' : 'opacity-100'
-      }`} role="banner">
-        <div className="container mx-auto">
-          <Link href="/synergize" className="block hover:opacity-90 transition-opacity">
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-center cursor-pointer">
-              <p className="text-sm sm:text-base font-bold text-white">
-                🎯 Try our AI learning assistant - Get personalized course recommendations instantly.
-              </p>
-              <div className="flex items-center gap-2 text-xs sm:text-sm bg-white rounded-full px-3 py-1 hover:bg-gray-50 transition-colors">
-                <Brain className="w-4 h-4 text-teal-600" />
-                <span className="font-semibold text-teal-600">Try Synergize AI</span>
-                <ArrowRight className="w-3 h-3 text-teal-600" />
+    <>
+      {/* Main Navigation Header - Can Hide on Scroll */}
+      <div className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        headerVisible 
+          ? 'translate-y-0 opacity-100' 
+          : '-translate-y-full opacity-0'
+      }`}>
+        {/* AI Assistant Promotion Banner */}
+        <div className={`bg-gradient-to-r from-teal-600 to-emerald-600 py-3 px-4 transition-all duration-300 ${
+          lastScrollY > 50 ? 'opacity-95' : 'opacity-100'
+        }`} role="banner">
+          <div className="container mx-auto">
+            <Link href="/synergize" className="block hover:opacity-90 transition-opacity">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-center cursor-pointer">
+                <p className="text-sm sm:text-base font-bold text-white">
+                  🎯 Try our AI learning assistant - Get personalized course recommendations instantly.
+                </p>
+                <div className="flex items-center gap-2 text-xs sm:text-sm bg-white rounded-full px-3 py-1 hover:bg-gray-50 transition-colors">
+                  <Brain className="w-4 h-4 text-teal-600" />
+                  <span className="font-semibold text-teal-600">Try Synergize AI</span>
+                  <ArrowRight className="w-3 h-3 text-teal-600" />
+                </div>
               </div>
-            </div>
-          </Link>
-        </div>
-      </div>
-
-      {/* Navigation */}
-      <nav className={`z-50 transition-all duration-300 ${
-        lastScrollY > 50 
-          ? 'bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-200/50' 
-          : 'bg-white border-b border-gray-200'
-      }`} role="navigation" aria-label="Main navigation">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <div className="flex-shrink-0">
-              <Link href="/" className="flex items-center" aria-label="Synergies4 home">
-                <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent hover:from-teal-700 hover:to-emerald-700 transition-all duration-300">
-                  Synergies4
-                </span>
-              </Link>
-            </div>
-            
-            {/* Desktop Search Button */}
-            <div className="hidden lg:flex items-center space-x-3 ml-8 mr-6">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsSearchOpen(true)}
-                className="flex items-center space-x-2 text-gray-900 hover:text-teal-600 border-gray-400 hover:border-teal-500 hover:bg-teal-50 px-3 py-2 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-white"
-                aria-label="Open search"
-              >
-                <Search className="w-4 h-4" />
-                <span className="hidden xl:inline">Search</span>
-                <kbd className="hidden xl:inline-flex h-5 select-none items-center gap-1 rounded border bg-gray-100 px-1.5 font-mono text-[10px] font-medium opacity-100 ml-2">
-                  <span className="text-xs">⌘</span>K
-                </kbd>
-              </Button>
-            </div>
-
-            {/* MegaMenu Navigation */}
-            <div className="flex-1 flex justify-end">
-              <MegaMenu isScrolled={lastScrollY > 50} />
-            </div>
-
-            {/* Mobile Search Button */}
-            <div className="lg:hidden ml-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsSearchOpen(true)}
-                className="p-2 border-gray-400 hover:border-teal-500 hover:text-teal-600 hover:bg-teal-50 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-white text-gray-900"
-                aria-label="Open search"
-              >
-                <Search className="w-5 h-5" />
-              </Button>
-            </div>
+            </Link>
           </div>
         </div>
-      </nav>
-    </div>
+
+        {/* Navigation */}
+        <nav className={`z-50 transition-all duration-300 ${
+          lastScrollY > 50 
+            ? 'bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-200/50' 
+            : 'bg-white border-b border-gray-200'
+        }`} role="navigation" aria-label="Main navigation">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center justify-between h-16">
+              {/* Logo */}
+              <div className="flex-shrink-0">
+                <Link href="/" className="flex items-center" aria-label="Synergies4 home">
+                  <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent hover:from-teal-700 hover:to-emerald-700 transition-all duration-300">
+                    Synergies4
+                  </span>
+                </Link>
+              </div>
+              
+              {/* Desktop Search Button */}
+              <div className="hidden lg:flex items-center space-x-3 ml-8 mr-6">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsSearchOpen(true)}
+                  className="flex items-center space-x-2 text-gray-900 hover:text-teal-600 border-gray-400 hover:border-teal-500 hover:bg-teal-50 px-3 py-2 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-white"
+                  aria-label="Open search"
+                >
+                  <Search className="w-4 h-4" />
+                  <span className="hidden xl:inline">Search</span>
+                  <kbd className="hidden xl:inline-flex h-5 select-none items-center gap-1 rounded border bg-gray-100 px-1.5 font-mono text-[10px] font-medium opacity-100 ml-2">
+                    <span className="text-xs">⌘</span>K
+                  </kbd>
+                </Button>
+              </div>
+
+              {/* MegaMenu Navigation - Only visible on desktop */}
+              <div className="hidden lg:flex flex-1 justify-end">
+                <MegaMenu isScrolled={lastScrollY > 50} />
+              </div>
+
+              {/* Mobile Search Button */}
+              <div className="lg:hidden ml-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsSearchOpen(true)}
+                  className="p-2 border-gray-400 hover:border-teal-500 hover:text-teal-600 hover:bg-teal-50 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-white text-gray-900"
+                  aria-label="Open search"
+                >
+                  <Search className="w-5 h-5" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </div>
+
+      {/* Mobile Navigation Overlay - Always Visible on Mobile */}
+      <div className="lg:hidden fixed top-0 right-0 z-[100] p-4">
+        <div className="mobile-menu-container">
+          <MegaMenu isScrolled={lastScrollY > 50} />
+        </div>
+      </div>
+    </>
   );
 }
 

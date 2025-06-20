@@ -1269,6 +1269,9 @@ a:hover {
   transition: all 0.2s ease !important;
   cursor: pointer !important;
   -webkit-tap-highlight-color: rgba(20, 184, 166, 0.1) !important;
+  min-height: 52px !important;
+  display: flex !important;
+  align-items: center !important;
 }
 
 .mobile-menu-item:hover,
@@ -1576,4 +1579,107 @@ section[class*="bg-slate-50"] h3 {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* MOBILE NAVIGATION FIXES - PREVENT DISAPPEARING ON SCROLL */
+
+/* Ensure navigation header stays visible on scroll */
+nav, header, [role="navigation"] {
+  position: relative !important;
+  z-index: 1000 !important;
+}
+
+/* Fix mobile menu button visibility */
+@media (max-width: 1024px) {
+  .mobile-menu-button,
+  [aria-label="Toggle mobile menu"] {
+    position: relative !important;
+    z-index: 1001 !important;
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+  
+  /* Ensure mobile menu container stays visible */
+  .mobile-menu-container {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    z-index: 1001 !important;
+  }
+  
+  /* Fix mobile menu overlay positioning */
+  .mobile-menu-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 9998 !important;
+    backdrop-filter: blur(4px) !important;
+  }
+  
+  /* Fix mobile menu content positioning */
+  .mobile-menu-content {
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 400px !important;
+    height: 100vh !important;
+    background: #ffffff !important;
+    z-index: 9999 !important;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15) !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+}
+
+/* ENHANCED MOBILE MENU STYLING */
+.mobile-menu-item {
+  display: block !important;
+  width: 100% !important;
+  text-align: left !important;
+  padding: 16px 20px !important;
+  color: #1f2937 !important;
+  text-decoration: none !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+  -webkit-tap-highlight-color: rgba(20, 184, 166, 0.1) !important;
+  min-height: 52px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.mobile-menu-item:hover,
+.mobile-menu-item:active,
+.mobile-menu-item:focus {
+  background: rgba(20, 184, 166, 0.05) !important;
+  color: #0d9488 !important;
+  transform: translateX(4px) !important;
+}
+
+/* Fix mobile menu button interactions */
+.mobile-menu button,
+.mobile-menu a[role="button"] {
+  width: 100% !important;
+  text-align: left !important;
+  justify-content: flex-start !important;
+  color: #1f2937 !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 16px 20px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  -webkit-tap-highlight-color: rgba(20, 184, 166, 0.1) !important;
+}
+
+.mobile-menu button:hover,
+.mobile-menu button:active,
+.mobile-menu a[role="button"]:hover,
+.mobile-menu a[role="button"]:active {
+  background: rgba(20, 184, 166, 0.05) !important;
+  color: #0d9488 !important;
 } 
