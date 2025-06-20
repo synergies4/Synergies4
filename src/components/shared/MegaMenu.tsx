@@ -475,7 +475,10 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                   return (
                     <div key={category.id}>
                       <button
-                        onClick={() => setActiveCategory(isActive ? null : category.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveCategory(isActive ? null : category.id);
+                        }}
                         className="flex items-center justify-between w-full p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
                       >
                         <div className="flex items-center space-x-3">
