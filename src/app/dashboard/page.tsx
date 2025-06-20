@@ -1,34 +1,29 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useEffect, Suspense } from 'react';
+import { createClient } from '@/utils/supabase/client';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import PageLayout from '@/components/shared/PageLayout';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   BookOpen, 
+  CheckCircle, 
   Clock, 
-  Award, 
+  Target, 
   TrendingUp, 
-  Play,
-  CheckCircle,
-  Calendar,
-  Target,
-  Menu,
-  X,
+  User, 
+  Video, 
+  BarChart3, 
+  FileText, 
+  CreditCard, 
+  Plus, 
+  Calendar, 
+  Users, 
   ArrowRight,
-  BarChart3,
-  CreditCard,
-  Video,
-  Users,
-  FileText,
-  Plus,
   Eye,
-  User,
+  Award,
   Settings,
   Edit3,
   Save,
@@ -36,11 +31,13 @@ import {
   Zap,
   Sparkles,
   Activity,
-  MessageSquare
+  MessageSquare,
+  Check
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/providers/AuthProvider';
+import { PageLayout } from '@/components/shared/PageLayout';
 import { UserAvatar } from '@/components/UserAvatar';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { formatDistanceToNow } from 'date-fns';
@@ -78,27 +75,22 @@ interface QuizAttempt {
 }
 
 function DashboardContent() {
-  const { user, userProfile, loading: authLoading, isLoggingOut } = useAuth();
+  const { user, userProfile, authLoading, isLoggingOut } = useAuth();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [quizAttempts, setQuizAttempts] = useState<QuizAttempt[]>([]);
   const [meetings, setMeetings] = useState<any[]>([]);
   const [activeBots, setActiveBots] = useState<any[]>([]);
+  const [goals, setGoals] = useState<any[]>([]);
+  const [recentActivities, setRecentActivities] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [subscriptionData, setSubscriptionData] = useState<any>(null);
   const [contentUsage, setContentUsage] = useState<any>(null);
-  const [stats, setStats] = useState({
-    totalCourses: 0,
-    completedCourses: 0,
-    totalHours: 0,
-    averageScore: 0,
-    totalMeetings: 0,
-    activeBots: 0,
-    completedMilestones: 0,
-    totalGoals: 0
-  });
-  const [userOnboarding, setUserOnboarding] = useState<any>(null);
   const [editingProfile, setEditingProfile] = useState(false);
-  const [profileForm, setProfileForm] = useState({
+  const [userOnboarding, setUserOnboarding] = useState<any>(null);
+  const [profileForm, setProfileForm] = useState<any>({
     full_name: '',
     job_title: '',
     company: '',
@@ -116,151 +108,119 @@ function DashboardContent() {
     communication_tone: 'professional',
     learning_style: 'mixed'
   });
-  const [refreshing, setRefreshing] = useState(false);
 
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  const [stats, setStats] = useState({
+    totalCourses: 0,
+    completedCourses: 0,
+    totalHours: 0,
+    averageScore: 0,
+    totalMeetings: 0,
+    activeBots: 0,
+    completedMilestones: 0,
+    totalGoals: 0
+  });
+
+  // Calculate completion percentage and items
+  const completionItems = [
+    { label: 'Profile Information', completed: !!userOnboarding?.full_name },
+    { label: 'Career Goals', completed: userOnboarding?.primary_goals?.length > 0 },
+    { label: 'Skills Assessment', completed: !!userOnboarding?.focus_areas?.length },
+    { label: 'Learning Preferences', completed: !!userOnboarding?.learning_style },
+    { label: 'First Course Enrollment', completed: enrollments.length > 0 }
+  ];
+
+  const completionPercentage = Math.round((completionItems.filter(item => item.completed).length / completionItems.length) * 100);
 
   useEffect(() => {
-    if (!authLoading && user) {
+    if (user && !authLoading) {
       fetchDashboardData();
-    } else if (!authLoading && !user && !isLoggingOut) {
-      // Only redirect to login if not in the process of logging out
-      window.location.href = '/login?redirect=/dashboard';
-    }
-  }, [user, authLoading, isLoggingOut]);
-
-  // Check for subscription success and refresh data
-  useEffect(() => {
-    const subscriptionSuccess = searchParams.get('subscription');
-    if (subscriptionSuccess === 'success' && user) {
-      // Clear the URL parameter
-      const url = new URL(window.location.href);
-      url.searchParams.delete('subscription');
-      window.history.replaceState({}, '', url.toString());
       
-      // Show success notification
-      (async () => {
-        const toast = (await import('sonner')).toast;
-        toast.success('Payment successful! Your subscription is being activated...', {
-          duration: 5000,
-        });
-      })();
-      
-      // Force refresh subscription data with retry logic
-      refreshSubscriptionData();
+      // Check for subscription success
+      const subscriptionSuccess = searchParams.get('subscription');
+      if (subscriptionSuccess === 'success') {
+        // Refresh subscription data after successful payment
+        setTimeout(() => refreshSubscriptionData(0, true), 2000);
+      }
     }
-  }, [user, searchParams]);
+  }, [user, authLoading, searchParams]);
 
   const refreshSubscriptionData = async (retryCount = 0, useAPI = false) => {
+    if (retryCount >= 3) {
+      console.log('Max retries reached for subscription data refresh');
+      return;
+    }
+
+    setRefreshing(true);
     try {
-      setRefreshing(true);
       const supabase = createClient();
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) return;
 
       if (useAPI) {
-        // Use the API endpoint to fetch from Stripe directly
-        console.log('Refreshing subscription via API...');
-        const response = await fetch('/api/subscription/refresh', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${session.access_token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setSubscriptionData(data.subscription);
-          setContentUsage({
-            settings: {
-              plan_type: data.usage.planType,
-              max_presentations: data.usage.maxPresentations,
-              max_conversations: data.usage.maxConversations
+        // Try to sync with Stripe first
+        try {
+          const response = await fetch('/api/stripe/sync-subscription', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session.access_token}`,
             },
-            currentPresentations: data.usage.currentPresentations,
-            currentConversations: data.usage.currentConversations
           });
-          console.log('Subscription refreshed via API:', data);
-          return;
-        } else {
-          console.log('API refresh failed, falling back to database query...');
+          
+          if (response.ok) {
+            console.log('Stripe sync completed successfully');
+            // Wait a moment for sync to complete
+            await new Promise(resolve => setTimeout(resolve, 2000));
+          }
+        } catch (error) {
+          console.warn('Stripe sync failed, continuing with database query:', error);
         }
       }
 
-      // Try multiple queries to handle different subscription states
-      let subscription = null;
-      
-      // First try: active subscriptions
-      const { data: activeSubscription } = await supabase
-        .from('subscriptions')
+      // Fetch subscription data
+      const { data: subscription } = await supabase
+        .from('user_subscriptions')
         .select('*')
         .eq('user_id', session.user.id)
         .eq('status', 'active')
+        .order('created_at', { ascending: false })
+        .limit(1)
         .single();
 
-      if (activeSubscription) {
-        subscription = activeSubscription;
-      } else {
-        // Second try: any subscription that's not cancelled
-        const { data: anySubscription } = await supabase
-          .from('subscriptions')
-          .select('*')
-          .eq('user_id', session.user.id)
-          .neq('status', 'cancelled')
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .single();
+      // Fetch usage data
+      const { data: settings } = await supabase
+        .from('subscription_settings')
+        .select('*')
+        .eq('plan_type', subscription?.plan_id || 'free')
+        .single();
 
-        subscription = anySubscription;
-      }
+      const { count: presentationsCount } = await supabase
+        .from('presentations')
+        .select('id', { count: 'exact' })
+        .eq('user_id', session.user.id)
+        .eq('is_archived', false);
 
-      if (subscription) {
-        setSubscriptionData(subscription);
-        
-        // Also refresh content usage settings
-        const { data: settings } = await supabase
-          .from('user_content_settings')
-          .select('*')
-          .eq('user_id', session.user.id)
-          .single();
+      const { count: conversationsCount } = await supabase
+        .from('ai_conversations')
+        .select('id', { count: 'exact' })
+        .eq('user_id', session.user.id)
+        .eq('is_archived', false);
 
-        const { count: presentationsCount } = await supabase
-          .from('user_presentations')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', session.user.id);
+      setSubscriptionData(subscription);
+      setContentUsage({
+        settings,
+        currentPresentations: presentationsCount || 0,
+        currentConversations: conversationsCount || 0
+      });
 
-        const { count: conversationsCount } = await supabase
-          .from('user_conversations')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', session.user.id)
-          .eq('is_archived', false);
-
-        setContentUsage({
-          settings,
-          currentPresentations: presentationsCount || 0,
-          currentConversations: conversationsCount || 0
-        });
-
-        console.log('Subscription data refreshed:', subscription);
-        console.log('Content usage:', { settings, presentationsCount, conversationsCount });
-      } else if (retryCount < 3) {
-        // Retry in case webhook is still processing
-        console.log(`No subscription found, retrying in 2 seconds... (attempt ${retryCount + 1}/3)`);
-        setTimeout(() => refreshSubscriptionData(retryCount + 1, retryCount === 2), 2000);
-        return;
-      } else {
-        // Final retry with API call
-        console.log('Final retry using API call...');
-        setTimeout(() => refreshSubscriptionData(0, true), 1000);
-      }
-      
+      console.log('Subscription data refreshed:', subscription);
+      console.log('Content usage:', { settings, presentationsCount, conversationsCount });
     } catch (error) {
       console.error('Error refreshing subscription data:', error);
       if (retryCount < 3) {
-        setTimeout(() => refreshSubscriptionData(retryCount + 1, retryCount === 2), 2000);
+        // Retry in case webhook is still processing
+        setTimeout(() => refreshSubscriptionData(retryCount + 1, useAPI), 3000);
       }
     } finally {
       setRefreshing(false);
@@ -269,144 +229,87 @@ function DashboardContent() {
 
   const fetchDashboardData = async () => {
     try {
+      setLoading(true);
       const supabase = createClient();
       const { data: { session } } = await supabase.auth.getSession();
       
-      if (!session) {
-        router.push('/login');
-        return;
-      }
+      if (!session) return;
 
-      // User profile comes from AuthContext, no need to fetch separately
-
-      // Fetch enrollments with course details
+      // Fetch enrollments
       const { data: enrollmentsData } = await supabase
         .from('course_enrollments')
         .select(`
           *,
-          course:courses (
-            id, title, description, image, category, level, duration, price
-          )
+          course:courses(*)
         `)
         .eq('user_id', session.user.id)
         .order('enrolled_at', { ascending: false });
-
-      if (enrollmentsData) {
-        setEnrollments(enrollmentsData);
-        setStats(prev => ({
-          ...prev,
-          totalCourses: enrollmentsData.length,
-          completedCourses: enrollmentsData.filter(e => e.status === 'COMPLETED').length
-        }));
-      }
 
       // Fetch quiz attempts
       const { data: quizData } = await supabase
         .from('quiz_attempts')
         .select(`
           *,
-          course:courses (title)
+          course:courses(title)
         `)
         .eq('user_id', session.user.id)
         .order('completed_at', { ascending: false });
 
-      if (quizData) {
-        setQuizAttempts(quizData);
-      }
+      // Fetch meetings
+      const { data: meetingsData } = await supabase
+        .from('meeting_recordings')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .order('created_at', { ascending: false });
 
-      // Fetch meetings and active bots
-      try {
-        const meetingsResponse = await fetch('/api/meeting-transcripts?limit=5', {
-          headers: {
-            'Authorization': `Bearer ${session.access_token}`,
-          },
-        });
+      // Fetch active recording bots
+      const { data: botsData } = await supabase
+        .from('recording_bots')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .in('status', ['recording', 'joining']);
 
-        if (meetingsResponse.ok) {
-          const meetingsData = await meetingsResponse.json();
-          setMeetings(meetingsData.transcripts || []);
-          setStats(prev => ({
-            ...prev,
-            totalMeetings: meetingsData.pagination?.total || 0
-          }));
-        }
+      // Fetch goals
+      const { data: goalsData } = await supabase
+        .from('user_goals')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .eq('is_active', true);
 
-        const activeBotsResponse = await fetch('/api/meeting-recorder/active', {
-          headers: {
-            'Authorization': `Bearer ${session.access_token}`,
-          },
-        });
+      // Fetch recent activities
+      const { data: activitiesData } = await supabase
+        .from('user_activities')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .order('created_at', { ascending: false })
+        .limit(10);
 
-        if (activeBotsResponse.ok) {
-          const botsData = await activeBotsResponse.json();
-          setActiveBots(botsData || []);
-          setStats(prev => ({
-            ...prev,
-            activeBots: botsData?.length || 0
-          }));
-        }
-      } catch (error) {
-        console.error('Error fetching meetings data:', error);
-      }
+      setEnrollments(enrollmentsData || []);
+      setQuizAttempts(quizData || []);
+      setMeetings(meetingsData || []);
+      setActiveBots(botsData || []);
+      setGoals(goalsData || []);
+      setRecentActivities(activitiesData || []);
 
-      // Fetch subscription data with improved logic
-      try {
-        // Try multiple queries to handle different subscription states
-        let subscription = null;
-        
-        // First try: active subscriptions
-        const { data: activeSubscription } = await supabase
-          .from('subscriptions')
-          .select('*')
-          .eq('user_id', session.user.id)
-          .eq('status', 'active')
-          .single();
+      // Calculate stats
+      const completedCourses = enrollmentsData?.filter(e => e.progress_percentage === 100).length || 0;
+      const totalHours = enrollmentsData?.reduce((acc, e) => acc + (e.course?.duration || 0), 0) || 0;
+      const avgScore = quizData?.length ? 
+        Math.round(quizData.reduce((acc, q) => acc + q.percentage, 0) / quizData.length) : 0;
 
-        if (activeSubscription) {
-          subscription = activeSubscription;
-        } else {
-          // Second try: any subscription that's not cancelled (including trialing, past_due, etc.)
-          const { data: anySubscription } = await supabase
-            .from('subscriptions')
-            .select('*')
-            .eq('user_id', session.user.id)
-            .neq('status', 'cancelled')
-            .order('created_at', { ascending: false })
-            .limit(1)
-            .single();
+      setStats({
+        totalCourses: enrollmentsData?.length || 0,
+        completedCourses,
+        totalHours: Math.round(totalHours / 60), // Convert to hours
+        averageScore: avgScore,
+        totalMeetings: meetingsData?.length || 0,
+        activeBots: botsData?.length || 0,
+        completedMilestones: completedCourses,
+        totalGoals: goalsData?.length || 0
+      });
 
-          subscription = anySubscription;
-        }
-
-        const { data: settings } = await supabase
-          .from('user_content_settings')
-          .select('*')
-          .eq('user_id', session.user.id)
-          .single();
-
-        const { count: presentationsCount } = await supabase
-          .from('user_presentations')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', session.user.id);
-
-        const { count: conversationsCount } = await supabase
-          .from('user_conversations')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', session.user.id)
-          .eq('is_archived', false);
-
-        setSubscriptionData(subscription);
-        setContentUsage({
-          settings,
-          currentPresentations: presentationsCount || 0,
-          currentConversations: conversationsCount || 0
-        });
-
-        console.log('Subscription data:', subscription);
-        console.log('Content usage:', { settings, presentationsCount, conversationsCount });
-      } catch (error) {
-        console.error('Error fetching subscription data:', error);
-      }
+      // Refresh subscription data
+      await refreshSubscriptionData();
 
       // Fetch user onboarding/profile data
       try {
@@ -887,6 +790,29 @@ function DashboardContent() {
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-500">Explore now</span>
+                    <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 transition-all duration-200" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </PageLayout>
+  );
+}
+
+export default function StudentDashboard() {
+  return (
+    <Suspense fallback={
+      <PageLayout>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading your dashboard...</p>
+          </div>
+        </div>
       </PageLayout>
     }>
       <DashboardContent />
