@@ -462,21 +462,9 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                                 key={item.href}
                                 href={item.href}
                                 className="flex items-center space-x-3 p-2.5 rounded-md hover:bg-gray-50 transition-colors mobile-menu-item"
-                                onClick={(e) => {
-                                  // Prevent event propagation
-                                  e.stopPropagation();
-                                  // Close menu after short delay to allow navigation
-                                  setTimeout(() => {
-                                    closeMobileMenu();
-                                  }, 100);
-                                }}
-                                onTouchEnd={(e) => {
-                                  // Prevent event propagation
-                                  e.stopPropagation();
-                                  // Close menu after short delay to allow navigation
-                                  setTimeout(() => {
-                                    closeMobileMenu();
-                                  }, 100);
+                                onClick={() => {
+                                  // Close menu immediately when link is clicked
+                                  closeMobileMenu();
                                 }}
                               >
                                 <div className="w-7 h-7 bg-gray-100 rounded-md flex items-center justify-center flex-shrink-0">
@@ -517,17 +505,9 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                     <Link
                       href={userProfile?.role === 'ADMIN' ? '/admin' : '/dashboard'}
                       className="flex items-center space-x-3 p-3 rounded-md hover:bg-gray-50 transition-colors mobile-menu-item"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setTimeout(() => {
-                          closeMobileMenu();
-                        }, 100);
-                      }}
-                      onTouchEnd={(e) => {
-                        e.stopPropagation();
-                        setTimeout(() => {
-                          closeMobileMenu();
-                        }, 100);
+                      onClick={() => {
+                        // Close menu immediately when link is clicked
+                        closeMobileMenu();
                       }}
                     >
                       <div className="w-8 h-8 bg-gray-100 rounded-md flex items-center justify-center">
@@ -538,8 +518,7 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                       </span>
                     </Link>
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
+                      onClick={() => {
                         signOut();
                         closeMobileMenu();
                       }}
@@ -556,17 +535,9 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                     <Link
                       href="/login"
                       className="flex items-center justify-center space-x-2 p-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors mobile-menu-item"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setTimeout(() => {
-                          closeMobileMenu();
-                        }, 100);
-                      }}
-                      onTouchEnd={(e) => {
-                        e.stopPropagation();
-                        setTimeout(() => {
-                          closeMobileMenu();
-                        }, 100);
+                      onClick={() => {
+                        // Close menu immediately when link is clicked
+                        closeMobileMenu();
                       }}
                     >
                       <User className="w-4 h-4 text-gray-600" />
@@ -575,17 +546,9 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                     <Link
                       href="/signup"
                       className="flex items-center justify-center space-x-2 p-3 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors mobile-menu-item"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setTimeout(() => {
-                          closeMobileMenu();
-                        }, 100);
-                      }}
-                      onTouchEnd={(e) => {
-                        e.stopPropagation();
-                        setTimeout(() => {
-                          closeMobileMenu();
-                        }, 100);
+                      onClick={() => {
+                        // Close menu immediately when link is clicked
+                        closeMobileMenu();
                       }}
                     >
                       <span className="font-medium text-sm">Sign Up</span>
