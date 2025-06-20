@@ -470,13 +470,12 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                                   
                                   console.log('Mobile menu item clicked:', item.title, item.href);
                                   
-                                  // Use programmatic navigation with a small delay to ensure it processes
-                                  setTimeout(() => {
-                                    router.push(item.href);
-                                    // Close entire mobile menu after navigation
-                                    setIsMobileMenuOpen(false);
-                                    setActiveCategory(null);
-                                  }, 50);
+                                  // Close menu first
+                                  setIsMobileMenuOpen(false);
+                                  setActiveCategory(null);
+                                  
+                                  // Use direct navigation - more reliable on mobile
+                                  window.location.href = item.href;
                                 }}
                                 onTouchEnd={(e) => {
                                   // Handle touch events specifically for mobile
@@ -526,14 +525,13 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                         e.preventDefault();
                         e.stopPropagation();
                         
-                        // Use programmatic navigation with a small delay
-                        setTimeout(() => {
-                          const dashboardUrl = userProfile?.role === 'ADMIN' ? '/admin' : '/dashboard';
-                          router.push(dashboardUrl);
-                          // Close entire mobile menu after navigation
-                          setIsMobileMenuOpen(false);
-                          setActiveCategory(null);
-                        }, 50);
+                        // Close menu first
+                        setIsMobileMenuOpen(false);
+                        setActiveCategory(null);
+                        
+                        // Use direct navigation
+                        const dashboardUrl = userProfile?.role === 'ADMIN' ? '/admin' : '/dashboard';
+                        window.location.href = dashboardUrl;
                       }}
                       onTouchEnd={(e) => {
                         e.preventDefault();
@@ -572,13 +570,12 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                         e.preventDefault();
                         e.stopPropagation();
                         
-                        // Use programmatic navigation with a small delay
-                        setTimeout(() => {
-                          router.push('/login');
-                          // Close entire mobile menu after navigation
-                          setIsMobileMenuOpen(false);
-                          setActiveCategory(null);
-                        }, 50);
+                        // Close menu first
+                        setIsMobileMenuOpen(false);
+                        setActiveCategory(null);
+                        
+                        // Use direct navigation
+                        window.location.href = '/login';
                       }}
                       onTouchEnd={(e) => {
                         e.preventDefault();
@@ -595,13 +592,12 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                         e.preventDefault();
                         e.stopPropagation();
                         
-                        // Use programmatic navigation with a small delay
-                        setTimeout(() => {
-                          router.push('/signup');
-                          // Close entire mobile menu after navigation
-                          setIsMobileMenuOpen(false);
-                          setActiveCategory(null);
-                        }, 50);
+                        // Close menu first
+                        setIsMobileMenuOpen(false);
+                        setActiveCategory(null);
+                        
+                        // Use direct navigation
+                        window.location.href = '/signup';
                       }}
                       onTouchEnd={(e) => {
                         e.preventDefault();
