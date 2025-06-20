@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
@@ -169,6 +170,7 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   // Handle mounting for portal
   useEffect(() => {
@@ -462,9 +464,11 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                                 key={item.href}
                                 href={item.href}
                                 className="flex items-center space-x-3 p-2.5 rounded-md hover:bg-gray-50 transition-colors mobile-menu-item"
-                                onClick={() => {
-                                  // Close menu immediately when link is clicked
-                                  closeMobileMenu();
+                                onClick={(e) => {
+                                  // Allow the Link navigation to happen first
+                                  setTimeout(() => {
+                                    closeMobileMenu();
+                                  }, 10);
                                 }}
                               >
                                 <div className="w-7 h-7 bg-gray-100 rounded-md flex items-center justify-center flex-shrink-0">
@@ -506,8 +510,10 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                       href={userProfile?.role === 'ADMIN' ? '/admin' : '/dashboard'}
                       className="flex items-center space-x-3 p-3 rounded-md hover:bg-gray-50 transition-colors mobile-menu-item"
                       onClick={() => {
-                        // Close menu immediately when link is clicked
-                        closeMobileMenu();
+                        // Allow the Link navigation to happen first
+                        setTimeout(() => {
+                          closeMobileMenu();
+                        }, 10);
                       }}
                     >
                       <div className="w-8 h-8 bg-gray-100 rounded-md flex items-center justify-center">
@@ -536,8 +542,10 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                       href="/login"
                       className="flex items-center justify-center space-x-2 p-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors mobile-menu-item"
                       onClick={() => {
-                        // Close menu immediately when link is clicked
-                        closeMobileMenu();
+                        // Allow the Link navigation to happen first
+                        setTimeout(() => {
+                          closeMobileMenu();
+                        }, 10);
                       }}
                     >
                       <User className="w-4 h-4 text-gray-600" />
@@ -547,8 +555,10 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                       href="/signup"
                       className="flex items-center justify-center space-x-2 p-3 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors mobile-menu-item"
                       onClick={() => {
-                        // Close menu immediately when link is clicked
-                        closeMobileMenu();
+                        // Allow the Link navigation to happen first
+                        setTimeout(() => {
+                          closeMobileMenu();
+                        }, 10);
                       }}
                     >
                       <span className="font-medium text-sm">Sign Up</span>
