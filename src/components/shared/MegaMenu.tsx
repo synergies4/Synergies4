@@ -463,11 +463,25 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                               <div
                                 key={item.href}
                                 className="flex items-center space-x-3 p-2.5 rounded-md hover:bg-gray-50 transition-colors mobile-menu-item cursor-pointer"
-                                onClick={() => {
-                                  // Use programmatic navigation
-                                  router.push(item.href);
-                                  // Close menu after navigation
-                                  closeMobileMenu();
+                                onClick={(e) => {
+                                  // Prevent event bubbling
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  
+                                  console.log('Mobile menu item clicked:', item.title, item.href);
+                                  
+                                  // Use programmatic navigation with a small delay to ensure it processes
+                                  setTimeout(() => {
+                                    router.push(item.href);
+                                    // Close entire mobile menu after navigation
+                                    setIsMobileMenuOpen(false);
+                                    setActiveCategory(null);
+                                  }, 50);
+                                }}
+                                onTouchEnd={(e) => {
+                                  // Handle touch events specifically for mobile
+                                  e.preventDefault();
+                                  e.stopPropagation();
                                 }}
                               >
                                 <div className="w-7 h-7 bg-gray-100 rounded-md flex items-center justify-center flex-shrink-0">
@@ -507,12 +521,23 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                     </div>
                     <div
                       className="flex items-center space-x-3 p-3 rounded-md hover:bg-gray-50 transition-colors mobile-menu-item cursor-pointer"
-                      onClick={() => {
-                        // Use programmatic navigation
-                        const dashboardUrl = userProfile?.role === 'ADMIN' ? '/admin' : '/dashboard';
-                        router.push(dashboardUrl);
-                        // Close menu after navigation
-                        closeMobileMenu();
+                      onClick={(e) => {
+                        // Prevent event bubbling
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        // Use programmatic navigation with a small delay
+                        setTimeout(() => {
+                          const dashboardUrl = userProfile?.role === 'ADMIN' ? '/admin' : '/dashboard';
+                          router.push(dashboardUrl);
+                          // Close entire mobile menu after navigation
+                          setIsMobileMenuOpen(false);
+                          setActiveCategory(null);
+                        }, 50);
+                      }}
+                      onTouchEnd={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
                       }}
                     >
                       <div className="w-8 h-8 bg-gray-100 rounded-md flex items-center justify-center">
@@ -523,9 +548,12 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                       </span>
                     </div>
                     <button
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
                         signOut();
-                        closeMobileMenu();
+                        setIsMobileMenuOpen(false);
+                        setActiveCategory(null);
                       }}
                       className="flex items-center space-x-3 p-3 rounded-md hover:bg-red-50 transition-colors w-full text-left mobile-menu-item"
                     >
@@ -539,11 +567,22 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                   <div className="space-y-2">
                     <div
                       className="flex items-center justify-center space-x-2 p-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors mobile-menu-item cursor-pointer"
-                      onClick={() => {
-                        // Use programmatic navigation
-                        router.push('/login');
-                        // Close menu after navigation
-                        closeMobileMenu();
+                      onClick={(e) => {
+                        // Prevent event bubbling
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        // Use programmatic navigation with a small delay
+                        setTimeout(() => {
+                          router.push('/login');
+                          // Close entire mobile menu after navigation
+                          setIsMobileMenuOpen(false);
+                          setActiveCategory(null);
+                        }, 50);
+                      }}
+                      onTouchEnd={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
                       }}
                     >
                       <User className="w-4 h-4 text-gray-600" />
@@ -551,11 +590,22 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                     </div>
                     <div
                       className="flex items-center justify-center space-x-2 p-3 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors mobile-menu-item cursor-pointer"
-                      onClick={() => {
-                        // Use programmatic navigation
-                        router.push('/signup');
-                        // Close menu after navigation
-                        closeMobileMenu();
+                      onClick={(e) => {
+                        // Prevent event bubbling
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        // Use programmatic navigation with a small delay
+                        setTimeout(() => {
+                          router.push('/signup');
+                          // Close entire mobile menu after navigation
+                          setIsMobileMenuOpen(false);
+                          setActiveCategory(null);
+                        }, 50);
+                      }}
+                      onTouchEnd={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
                       }}
                     >
                       <span className="font-medium text-sm">Sign Up</span>
