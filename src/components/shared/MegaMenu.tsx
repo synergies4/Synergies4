@@ -406,9 +406,12 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
 
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && isMounted && createPortal(
-        <div className="lg:hidden fixed inset-0 z-[9999] bg-black bg-opacity-50" onClick={closeMobileMenu}>
+        <div 
+          className="lg:hidden fixed inset-0 z-[9999] bg-black bg-opacity-50 mobile-menu-overlay" 
+          onClick={closeMobileMenu}
+        >
           <div 
-            className="fixed top-0 right-0 w-full max-w-sm h-full bg-white shadow-2xl overflow-y-auto touch-manipulation"
+            className="fixed top-0 right-0 w-full max-w-sm h-full bg-white shadow-2xl overflow-y-auto touch-manipulation mobile-menu-content"
             onClick={(e) => e.stopPropagation()}
             onTouchStart={(e) => e.stopPropagation()}
           >
@@ -436,7 +439,7 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                     <div key={category.id} className="space-y-2">
                       <button
                         onClick={() => setActiveCategory(isActive ? null : category.id)}
-                        className="flex items-center justify-between w-full text-left p-3 rounded-md bg-gray-50 hover:bg-gray-100 transition-colors"
+                        className="flex items-center justify-between w-full text-left p-3 rounded-md bg-gray-50 hover:bg-gray-100 transition-colors mobile-menu-item"
                       >
                         <div className="flex items-center space-x-3">
                           <div className="w-8 h-8 bg-teal-100 rounded-md flex items-center justify-center flex-shrink-0">
@@ -458,9 +461,23 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                               <Link
                                 key={item.href}
                                 href={item.href}
-                                className="flex items-center space-x-3 p-2.5 rounded-md hover:bg-gray-50 transition-colors touch-manipulation active:bg-gray-100"
-                                onClick={closeMobileMenu}
-                                onTouchEnd={closeMobileMenu}
+                                className="flex items-center space-x-3 p-2.5 rounded-md hover:bg-gray-50 transition-colors mobile-menu-item"
+                                onClick={(e) => {
+                                  // Prevent event propagation
+                                  e.stopPropagation();
+                                  // Close menu after short delay to allow navigation
+                                  setTimeout(() => {
+                                    closeMobileMenu();
+                                  }, 100);
+                                }}
+                                onTouchEnd={(e) => {
+                                  // Prevent event propagation
+                                  e.stopPropagation();
+                                  // Close menu after short delay to allow navigation
+                                  setTimeout(() => {
+                                    closeMobileMenu();
+                                  }, 100);
+                                }}
                               >
                                 <div className="w-7 h-7 bg-gray-100 rounded-md flex items-center justify-center flex-shrink-0">
                                   <ItemIcon className="w-3.5 h-3.5 text-gray-600" />
@@ -499,9 +516,19 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                     </div>
                     <Link
                       href={userProfile?.role === 'ADMIN' ? '/admin' : '/dashboard'}
-                      className="flex items-center space-x-3 p-3 rounded-md hover:bg-gray-50 transition-colors touch-manipulation active:bg-gray-100"
-                      onClick={closeMobileMenu}
-                      onTouchEnd={closeMobileMenu}
+                      className="flex items-center space-x-3 p-3 rounded-md hover:bg-gray-50 transition-colors mobile-menu-item"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setTimeout(() => {
+                          closeMobileMenu();
+                        }, 100);
+                      }}
+                      onTouchEnd={(e) => {
+                        e.stopPropagation();
+                        setTimeout(() => {
+                          closeMobileMenu();
+                        }, 100);
+                      }}
                     >
                       <div className="w-8 h-8 bg-gray-100 rounded-md flex items-center justify-center">
                         <BarChart3 className="w-4 h-4 text-gray-600" />
@@ -511,11 +538,12 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                       </span>
                     </Link>
                     <button
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation();
                         signOut();
                         closeMobileMenu();
                       }}
-                      className="flex items-center space-x-3 p-3 rounded-md hover:bg-red-50 transition-colors w-full text-left"
+                      className="flex items-center space-x-3 p-3 rounded-md hover:bg-red-50 transition-colors w-full text-left mobile-menu-item"
                     >
                       <div className="w-8 h-8 bg-red-100 rounded-md flex items-center justify-center">
                         <LogOut className="w-4 h-4 text-red-600" />
@@ -527,18 +555,38 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                   <div className="space-y-2">
                     <Link
                       href="/login"
-                      className="flex items-center justify-center space-x-2 p-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors touch-manipulation active:bg-gray-100"
-                      onClick={closeMobileMenu}
-                      onTouchEnd={closeMobileMenu}
+                      className="flex items-center justify-center space-x-2 p-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors mobile-menu-item"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setTimeout(() => {
+                          closeMobileMenu();
+                        }, 100);
+                      }}
+                      onTouchEnd={(e) => {
+                        e.stopPropagation();
+                        setTimeout(() => {
+                          closeMobileMenu();
+                        }, 100);
+                      }}
                     >
                       <User className="w-4 h-4 text-gray-600" />
                       <span className="font-medium text-gray-900 text-sm">Login</span>
                     </Link>
                     <Link
                       href="/signup"
-                      className="flex items-center justify-center space-x-2 p-3 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors touch-manipulation active:bg-teal-800"
-                      onClick={closeMobileMenu}
-                      onTouchEnd={closeMobileMenu}
+                      className="flex items-center justify-center space-x-2 p-3 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors mobile-menu-item"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setTimeout(() => {
+                          closeMobileMenu();
+                        }, 100);
+                      }}
+                      onTouchEnd={(e) => {
+                        e.stopPropagation();
+                        setTimeout(() => {
+                          closeMobileMenu();
+                        }, 100);
+                      }}
                     >
                       <span className="font-medium text-sm">Sign Up</span>
                     </Link>

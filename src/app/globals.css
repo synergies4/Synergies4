@@ -1239,4 +1239,341 @@ a:hover {
   padding: 8px !important;
   border-radius: 6px !important;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* ===== CRITICAL MOBILE MENU & TEXT VISIBILITY FIXES ===== */
+
+/* Fix mobile menu navigation issues - ensure proper touch handling */
+.mobile-menu-content {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;
+  max-width: 400px;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(12px);
+  z-index: 9999;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mobile-menu-item {
+  display: block !important;
+  width: 100% !important;
+  text-align: left !important;
+  padding: 16px 20px !important;
+  color: #1f2937 !important;
+  text-decoration: none !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+  -webkit-tap-highlight-color: rgba(20, 184, 166, 0.1) !important;
+}
+
+.mobile-menu-item:hover,
+.mobile-menu-item:active,
+.mobile-menu-item:focus {
+  background: rgba(20, 184, 166, 0.05) !important;
+  color: #0d9488 !important;
+  transform: translateX(4px) !important;
+}
+
+/* Fix mobile menu button interactions */
+.mobile-menu button,
+.mobile-menu a[role="button"] {
+  width: 100% !important;
+  text-align: left !important;
+  justify-content: flex-start !important;
+  color: #1f2937 !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 16px 20px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  -webkit-tap-highlight-color: rgba(20, 184, 166, 0.1) !important;
+}
+
+.mobile-menu button:hover,
+.mobile-menu button:active,
+.mobile-menu a[role="button"]:hover,
+.mobile-menu a[role="button"]:active {
+  background: rgba(20, 184, 166, 0.05) !important;
+  color: #0d9488 !important;
+}
+
+/* HOMEPAGE TEXT VISIBILITY FIXES */
+
+/* Fix hero section text visibility */
+.hero-section {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+}
+
+.hero-section * {
+  color: #1f2937 !important;
+}
+
+.hero-section h1 {
+  color: #111827 !important;
+  font-weight: 700 !important;
+}
+
+.hero-section p {
+  color: #374151 !important;
+}
+
+/* Fix light text on light backgrounds throughout homepage */
+.text-gray-400:not([class*="bg-gray-8"]):not([class*="bg-slate-8"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]) {
+  color: #4b5563 !important;
+}
+
+.text-gray-300:not([class*="bg-gray-8"]):not([class*="bg-slate-8"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]) {
+  color: #6b7280 !important;
+}
+
+.text-gray-200:not([class*="bg-gray-8"]):not([class*="bg-slate-8"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]) {
+  color: #9ca3af !important;
+}
+
+/* Fix transparent gradient text that becomes invisible */
+.bg-gradient-to-r.from-gray-300.to-gray-600.bg-clip-text.text-transparent {
+  background: linear-gradient(to right, #374151, #111827) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+/* Fix white/very light text on light backgrounds */
+section:not([class*="bg-gray-8"]):not([class*="bg-slate-8"]):not([class*="bg-gray-9"]):not([class*="bg-slate-9"]) .text-white {
+  color: #1f2937 !important;
+}
+
+/* FOOTER TEXT CONTRAST FIXES */
+footer {
+  background: #1f2937 !important;
+  color: #e5e7eb !important;
+}
+
+footer * {
+  color: #e5e7eb !important;
+}
+
+footer h1,
+footer h2,
+footer h3,
+footer h4,
+footer h5,
+footer h6 {
+  color: #f9fafb !important;
+}
+
+footer a {
+  color: #d1d5db !important;
+  text-decoration: none !important;
+  transition: color 0.2s ease !important;
+}
+
+footer a:hover {
+  color: #10b981 !important;
+}
+
+footer .text-gray-600,
+footer .text-gray-500,
+footer .text-gray-400 {
+  color: #9ca3af !important;
+}
+
+/* BUTTON STYLING FIXES */
+
+/* Ensure all buttons have proper styling */
+button:not([class*="bg-gradient"]):not([class*="bg-teal"]):not([class*="bg-blue"]):not([class*="bg-green"]):not([class*="bg-red"]):not([class*="bg-orange"]):not([class*="bg-purple"]) {
+  background: #f3f4f6 !important;
+  color: #1f2937 !important;
+  border: 1px solid #d1d5db !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+button:not([class*="bg-gradient"]):not([class*="bg-teal"]):not([class*="bg-blue"]):not([class*="bg-green"]):not([class*="bg-red"]):not([class*="bg-orange"]):not([class*="bg-purple"]):hover {
+  background: #e5e7eb !important;
+  border-color: #9ca3af !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Primary button styling */
+.btn-primary,
+button[class*="bg-teal"],
+button[class*="bg-blue"] {
+  font-weight: 600 !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-primary:hover,
+button[class*="bg-teal"]:hover,
+button[class*="bg-blue"]:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Outline button fixes */
+button[class*="variant-outline"],
+button[class*="border"] {
+  background: transparent !important;
+  color: #1f2937 !important;
+  border: 2px solid #d1d5db !important;
+  font-weight: 500 !important;
+}
+
+button[class*="variant-outline"]:hover,
+button[class*="border"]:hover {
+  background: #f9fafb !important;
+  border-color: #0d9488 !important;
+  color: #0d9488 !important;
+}
+
+/* ENHANCED CONTRAST FOR ALL SECTIONS */
+
+/* Light background sections */
+section[class*="bg-white"],
+section[class*="bg-gray-50"],
+section[class*="bg-slate-50"] {
+  color: #1f2937 !important;
+}
+
+section[class*="bg-white"] *:not([class*="text-"]):not([class*="bg-gradient"]),
+section[class*="bg-gray-50"] *:not([class*="text-"]):not([class*="bg-gradient"]),
+section[class*="bg-slate-50"] *:not([class*="text-"]):not([class*="bg-gradient"]) {
+  color: #374151 !important;
+}
+
+section[class*="bg-white"] h1,
+section[class*="bg-white"] h2,
+section[class*="bg-white"] h3,
+section[class*="bg-gray-50"] h1,
+section[class*="bg-gray-50"] h2,
+section[class*="bg-gray-50"] h3,
+section[class*="bg-slate-50"] h1,
+section[class*="bg-slate-50"] h2,
+section[class*="bg-slate-50"] h3 {
+  color: #111827 !important;
+  font-weight: 700 !important;
+}
+
+/* Gradient background fixes */
+.bg-gradient-to-br.from-blue-50.to-indigo-100 * {
+  color: #1f2937 !important;
+}
+
+.bg-gradient-to-br.from-blue-50.to-indigo-100 h1,
+.bg-gradient-to-br.from-blue-50.to-indigo-100 h2,
+.bg-gradient-to-br.from-blue-50.to-indigo-100 h3 {
+  color: #111827 !important;
+}
+
+/* CARD AND COMPONENT FIXES */
+
+/* Ensure cards have proper text contrast */
+.card,
+[class*="card"] {
+  color: #1f2937 !important;
+}
+
+.card *:not([class*="bg-gradient"]):not([class*="text-"]),
+[class*="card"] *:not([class*="bg-gradient"]):not([class*="text-"]) {
+  color: #374151 !important;
+}
+
+.card h1, .card h2, .card h3, .card h4, .card h5, .card h6,
+[class*="card"] h1, [class*="card"] h2, [class*="card"] h3, [class*="card"] h4, [class*="card"] h5, [class*="card"] h6 {
+  color: #111827 !important;
+  font-weight: 600 !important;
+}
+
+/* Badge text fixes */
+.badge,
+[class*="badge"] {
+  font-weight: 600 !important;
+  text-shadow: none !important;
+}
+
+.badge.bg-green-100,
+.badge.bg-blue-100,
+.badge.bg-purple-100,
+.badge.bg-orange-100 {
+  color: #1f2937 !important;
+}
+
+/* RESPONSIVE MOBILE FIXES */
+@media (max-width: 768px) {
+  /* Ensure mobile text is large enough and has good contrast */
+  body {
+    font-size: 16px !important;
+    line-height: 1.6 !important;
+  }
+  
+  h1, h2, h3 {
+    line-height: 1.3 !important;
+    font-weight: 700 !important;
+  }
+  
+  /* Mobile button sizing */
+  button {
+    min-height: 44px !important;
+    min-width: 44px !important;
+    font-size: 16px !important;
+  }
+  
+  /* Mobile menu specific fixes */
+  .mobile-menu-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    z-index: 9998 !important;
+    backdrop-filter: blur(4px) !important;
+  }
+  
+  .mobile-menu-content {
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 400px !important;
+    height: 100vh !important;
+    background: #ffffff !important;
+    z-index: 9999 !important;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15) !important;
+  }
+}
+
+/* ACCESSIBILITY IMPROVEMENTS */
+
+/* Enhanced focus states */
+*:focus-visible {
+  outline: 3px solid #10b981 !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2) !important;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .text-gray-600 { color: #374151 !important; }
+  .text-gray-500 { color: #4b5563 !important; }
+  .text-gray-400 { color: #6b7280 !important; }
+  
+  button:not([class*="bg-gradient"]) {
+    border: 2px solid #1f2937 !important;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 } 
