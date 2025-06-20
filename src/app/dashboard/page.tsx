@@ -31,13 +31,19 @@ import {
   User,
   Settings,
   Edit3,
-  Save
+  Save,
+  Trophy,
+  Zap,
+  Sparkles,
+  Activity,
+  MessageSquare
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import { UserAvatar } from '@/components/UserAvatar';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { formatDistanceToNow } from 'date-fns';
 
 interface Enrollment {
   id: string;
@@ -86,7 +92,9 @@ function DashboardContent() {
     totalHours: 0,
     averageScore: 0,
     totalMeetings: 0,
-    activeBots: 0
+    activeBots: 0,
+    completedMilestones: 0,
+    totalGoals: 0
   });
   const [userOnboarding, setUserOnboarding] = useState<any>(null);
   const [editingProfile, setEditingProfile] = useState(false);
@@ -237,6 +245,7 @@ function DashboardContent() {
         });
 
         console.log('Subscription data refreshed:', subscription);
+        console.log('Content usage:', { settings, presentationsCount, conversationsCount });
       } else if (retryCount < 3) {
         // Retry in case webhook is still processing
         console.log(`No subscription found, retrying in 2 seconds... (attempt ${retryCount + 1}/3)`);
@@ -551,1074 +560,333 @@ function DashboardContent() {
 
   return (
     <PageLayout>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 relative light" style={{ backgroundColor: '#f8fafc', color: '#1f2937' }}>
-        <div className="container mx-auto px-4 py-6 md:py-8">
-          {/* Header */}
-          <div className="mb-6 md:mb-8">
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-              Welcome back, {userProfile?.name || user?.email}!
-            </h1>
-            <p className="text-gray-600 text-sm md:text-base">
-              Continue your learning journey and track your progress.
-            </p>
-          </div>
-
-          {/* Stats Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-6 mb-6 md:mb-8">
-            <Card className="bg-white border border-gray-200 shadow-sm">
-              <CardContent className="p-4 md:p-6">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                  <div className="mb-2 md:mb-0">
-                    <p className="text-xs md:text-sm font-medium text-gray-600">Total Courses</p>
-                    <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.totalCourses}</p>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+        {/* Enhanced Hero Section */}
+        <div className="bg-white/80 backdrop-blur-xl border-b border-white/20" style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.1)' }}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-8 lg:space-y-0">
+              <div className="flex-1">
+                <div className="flex items-center space-x-4 mb-6">
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center shadow-xl">
+                    <User className="w-8 h-8 text-white" />
                   </div>
-                  <BookOpen className="h-6 w-6 md:h-8 md:w-8 text-blue-600 self-end md:self-auto" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white border border-gray-200 shadow-sm">
-              <CardContent className="p-4 md:p-6">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                  <div className="mb-2 md:mb-0">
-                    <p className="text-xs md:text-sm font-medium text-gray-600">Meetings</p>
-                    <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.totalMeetings}</p>
+                  <div>
+                    <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                      Welcome back{userProfile?.first_name ? `, ${userProfile.first_name}` : ''}!
+                    </h1>
+                    <p className="text-lg text-gray-600 mt-1">
+                      Ready to accelerate your career growth?
+                    </p>
                   </div>
-                  <Video className="h-6 w-6 md:h-8 md:w-8 text-teal-600 self-end md:self-auto" />
                 </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white border border-gray-200 shadow-sm">
-              <CardContent className="p-4 md:p-6">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                  <div className="mb-2 md:mb-0">
-                    <p className="text-xs md:text-sm font-medium text-gray-600">Completed</p>
-                    <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.completedCourses}</p>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="card-modern p-6 rounded-2xl text-center">
+                    <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                      <Trophy className="w-6 h-6 text-green-600" />
+                    </div>
+                    <div className="text-2xl font-bold text-gray-900">{stats.completedMilestones}</div>
+                    <div className="text-sm text-gray-600">Milestones Complete</div>
                   </div>
-                  <CheckCircle className="h-6 w-6 md:h-8 md:w-8 text-green-600 self-end md:self-auto" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white border border-gray-200 shadow-sm">
-              <CardContent className="p-4 md:p-6">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                  <div className="mb-2 md:mb-0">
-                    <p className="text-xs md:text-sm font-medium text-gray-600">Learning Hours</p>
-                    <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.totalHours}</p>
+                  
+                  <div className="card-modern p-6 rounded-2xl text-center">
+                    <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                      <Target className="w-6 h-6 text-blue-600" />
+                    </div>
+                    <div className="text-2xl font-bold text-gray-900">{stats.totalGoals}</div>
+                    <div className="text-sm text-gray-600">Active Goals</div>
                   </div>
-                  <Clock className="h-6 w-6 md:h-8 md:w-8 text-orange-600 self-end md:self-auto" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white border border-gray-200 shadow-sm">
-              <CardContent className="p-4 md:p-6">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                  <div className="mb-2 md:mb-0">
-                    <p className="text-xs md:text-sm font-medium text-gray-600">Avg. Score</p>
-                    <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.averageScore}%</p>
+                  
+                  <div className="card-modern p-6 rounded-2xl text-center">
+                    <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                      <Zap className="w-6 h-6 text-purple-600" />
+                    </div>
+                    <div className="text-2xl font-bold text-gray-900">{completionPercentage}%</div>
+                    <div className="text-sm text-gray-600">Profile Complete</div>
                   </div>
-                  <Target className="h-6 w-6 md:h-8 md:w-8 text-purple-600 self-end md:self-auto" />
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
 
-          {/* Main Content */}
-          <div>
-            <Tabs defaultValue="courses" className="space-y-4 md:space-y-6">
-              <TabsList className="grid w-full grid-cols-6 h-auto bg-white border border-gray-200">
-                <TabsTrigger value="courses" className="text-xs md:text-sm py-2 md:py-3 text-gray-900 data-[state=active]:bg-teal-600 data-[state=active]:text-white">My Courses</TabsTrigger>
-                <TabsTrigger value="meetings" className="text-xs md:text-sm py-2 md:py-3 text-gray-900 data-[state=active]:bg-teal-600 data-[state=active]:text-white">Meetings</TabsTrigger>
-                <TabsTrigger value="progress" className="text-xs md:text-sm py-2 md:py-3 text-gray-900 data-[state=active]:bg-teal-600 data-[state=active]:text-white">Progress</TabsTrigger>
-                <TabsTrigger value="profile" className="text-xs md:text-sm py-2 md:py-3 text-gray-900 data-[state=active]:bg-teal-600 data-[state=active]:text-white">Profile</TabsTrigger>
-                <TabsTrigger value="subscription" className="text-xs md:text-sm py-2 md:py-3 text-gray-900 data-[state=active]:bg-teal-600 data-[state=active]:text-white">Subscription</TabsTrigger>
-                <TabsTrigger value="certificates" className="text-xs md:text-sm py-2 md:py-3 text-gray-900 data-[state=active]:bg-teal-600 data-[state=active]:text-white">Certificates</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="courses" className="space-y-4 md:space-y-6">
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-                  <h2 className="text-xl md:text-2xl font-bold text-gray-900">My Courses</h2>
-                  <Button asChild size="sm" className="w-full sm:w-auto">
-                    <Link href="/courses">Browse More Courses</Link>
-                  </Button>
-                </div>
-
-                {enrollments.length === 0 ? (
-                  <Card>
-                    <CardContent className="p-8 md:p-12 text-center">
-                      <BookOpen className="h-10 w-10 md:h-12 md:w-12 text-gray-400 mx-auto mb-4" />
-                      <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-2">
-                        No courses enrolled yet
-                      </h3>
-                      <p className="text-sm md:text-base text-gray-600 mb-4 md:mb-6">
-                        Start your learning journey by enrolling in a course.
-                      </p>
-                      <Button asChild size="sm" className="w-full sm:w-auto">
-                        <Link href="/courses">Browse Courses</Link>
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
-                    {enrollments.map((enrollment) => (
-                      <Card key={enrollment.id} className="h-full flex flex-col">
-                        <CardContent className="p-6 flex flex-col flex-1">
-                          {/* Course Header - Fixed Height */}
-                          <div className="flex items-start space-x-4 mb-4">
-                            <Image 
-                              src={enrollment.course.image || '/default-course.png'} 
-                              alt={enrollment.course.title} 
-                              width={60} 
-                              height={60} 
-                              className="rounded-lg object-cover flex-shrink-0" 
-                            />
-                            <div className="flex-1 min-w-0">
-                              <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 min-h-[3.5rem]">
-                                {enrollment.course.title}
-                              </h3>
-                              <div className="flex items-center space-x-2 mb-2">
-                                <Badge className={getLevelBadgeStyle(enrollment.course.level)}>{enrollment.course.level}</Badge>
-                                <Badge variant="secondary">{enrollment.course.category}</Badge>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Course Description - Fixed Height */}
-                          <p className="text-gray-600 text-sm mb-4 line-clamp-2 min-h-[2.5rem] flex-shrink-0">
-                            {enrollment.course.description}
-                          </p>
-
-                          {/* Progress Section - Fixed Height */}
-                          <div className="mb-4 flex-shrink-0">
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="text-sm font-medium text-gray-700">Progress</span>
-                              <span className="text-sm text-gray-500">{enrollment.progress_percentage}%</span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
-                              <div 
-                                className="bg-gradient-to-r from-blue-600 to-teal-600 h-2.5 rounded-full transition-all duration-300"
-                                style={{ width: `${Math.max(enrollment.progress_percentage, 2)}%` }}
-                              ></div>
-                            </div>
-                            <div className="flex justify-between text-xs text-gray-500">
-                              <span>Lessons: {enrollment.lessonsCompleted || 0} / {enrollment.totalLessons || '—'}</span>
-                              {enrollment.timeSpent && (
-                                <span>Time: {enrollment.timeSpent}h</span>
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Quiz Performance - Flex Section */}
-                          {quizAttempts.filter(q => q.course.title === enrollment.course.title).length > 0 && (
-                            <div className="mb-4 flex-1">
-                              <h4 className="text-sm font-semibold mb-2 text-gray-700">Quiz Performance</h4>
-                              <div className="bg-gray-50 rounded-lg p-3">
-                                {quizAttempts.filter(q => q.course.title === enrollment.course.title).slice(0, 2).map((attempt) => (
-                                  <div key={attempt.id} className="text-xs text-gray-600 mb-1 last:mb-0">
-                                    <span className="font-medium">{attempt.percentage}%</span> on {new Date(attempt.completed_at).toLocaleDateString()}
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Action Buttons - Fixed at Bottom */}
-                          <div className="flex flex-col space-y-2 mt-auto pt-4">
-                            {enrollment.certificate_issued && (
-                              <Button size="sm" variant="outline" asChild className="w-full">
-                                <Link href={`/certificates/${enrollment.id}`}>
-                                  <Award className="w-4 h-4 mr-2" />
-                                  Download Certificate
-                                </Link>
-                              </Button>
-                            )}
-                            <Button size="sm" asChild className="w-full">
-                              <Link href={`/learn/${createCourseSlug(enrollment.course.title)}`}>
-                                Continue Learning
-                                <ArrowRight className="w-4 h-4 ml-2" />
-                              </Link>
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
+              <div className="lg:w-80">
+                <div className="card-modern p-6 rounded-2xl">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-semibold text-gray-900">Profile Completion</h3>
+                    <span className="text-sm text-gray-500">{completionPercentage}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
+                    <div 
+                      className="bg-gradient-to-r from-blue-500 to-indigo-500 h-3 rounded-full transition-all duration-1000 ease-out"
+                      style={{ width: `${completionPercentage}%` }}
+                    />
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    {completionItems.map((item, index) => (
+                      <div key={index} className="flex items-center space-x-2">
+                        {item.completed ? (
+                          <Check className="w-4 h-4 text-green-500" />
+                        ) : (
+                          <div className="w-4 h-4 border-2 border-gray-300 rounded-full" />
+                        )}
+                        <span className={item.completed ? 'text-green-700' : 'text-gray-600'}>
+                          {item.label}
+                        </span>
+                      </div>
                     ))}
                   </div>
-                )}
-              </TabsContent>
-
-              <TabsContent value="meetings" className="space-y-4 md:space-y-6">
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-                  <h2 className="text-xl md:text-2xl font-bold text-gray-900">Meeting Recordings</h2>
-                  <div className="flex gap-2">
-                    <Button asChild size="sm" variant="outline" className="w-full sm:w-auto">
-                      <Link href="/record-meeting">Record Meeting</Link>
-                    </Button>
-                    <Button asChild size="sm" variant="outline" className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 border-0">
-                      <Link href="/pocket-coach">Pocket Coach</Link>
-                    </Button>
-                    <Button asChild size="sm" className="w-full sm:w-auto">
-                      <Link href="/meetings">View All Meetings</Link>
-                    </Button>
-                  </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-                {/* Active Recording Bots */}
-                {activeBots.length > 0 && (
-                  <Card className="bg-gradient-to-r from-red-50 to-orange-50 border-red-200">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-red-900">
-                        <Video className="h-5 w-5 text-red-600" />
-                        Active Recordings ({activeBots.length})
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      {activeBots.map((bot) => (
-                        <div key={bot.id} className="flex items-center justify-between p-3 bg-white rounded-lg border">
-                          <div className="flex items-center gap-3">
-                            <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                            <div>
-                              <p className="font-medium text-gray-900">{bot.botName || 'Meeting Recorder'}</p>
-                              <p className="text-sm text-gray-600">{bot.platform} • {bot.status}</p>
-                            </div>
-                          </div>
-                          <Badge variant="destructive" className="bg-red-100 text-red-800">
-                            {bot.status === 'recording' ? 'Recording' : 'Joining...'}
-                          </Badge>
-                        </div>
-                      ))}
-                    </CardContent>
-                  </Card>
-                )}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Enhanced Quick Actions */}
+          <div className="mb-12">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Quick Actions</h2>
+                <p className="text-gray-600 mt-1">Jump into your most important tasks</p>
+              </div>
+              <Button 
+                onClick={() => router.push('/onboarding')} 
+                className="btn-modern bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white px-6 py-2 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+              >
+                <Settings className="w-4 h-4 mr-2" />
+                Update Profile
+              </Button>
+            </div>
 
-                {/* Recent Meetings */}
-                <Card className="bg-white border border-gray-200 shadow-sm">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-gray-900">
-                      <FileText className="h-5 w-5" />
-                      Recent Meeting Transcripts
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {meetings.length === 0 ? (
-                      <div className="text-center py-8">
-                        <Video className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">No meetings recorded yet</h3>
-                        <p className="text-gray-600 mb-4">Start recording meetings to see transcripts here</p>
-                        <div className="flex flex-col sm:flex-row gap-2 justify-center">
-                          <Button asChild size="sm">
-                            <Link href="/record-meeting">Record Local Meeting</Link>
-                          </Button>
-                          <Button asChild size="sm" variant="outline">
-                            <Link href="#" onClick={(e) => {
-                              e.preventDefault();
-                              // This will open the floating recorder
-                              const recordButton = document.querySelector('[data-recorder-trigger]') as HTMLElement;
-                              recordButton?.click();
-                            }}>Join External Meeting</Link>
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="space-y-4">
-                        {meetings.slice(0, 5).map((meeting) => (
-                          <div key={meeting.id} className="flex items-start justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-                            <div className="flex-1">
-                              <h4 className="font-medium text-gray-900 mb-1">{meeting.title}</h4>
-                              <div className="flex items-center gap-4 text-sm text-gray-600 mb-2">
-                                <div className="flex items-center gap-1">
-                                  <Calendar className="h-4 w-4" />
-                                  {new Date(meeting.meeting_date).toLocaleDateString()}
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <Clock className="h-4 w-4" />
-                                  {Math.floor((meeting.duration_minutes || 0) / 60)}h {(meeting.duration_minutes || 0) % 60}m
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <Users className="h-4 w-4" />
-                                  {meeting.participants?.length || 0} participants
-                                </div>
-                              </div>
-                              <p className="text-sm text-gray-600 line-clamp-2">{meeting.summary}</p>
-                            </div>
-                            <div className="flex items-center gap-2 ml-4">
-                              <Button size="sm" variant="outline" asChild>
-                                <Link href={`/meetings/${meeting.id}`}>
-                                  <Eye className="h-4 w-4 mr-1" />
-                                  View
-                                </Link>
-                              </Button>
-                            </div>
-                          </div>
-                        ))}
-                        {meetings.length > 5 && (
-                          <div className="text-center pt-4 border-t">
-                            <Button variant="outline" asChild>
-                              <Link href="/meetings">View All {stats.totalMeetings} Meetings</Link>
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-
-                {/* Quick Actions */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <Card className="bg-gradient-to-br from-teal-50 to-emerald-50 border-teal-200">
-                    <CardContent className="p-6">
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center">
-                          <Video className="h-5 w-5 text-teal-600" />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-teal-900">Record Meeting</h3>
-                          <p className="text-sm text-teal-700">Record local audio or screen</p>
-                        </div>
-                      </div>
-                      <Button asChild className="w-full bg-teal-600 hover:bg-teal-700">
-                        <Link href="/record-meeting">Start Recording</Link>
-                      </Button>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
-                    <CardContent className="p-6">
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                          <Plus className="h-5 w-5 text-blue-600" />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-blue-900">Join Meeting</h3>
-                          <p className="text-sm text-blue-700">Add recorder to any meeting</p>
-                        </div>
-                      </div>
-                      <Button 
-                        className="w-full bg-blue-600 hover:bg-blue-700"
-                        data-recorder-trigger
-                        onClick={() => {
-                          // Open the floating recorder dialog
-                          const event = new CustomEvent('openRecorder');
-                          window.dispatchEvent(event);
-                        }}
-                      >
-                        Add Recorder Bot
-                      </Button>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
-                    <CardContent className="p-6">
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                          <FileText className="h-5 w-5 text-purple-600" />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-purple-900">Resume Customizer</h3>
-                          <p className="text-sm text-purple-700">AI-powered resume & interview prep</p>
-                        </div>
-                      </div>
-                      <Button asChild className="w-full bg-purple-600 hover:bg-purple-700">
-                        <Link href="/resume-customizer">Start Customizing</Link>
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="progress" className="space-y-4 md:space-y-6">
-                <h2 className="text-xl md:text-2xl font-bold text-gray-900">Learning Progress</h2>
-                
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-                  <Card className="bg-white border border-gray-200 shadow-sm">
-                    <CardHeader className="pb-3 md:pb-6">
-                      <CardTitle className="flex items-center gap-2 text-base md:text-lg text-gray-900">
-                        <TrendingUp className="h-4 w-4 md:h-5 md:w-5" />
-                        Course Progress
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3 md:space-y-4">
-                      {enrollments.map((enrollment) => (
-                        <div key={enrollment.id} className="space-y-2">
-                          <div className="flex justify-between text-xs md:text-sm">
-                            <span className="font-medium truncate pr-2 text-gray-900">{enrollment.course.title}</span>
-                            <span className="flex-shrink-0 text-gray-700 font-medium">{enrollment.progress_percentage}%</span>
-                          </div>
-                          <div className="w-full bg-gray-300 rounded-full h-2.5 border border-gray-200">
-                            <div 
-                              className="bg-gradient-to-r from-blue-600 to-teal-600 h-2.5 rounded-full transition-all duration-300 ease-out"
-                              style={{ 
-                                width: `${Math.max(enrollment.progress_percentage, 2)}%`,
-                                minWidth: enrollment.progress_percentage > 0 ? '8px' : '0px'
-                              }}
-                            ></div>
-                          </div>
-                        </div>
-                      ))}
-                    </CardContent>
-                  </Card>
-
-                  <Card className="bg-white border border-gray-200 shadow-sm">
-                    <CardHeader className="pb-3 md:pb-6">
-                      <CardTitle className="flex items-center gap-2 text-base md:text-lg text-gray-900">
-                        <Target className="h-4 w-4 md:h-5 md:w-5" />
-                        Quiz Performance
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3 md:space-y-4">
-                      {quizAttempts.length === 0 ? (
-                        <p className="text-xs md:text-sm text-gray-500 text-center py-4">
-                          No quiz attempts yet
-                        </p>
-                      ) : (
-                        quizAttempts.slice(0, 5).map((attempt) => (
-                          <div key={attempt.id} className="flex justify-between items-center">
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs md:text-sm font-medium text-gray-900 truncate">
-                                {attempt.course.title}
-                              </p>
-                              <p className="text-xs text-gray-500">
-                                {new Date(attempt.completed_at).toLocaleDateString()}
-                              </p>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-xs md:text-sm font-bold text-gray-900">
-                                {attempt.percentage}%
-                              </p>
-                              <p className="text-xs text-gray-500">
-                                {attempt.score}/{attempt.total_points}
-                              </p>
-                            </div>
-                          </div>
-                        ))
-                      )}
-                    </CardContent>
-                  </Card>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="profile" className="space-y-4 md:space-y-6">
-                <div className="flex justify-between items-center">
-                  <h2 className="text-xl md:text-2xl font-bold text-gray-900">Profile & Personalization</h2>
-                  <Button
-                    onClick={() => editingProfile ? saveProfile() : setEditingProfile(true)}
-                    className="flex items-center gap-2"
-                  >
-                    {editingProfile ? (
-                      <>
-                        <Save className="h-4 w-4" />
-                        Save Changes
-                      </>
-                    ) : (
-                      <>
-                        <Edit3 className="h-4 w-4" />
-                        Edit Profile
-                      </>
-                    )}
-                  </Button>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Personal Information */}
-                  <Card className="bg-white border border-gray-200 shadow-sm">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-lg text-gray-900">
-                        <User className="h-5 w-5 text-blue-600" />
-                        Personal Information
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="text-sm font-medium text-gray-700 mb-1 block">Full Name</label>
-                          {editingProfile ? (
-                            <Input
-                              value={profileForm.full_name}
-                              onChange={(e) => setProfileForm(prev => ({ ...prev, full_name: e.target.value }))}
-                              placeholder="Enter your full name"
-                            />
-                          ) : (
-                            <p className="text-gray-900">{userOnboarding?.full_name || 'Not provided'}</p>
-                          )}
-                        </div>
-                        <div>
-                          <label className="text-sm font-medium text-gray-700 mb-1 block">Job Title</label>
-                          {editingProfile ? (
-                            <Input
-                              value={profileForm.job_title}
-                              onChange={(e) => setProfileForm(prev => ({ ...prev, job_title: e.target.value }))}
-                              placeholder="Enter your job title"
-                            />
-                          ) : (
-                            <p className="text-gray-900">{userOnboarding?.job_title || 'Not provided'}</p>
-                          )}
-                        </div>
-                        <div>
-                          <label className="text-sm font-medium text-gray-700 mb-1 block">Company</label>
-                          {editingProfile ? (
-                            <Input
-                              value={profileForm.company}
-                              onChange={(e) => setProfileForm(prev => ({ ...prev, company: e.target.value }))}
-                              placeholder="Enter your company"
-                            />
-                          ) : (
-                            <p className="text-gray-900">{userOnboarding?.company || 'Not provided'}</p>
-                          )}
-                        </div>
-                        <div>
-                          <label className="text-sm font-medium text-gray-700 mb-1 block">Years of Experience</label>
-                          {editingProfile ? (
-                            <Input
-                              value={profileForm.years_experience}
-                              onChange={(e) => setProfileForm(prev => ({ ...prev, years_experience: e.target.value }))}
-                              placeholder="Enter years of experience"
-                            />
-                          ) : (
-                            <p className="text-gray-900">{userOnboarding?.years_experience || 'Not provided'}</p>
-                          )}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Professional Details */}
-                  <Card className="bg-white border border-gray-200 shadow-sm">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-lg text-gray-900">
-                        <Settings className="h-5 w-5 text-green-600" />
-                        Professional Details
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div>
-                        <label className="text-sm font-medium text-gray-700 mb-1 block">Primary Role</label>
-                        {editingProfile ? (
-                          <Input
-                            value={profileForm.primary_role}
-                            onChange={(e) => setProfileForm(prev => ({ ...prev, primary_role: e.target.value }))}
-                            placeholder="e.g., Product Manager, Scrum Master"
-                          />
-                        ) : (
-                          <p className="text-gray-900">{userOnboarding?.primary_role || 'Not provided'}</p>
-                        )}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Resume Customizer - Featured */}
+              <div className="lg:col-span-2 card-modern p-8 rounded-3xl bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200/50 hover:border-purple-300/50 transition-all duration-300 group">
+                <div className="flex items-start justify-between mb-6">
+                  <div>
+                    <div className="flex items-center space-x-3 mb-4">
+                      <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-200">
+                        <FileText className="w-7 h-7 text-white" />
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700 mb-1 block">Management Level</label>
-                        {editingProfile ? (
-                          <Input
-                            value={profileForm.management_level}
-                            onChange={(e) => setProfileForm(prev => ({ ...prev, management_level: e.target.value }))}
-                            placeholder="e.g., Individual Contributor, Team Lead"
-                          />
-                        ) : (
-                          <p className="text-gray-900">{userOnboarding?.management_level || 'Not provided'}</p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-700 mb-1 block">Team Size</label>
-                        {editingProfile ? (
-                          <Input
-                            value={profileForm.team_size}
-                            onChange={(e) => setProfileForm(prev => ({ ...prev, team_size: e.target.value }))}
-                            placeholder="e.g., 5-10 people"
-                          />
-                        ) : (
-                          <p className="text-gray-900">{userOnboarding?.team_size || 'Not provided'}</p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-700 mb-1 block">Company Size</label>
-                        {editingProfile ? (
-                          <Input
-                            value={profileForm.company_size}
-                            onChange={(e) => setProfileForm(prev => ({ ...prev, company_size: e.target.value }))}
-                            placeholder="e.g., 100-500 employees"
-                          />
-                        ) : (
-                          <p className="text-gray-900">{userOnboarding?.company_size || 'Not provided'}</p>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Learning Preferences */}
-                  <Card className="bg-white border border-gray-200 shadow-sm">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-lg text-gray-900">
-                        <Target className="h-5 w-5 text-purple-600" />
-                        Learning Preferences
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div>
-                        <label className="text-sm font-medium text-gray-700 mb-1 block">Coaching Style</label>
-                        {editingProfile ? (
-                          <select
-                            value={profileForm.coaching_style}
-                            onChange={(e) => setProfileForm(prev => ({ ...prev, coaching_style: e.target.value }))}
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                          >
-                            <option value="directive">Directive</option>
-                            <option value="collaborative">Collaborative</option>
-                            <option value="balanced">Balanced</option>
-                            <option value="supportive">Supportive</option>
-                          </select>
-                        ) : (
-                          <p className="text-gray-900 capitalize">{userOnboarding?.coaching_style || 'balanced'}</p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-700 mb-1 block">Communication Tone</label>
-                        {editingProfile ? (
-                          <select
-                            value={profileForm.communication_tone}
-                            onChange={(e) => setProfileForm(prev => ({ ...prev, communication_tone: e.target.value }))}
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                          >
-                            <option value="casual">Casual</option>
-                            <option value="professional">Professional</option>
-                            <option value="formal">Formal</option>
-                          </select>
-                        ) : (
-                          <p className="text-gray-900 capitalize">{userOnboarding?.communication_tone || 'professional'}</p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-700 mb-1 block">Learning Style</label>
-                        {editingProfile ? (
-                          <select
-                            value={profileForm.learning_style}
-                            onChange={(e) => setProfileForm(prev => ({ ...prev, learning_style: e.target.value }))}
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                          >
-                            <option value="visual">Visual</option>
-                            <option value="auditory">Auditory</option>
-                            <option value="hands-on">Hands-on</option>
-                            <option value="mixed">Mixed</option>
-                          </select>
-                        ) : (
-                          <p className="text-gray-900 capitalize">{userOnboarding?.learning_style || 'mixed'}</p>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Goals & Challenges */}
-                  <Card className="bg-white border border-gray-200 shadow-sm">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-lg text-gray-900">
-                        <Award className="h-5 w-5 text-orange-600" />
-                        Goals & Challenges
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div>
-                        <label className="text-sm font-medium text-gray-700 mb-2 block">Current Challenges</label>
-                        {userOnboarding?.biggest_challenges?.length > 0 ? (
-                          <div className="flex flex-wrap gap-2">
-                            {userOnboarding.biggest_challenges.map((challenge: string, index: number) => (
-                              <Badge key={index} variant="outline" className="bg-red-50 text-red-700 border-red-200">
-                                {challenge}
-                              </Badge>
-                            ))}
-                          </div>
-                        ) : (
-                          <p className="text-gray-500 text-sm">No challenges specified</p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-700 mb-2 block">Primary Goals</label>
-                        {userOnboarding?.primary_goals?.length > 0 ? (
-                          <div className="flex flex-wrap gap-2">
-                            {userOnboarding.primary_goals.map((goal: string, index: number) => (
-                              <Badge key={index} variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                                {goal}
-                              </Badge>
-                            ))}
-                          </div>
-                        ) : (
-                          <p className="text-gray-500 text-sm">No goals specified</p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-700 mb-2 block">Focus Areas</label>
-                        {userOnboarding?.focus_areas?.length > 0 ? (
-                          <div className="flex flex-wrap gap-2">
-                            {userOnboarding.focus_areas.map((area: string, index: number) => (
-                              <Badge key={index} variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                                {area}
-                              </Badge>
-                            ))}
-                          </div>
-                        ) : (
-                          <p className="text-gray-500 text-sm">No focus areas specified</p>
-                        )}
-                      </div>
-                      {!userOnboarding && (
-                        <div className="text-center py-6">
-                          <p className="text-gray-600 mb-4">Complete your profile to get personalized AI coaching recommendations</p>
-                          <Button asChild>
-                            <Link href="/synergize">Complete Onboarding</Link>
-                          </Button>
+                        <h3 className="text-xl font-bold text-gray-900">Resume Customizer</h3>
+                        <div className="flex items-center space-x-2">
+                          <span className="px-2 py-1 bg-gradient-to-r from-green-400 to-emerald-400 text-white text-xs font-bold rounded-full animate-pulse">
+                            NEW
+                          </span>
+                          <span className="px-2 py-1 bg-gradient-to-r from-blue-400 to-indigo-400 text-white text-xs font-bold rounded-full">
+                            AI-POWERED
+                          </span>
                         </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="subscription" className="space-y-4 md:space-y-6">
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-                  <h2 className="text-xl md:text-2xl font-bold text-gray-900">Subscription Management</h2>
-                  <div className="flex items-center gap-2">
-                    {refreshing && (
-                      <div className="flex items-center gap-2 text-sm text-blue-600">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                        Updating subscription...
                       </div>
-                    )}
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => refreshSubscriptionData(0, true)}
-                      disabled={refreshing}
-                      className="flex items-center gap-2"
-                    >
-                      <BarChart3 className="h-4 w-4" />
-                      Refresh Status
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Current Plan */}
-                  <Card className="bg-white border border-gray-200 shadow-sm">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-gray-900">
-                        <CreditCard className="h-5 w-5 text-teal-600" />
-                        Current Plan
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      {subscriptionData ? (
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <h3 className="text-lg font-semibold text-gray-900 capitalize">
-                                {subscriptionData.plan_id === 'starter' && 'Starter Plan'}
-                                {subscriptionData.plan_id === 'professional' && 'Professional Plan'}
-                                {subscriptionData.plan_id === 'enterprise' && 'Enterprise Plan'}
-                              </h3>
-                              <p className="text-sm text-gray-600 capitalize">
-                                Status: {subscriptionData.status}
-                              </p>
-                            </div>
-                            <Badge className="bg-teal-100 text-teal-800">
-                              {subscriptionData.status === 'active' ? 'Active' : subscriptionData.status}
-                            </Badge>
-                          </div>
-                          
-                          {subscriptionData.current_period_end && (
-                            <div className="text-sm text-gray-600">
-                              <p>Current period ends: {new Date(subscriptionData.current_period_end).toLocaleDateString()}</p>
-                            </div>
-                          )}
-
-                          <div className="space-y-2">
-                            <h4 className="font-medium text-gray-900">Plan Features:</h4>
-                            <ul className="text-sm text-gray-600 space-y-1">
-                              {subscriptionData.plan_id === 'starter' && (
-                                <>
-                                  <li>• 20 Presentations</li>
-                                  <li>• 50 AI Conversations</li>
-                                  <li>• Basic presentation templates</li>
-                                  <li>• Email support</li>
-                                </>
-                              )}
-                              {subscriptionData.plan_id === 'professional' && (
-                                <>
-                                  <li>• 50 Presentations</li>
-                                  <li>• 200 AI Conversations</li>
-                                  <li>• Advanced presentation tools</li>
-                                  <li>• Priority support</li>
-                                  <li>• 1-on-1 coaching sessions</li>
-                                </>
-                              )}
-                              {subscriptionData.plan_id === 'enterprise' && (
-                                <>
-                                  <li>• 100 Presentations</li>
-                                  <li>• 500 AI Conversations</li>
-                                  <li>• White-label branding</li>
-                                  <li>• Dedicated account manager</li>
-                                  <li>• API access</li>
-                                </>
-                              )}
-                            </ul>
-                          </div>
-
-                          {subscriptionData.status === 'active' && (
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="w-full"
-                              onClick={() => {
-                                // Handle subscription management (cancel, change plan, etc.)
-                                alert('Subscription management coming soon!');
-                              }}
-                            >
-                              Manage Subscription
-                            </Button>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <h3 className="text-lg font-semibold text-gray-900">Free Plan</h3>
-                              <p className="text-sm text-gray-600">Limited features</p>
-                            </div>
-                            <Badge variant="secondary">Free</Badge>
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <h4 className="font-medium text-gray-900">Plan Features:</h4>
-                            <ul className="text-sm text-gray-600 space-y-1">
-                              <li>• 5 Presentations</li>
-                              <li>• 10 AI Conversations</li>
-                              <li>• Basic templates</li>
-                              <li>• Community support</li>
-                            </ul>
-                          </div>
-
-                          <div className="space-y-2">
-                            <Button 
-                              size="sm" 
-                              className="w-full bg-teal-600 hover:bg-teal-700"
-                              onClick={() => handleSubscriptionUpgrade('starter')}
-                            >
-                              Upgrade to Starter - $29/mo
-                            </Button>
-                            <Button 
-                              size="sm" 
-                              variant="outline"
-                              className="w-full"
-                              onClick={() => handleSubscriptionUpgrade('professional')}
-                            >
-                              Upgrade to Professional - $79/mo
-                            </Button>
-                          </div>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-
-                  {/* Usage Statistics */}
-                  <Card className="bg-white border border-gray-200 shadow-sm">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-gray-900">
-                        <BarChart3 className="h-5 w-5 text-blue-600" />
-                        Usage Statistics
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      {contentUsage?.settings ? (
-                        <div className="space-y-4">
-                          {/* Presentations Usage */}
-                          <div>
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="text-sm font-medium text-gray-700">Presentations</span>
-                              <span className="text-sm text-gray-500">
-                                {contentUsage.currentPresentations} / {contentUsage.settings.max_presentations}
-                              </span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2">
-                              <div 
-                                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                                style={{ 
-                                  width: `${Math.min((contentUsage.currentPresentations / contentUsage.settings.max_presentations) * 100, 100)}%` 
-                                }}
-                              ></div>
-                            </div>
-                          </div>
-
-                          {/* Conversations Usage */}
-                          <div>
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="text-sm font-medium text-gray-700">AI Conversations</span>
-                              <span className="text-sm text-gray-500">
-                                {contentUsage.currentConversations} / {contentUsage.settings.max_conversations}
-                              </span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2">
-                              <div 
-                                className="bg-teal-600 h-2 rounded-full transition-all duration-300"
-                                style={{ 
-                                  width: `${Math.min((contentUsage.currentConversations / contentUsage.settings.max_conversations) * 100, 100)}%` 
-                                }}
-                              ></div>
-                            </div>
-                          </div>
-
-                          <div className="pt-2 border-t">
-                            <div className="text-sm text-gray-600">
-                              <p>Plan: <span className="font-medium capitalize">{contentUsage.settings.plan_type}</span></p>
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="text-center py-4">
-                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-                          <p className="text-sm text-gray-600">Loading usage statistics...</p>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                </div>
-
-                {/* Subscription Plans (for free users) */}
-                {!subscriptionData && (
-                  <div className="mt-8">
-                    <h3 className="text-xl font-bold text-gray-900 mb-4">Upgrade Your Plan</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      {/* Starter Plan */}
-                      <Card className="border-2 border-gray-200 hover:border-teal-500 transition-colors">
-                        <CardHeader>
-                          <CardTitle className="text-lg">Starter Plan</CardTitle>
-                          <div className="text-2xl font-bold">$29<span className="text-sm font-normal">/month</span></div>
-                        </CardHeader>
-                        <CardContent>
-                          <ul className="space-y-2 text-sm text-gray-600 mb-4">
-                            <li>• 20 Presentations</li>
-                            <li>• 50 AI Conversations</li>
-                            <li>• Basic templates</li>
-                            <li>• Email support</li>
-                          </ul>
-                          <Button 
-                            className="w-full bg-teal-600 hover:bg-teal-700"
-                            onClick={() => handleSubscriptionUpgrade('starter')}
-                          >
-                            Get Started
-                          </Button>
-                        </CardContent>
-                      </Card>
-
-                      {/* Professional Plan */}
-                      <Card className="border-2 border-teal-500 relative">
-                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                          <Badge className="bg-teal-600 text-white">Most Popular</Badge>
-                        </div>
-                        <CardHeader>
-                          <CardTitle className="text-lg">Professional Plan</CardTitle>
-                          <div className="text-2xl font-bold">$79<span className="text-sm font-normal">/month</span></div>
-                        </CardHeader>
-                        <CardContent>
-                          <ul className="space-y-2 text-sm text-gray-600 mb-4">
-                            <li>• 50 Presentations</li>
-                            <li>• 200 AI Conversations</li>
-                            <li>• Advanced tools</li>
-                            <li>• Priority support</li>
-                            <li>• 1-on-1 coaching</li>
-                          </ul>
-                          <Button 
-                            className="w-full bg-teal-600 hover:bg-teal-700"
-                            onClick={() => handleSubscriptionUpgrade('professional')}
-                          >
-                            Get Professional
-                          </Button>
-                        </CardContent>
-                      </Card>
-
-                      {/* Enterprise Plan */}
-                      <Card className="border-2 border-gray-200 hover:border-teal-500 transition-colors">
-                        <CardHeader>
-                          <CardTitle className="text-lg">Enterprise Plan</CardTitle>
-                          <div className="text-2xl font-bold">$199<span className="text-sm font-normal">/month</span></div>
-                        </CardHeader>
-                        <CardContent>
-                          <ul className="space-y-2 text-sm text-gray-600 mb-4">
-                            <li>• 100 Presentations</li>
-                            <li>• 500 AI Conversations</li>
-                            <li>• White-label branding</li>
-                            <li>• Dedicated manager</li>
-                            <li>• API access</li>
-                          </ul>
-                          <Button 
-                            className="w-full bg-teal-600 hover:bg-teal-700"
-                            onClick={() => handleSubscriptionUpgrade('enterprise')}
-                          >
-                            Get Enterprise
-                          </Button>
-                        </CardContent>
-                      </Card>
+                    </div>
+                    <p className="text-gray-700 mb-4 leading-relaxed">
+                      Transform your career with AI-powered resume optimization, job fit analysis, and personalized cover letters. Get interview-ready in minutes.
+                    </p>
+                    <div className="flex flex-wrap gap-2 mb-6">
+                      <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">Job Analysis</span>
+                      <span className="px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-sm font-medium">Resume Tailoring</span>
+                      <span className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium">Cover Letters</span>
+                      <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">Interview Prep</span>
                     </div>
                   </div>
-                )}
-              </TabsContent>
-
-              <TabsContent value="certificates" className="space-y-4 md:space-y-6">
-                <h2 className="text-xl md:text-2xl font-bold text-gray-900">Certificates</h2>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                  {enrollments
-                    .filter(enrollment => enrollment.certificate_issued)
-                    .map((enrollment) => (
-                      <Card key={enrollment.id} className="hover:shadow-lg transition-shadow bg-white border border-gray-200 shadow-sm">
-                        <CardContent className="p-4 md:p-6">
-                          <div className="flex items-center gap-3 md:gap-4 mb-3 md:mb-4">
-                            <div className="w-10 h-10 md:w-12 md:h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                              <Award className="h-5 w-5 md:h-6 md:w-6 text-yellow-600" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <h3 className="font-semibold text-sm md:text-base text-gray-900 truncate">
-                                {enrollment.course.title}
-                              </h3>
-                              <p className="text-xs md:text-sm text-gray-500">
-                                Completed {enrollment.completed_at ? new Date(enrollment.completed_at).toLocaleDateString() : 'Recently'}
-                              </p>
-                            </div>
-                          </div>
-                          <Button variant="outline" size="sm" className="w-full text-xs md:text-sm border-gray-300 text-gray-900 hover:bg-gray-50 hover:border-gray-400 bg-white">
-                            Download Certificate
-                          </Button>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  
-                  {enrollments.filter(enrollment => enrollment.certificate_issued).length === 0 && (
-                    <Card className="col-span-full bg-white border border-gray-200 shadow-sm">
-                      <CardContent className="p-8 md:p-12 text-center">
-                        <Award className="h-10 w-10 md:h-12 md:w-12 text-gray-400 mx-auto mb-4" />
-                        <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-2">
-                          No certificates yet
-                        </h3>
-                        <p className="text-sm md:text-base text-gray-600">
-                          Complete courses to earn certificates and showcase your achievements.
-                        </p>
-                      </CardContent>
-                    </Card>
-                  )}
                 </div>
-              </TabsContent>
-            </Tabs>
-          </div>
-        </div>
-      </div>
-    </PageLayout>
-  );
-}
+                <Button 
+                  onClick={() => router.push('/resume-customizer')}
+                  className="btn-modern w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white py-4 rounded-2xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-200 group-hover:scale-[1.02]"
+                >
+                  <Sparkles className="w-5 h-5 mr-2" />
+                  Start Resume Optimization
+                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-200" />
+                </Button>
+              </div>
 
-export default function StudentDashboard() {
-  return (
-    <Suspense fallback={
-      <PageLayout>
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading your dashboard...</p>
+              {/* Other Quick Actions */}
+              <div className="space-y-6">
+                <div className="card-modern p-6 rounded-2xl hover:shadow-lg transition-all duration-200 group cursor-pointer" onClick={() => router.push('/goal-setting')}>
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+                      <Target className="w-6 h-6 text-green-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900">Goal Setting</h3>
+                      <p className="text-sm text-gray-600">Define your career path</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-500">{stats.totalGoals} active goals</span>
+                    <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 transition-all duration-200" />
+                  </div>
+                </div>
+
+                <div className="card-modern p-6 rounded-2xl hover:shadow-lg transition-all duration-200 group cursor-pointer" onClick={() => router.push('/ai-interview-practice')}>
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+                      <Video className="w-6 h-6 text-red-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900">AI Interview Practice</h3>
+                      <p className="text-sm text-gray-600">Practice with AI coach</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-500">Build confidence</span>
+                    <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 transition-all duration-200" />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+
+          {/* Enhanced Recent Activity & Goals */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Recent Activity */}
+            <div className="card-modern p-8 rounded-3xl">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-gray-900">Recent Activity</h2>
+                <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <Activity className="w-5 h-5 text-blue-600" />
+                </div>
+              </div>
+              
+              {recentActivities.length > 0 ? (
+                <div className="space-y-4">
+                  {recentActivities.slice(0, 5).map((activity, index) => (
+                    <div key={index} className="flex items-start space-x-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200">
+                      <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm">
+                        <Clock className="w-5 h-5 text-gray-600" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900">
+                          {activity.description || 'Activity completed'}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {formatDistanceToNow(new Date(activity.created_at || ''), { addSuffix: true })}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Activity className="w-8 h-8 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No recent activity</h3>
+                  <p className="text-gray-600 mb-6">Start your career development journey today!</p>
+                  <Button 
+                    onClick={() => router.push('/resume-customizer')}
+                    className="btn-modern bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white px-6 py-2 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                  >
+                    Get Started
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            {/* Active Goals */}
+            <div className="card-modern p-8 rounded-3xl">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-gray-900">Active Goals</h2>
+                <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                  <Target className="w-5 h-5 text-green-600" />
+                </div>
+              </div>
+              
+              {goals.length > 0 ? (
+                <div className="space-y-4">
+                  {goals.slice(0, 5).map((goal, index) => (
+                    <div key={index} className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200/50">
+                      <div className="flex items-start justify-between mb-3">
+                        <h3 className="font-semibold text-gray-900 text-sm">
+                          {goal.goal_text || 'Career Goal'}
+                        </h3>
+                        <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                          {goal.priority || 'Medium'}
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <div className="flex-1 bg-green-200 rounded-full h-2">
+                          <div 
+                            className="bg-gradient-to-r from-green-500 to-emerald-500 h-2 rounded-full transition-all duration-500 ease-out"
+                            style={{ width: `${Math.random() * 100}%` }}
+                          />
+                        </div>
+                        <span className="text-xs text-green-700 font-medium">
+                          {Math.floor(Math.random() * 100)}%
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Target className="w-8 h-8 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No active goals</h3>
+                  <p className="text-gray-600 mb-6">Set your first career goal to get started!</p>
+                  <Button 
+                    onClick={() => router.push('/goal-setting')}
+                    className="btn-modern bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-6 py-2 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                  >
+                    Set Goals
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Enhanced Learning Resources */}
+          <div className="mt-12">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Continue Learning</h2>
+                <p className="text-gray-600 mt-1">Recommended resources for your career path</p>
+              </div>
+              <Button 
+                onClick={() => router.push('/learning')}
+                className="btn-modern bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white px-6 py-2 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+              >
+                View All Resources
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                {
+                  title: "Leadership Development",
+                  description: "Build essential leadership skills for career advancement",
+                  icon: Users,
+                  color: "from-blue-500 to-indigo-500",
+                  bgColor: "from-blue-50 to-indigo-50",
+                  borderColor: "border-blue-200/50"
+                },
+                {
+                  title: "Technical Skills",
+                  description: "Stay current with industry-relevant technologies",
+                  icon: Zap,
+                  color: "from-purple-500 to-pink-500",
+                  bgColor: "from-purple-50 to-pink-50",
+                  borderColor: "border-purple-200/50"
+                },
+                {
+                  title: "Communication",
+                  description: "Enhance your professional communication abilities",
+                  icon: MessageSquare,
+                  color: "from-green-500 to-emerald-500",
+                  bgColor: "from-green-50 to-emerald-50",
+                  borderColor: "border-green-200/50"
+                }
+              ].map((resource, index) => (
+                <div key={index} className={`card-modern p-6 rounded-2xl bg-gradient-to-br ${resource.bgColor} border-2 ${resource.borderColor} hover:shadow-lg transition-all duration-200 group cursor-pointer`}>
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div className={`w-12 h-12 bg-gradient-to-br ${resource.color} rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-200`}>
+                      <resource.icon className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900">{resource.title}</h3>
+                      <p className="text-sm text-gray-600">{resource.description}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
       </PageLayout>
     }>
       <DashboardContent />
