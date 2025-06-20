@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -168,6 +169,7 @@ interface MegaMenuProps {
 
 export default function MegaMenu({ isScrolled }: MegaMenuProps) {
   const { user, userProfile, signOut } = useAuth();
+  const router = useRouter();
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
@@ -255,6 +257,15 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
     setActiveCategory(null);
+  };
+
+  // Mobile navigation handler
+  const handleMobileNavigation = (href: string) => {
+    closeMobileMenu();
+    // Small delay to ensure menu closes before navigation
+    setTimeout(() => {
+      router.push(href);
+    }, 100);
   };
 
   return (
@@ -407,7 +418,7 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
         </button>
       </div>
 
-      {/* Simplified Mobile Menu */}
+      {/* Reliable Mobile Menu */}
       {isMobileMenuOpen && isMounted && createPortal(
         <div className="lg:hidden fixed inset-0 z-[9999] bg-black/50" onClick={closeMobileMenu}>
           <div 
@@ -421,7 +432,7 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                   <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
                     <span className="text-white font-bold">S4</span>
                   </div>
-                  <h2 className="text-lg font-bold text-white">Menu</h2>
+                  <h2 className="text-lg font-bold text-white">Navigation</h2>
                 </div>
                 <button
                   onClick={closeMobileMenu}
@@ -434,12 +445,11 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
 
             {/* Menu Content */}
             <div className="p-4">
-              {/* Quick Access - Resume Customizer */}
+              {/* Featured Resume Customizer */}
               <div className="mb-6">
-                <Link
-                  href="/resume-customizer"
-                  className="block p-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl text-white mb-4"
-                  onClick={closeMobileMenu}
+                <button
+                  onClick={() => handleMobileNavigation('/resume-customizer')}
+                  className="block w-full p-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl text-white text-left hover:from-purple-600 hover:to-pink-600 transition-colors"
                 >
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
@@ -447,16 +457,16 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                     </div>
                     <div>
                       <h3 className="font-bold">Resume Customizer</h3>
-                      <p className="text-sm opacity-90">AI-powered optimization</p>
+                      <p className="text-sm opacity-90">AI-powered resume optimization</p>
                     </div>
                     <div className="ml-auto">
                       <span className="px-2 py-1 bg-white/20 rounded-full text-xs font-bold">NEW</span>
                     </div>
                   </div>
-                </Link>
+                </button>
               </div>
 
-              {/* Categories */}
+              {/* Navigation Categories */}
               <div className="space-y-4">
                 {menuCategories.map((category) => {
                   const Icon = category.icon;
@@ -478,31 +488,32 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                       </button>
 
                       {isActive && (
-                        <div className="mt-2 ml-11 space-y-1">
+                        <div className="mt-2 space-y-1">
                           {category.items.map((item) => {
                             const ItemIcon = item.icon;
                             return (
-                              <Link
+                              <button
                                 key={item.href}
-                                href={item.href}
-                                className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 transition-colors"
-                                onClick={closeMobileMenu}
+                                onClick={() => handleMobileNavigation(item.href)}
+                                className="flex items-center space-x-3 p-3 ml-4 bg-white hover:bg-teal-50 rounded-lg border border-gray-100 hover:border-teal-200 transition-all w-full text-left"
                               >
-                                <ItemIcon className="w-4 h-4 text-gray-600" />
+                                <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
+                                  <ItemIcon className="w-4 h-4 text-gray-600" />
+                                </div>
                                 <div className="flex-1">
                                   <div className="flex items-center space-x-2">
                                     <span className="font-medium text-gray-900 text-sm">{item.title}</span>
                                     {item.isNew && (
-                                      <span className="px-1.5 py-0.5 bg-green-500 text-white text-xs rounded-full">NEW</span>
+                                      <span className="px-1.5 py-0.5 bg-green-500 text-white text-xs rounded-full font-medium">NEW</span>
                                     )}
                                     {item.badge && (
-                                      <span className="px-1.5 py-0.5 bg-blue-500 text-white text-xs rounded-full">{item.badge}</span>
+                                      <span className="px-1.5 py-0.5 bg-blue-500 text-white text-xs rounded-full font-medium">{item.badge}</span>
                                     )}
                                   </div>
-                                  <p className="text-xs text-gray-600">{item.description}</p>
+                                  <p className="text-xs text-gray-600 mt-0.5">{item.description}</p>
                                 </div>
                                 <ArrowRight className="w-4 h-4 text-gray-400" />
-                              </Link>
+                              </button>
                             );
                           })}
                         </div>
@@ -515,22 +526,21 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
               {/* User Section */}
               <div className="mt-6 pt-6 border-t border-gray-200">
                 {user ? (
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <div className="p-3 bg-blue-50 rounded-lg">
                       <p className="font-semibold text-blue-900">Welcome back!</p>
-                      <p className="text-sm text-blue-700">{userProfile?.name}</p>
+                      <p className="text-sm text-blue-700">{userProfile?.name || 'User'}</p>
                     </div>
-                    <Link
-                      href={userProfile?.role === 'ADMIN' ? '/admin' : '/dashboard'}
-                      className="flex items-center space-x-3 p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
-                      onClick={closeMobileMenu}
+                    <button
+                      onClick={() => handleMobileNavigation(userProfile?.role === 'ADMIN' ? '/admin' : '/dashboard')}
+                      className="flex items-center space-x-3 p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors w-full text-left"
                     >
                       <BarChart3 className="w-5 h-5 text-gray-600" />
                       <span className="font-medium text-gray-900">
                         {userProfile?.role === 'ADMIN' ? 'Admin Dashboard' : 'Dashboard'}
                       </span>
                       <ArrowRight className="w-4 h-4 text-gray-400 ml-auto" />
-                    </Link>
+                    </button>
                     <button
                       onClick={() => {
                         signOut();
@@ -543,23 +553,21 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                     </button>
                   </div>
                 ) : (
-                  <div className="space-y-2">
-                    <Link
-                      href="/login"
-                      className="flex items-center justify-center space-x-2 p-3 border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                      onClick={closeMobileMenu}
+                  <div className="space-y-3">
+                    <button
+                      onClick={() => handleMobileNavigation('/login')}
+                      className="flex items-center justify-center space-x-2 p-3 border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition-colors w-full"
                     >
                       <User className="w-5 h-5 text-gray-600" />
                       <span className="font-semibold text-gray-900">Login</span>
-                    </Link>
-                    <Link
-                      href="/signup"
-                      className="flex items-center justify-center space-x-2 p-3 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-lg hover:from-teal-600 hover:to-emerald-600 transition-colors"
-                      onClick={closeMobileMenu}
+                    </button>
+                    <button
+                      onClick={() => handleMobileNavigation('/signup')}
+                      className="flex items-center justify-center space-x-2 p-3 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-lg hover:from-teal-600 hover:to-emerald-600 transition-colors w-full"
                     >
                       <span className="font-semibold">Get Started Free</span>
                       <ArrowRight className="w-5 h-5" />
-                    </Link>
+                    </button>
                   </div>
                 )}
               </div>
