@@ -499,7 +499,10 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
               <div className="mb-6">
                 <Link
                   href="/resume-customizer"
-                  onClick={closeMobileMenu}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    closeMobileMenu();
+                  }}
                   className="block w-full p-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl text-white text-left hover:from-purple-600 hover:to-pink-600 transition-colors"
                 >
                   <div className="flex items-center space-x-3">
@@ -546,7 +549,10 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                               <Link
                                 key={item.href}
                                 href={item.href}
-                                onClick={closeMobileMenu}
+                                onClick={(e) => {
+                                  e.stopPropagation(); // Prevent event bubbling
+                                  closeMobileMenu();
+                                }}
                                 className="flex items-center space-x-3 p-4 w-full text-left hover:bg-teal-50 transition-colors border-b border-gray-100 last:border-b-0"
                               >
                                 <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
@@ -585,7 +591,10 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                     </div>
                     <Link
                       href={userProfile?.role === 'ADMIN' ? '/admin' : '/dashboard'}
-                      onClick={closeMobileMenu}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        closeMobileMenu();
+                      }}
                       className="flex items-center space-x-3 p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors w-full text-left"
                     >
                       <BarChart3 className="w-5 h-5 text-gray-600" />
@@ -610,7 +619,10 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                   <div className="space-y-3">
                     <Link
                       href="/login"
-                      onClick={closeMobileMenu}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        closeMobileMenu();
+                      }}
                       className="flex items-center justify-center space-x-2 p-3 border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition-colors w-full"
                     >
                       <User className="w-5 h-5 text-gray-600" />
@@ -618,7 +630,10 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                     </Link>
                     <Link
                       href="/signup"
-                      onClick={closeMobileMenu}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        closeMobileMenu();
+                      }}
                       className="flex items-center justify-center space-x-2 p-3 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-lg hover:from-teal-600 hover:to-emerald-600 transition-colors w-full"
                     >
                       <span className="font-semibold">Get Started Free</span>
