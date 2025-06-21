@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { createPortal } from 'react-dom';
 import {
   ChevronDown,
   User,
@@ -173,7 +174,12 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
   const router = useRouter();
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -472,10 +478,23 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
         </button>
       </div>
 
-      {/* Mobile Menu - Simplified without Portal */}
-      {isMobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 z-[99999] bg-black/50">
-          <div className="fixed top-0 right-0 w-80 max-w-[90vw] h-full bg-white shadow-xl overflow-y-auto z-[99999]">
+      {/* Mobile Menu - Using Portal with Maximum Z-Index */}
+      {isMobileMenuOpen && isMounted && createPortal(
+        <div 
+          className="lg:hidden fixed inset-0 bg-black/50" 
+          style={{ zIndex: 2147483647 }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setIsMobileMenuOpen(false);
+              setActiveCategory(null);
+            }
+          }}
+        >
+          <div 
+            className="fixed top-0 right-0 w-80 max-w-[90vw] h-full bg-white shadow-xl overflow-y-auto" 
+            style={{ zIndex: 2147483647 }}
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Header */}
             <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-teal-500 to-emerald-500">
               <div className="flex items-center justify-between">
@@ -654,7 +673,8 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
     </div>
