@@ -295,7 +295,7 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
           variant="outline"
           size="sm"
           onClick={onSearchOpen}
-          className="flex items-center space-x-2 text-gray-900 hover:text-teal-600 border-gray-400 hover:border-teal-500 hover:bg-teal-50 px-3 py-2 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-white mr-4"
+          className="flex items-center space-x-2 text-gray-900 hover:text-teal-600 border-gray-400 hover:border-teal-500 hover:bg-teal-50 px-3 py-2 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-white mr-6"
           aria-label="Open search"
         >
           <Search className="w-4 h-4" />
@@ -436,7 +436,7 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
       </div>
 
       {/* Mobile Menu Buttons */}
-      <div className="lg:hidden flex items-center space-x-2">
+      <div className="lg:hidden flex items-center space-x-3">
         {/* Mobile Search Button */}
         <Button
           variant="outline"
@@ -474,8 +474,8 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
 
       {/* Mobile Menu - Simplified without Portal */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 z-[9999] bg-black/50">
-          <div className="fixed top-0 right-0 w-80 max-w-[90vw] h-full bg-white shadow-xl overflow-y-auto z-[10000]">
+        <div className="lg:hidden fixed inset-0 z-[99999] bg-black/50">
+          <div className="fixed top-0 right-0 w-80 max-w-[90vw] h-full bg-white shadow-xl overflow-y-auto z-[99999]">
             {/* Header */}
             <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-teal-500 to-emerald-500">
               <div className="flex items-center justify-between">

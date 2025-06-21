@@ -159,18 +159,16 @@ function Navigation({ isSearchOpen, setIsSearchOpen, headerVisible, lastScrollY 
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between h-16">
               {/* Logo */}
-              <div className="flex-shrink-0">
+              <div className="flex-shrink-0 mr-4">
                 <Link href="/" className="flex items-center" aria-label="Synergies4 home">
                   <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent hover:from-teal-700 hover:to-emerald-700 transition-all duration-300">
                     Synergies4
                   </span>
                 </Link>
               </div>
-              
-
 
               {/* Navigation Menu - Desktop and Mobile */}
-              <div className="flex flex-1 justify-end">
+              <div className="flex flex-1 justify-end ml-4">
                 <MegaMenu isScrolled={lastScrollY > 50} onSearchOpen={() => setIsSearchOpen(true)} />
               </div>
             </div>
