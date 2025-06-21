@@ -262,11 +262,26 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
   };
 
   const handleMobileNavigation = (href: string) => {
-    // Close menu first
-    setIsMobileMenuOpen(false);
-    setActiveCategory(null);
-    // Navigate programmatically
-    router.push(href);
+    console.log('🔥 NAVIGATION CLICKED:', href); // Debug
+    
+    try {
+      // Close menu first
+      setIsMobileMenuOpen(false);
+      setActiveCategory(null);
+      
+      console.log('🔥 Menu closed, navigating to:', href); // Debug
+      
+      // Use window.location.href for more reliable navigation
+      setTimeout(() => {
+        console.log('🔥 About to navigate with window.location.href'); // Debug
+        window.location.href = href;
+      }, 100); // Small delay to ensure menu closes first
+      
+    } catch (error) {
+      console.error('🔥 Navigation error:', error);
+      // Fallback
+      window.location.href = href;
+    }
   };
 
 
@@ -512,6 +527,7 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
               <div className="mb-6">
                 <button
                   onClick={(e) => {
+                    console.log('🔥 RESUME BUTTON CLICKED'); // Debug
                     e.preventDefault();
                     e.stopPropagation();
                     handleMobileNavigation('/resume-customizer');
@@ -562,6 +578,7 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
                               <button
                                 key={item.href}
                                 onClick={(e) => {
+                                  console.log('🔥 BUTTON CLICKED:', item.title, item.href); // Debug
                                   e.preventDefault();
                                   e.stopPropagation();
                                   handleMobileNavigation(item.href);
