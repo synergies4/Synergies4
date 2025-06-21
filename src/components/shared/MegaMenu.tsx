@@ -466,17 +466,10 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
         <div 
           className="lg:hidden fixed inset-0 bg-black/50" 
           style={{ zIndex: 2147483647 }}
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              setIsMobileMenuOpen(false);
-              setActiveCategory(null);
-            }
-          }}
         >
           <div 
             className="fixed top-0 right-0 w-80 max-w-[90vw] h-full bg-white shadow-xl overflow-y-auto" 
             style={{ zIndex: 2147483647 }}
-            onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
             <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-teal-500 to-emerald-500">
@@ -488,12 +481,15 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
                   <h2 className="text-lg font-bold text-white">Navigation</h2>
                 </div>
                 <button
-                  onClick={() => {
-                    console.log('Close button clicked'); // Debug log
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('🔥 CLOSE BUTTON CLICKED');
                     setIsMobileMenuOpen(false);
                     setActiveCategory(null);
                   }}
                   className="p-2 rounded-lg bg-white/20 hover:bg-white/30 transition-colors"
+                  type="button"
                 >
                   <X className="w-5 h-5 text-white" />
                 </button>
@@ -505,11 +501,15 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
               {/* Featured Resume Customizer */}
               <div className="mb-6">
                 <button
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     console.log('🔥 RESUME BUTTON CLICKED');
+                    console.log('🔥 About to navigate to resume customizer...');
                     window.location.href = '/resume-customizer';
                   }}
                   className="block w-full p-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl text-white text-left hover:from-purple-600 hover:to-pink-600 transition-colors cursor-pointer"
+                  type="button"
                 >
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
@@ -535,8 +535,14 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
                   return (
                     <div key={category.id} className="border border-gray-200 rounded-lg overflow-hidden">
                       <button
-                        onClick={() => toggleMobileCategory(category.id)}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          console.log('🔥 CATEGORY TOGGLE CLICKED:', category.title);
+                          toggleMobileCategory(category.id);
+                        }}
                         className="flex items-center justify-between w-full p-4 bg-gray-50 hover:bg-gray-100 transition-colors text-left"
+                        type="button"
                       >
                         <div className="flex items-center space-x-3">
                           <div className="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center">
@@ -554,11 +560,15 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
                             return (
                               <button
                                 key={item.href}
-                                onClick={() => {
-                                  console.log('🔥 BUTTON CLICKED:', item.title, item.href);
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  console.log('🔥 MENU ITEM CLICKED:', item.title, item.href);
+                                  console.log('🔥 About to navigate...');
                                   window.location.href = item.href;
                                 }}
                                 className="flex items-center space-x-3 p-4 w-full text-left hover:bg-teal-50 transition-colors border-b border-gray-100 last:border-b-0 cursor-pointer"
+                                type="button"
                               >
                                 <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
                                   <ItemIcon className="w-4 h-4 text-gray-600" />
@@ -595,11 +605,16 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
                       <p className="text-sm text-blue-700">{userProfile?.name || 'User'}</p>
                     </div>
                     <button
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
                         console.log('🔥 DASHBOARD BUTTON CLICKED');
-                        window.location.href = userProfile?.role === 'ADMIN' ? '/admin' : '/dashboard';
+                        const url = userProfile?.role === 'ADMIN' ? '/admin' : '/dashboard';
+                        console.log('🔥 About to navigate to:', url);
+                        window.location.href = url;
                       }}
                       className="flex items-center space-x-3 p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors w-full text-left cursor-pointer"
+                      type="button"
                     >
                       <BarChart3 className="w-5 h-5 text-gray-600" />
                       <span className="font-medium text-gray-900">
@@ -622,21 +637,29 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
                 ) : (
                   <div className="space-y-3">
                     <button
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
                         console.log('🔥 LOGIN BUTTON CLICKED');
+                        console.log('🔥 About to navigate to login...');
                         window.location.href = '/login';
                       }}
                       className="flex items-center justify-center space-x-2 p-3 border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition-colors w-full cursor-pointer"
+                      type="button"
                     >
                       <User className="w-5 h-5 text-gray-600" />
                       <span className="font-semibold text-gray-900">Login</span>
                     </button>
                     <button
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
                         console.log('🔥 SIGNUP BUTTON CLICKED');
+                        console.log('🔥 About to navigate to signup...');
                         window.location.href = '/signup';
                       }}
                       className="flex items-center justify-center space-x-2 p-3 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-lg hover:from-teal-600 hover:to-emerald-600 transition-colors w-full cursor-pointer"
+                      type="button"
                     >
                       <span className="font-semibold">Get Started Free</span>
                       <ArrowRight className="w-5 h-5" />
