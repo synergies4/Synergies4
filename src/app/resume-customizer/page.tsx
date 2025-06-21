@@ -297,19 +297,29 @@ There was an issue processing your file, but don't worry - we can still help!
     }
 
     setExtractingJob(true);
+    
+    // Show immediate feedback
+    toast.info('Extracting job information from URL...');
+    
     try {
+      console.log('🔗 Starting job URL extraction:', jobUrl);
+      
       const response = await fetch('/api/resume-customizer/extract-job-url', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ job_url: jobUrl })
       });
 
+      console.log('📡 API Response status:', response.status);
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to extract job information');
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('❌ API Error:', errorData);
+        throw new Error(errorData.error || `Server error (${response.status})`);
       }
 
       const data = await response.json();
+      console.log('✅ Extraction result:', data);
       
       if (data.success && data.job_info) {
         const jobInfo = data.job_info;
@@ -322,18 +332,34 @@ There was an issue processing your file, but don't worry - we can still help!
         });
 
         if (jobInfo.extraction_status === 'success') {
-          toast.success('Job information extracted successfully!');
+          toast.success('✅ Job information extracted successfully!');
         } else if (jobInfo.extraction_status === 'partial') {
-          toast.success('Job information partially extracted. Please review and complete the details.');
+          toast.success('⚠️ Job information partially extracted. Please review and complete the details.');
         } else {
-          toast.error('Could not extract job information. Please enter details manually.');
+          toast.error('❌ Could not extract job information. Please enter details manually.');
         }
       } else {
-        throw new Error('Invalid response format');
+        throw new Error('Invalid response format from server');
       }
     } catch (error) {
-      console.error('Error extracting job from URL:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to extract job information');
+      console.error('💥 Extraction error:', error);
+      
+      // Provide more helpful error messages
+      let errorMessage = 'Failed to extract job information. ';
+      
+      if (error instanceof Error) {
+        if (error.message.includes('Unauthorized')) {
+          errorMessage += 'Please try refreshing the page and try again.';
+        } else if (error.message.includes('fetch')) {
+          errorMessage += 'Please check your internet connection and try again.';
+        } else {
+          errorMessage += error.message;
+        }
+      } else {
+        errorMessage += 'Please enter the job details manually.';
+      }
+      
+      toast.error(errorMessage);
     } finally {
       setExtractingJob(false);
     }
@@ -1353,12 +1379,12 @@ Sincerely,
                 )}
 
                 {/* Manual Text Input Option */}
-                <div className="mt-8 border-t border-gray-200 pt-8">
-                  <div className="text-center mb-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <div className="mt-6 sm:mt-8 border-t border-gray-200 pt-6 sm:pt-8">
+                  <div className="text-center mb-4 sm:mb-6">
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
                       Or paste your resume text directly
                     </h3>
-                    <p className="text-gray-600">
+                    <p className="text-sm sm:text-base text-gray-600">
                       If file upload doesn't work or you prefer to paste your content manually
                     </p>
                   </div>
@@ -1380,8 +1406,8 @@ Sincerely,
                         }
                       }}
                       placeholder="Paste your resume content here... Include your name, contact information, work experience, education, skills, and achievements."
-                      rows={12}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200 resize-none"
+                      rows={8}
+                      className="w-full px-3 sm:px-4 py-3 text-sm sm:text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200 resize-none min-h-[120px] sm:min-h-[200px]"
                     />
                     
                     {resumeText && resumeText.length > 50 && !uploadedFile && (
@@ -1418,8 +1444,9 @@ Sincerely,
               </div>
               
               {/* Mobile Instructions */}
-              <div className="lg:hidden text-center">
-                <p className="text-base text-gray-600 mb-6">
+              <div className="lg:hidden text-center mb-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-3">Job Description</h2>
+                <p className="text-sm text-gray-600 px-2">
                   Enter the job details or paste a URL. Our AI will analyze how well your resume matches the requirements.
                 </p>
               </div>
@@ -1427,56 +1454,58 @@ Sincerely,
               <div className="max-w-4xl mx-auto space-y-6">
                 {/* Input Method Toggle */}
                 <div className="flex justify-center">
-                  <div className="bg-gray-100 p-1 rounded-lg flex space-x-1">
+                  <div className="bg-gray-100 p-1 rounded-lg flex space-x-1 w-full max-w-xs sm:w-auto">
                     <button
                       onClick={() => setJobInputMethod('manual')}
-                      className={`px-4 py-2 rounded-md transition-all duration-200 flex items-center space-x-2 ${
+                      className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-md transition-all duration-200 flex items-center justify-center space-x-2 text-sm sm:text-base ${
                         jobInputMethod === 'manual'
                           ? 'bg-white text-blue-600 shadow-sm font-medium'
                           : 'text-gray-600 hover:text-gray-800'
                       }`}
                     >
                       <FileText className="w-4 h-4" />
-                      <span>Manual Entry</span>
+                      <span className="hidden sm:inline">Manual Entry</span>
+                      <span className="sm:hidden">Manual</span>
                     </button>
                     <button
                       onClick={() => setJobInputMethod('url')}
-                      className={`px-4 py-2 rounded-md transition-all duration-200 flex items-center space-x-2 ${
+                      className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-md transition-all duration-200 flex items-center justify-center space-x-2 text-sm sm:text-base ${
                         jobInputMethod === 'url'
                           ? 'bg-white text-blue-600 shadow-sm font-medium'
                           : 'text-gray-600 hover:text-gray-800'
                       }`}
                     >
                       <Link className="w-4 h-4" />
-                      <span>Job URL</span>
+                      <span className="hidden sm:inline">Job URL</span>
+                      <span className="sm:hidden">URL</span>
                     </button>
                   </div>
                 </div>
 
                 {jobInputMethod === 'url' && (
                   <div className="space-y-4">
-                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-6">
+                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-4 sm:p-6">
                       <div className="flex items-center space-x-3 mb-4">
-                        <Globe className="w-6 h-6 text-blue-600" />
-                        <h3 className="text-lg font-semibold text-blue-900">Extract Job from URL</h3>
+                        <Globe className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+                        <h3 className="text-base sm:text-lg font-semibold text-blue-900">Extract Job from URL</h3>
                       </div>
-                      <p className="text-blue-700 mb-4">
+                      <p className="text-sm sm:text-base text-blue-700 mb-4">
                         Paste a job posting URL from sites like LinkedIn, Indeed, Glassdoor, or company career pages. 
                         Our AI will automatically extract the job title, company name, and description.
                       </p>
                       
-                      <div className="flex space-x-3">
+                      <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
                         <input
                           type="url"
                           value={jobUrl}
                           onChange={(e) => setJobUrl(e.target.value)}
-                          placeholder="https://www.linkedin.com/jobs/view/..."
-                          className="flex-1 px-4 py-3 border border-blue-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                          placeholder="https://careers.company.com/..."
+                          className="flex-1 px-3 py-3 text-sm sm:text-base border border-blue-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 min-w-0"
                         />
                         <button
                           onClick={extractJobFromUrl}
                           disabled={extractingJob || !jobUrl.trim()}
-                          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center space-x-2"
+                          className="w-full sm:w-auto px-4 sm:px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center space-x-2 text-sm sm:text-base font-medium"
                         >
                           {extractingJob ? (
                             <>
@@ -1486,7 +1515,8 @@ Sincerely,
                           ) : (
                             <>
                               <Search className="w-4 h-4" />
-                              <span>Extract</span>
+                              <span className="hidden sm:inline">Extract</span>
+                              <span className="sm:hidden">Extract Job</span>
                             </>
                           )}
                         </button>
@@ -1496,16 +1526,16 @@ Sincerely,
                 )}
 
                 {/* Job Details Form - Always shown, populated by URL extraction or manual entry */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                   <div className="form-floating">
                     <input
                       type="text"
                       value={jobData.job_title}
                       onChange={(e) => setJobData(prev => ({ ...prev, job_title: e.target.value }))}
                       placeholder=" "
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200 peer"
+                      className="w-full px-3 sm:px-4 py-3 text-sm sm:text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200 peer"
                     />
-                    <label className="text-gray-500">Job Title</label>
+                    <label className="text-gray-500 text-sm sm:text-base">Job Title</label>
                   </div>
                   
                   <div className="form-floating">
@@ -1514,9 +1544,9 @@ Sincerely,
                       value={jobData.company_name}
                       onChange={(e) => setJobData(prev => ({ ...prev, company_name: e.target.value }))}
                       placeholder=" "
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200 peer"
+                      className="w-full px-3 sm:px-4 py-3 text-sm sm:text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200 peer"
                     />
-                    <label className="text-gray-500">Company Name</label>
+                    <label className="text-gray-500 text-sm sm:text-base">Company Name</label>
                   </div>
                 </div>
 
@@ -1525,10 +1555,10 @@ Sincerely,
                     value={jobData.job_description}
                     onChange={(e) => setJobData(prev => ({ ...prev, job_description: e.target.value }))}
                     placeholder=" "
-                    rows={12}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200 peer resize-none"
+                    rows={8}
+                    className="w-full px-3 sm:px-4 py-3 text-sm sm:text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200 peer resize-none min-h-[120px] sm:min-h-[200px]"
                   />
-                  <label className="text-gray-500">Job Description</label>
+                  <label className="text-gray-500 text-sm sm:text-base">Job Description</label>
                 </div>
 
                 <div className="flex items-center space-x-4 p-4 bg-blue-50 rounded-xl border border-blue-200">

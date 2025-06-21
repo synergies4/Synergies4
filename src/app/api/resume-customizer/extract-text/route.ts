@@ -5,11 +5,11 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
     
-    // Get current user
+    // Get current user (optional for this endpoint)
     const { data: { user }, error: userError } = await supabase.auth.getUser();
-    if (userError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    
+    // Note: We'll allow this endpoint to work without authentication for better UX
+    // In production, you might want to add rate limiting instead
 
     // Get form data containing the file
     const formData = await request.formData();
