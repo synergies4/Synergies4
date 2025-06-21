@@ -70,7 +70,8 @@ export default function ResumeCustomizer() {
     { id: 'analysis', title: 'Fit Analysis', description: 'See your match score', icon: Target },
     { id: 'customize', title: 'Customize Resume', description: 'AI-tailored version', icon: Brain },
     { id: 'cover-letter', title: 'Cover Letter', description: 'Personalized letter', icon: MessageCircle },
-    { id: 'interview', title: 'Interview Prep', description: 'Practice questions', icon: Video }
+    { id: 'interview', title: 'Interview Prep', description: 'Practice questions', icon: Video },
+    { id: 'download', title: 'Download & Export', description: 'Get your documents', icon: Download }
   ];
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -213,14 +214,18 @@ The AI analysis can still work with this file, but for better display, please us
         return coverLetter; // Cover letter generated
       case 6:
         return interviewQuestions.length > 0; // Interview questions generated
+      case 7:
+        return true; // Final step - always can proceed (it's the end)
       default:
         return false;
     }
   };
 
   const nextStep = () => {
-    if (canProceed()) {
-      setCurrentStep(prev => Math.min(6, prev + 1));
+    if (canProceed() && currentStep < steps.length) {
+      setCurrentStep(currentStep + 1);
+      // Scroll to top when moving to next step
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -423,9 +428,15 @@ The AI analysis can still work with this file, but for better display, please us
 
       if (response.ok) {
         const result = await response.json();
-        setTailoredResume(result.tailored_resume || result.content);
-        if (apiStatus !== 'fallback') setApiStatus('working');
-        toast.success('AI resume customization completed!');
+        console.log('🔥 Resume API Response:', result);
+        
+        if (result.success && (result.tailored_resume || result.content)) {
+          setTailoredResume(result.tailored_resume || result.content);
+          if (apiStatus !== 'fallback') setApiStatus('working');
+          toast.success('AI resume customization completed!');
+        } else {
+          throw new Error('Invalid response format or empty content');
+        }
       } else {
         // Fallback if API fails
         const fallbackResume = generateFallbackTailoredResume();
@@ -500,9 +511,15 @@ The AI analysis can still work with this file, but for better display, please us
 
       if (response.ok) {
         const result = await response.json();
-        setCoverLetter(result.cover_letter || result.content);
-        if (apiStatus !== 'fallback') setApiStatus('working');
-        toast.success('AI cover letter generated successfully!');
+        console.log('🔥 Cover Letter API Response:', result);
+        
+        if (result.success && (result.cover_letter || result.content)) {
+          setCoverLetter(result.cover_letter || result.content);
+          if (apiStatus !== 'fallback') setApiStatus('working');
+          toast.success('AI cover letter generated successfully!');
+        } else {
+          throw new Error('Invalid response format or empty content');
+        }
       } else {
         // Fallback if API fails
         const fallbackCoverLetter = generateFallbackCoverLetter();
@@ -741,8 +758,10 @@ Sincerely,
   };
 
   const prevStep = () => {
-    if (currentStep > 0) {
+    if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
+      // Scroll to top when moving to previous step
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -752,7 +771,7 @@ Sincerely,
       {/* Mobile-Optimized Header */}
       <div className="bg-white/95 backdrop-blur-xl border-b border-white/20 sticky top-0 z-20 shadow-lg">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-14 sm:h-16">
+          <div className="flex items-center justify-between h-16 sm:h-18">
             <div className="flex items-center space-x-2 sm:space-x-4 min-w-0 flex-1">
               <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
                 <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
@@ -779,7 +798,7 @@ Sincerely,
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-8">
         {/* Enhanced Mobile-First Progress */}
         <div className="mb-6 sm:mb-8 lg:mb-12">
           <div className="flex flex-col space-y-4 sm:space-y-6">
@@ -1515,10 +1534,261 @@ Sincerely,
             </div>
           )}
 
+          {currentStep === 7 && (
+            <div className="space-y-8">
+              <div className="text-center hidden lg:block">
+                <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                  <Download className="w-8 h-8 text-white" />
+                </div>
+                <h2 className="text-responsive-3xl font-bold text-gray-900 mb-4">
+                  Download & Export
+                </h2>
+                <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                  Your customized job application materials are ready! Download and export your documents.
+                </p>
+              </div>
+              
+              {/* Mobile Instructions */}
+              <div className="lg:hidden text-center">
+                <p className="text-base text-gray-600 mb-6">
+                  Your job application materials are ready! Download your customized documents below.
+                </p>
+              </div>
+
+              <div className="max-w-4xl mx-auto space-y-8">
+                {/* Summary Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Resume Card */}
+                  {tailoredResume && (
+                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-2xl p-6 text-center">
+                      <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                        <FileText className="w-6 h-6 text-white" />
+                      </div>
+                      <h3 className="text-lg font-bold text-green-900 mb-2">Tailored Resume</h3>
+                      <p className="text-sm text-green-700 mb-4">Optimized for {jobData.company_name}</p>
+                      <div className="flex items-center justify-center text-xs text-green-600 mb-3">
+                        <CheckCircle className="w-4 h-4 mr-1" />
+                        <span>Ready to download</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Cover Letter Card */}
+                  {coverLetter && (
+                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-6 text-center">
+                      <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                        <MessageCircle className="w-6 h-6 text-white" />
+                      </div>
+                      <h3 className="text-lg font-bold text-blue-900 mb-2">Cover Letter</h3>
+                      <p className="text-sm text-blue-700 mb-4">Personalized for {jobData.job_title}</p>
+                      <div className="flex items-center justify-center text-xs text-blue-600 mb-3">
+                        <CheckCircle className="w-4 h-4 mr-1" />
+                        <span>Ready to download</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Interview Prep Card */}
+                  {interviewQuestions.length > 0 && (
+                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-2xl p-6 text-center">
+                      <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                        <Video className="w-6 h-6 text-white" />
+                      </div>
+                      <h3 className="text-lg font-bold text-purple-900 mb-2">Interview Prep</h3>
+                      <p className="text-sm text-purple-700 mb-4">{interviewQuestions.length} practice questions</p>
+                      <div className="flex items-center justify-center text-xs text-purple-600 mb-3">
+                        <CheckCircle className="w-4 h-4 mr-1" />
+                        <span>Ready to export</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Download Options */}
+                <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-lg">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">Download Your Documents</h3>
+                  
+                  <div className="space-y-6">
+                    {/* Individual Downloads */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {tailoredResume && (
+                        <div className="space-y-3">
+                          <h4 className="font-semibold text-gray-900 flex items-center">
+                            <FileText className="w-4 h-4 mr-2 text-green-600" />
+                            Tailored Resume
+                          </h4>
+                          <div className="space-y-2">
+                            <button
+                              onClick={() => {
+                                const blob = new Blob([tailoredResume], { type: 'text/plain' });
+                                const url = URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.download = `${jobData.company_name}_Resume.txt`;
+                                a.click();
+                                URL.revokeObjectURL(url);
+                                toast.success('Resume downloaded!');
+                              }}
+                              className="w-full px-4 py-2 bg-green-100 hover:bg-green-200 text-green-800 rounded-lg transition-colors duration-200 text-sm font-medium"
+                            >
+                              Download as TXT
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {coverLetter && (
+                        <div className="space-y-3">
+                          <h4 className="font-semibold text-gray-900 flex items-center">
+                            <MessageCircle className="w-4 h-4 mr-2 text-blue-600" />
+                            Cover Letter
+                          </h4>
+                          <div className="space-y-2">
+                            <button
+                              onClick={() => {
+                                const blob = new Blob([coverLetter], { type: 'text/plain' });
+                                const url = URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.download = `${jobData.company_name}_CoverLetter.txt`;
+                                a.click();
+                                URL.revokeObjectURL(url);
+                                toast.success('Cover letter downloaded!');
+                              }}
+                              className="w-full px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-lg transition-colors duration-200 text-sm font-medium"
+                            >
+                              Download as TXT
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {interviewQuestions.length > 0 && (
+                        <div className="space-y-3">
+                          <h4 className="font-semibold text-gray-900 flex items-center">
+                            <Video className="w-4 h-4 mr-2 text-purple-600" />
+                            Interview Questions
+                          </h4>
+                          <div className="space-y-2">
+                            <button
+                              onClick={() => {
+                                const content = interviewQuestions.map((q: any, i: number) => 
+                                  `Question ${i + 1}: ${q.question}\n\nTips: ${q.tips || 'No tips provided'}\n\nSuggested Approach: ${q.suggested_answer || 'No suggestions provided'}\n\n---\n\n`
+                                ).join('');
+                                const blob = new Blob([`Interview Preparation for ${jobData.job_title} at ${jobData.company_name}\n\n${content}`], { type: 'text/plain' });
+                                const url = URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.download = `${jobData.company_name}_InterviewQuestions.txt`;
+                                a.click();
+                                URL.revokeObjectURL(url);
+                                toast.success('Interview questions downloaded!');
+                              }}
+                              className="w-full px-4 py-2 bg-purple-100 hover:bg-purple-200 text-purple-800 rounded-lg transition-colors duration-200 text-sm font-medium"
+                            >
+                              Download as TXT
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Complete Package Download */}
+                    <div className="border-t border-gray-200 pt-6">
+                      <div className="text-center">
+                        <h4 className="text-lg font-bold text-gray-900 mb-4">Complete Application Package</h4>
+                        <button
+                          onClick={() => {
+                            const packageContent = `JOB APPLICATION PACKAGE
+${jobData.job_title} at ${jobData.company_name}
+Generated on ${new Date().toLocaleDateString()}
+
+========================================
+TAILORED RESUME
+========================================
+
+${tailoredResume || 'Resume not generated'}
+
+========================================
+COVER LETTER
+========================================
+
+${coverLetter || 'Cover letter not generated'}
+
+========================================
+INTERVIEW PREPARATION
+========================================
+
+${interviewQuestions.length > 0 ? interviewQuestions.map((q: any, i: number) => 
+  `Question ${i + 1}: ${q.question}\n\nTips: ${q.tips || 'No tips provided'}\n\nSuggested Approach: ${q.suggested_answer || 'No suggestions provided'}\n\n---\n\n`
+).join('') : 'Interview questions not generated'}
+
+========================================
+JOB FIT ANALYSIS
+========================================
+
+Overall Fit Score: ${analysisData?.fit_score || 'Not analyzed'}%
+
+Key Strengths:
+${analysisData?.strengths?.map((s: string) => `• ${s}`).join('\n') || 'No analysis available'}
+
+Areas for Improvement:
+${analysisData?.improvements?.map((i: string) => `• ${i}`).join('\n') || 'No analysis available'}
+
+Important Keywords:
+${analysisData?.missing_keywords?.join(', ') || 'No keywords identified'}
+`;
+                            const blob = new Blob([packageContent], { type: 'text/plain' });
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = `${jobData.company_name}_Complete_Application_Package.txt`;
+                            a.click();
+                            URL.revokeObjectURL(url);
+                            toast.success('Complete package downloaded!');
+                          }}
+                          className="px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl font-semibold text-lg transform hover:scale-[1.02] active:scale-[0.98]"
+                        >
+                          <Download className="w-5 h-5 inline mr-2" />
+                          Download Complete Package
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Final Success Message */}
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-6 text-center shadow-lg">
+                  <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl">
+                    <CheckCircle className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-green-900 mb-2">Application Materials Complete!</h3>
+                  <p className="text-green-800 mb-4">
+                    You now have everything you need to apply for the {jobData.job_title} position at {jobData.company_name}.
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+                    <div className="flex items-center justify-center text-green-700">
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      <span>Resume optimized</span>
+                    </div>
+                    <div className="flex items-center justify-center text-green-700">
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      <span>Cover letter personalized</span>
+                    </div>
+                    <div className="flex items-center justify-center text-green-700">
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      <span>Interview prep ready</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Enhanced Mobile-First Navigation */}
           <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center pt-6 sm:pt-8 mt-6 sm:mt-8 border-t border-gray-200/60 space-y-4 lg:space-y-0">
             <button
-              onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
+              onClick={prevStep}
               disabled={currentStep === 1}
               className="flex items-center justify-center space-x-3 px-6 py-4 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-2xl transition-all duration-200 w-full sm:w-auto border border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-md font-medium text-gray-700 hover:text-gray-900"
             >
@@ -1576,19 +1846,34 @@ Sincerely,
                 </button>
               )}
               {currentStep === 6 && interviewQuestions.length > 0 && (
-                <div className="w-full lg:max-w-md bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-4 sm:p-6 shadow-lg animate-in slide-in-from-bottom-4 duration-500">
-                  <div className="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0">
-                      <CheckCircle className="w-7 h-7 text-white" />
-                    </div>
-                    <div className="flex-1 text-center sm:text-left">
-                      <h4 className="text-green-900 font-bold text-lg mb-1">Congratulations!</h4>
-                      <p className="text-green-800 font-medium text-sm leading-relaxed">
-                        You've completed all steps of the resume customization process.
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                <button
+                  onClick={nextStep}
+                  className="flex items-center justify-center space-x-3 px-8 py-4 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white rounded-2xl transition-all duration-300 shadow-lg hover:shadow-2xl w-full sm:max-w-xs font-semibold text-lg transform hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  <span>Download & Export</span>
+                  <Download className="w-5 h-5" />
+                </button>
+              )}
+              {currentStep === 7 && (
+                <button
+                  onClick={() => {
+                    // Reset to step 1 for new application
+                    setCurrentStep(1);
+                    setUploadedFile(null);
+                    setResumeText('');
+                    setJobData({ job_title: '', company_name: '', job_description: '' });
+                    setAnalysisData(null);
+                    setTailoredResume('');
+                    setCoverLetter('');
+                    setInterviewQuestions([]);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    toast.success('Ready for new application!');
+                  }}
+                  className="flex items-center justify-center space-x-3 px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-2xl transition-all duration-300 shadow-lg hover:shadow-2xl w-full sm:max-w-xs font-semibold text-lg transform hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  <span>Start New Application</span>
+                  <Sparkles className="w-5 h-5" />
+                </button>
               )}
             </div>
           </div>
