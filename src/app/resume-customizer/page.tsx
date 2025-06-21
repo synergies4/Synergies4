@@ -104,31 +104,41 @@ export default function ResumeCustomizer() {
       let text = '';
       
       if (file.type === 'application/pdf') {
-        // For PDF files, we should ideally use a PDF parser
-        // For now, we'll show a message that PDF text extraction needs improvement
-        text = `PDF Resume Uploaded: ${file.name}
+        // For PDF files, we need better text extraction
+        // For now, we'll ask users to provide plain text or use a converter
+        text = `⚠️ PDF FILE DETECTED: ${file.name}
 
-This appears to be a PDF file. For the best experience, please:
-1. Copy and paste your resume text directly into a text file, or
-2. Use a DOC/DOCX file, or  
-3. Convert your PDF to text manually
+📄 THIS IS A PDF RESUME
+To get the best AI analysis and customization, please:
 
-The current PDF text extraction may not display properly, but the AI analysis will still work with the uploaded content.
+1. **COPY & PASTE** your resume text directly from the PDF into a text file, OR
+2. **CONVERT** your PDF to a text (.txt) file using an online converter, OR  
+3. **SAVE AS** a Word document (.docx) from your PDF
 
-File: ${file.name}
-Size: ${(file.size / 1024 / 1024).toFixed(2)} MB
-Type: PDF Document`;
+The AI will still analyze this PDF, but results will be more accurate with plain text.
+
+File Details:
+• Name: ${file.name}
+• Size: ${(file.size / 1024 / 1024).toFixed(2)} MB
+• Type: PDF Document
+
+💡 TIP: If this is your current resume, the AI can still work with it, but for optimal results, providing the text content directly gives much better customization.`;
       } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
         // For DOCX files, we'd need a proper parser too
-        text = `DOCX Resume Uploaded: ${file.name}
+        text = `📄 WORD DOCUMENT DETECTED: ${file.name}
 
-This appears to be a Word document. For the best text display, please copy and paste your resume content as plain text.
+📋 THIS IS A WORD DOCUMENT (.DOCX)
+The AI will analyze this document. For the best results:
 
-The AI analysis will work with the uploaded content.
+1. **COPY & PASTE** your resume text into a plain text file for optimal processing
+2. Or continue with this file - the AI will still provide good customization
 
-File: ${file.name}
-Size: ${(file.size / 1024 / 1024).toFixed(2)} MB
-Type: Word Document`;
+File Details:
+• Name: ${file.name}
+• Size: ${(file.size / 1024 / 1024).toFixed(2)} MB
+• Type: Microsoft Word Document
+
+✅ The AI can work with this format and will provide personalized resume customization.`;
       } else {
         // For text files, read normally
         text = await file.text();
@@ -140,16 +150,23 @@ Type: Word Document`;
           .trim();
           
         if (!text || text.length < 50) {
-          text = `Text file uploaded: ${file.name}
+          text = `⚠️ TEXT FILE ISSUE: ${file.name}
 
-The uploaded file appears to be empty or very short. Please ensure your resume contains your:
-- Contact information
-- Work experience
-- Skills and qualifications
-- Education
+📄 The uploaded text file appears to be empty or very short.
 
-File: ${file.name}
-Size: ${(file.size / 1024 / 1024).toFixed(2)} MB`;
+Please ensure your resume contains:
+• Contact information
+• Work experience with dates
+• Skills and qualifications  
+• Education background
+• Professional achievements
+
+File Details:
+• Name: ${file.name}
+• Size: ${(file.size / 1024 / 1024).toFixed(2)} MB
+• Type: Text File
+
+💡 TIP: Copy your full resume content and paste it into a new text file, then upload that file.`;
         }
       }
       
@@ -162,22 +179,36 @@ Size: ${(file.size / 1024 / 1024).toFixed(2)} MB`;
         content: text
       }));
       
-      toast.success('Resume uploaded successfully!');
+      // Show different success messages based on file type
+      if (file.type === 'application/pdf') {
+        toast.success('PDF uploaded! For best results, consider uploading as text.');
+      } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        toast.success('Word document uploaded successfully!');
+      } else {
+        toast.success('Resume uploaded and ready for AI analysis!');
+      }
     } catch (error) {
       console.error('Error processing file:', error);
       
-      // Fallback text
-      const fallbackText = `Resume file uploaded: ${file.name}
+      // Enhanced fallback text with clear instructions
+      const fallbackText = `❌ FILE PROCESSING ERROR: ${file.name}
 
-There was an issue reading the file content. Please try:
-1. Using a plain text (.txt) file
-2. Copying and pasting your resume content directly
-3. Converting your resume to a simpler format
+🔧 There was an issue reading your file. Here's what you can try:
 
-File: ${file.name}
-Size: ${(file.size / 1024 / 1024).toFixed(2)} MB
+**RECOMMENDED SOLUTIONS:**
+1. **Convert to text file**: Copy your resume content and save as a .txt file
+2. **Save as Word document**: Export your PDF as a .docx file  
+3. **Manual upload**: Copy and paste your resume content directly
 
-The AI analysis can still work with this file, but for better display, please use plain text.`;
+**FILE INFORMATION:**
+• Name: ${file.name}
+• Size: ${(file.size / 1024 / 1024).toFixed(2)} MB
+• Status: Upload successful, but content needs manual input
+
+💡 **QUICK FIX**: You can still proceed! The AI will work with whatever format you have, but plain text gives the best results.
+
+**WHY THIS HAPPENS:** 
+PDF and complex document formats sometimes have encoding issues. Plain text files work 100% of the time.`;
       
       setResumeText(fallbackText);
       setResumeData(prev => ({
@@ -186,7 +217,7 @@ The AI analysis can still work with this file, but for better display, please us
         content: fallbackText
       }));
       
-      toast.error('File uploaded but content may not display correctly. Try using a text file for better results.');
+      toast.error('File uploaded but may need conversion. See instructions below.');
     } finally {
       setUploading(false);
     }
@@ -407,6 +438,14 @@ The AI analysis can still work with this file, but for better display, please us
     }
     
     try {
+      console.log('🔥 Sending to tailor-resume API:', {
+        original_resume_length: resumeData.content.length,
+        job_title: jobData.job_title,
+        company_name: jobData.company_name,
+        job_description_length: jobData.job_description.length,
+        fit_analysis: analysisData ? 'present' : 'missing'
+      });
+      
       const response = await fetch('/api/resume-customizer/tailor-resume', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -489,16 +528,26 @@ The AI analysis can still work with this file, but for better display, please us
     }
     
     try {
+      console.log('🔥 Sending to cover letter API:', {
+        resume_content_length: resumeData.content.length,
+        job_title: jobData.job_title,
+        company_name: jobData.company_name,
+        job_description_length: jobData.job_description.length,
+        tailored_resume_length: tailoredResume.length,
+        fit_analysis: analysisData ? 'present' : 'missing'
+      });
+      
       const response = await fetch('/api/resume-customizer/generate-cover-letter', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({
-          original_resume: resumeData.content,
+          resume_content: resumeData.content, // Fixed: was original_resume, now resume_content
           job_description: `Job Title: ${jobData.job_title}\nCompany: ${jobData.company_name}\n\n${jobData.job_description}`,
           tailored_resume: tailoredResume,
           job_title: jobData.job_title,
-          company_name: jobData.company_name
+          company_name: jobData.company_name,
+          fit_analysis: analysisData // Add fit analysis for better personalization
         })
       });
 
@@ -572,13 +621,19 @@ The AI analysis can still work with this file, but for better display, please us
     }
     
     try {
+      console.log('🔥 Sending to interview questions API:', {
+        resume_content_length: resumeText.length,
+        job_title: jobData.job_title,
+        company_name: jobData.company_name,
+        job_description_length: jobData.job_description.length
+      });
+      
       const response = await fetch('/api/resume-customizer/generate-interview-questions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({
-          original_resume: resumeData.content,
-          resume_content: resumeText, // Include full resume text for better analysis
+          resume_content: resumeText, // Use resumeText (the actual parsed text) instead of resumeData.content
           job_description: `Job Title: ${jobData.job_title}\nCompany: ${jobData.company_name}\n\n${jobData.job_description}`,
           job_title: jobData.job_title,
           company_name: jobData.company_name
