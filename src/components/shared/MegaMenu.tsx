@@ -175,6 +175,7 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -275,10 +276,32 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
 
 
 
-  // Simplified mobile category toggle
+  // Simplified mobile category toggle with navigation check
   const toggleMobileCategory = (categoryId: string) => {
+    if (isNavigating) {
+      console.log('Navigation in progress, ignoring toggle'); // Debug log
+      return;
+    }
     console.log('Toggling category:', categoryId); // Debug log
     setActiveCategory(activeCategory === categoryId ? null : categoryId);
+  };
+
+  // Direct navigation function
+  const navigateAndClose = (href: string) => {
+    console.log('=== NAVIGATION START ===');
+    console.log('Navigating to:', href);
+    setIsNavigating(true);
+    
+    // Use direct window navigation for reliability
+    setTimeout(() => {
+      window.location.href = href;
+    }, 50);
+    
+    // Close menu after short delay
+    setTimeout(() => {
+      closeMobileMenu();
+      setIsNavigating(false);
+    }, 100);
   };
 
   return (
@@ -501,9 +524,7 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log('Navigating to: /resume-customizer');
-                    router.push('/resume-customizer');
-                    setTimeout(() => closeMobileMenu(), 150);
+                    navigateAndClose('/resume-customizer');
                   }}
                   className="block w-full p-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl text-white text-left hover:from-purple-600 hover:to-pink-600 transition-colors cursor-pointer"
                 >
@@ -553,9 +574,7 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                                 onClick={(e) => {
                                   e.preventDefault();
                                   e.stopPropagation();
-                                  console.log('Navigating to:', item.href);
-                                  router.push(item.href);
-                                  setTimeout(() => closeMobileMenu(), 150);
+                                  navigateAndClose(item.href);
                                 }}
                                 className="flex items-center space-x-3 p-4 w-full text-left hover:bg-teal-50 transition-colors border-b border-gray-100 last:border-b-0 cursor-pointer"
                               >
@@ -598,9 +617,7 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                         e.preventDefault();
                         e.stopPropagation();
                         const href = userProfile?.role === 'ADMIN' ? '/admin' : '/dashboard';
-                        console.log('Navigating to:', href);
-                        router.push(href);
-                        setTimeout(() => closeMobileMenu(), 150);
+                        navigateAndClose(href);
                       }}
                       className="flex items-center space-x-3 p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors w-full text-left cursor-pointer"
                     >
@@ -628,9 +645,7 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        console.log('Navigating to: /login');
-                        router.push('/login');
-                        setTimeout(() => closeMobileMenu(), 150);
+                        navigateAndClose('/login');
                       }}
                       className="flex items-center justify-center space-x-2 p-3 border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition-colors w-full cursor-pointer"
                     >
@@ -641,9 +656,7 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        console.log('Navigating to: /signup');
-                        router.push('/signup');
-                        setTimeout(() => closeMobileMenu(), 150);
+                        navigateAndClose('/signup');
                       }}
                       className="flex items-center justify-center space-x-2 p-3 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-lg hover:from-teal-600 hover:to-emerald-600 transition-colors w-full cursor-pointer"
                     >
