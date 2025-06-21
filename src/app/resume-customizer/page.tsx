@@ -178,10 +178,6 @@ export default function ResumeCustomizer() {
       setAnalysisData(data);
       setApiStatus('working');
       toast.success('Job fit analysis completed!');
-      // Advance to next step after successful analysis
-      setTimeout(() => {
-        setCurrentStep(4);
-      }, 1500);
     } catch (error) {
       console.error('Analysis API failed, using intelligent fallback:', error);
       // Generate more realistic fallback analysis using actual job data
@@ -214,10 +210,6 @@ export default function ResumeCustomizer() {
       setAnalysisData(fallbackAnalysis);
       setApiStatus('fallback');
       toast.success('Analysis completed with intelligent insights!');
-      // Advance to next step after fallback analysis
-      setTimeout(() => {
-        setCurrentStep(4);
-      }, 1500);
     } finally {
       setAnalyzing(false);
       setLoading(false);
@@ -266,27 +258,28 @@ export default function ResumeCustomizer() {
       });
 
       if (response.ok) {
+        // Add realistic delay for AI processing
+        await new Promise(resolve => setTimeout(resolve, 2000));
         const result = await response.json();
         setTailoredResume(result.tailored_resume || result.content);
         if (apiStatus !== 'fallback') setApiStatus('working');
         toast.success('AI resume customization completed!');
-        nextStep();
       } else {
         // Fallback if API fails
+        await new Promise(resolve => setTimeout(resolve, 1500));
         const fallbackResume = generateFallbackTailoredResume();
         setTailoredResume(fallbackResume);
         setApiStatus('fallback');
         toast.success('Resume customized with professional templates!');
-        nextStep();
       }
     } catch (error) {
       console.error('Error tailoring resume:', error);
       // Always provide fallback
+      await new Promise(resolve => setTimeout(resolve, 1500));
       const fallbackResume = generateFallbackTailoredResume();
       setTailoredResume(fallbackResume);
       setApiStatus('fallback');
       toast.success('Resume customized with professional templates!');
-      nextStep();
     } finally {
       setLoading(false);
     }
@@ -309,27 +302,28 @@ export default function ResumeCustomizer() {
       });
 
       if (response.ok) {
+        // Add realistic delay for AI processing
+        await new Promise(resolve => setTimeout(resolve, 2000));
         const result = await response.json();
         setCoverLetter(result.cover_letter || result.content);
         if (apiStatus !== 'fallback') setApiStatus('working');
         toast.success('AI cover letter generated successfully!');
-        nextStep();
       } else {
         // Fallback if API fails
+        await new Promise(resolve => setTimeout(resolve, 1500));
         const fallbackCoverLetter = generateFallbackCoverLetter();
         setCoverLetter(fallbackCoverLetter);
         setApiStatus('fallback');
         toast.success('Cover letter template created successfully!');
-        nextStep();
       }
     } catch (error) {
       console.error('Error generating cover letter:', error);
       // Always provide fallback
+      await new Promise(resolve => setTimeout(resolve, 1500));
       const fallbackCoverLetter = generateFallbackCoverLetter();
       setCoverLetter(fallbackCoverLetter);
       setApiStatus('fallback');
       toast.success('Cover letter template created successfully!');
-      nextStep();
     } finally {
       setLoading(false);
     }
@@ -1143,22 +1137,22 @@ Sincerely,
           )}
 
           {/* Navigation */}
-          <div className="flex justify-between items-center pt-8 border-t border-gray-200">
+          <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center pt-8 border-t border-gray-200 space-y-4 lg:space-y-0">
             <button
               onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
               disabled={currentStep === 1}
-              className="btn-modern flex items-center space-x-2 px-6 py-3 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-all duration-200"
+              className="btn-modern flex items-center space-x-2 px-6 py-3 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-all duration-200 w-full sm:w-auto justify-center"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Previous</span>
             </button>
 
-            <div className="flex space-x-3">
+            <div className="flex flex-col space-y-3 lg:flex-row lg:space-y-0 lg:space-x-3">
               {currentStep < 3 && (
                 <button
                   onClick={nextStep}
                   disabled={!canProceed()}
-                  className="btn-modern flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
+                  className="btn-modern flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl w-full sm:w-auto justify-center"
                 >
                   <span>Continue</span>
                   <ArrowRight className="w-4 h-4" />
@@ -1169,7 +1163,7 @@ Sincerely,
                   onClick={analyzeJobFit}
                   onMouseDown={() => console.log('🔥 ANALYZE FIT BUTTON PRESSED')}
                   disabled={!canProceed() || loading}
-                  className="btn-modern flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
+                  className="btn-modern flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl w-full sm:w-auto justify-center"
                 >
                   {loading ? (
                     <>
@@ -1184,21 +1178,30 @@ Sincerely,
                   )}
                 </button>
               )}
+              {currentStep === 3 && analysisData && (
+                <button
+                  onClick={nextStep}
+                  className="btn-modern flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl w-full sm:w-auto justify-center"
+                >
+                  <span>Continue to Resume Customization</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              )}
               {currentStep >= 4 && currentStep < 6 && (
                 <button
                   onClick={nextStep}
                   disabled={!canProceed()}
-                  className="btn-modern flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
+                  className="btn-modern flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl w-full sm:w-auto justify-center"
                 >
                   <span>Continue</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               )}
-              {currentStep === 6 && (
-                <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-                  <div className="flex items-center space-x-3">
+              {currentStep === 6 && interviewQuestions.length > 0 && (
+                <div className="w-full bg-green-50 border border-green-200 rounded-xl p-4 mt-4 lg:mt-0 lg:w-auto">
+                  <div className="flex flex-col lg:flex-row items-center space-y-2 lg:space-y-0 lg:space-x-3">
                     <CheckCircle className="w-6 h-6 text-green-600" />
-                    <span className="text-green-800 font-medium">
+                    <span className="text-green-800 font-medium text-center lg:text-left">
                       Congratulations! You've completed all steps of the resume customization process.
                     </span>
                   </div>
