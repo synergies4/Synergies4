@@ -33,7 +33,9 @@ import {
   Search,
   BarChart3,
   X,
-  Check
+  Check,
+  Link,
+  Globe
 } from 'lucide-react';
 import { toast } from 'sonner';
 import PageLayout from '@/components/shared/PageLayout';
@@ -52,6 +54,9 @@ export default function ResumeCustomizer() {
     company_name: '',
     job_description: ''
   });
+  const [jobInputMethod, setJobInputMethod] = useState<'manual' | 'url'>('manual');
+  const [jobUrl, setJobUrl] = useState('');
+  const [extractingJob, setExtractingJob] = useState(false);
   const [analysisData, setAnalysisData] = useState<any>(null);
   const [tailoredResume, setTailoredResume] = useState('');
   const [coverLetter, setCoverLetter] = useState('');
@@ -103,100 +108,104 @@ export default function ResumeCustomizer() {
     setUploading(true);
     try {
       let text = '';
+      let extractionSuccess = false;
       
-      if (file.type === 'application/pdf') {
-        // Handle PDF files with instructions but still allow AI processing
-        text = `✅ PDF RESUME UPLOADED: ${file.name}
-
-📄 **READY FOR AI ANALYSIS**
-Your PDF resume has been successfully uploaded and is ready for AI customization!
-
-**CURRENT STATUS:**
-✅ File uploaded and processed
-✅ Compatible with AI analysis  
-✅ Resume customization will work
-
-**HOW IT WORKS:**
-The AI will analyze your PDF and create personalized content based on:
-• Your resume structure and content
-• The job description you provide
-• Industry best practices and optimization
-
-**FOR EVEN BETTER RESULTS:**
-If you'd like the most accurate text analysis, you can optionally:
-1. Copy your resume text and paste it below, OR
-2. Upload a .txt version alongside this PDF
-
-**FILE DETAILS:**
-• Name: ${file.name}
-• Size: ${(file.size / 1024 / 1024).toFixed(2)} MB
-• Type: PDF Resume
-• Status: Ready for AI processing
-
-🚀 **NEXT STEPS:** Proceed to add your job description and the AI will create personalized resume content!`;
-
-        toast.success('✅ PDF resume uploaded successfully! Ready for AI analysis.');
+      // For supported file types, use the server-side text extraction API
+      if (file.type === 'application/pdf' || 
+          file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+          file.type === 'text/plain') {
         
-      } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-        // Handle DOCX files
-        text = `✅ WORD DOCUMENT UPLOADED: ${file.name}
-
-📋 **READY FOR AI ANALYSIS**
-Your Word document resume has been successfully uploaded!
-
-**CURRENT STATUS:**
-✅ File uploaded and processed
-✅ Compatible with AI analysis
-✅ Resume customization will work
-
-**AI CAPABILITIES:**
-The system will analyze your document and create:
-• Tailored resume versions
-• Personalized cover letters  
-• Custom interview questions
-• Job fit analysis
-
-**FILE DETAILS:**
-• Name: ${file.name}
-• Size: ${(file.size / 1024 / 1024).toFixed(2)} MB
-• Type: Microsoft Word Document
-• Status: Ready for AI processing
-
-🚀 **NEXT STEPS:** Add your job description and let the AI create personalized application materials!`;
-
-        toast.success('✅ Word document uploaded successfully! Ready for AI analysis.');
-        
-      } else if (file.type === 'text/plain') {
-        // Handle text files - read the actual content
-        text = await file.text();
-        
-        // Clean up any weird characters or encoding issues
-        text = text
-          .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, '') // Remove control characters
-          .replace(/\s+/g, ' ') // Normalize whitespace
-          .trim();
+        try {
+          // Create FormData to send the file
+          const formData = new FormData();
+          formData.append('file', file);
           
-        if (!text || text.length < 50) {
-          text = `⚠️ TEXT FILE ISSUE: ${file.name}
+          console.log('📄 Sending file to text extraction API:', file.name, file.type);
+          
+          // Call the text extraction API
+          const response = await fetch('/api/resume-customizer/extract-text', {
+            method: 'POST',
+            body: formData
+          });
+          
+          const result = await response.json();
+          
+          if (response.ok && result.success && result.text) {
+            text = result.text;
+            extractionSuccess = true;
+            
+            const fileTypeNames = {
+              'application/pdf': 'PDF',
+              'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'Word Document',
+              'text/plain': 'Text File'
+            };
+            
+            const fileTypeName = fileTypeNames[file.type as keyof typeof fileTypeNames] || 'Document';
+            
+            toast.success(`✅ ${fileTypeName} text extracted successfully! Ready for AI analysis.`);
+            
+            console.log('📝 Text extraction successful:', {
+              fileName: file.name,
+              textLength: text.length,
+              fileType: file.type
+            });
+          } else {
+            // API returned error or no text
+            throw new Error(result.message || 'Text extraction failed');
+          }
+          
+        } catch (extractionError) {
+          console.error('Text extraction API error:', extractionError);
+          
+          // Fallback to manual text entry for text files
+          if (file.type === 'text/plain') {
+            try {
+              text = await file.text();
+              if (text && text.length >= 50) {
+                extractionSuccess = true;
+                toast.success('✅ Text file loaded successfully!');
+              } else {
+                throw new Error('Text file appears to be empty or too short');
+              }
+            } catch (textError) {
+              extractionSuccess = false;
+            }
+          }
+          
+          if (!extractionSuccess) {
+            // Show appropriate error message
+            const fileTypeNames = {
+              'application/pdf': 'PDF',
+              'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'Word Document', 
+              'text/plain': 'Text File'
+            };
+            
+            const fileTypeName = fileTypeNames[file.type as keyof typeof fileTypeNames] || 'Document';
+            
+            text = `⚠️ TEXT EXTRACTION ISSUE: ${file.name}
 
-📄 The uploaded text file appears to be empty or very short.
+📄 **Unable to extract text from ${fileTypeName}**
 
-**PLEASE ENSURE YOUR RESUME CONTAINS:**
-• Contact information (name, email, phone)
-• Work experience with dates and descriptions
-• Skills and technical qualifications  
-• Education background
-• Professional achievements and accomplishments
+**POSSIBLE CAUSES:**
+• File may be password-protected or encrypted
+• File may contain only images/scanned content
+• File may be corrupted or in an unsupported format
+• Server processing temporarily unavailable
+
+**WHAT YOU CAN DO:**
+1. **Try a different format** - Convert to .txt or .docx
+2. **Copy and paste** - Manually copy your resume text and paste it below
+3. **Continue anyway** - Upload the file and manually enter text in the next step
 
 **FILE DETAILS:**
 • Name: ${file.name}
 • Size: ${(file.size / 1024 / 1024).toFixed(2)} MB
-• Type: Plain Text File
+• Type: ${fileTypeName}
 
-💡 **QUICK FIX:** Copy your complete resume content and paste it into a new text file, then upload again.`;
-        } else {
-          // Successful text file processing
-          toast.success('✅ Text resume uploaded and ready for AI analysis!');
+💡 **RECOMMENDATION:** For best results, please copy your resume text and paste it in the text area below.`;
+
+            toast.error(`Could not extract text from ${fileTypeName}. Please try copying and pasting the text manually.`);
+          }
         }
       } else {
         // Handle unsupported file types
@@ -226,7 +235,7 @@ Please save your resume in one of the supported formats:
       
       setResumeText(text);
       
-      // Update resumeData for compatibility - use the actual text for analysis
+      // Update resumeData - use the actual extracted text for AI analysis
       setResumeData(prev => ({
         ...prev,
         filename: file.name,
@@ -245,10 +254,10 @@ There was an issue processing your file, but don't worry - we can still help!
 **WHAT HAPPENED:**
 • File upload was successful
 • Processing encountered an unexpected error
-• This might be due to file corruption or unusual formatting
+• This might be due to network issues or server problems
 
 **IMMEDIATE SOLUTIONS:**
-1. **Try again** - Sometimes a simple retry resolves the issue
+1. **Try again** - Refresh the page and try uploading again
 2. **Different format** - Convert to .txt, .pdf, or .docx and retry
 3. **Manual input** - Copy and paste your resume text directly
 4. **Continue anyway** - The AI can still provide valuable customization guidance
@@ -258,7 +267,7 @@ There was an issue processing your file, but don't worry - we can still help!
 • Size: ${(file.size / 1024 / 1024).toFixed(2)} MB
 • Error: ${error instanceof Error ? error.message : 'Unknown error'}
 
-🚀 **GOOD NEWS:** You can still proceed with the job description, and the AI will provide professional resume guidance and templates!`;
+🚀 **GOOD NEWS:** You can still proceed and manually enter your resume content!`;
       
       setResumeText(fallbackText);
       setResumeData(prev => ({
@@ -267,7 +276,7 @@ There was an issue processing your file, but don't worry - we can still help!
         content: fallbackText
       }));
       
-      toast.error('File processing failed, but you can still proceed with AI guidance.');
+      toast.error('File processing failed, but you can still proceed with manual entry.');
     } finally {
       setUploading(false);
     }
@@ -281,10 +290,60 @@ There was an issue processing your file, but don't worry - we can still help!
     }
   };
 
+  const extractJobFromUrl = async () => {
+    if (!jobUrl.trim()) {
+      toast.error('Please enter a valid job URL');
+      return;
+    }
+
+    setExtractingJob(true);
+    try {
+      const response = await fetch('/api/resume-customizer/extract-job-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ job_url: jobUrl })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to extract job information');
+      }
+
+      const data = await response.json();
+      
+      if (data.success && data.job_info) {
+        const jobInfo = data.job_info;
+        
+        // Populate the job data with extracted information
+        setJobData({
+          job_title: jobInfo.job_title || '',
+          company_name: jobInfo.company_name || '',
+          job_description: jobInfo.job_description || ''
+        });
+
+        if (jobInfo.extraction_status === 'success') {
+          toast.success('Job information extracted successfully!');
+        } else if (jobInfo.extraction_status === 'partial') {
+          toast.success('Job information partially extracted. Please review and complete the details.');
+        } else {
+          toast.error('Could not extract job information. Please enter details manually.');
+        }
+      } else {
+        throw new Error('Invalid response format');
+      }
+    } catch (error) {
+      console.error('Error extracting job from URL:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to extract job information');
+    } finally {
+      setExtractingJob(false);
+    }
+  };
+
   const canProceed = () => {
     switch (currentStep) {
       case 1:
-        return uploadedFile && resumeText;
+        // Allow proceeding if either file is uploaded OR text is manually entered (minimum 50 characters)
+        return (uploadedFile || (resumeText && resumeText.length > 50 && !resumeText.includes('TEXT EXTRACTION ISSUE') && !resumeText.includes('FILE PROCESSING ERROR')));
       case 2:
         return jobData.job_title && jobData.company_name && jobData.job_description;
       case 3:
@@ -1292,6 +1351,54 @@ Sincerely,
                     </div>
                   </div>
                 )}
+
+                {/* Manual Text Input Option */}
+                <div className="mt-8 border-t border-gray-200 pt-8">
+                  <div className="text-center mb-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      Or paste your resume text directly
+                    </h3>
+                    <p className="text-gray-600">
+                      If file upload doesn't work or you prefer to paste your content manually
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <textarea
+                      value={resumeText}
+                      onChange={(e) => {
+                        const text = e.target.value;
+                        setResumeText(text);
+                        setResumeData(prev => ({
+                          ...prev,
+                          filename: 'Manual Entry',
+                          content: text
+                        }));
+                        // Clear uploaded file if user starts typing
+                        if (text && uploadedFile) {
+                          setUploadedFile(null);
+                        }
+                      }}
+                      placeholder="Paste your resume content here... Include your name, contact information, work experience, education, skills, and achievements."
+                      rows={12}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200 resize-none"
+                    />
+                    
+                    {resumeText && resumeText.length > 50 && !uploadedFile && (
+                      <div className="p-4 bg-gradient-to-r from-teal-50 to-emerald-50 rounded-xl border border-teal-200">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center">
+                            <Check className="w-5 h-5 text-teal-600" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-teal-900">Resume text ready for analysis</p>
+                            <p className="text-sm text-teal-700">{resumeText.length} characters • Ready to proceed</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -1306,18 +1413,89 @@ Sincerely,
                   Job Description Analysis
                 </h2>
                 <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                  Paste the job description you're interested in. Our AI will analyze it and provide insights about how well your resume matches.
+                  Enter the job details or paste a job URL. Our AI will analyze it and provide insights about how well your resume matches.
                 </p>
               </div>
               
               {/* Mobile Instructions */}
               <div className="lg:hidden text-center">
                 <p className="text-base text-gray-600 mb-6">
-                  Enter the job details you're applying for. Our AI will analyze how well your resume matches the requirements.
+                  Enter the job details or paste a URL. Our AI will analyze how well your resume matches the requirements.
                 </p>
               </div>
 
               <div className="max-w-4xl mx-auto space-y-6">
+                {/* Input Method Toggle */}
+                <div className="flex justify-center">
+                  <div className="bg-gray-100 p-1 rounded-lg flex space-x-1">
+                    <button
+                      onClick={() => setJobInputMethod('manual')}
+                      className={`px-4 py-2 rounded-md transition-all duration-200 flex items-center space-x-2 ${
+                        jobInputMethod === 'manual'
+                          ? 'bg-white text-blue-600 shadow-sm font-medium'
+                          : 'text-gray-600 hover:text-gray-800'
+                      }`}
+                    >
+                      <FileText className="w-4 h-4" />
+                      <span>Manual Entry</span>
+                    </button>
+                    <button
+                      onClick={() => setJobInputMethod('url')}
+                      className={`px-4 py-2 rounded-md transition-all duration-200 flex items-center space-x-2 ${
+                        jobInputMethod === 'url'
+                          ? 'bg-white text-blue-600 shadow-sm font-medium'
+                          : 'text-gray-600 hover:text-gray-800'
+                      }`}
+                    >
+                      <Link className="w-4 h-4" />
+                      <span>Job URL</span>
+                    </button>
+                  </div>
+                </div>
+
+                {jobInputMethod === 'url' && (
+                  <div className="space-y-4">
+                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-6">
+                      <div className="flex items-center space-x-3 mb-4">
+                        <Globe className="w-6 h-6 text-blue-600" />
+                        <h3 className="text-lg font-semibold text-blue-900">Extract Job from URL</h3>
+                      </div>
+                      <p className="text-blue-700 mb-4">
+                        Paste a job posting URL from sites like LinkedIn, Indeed, Glassdoor, or company career pages. 
+                        Our AI will automatically extract the job title, company name, and description.
+                      </p>
+                      
+                      <div className="flex space-x-3">
+                        <input
+                          type="url"
+                          value={jobUrl}
+                          onChange={(e) => setJobUrl(e.target.value)}
+                          placeholder="https://www.linkedin.com/jobs/view/..."
+                          className="flex-1 px-4 py-3 border border-blue-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                        />
+                        <button
+                          onClick={extractJobFromUrl}
+                          disabled={extractingJob || !jobUrl.trim()}
+                          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center space-x-2"
+                        >
+                          {extractingJob ? (
+                            <>
+                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                              <span>Extracting...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Search className="w-4 h-4" />
+                              <span>Extract</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Job Details Form - Always shown, populated by URL extraction or manual entry */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div className="form-floating">
                     <input
@@ -1360,7 +1538,10 @@ Sincerely,
                   <div>
                     <h4 className="font-semibold text-blue-900">Pro Tip</h4>
                     <p className="text-sm text-blue-700">
-                      Copy the entire job posting including requirements, responsibilities, and qualifications for the most accurate analysis.
+                      {jobInputMethod === 'url' 
+                        ? 'Use direct job posting URLs for best results. After extraction, review and edit the details if needed.'
+                        : 'Copy the entire job posting including requirements, responsibilities, and qualifications for the most accurate analysis.'
+                      }
                     </p>
                   </div>
                 </div>
@@ -2179,6 +2360,9 @@ ${analysisData?.missing_keywords?.join(', ') || 'No keywords identified'}
                     setUploadedFile(null);
                     setResumeText('');
                     setJobData({ job_title: '', company_name: '', job_description: '' });
+                    setJobInputMethod('manual');
+                    setJobUrl('');
+                    setExtractingJob(false);
                     setAnalysisData(null);
                     setTailoredResume('');
                     setCoverLetter('');
