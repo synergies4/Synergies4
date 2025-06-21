@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Upload, 
   FileText, 
@@ -51,6 +52,7 @@ export default function ResumeCustomizer() {
   const [tailoredResume, setTailoredResume] = useState('');
   const [coverLetter, setCoverLetter] = useState('');
   const [interviewQuestions, setInterviewQuestions] = useState<any[]>([]);
+  const [activeInterviewTab, setActiveInterviewTab] = useState('behavioral');
   const [isOptimizedMode, setIsOptimizedMode] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -347,13 +349,28 @@ export default function ResumeCustomizer() {
 
       if (response.ok) {
         const result = await response.json();
-        setInterviewQuestions(result.questions || []);
+        const questions = result.questions || [];
+        setInterviewQuestions(questions);
+        
+        // Set the active tab to the first available category
+        if (questions.length > 0) {
+          const firstQuestionType = questions[0].type || 'general';
+          setActiveInterviewTab(firstQuestionType);
+        }
+        
         if (apiStatus !== 'fallback') setApiStatus('working');
         toast.success('AI interview questions generated successfully!');
       } else {
         // Fallback if API fails
         const fallbackQuestions = generateFallbackInterviewQuestions();
         setInterviewQuestions(fallbackQuestions);
+        
+        // Set the active tab to the first available category
+        if (fallbackQuestions.length > 0) {
+          const firstQuestionType = fallbackQuestions[0].type || 'general';
+          setActiveInterviewTab(firstQuestionType);
+        }
+        
         setApiStatus('fallback');
         toast.success('Interview questions prepared successfully!');
       }
@@ -362,6 +379,13 @@ export default function ResumeCustomizer() {
       // Always provide fallback
       const fallbackQuestions = generateFallbackInterviewQuestions();
       setInterviewQuestions(fallbackQuestions);
+      
+      // Set the active tab to the first available category
+      if (fallbackQuestions.length > 0) {
+        const firstQuestionType = fallbackQuestions[0].type || 'general';
+        setActiveInterviewTab(firstQuestionType);
+      }
+      
       setApiStatus('fallback');
       toast.success('Interview questions prepared successfully!');
     } finally {
@@ -1145,8 +1169,8 @@ Sincerely,
                 </div>
 
                 {interviewQuestions.length > 0 && (
-                  <div className="mt-8 space-y-6">
-                    {/* Questions grouped by category */}
+                  <div className="mt-8">
+                    {/* Group questions by type */}
                     {(() => {
                       const questionsByType = interviewQuestions.reduce((acc: any, question: any) => {
                         const type = question.type || 'general';
@@ -1156,78 +1180,113 @@ Sincerely,
                       }, {});
 
                       const typeConfig = {
-                        behavioral: { title: 'Behavioral Questions', icon: '🧠', color: 'blue' },
-                        technical: { title: 'Technical Questions', icon: '⚙️', color: 'green' },
-                        company: { title: 'Company-Specific Questions', icon: '🏢', color: 'purple' },
-                        role: { title: 'Role-Specific Questions', icon: '💼', color: 'orange' },
-                        general: { title: 'General Questions', icon: '💬', color: 'gray' }
+                        behavioral: { title: 'Behavioral', icon: '🧠', color: 'blue' },
+                        technical: { title: 'Technical', icon: '⚙️', color: 'green' },
+                        company: { title: 'Company', icon: '🏢', color: 'purple' },
+                        role: { title: 'Role-Specific', icon: '💼', color: 'orange' },
+                        general: { title: 'General', icon: '💬', color: 'gray' }
                       };
 
-                      return Object.entries(questionsByType).map(([type, questions]: [string, any]) => {
-                        const config = typeConfig[type as keyof typeof typeConfig] || typeConfig.general;
-                        return (
-                          <div key={type} className="bg-white border border-gray-200 rounded-2xl p-8 shadow-lg">
-                            <div className="flex items-center space-x-3 mb-6">
-                              <span className="text-2xl">{config.icon}</span>
-                              <h4 className="text-xl font-bold text-gray-900">{config.title}</h4>
-                              <span className={`px-3 py-1 bg-${config.color}-100 text-${config.color}-700 rounded-full text-sm font-medium`}>
-                                {questions.length} Questions
-                              </span>
-                            </div>
-                            <div className="space-y-6">
-                              {questions.map((item: any, index: number) => (
-                                <div key={index} className="bg-gray-50 rounded-xl p-6 space-y-4">
-                                  <div className="flex items-start justify-between">
-                                    <div className="flex items-center space-x-3">
-                                      <span className={`w-8 h-8 bg-${config.color}-500 text-white rounded-full flex items-center justify-center text-sm font-bold`}>
-                                        {index + 1}
-                                      </span>
-                                      <div className="flex items-center space-x-2">
-                                        <span className={`px-2 py-1 bg-${config.color}-100 text-${config.color}-700 rounded-full text-xs font-medium`}>
-                                          {item.category}
-                                        </span>
-                                        {item.difficulty && (
-                                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                            item.difficulty === 'easy' ? 'bg-green-100 text-green-700' :
-                                            item.difficulty === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-                                            'bg-red-100 text-red-700'
-                                          }`}>
-                                            {item.difficulty}
-                                          </span>
-                                        )}
-                                      </div>
-                                    </div>
+                      // Filter to only show tabs that have questions
+                      const availableTabs = Object.keys(questionsByType).filter(type => 
+                        questionsByType[type].length > 0
+                      );
+
+                      return (
+                        <Tabs value={activeInterviewTab} onValueChange={setActiveInterviewTab} className="w-full">
+                          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 mb-6 bg-gray-100 p-1 rounded-lg">
+                            {availableTabs.map((type) => {
+                              const config = typeConfig[type as keyof typeof typeConfig] || typeConfig.general;
+                              const questions = questionsByType[type];
+                              return (
+                                <TabsTrigger 
+                                  key={type} 
+                                  value={type}
+                                  className="flex items-center space-x-2 px-3 py-2 rounded-md transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                                >
+                                  <span>{config.icon}</span>
+                                  <span className="hidden sm:inline">{config.title}</span>
+                                  <span className="sm:hidden">{config.title.slice(0, 4)}</span>
+                                  <Badge variant="secondary" className="ml-1 text-xs">
+                                    {questions.length}
+                                  </Badge>
+                                </TabsTrigger>
+                              );
+                            })}
+                          </TabsList>
+                          
+                          {availableTabs.map((type) => {
+                            const config = typeConfig[type as keyof typeof typeConfig] || typeConfig.general;
+                            const questions = questionsByType[type];
+                            
+                            return (
+                              <TabsContent key={type} value={type} className="mt-0">
+                                <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-lg">
+                                  <div className="flex items-center space-x-3 mb-6">
+                                    <span className="text-2xl">{config.icon}</span>
+                                    <h4 className="text-xl font-bold text-gray-900">{config.title} Questions</h4>
+                                    <Badge variant="outline" className={`bg-${config.color}-50 text-${config.color}-700 border-${config.color}-200`}>
+                                      {questions.length} Questions
+                                    </Badge>
                                   </div>
                                   
-                                  <div className="pl-11">
-                                    <p className="text-gray-800 font-medium text-lg">{item.question}</p>
-                                    
-                                    {item.tips && (
-                                      <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                                        <div className="flex items-center space-x-2 mb-2">
-                                          <Lightbulb className="w-4 h-4 text-blue-600" />
-                                          <span className="text-sm font-medium text-blue-900">Answer Tips</span>
+                                  <div className="space-y-6">
+                                    {questions.map((item: any, index: number) => (
+                                      <div key={index} className="bg-gray-50 rounded-xl p-6 space-y-4">
+                                        <div className="flex items-start justify-between">
+                                          <div className="flex items-center space-x-3">
+                                            <span className={`w-8 h-8 bg-${config.color}-500 text-white rounded-full flex items-center justify-center text-sm font-bold`}>
+                                              {index + 1}
+                                            </span>
+                                            <div className="flex items-center space-x-2">
+                                              <Badge variant="outline" className={`bg-${config.color}-50 text-${config.color}-700`}>
+                                                {item.category}
+                                              </Badge>
+                                              {item.difficulty && (
+                                                <Badge variant="outline" className={`${
+                                                  item.difficulty === 'easy' ? 'bg-green-50 text-green-700 border-green-200' :
+                                                  item.difficulty === 'medium' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
+                                                  'bg-red-50 text-red-700 border-red-200'
+                                                }`}>
+                                                  {item.difficulty}
+                                                </Badge>
+                                              )}
+                                            </div>
+                                          </div>
                                         </div>
-                                        <p className="text-sm text-blue-800">{item.tips}</p>
-                                      </div>
-                                    )}
-                                    
-                                    {item.suggested_answer && (
-                                      <div className="mt-4 p-4 bg-green-50 rounded-lg border border-green-200">
-                                        <div className="flex items-center space-x-2 mb-2">
-                                          <Target className="w-4 h-4 text-green-600" />
-                                          <span className="text-sm font-medium text-green-900">Suggested Approach</span>
+                                        
+                                        <div className="pl-11">
+                                          <p className="text-gray-800 font-medium text-lg mb-4">{item.question}</p>
+                                          
+                                          {item.tips && (
+                                            <div className="p-4 bg-blue-50 rounded-lg border border-blue-200 mb-4">
+                                              <div className="flex items-center space-x-2 mb-2">
+                                                <Lightbulb className="w-4 h-4 text-blue-600" />
+                                                <span className="text-sm font-medium text-blue-900">Answer Tips</span>
+                                              </div>
+                                              <p className="text-sm text-blue-800">{item.tips}</p>
+                                            </div>
+                                          )}
+                                          
+                                          {item.suggested_answer && (
+                                            <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                                              <div className="flex items-center space-x-2 mb-2">
+                                                <Target className="w-4 h-4 text-green-600" />
+                                                <span className="text-sm font-medium text-green-900">Suggested Approach</span>
+                                              </div>
+                                              <p className="text-sm text-green-800">{item.suggested_answer}</p>
+                                            </div>
+                                          )}
                                         </div>
-                                        <p className="text-sm text-green-800">{item.suggested_answer}</p>
                                       </div>
-                                    )}
+                                    ))}
                                   </div>
                                 </div>
-                              ))}
-                            </div>
-                          </div>
-                        );
-                      });
+                              </TabsContent>
+                            );
+                          })}
+                        </Tabs>
+                      );
                     })()}
                   </div>
                 )}
