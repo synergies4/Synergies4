@@ -149,7 +149,7 @@ export default function ResumeCustomizer() {
               textLength: text.length,
               fileType: file.type
             });
-          } else {
+                    } else {
             // API returned error or no text
             throw new Error(result.message || 'Text extraction failed');
           }
@@ -182,30 +182,54 @@ export default function ResumeCustomizer() {
             
             const fileTypeName = fileTypeNames[file.type as keyof typeof fileTypeNames] || 'Document';
             
-            text = `⚠️ TEXT EXTRACTION ISSUE: ${file.name}
+            // Extract error message from the extraction error
+            let errorMessage = `Unable to extract text from ${fileTypeName}`;
+            if (extractionError instanceof Error) {
+              errorMessage = extractionError.message;
+            }
+            
+            const fallbackAdvice = 'Try copying your resume text and pasting it below.';
+             
+             text = `⚠️ TEXT EXTRACTION ISSUE: ${file.name}
 
-📄 **Unable to extract text from ${fileTypeName}**
+📄 **${errorMessage}**
 
 **POSSIBLE CAUSES:**
 • File may be password-protected or encrypted
-• File may contain only images/scanned content
+• File may contain only images/scanned content (like a photo of a resume)
 • File may be corrupted or in an unsupported format
-• Server processing temporarily unavailable
+• Some PDFs are image-based and don't contain extractable text
 
-**WHAT YOU CAN DO:**
-1. **Try a different format** - Convert to .txt or .docx
-2. **Copy and paste** - Manually copy your resume text and paste it below
-3. **Continue anyway** - Upload the file and manually enter text in the next step
+**IMMEDIATE SOLUTION:**
+✅ **Use the manual text input below** - Copy your resume content and paste it in the text area
+
+**ALTERNATIVE OPTIONS:**
+1. **Save as text-based PDF** - Re-export from Word/Google Docs as PDF
+2. **Convert to DOCX** - Save as Word document format
+3. **Use OCR software** - Convert scanned images to text first
 
 **FILE DETAILS:**
 • Name: ${file.name}
 • Size: ${(file.size / 1024 / 1024).toFixed(2)} MB
 • Type: ${fileTypeName}
 
-💡 **RECOMMENDATION:** For best results, please copy your resume text and paste it in the text area below.`;
+💡 **BEST OPTION:** Copy your resume text from the original document and paste it in the manual input field below.`;
 
-            toast.error(`Could not extract text from ${fileTypeName}. Please try copying and pasting the text manually.`);
-          }
+             toast.error(`Text extraction failed: ${errorMessage}`, {
+               duration: 5000,
+               action: {
+                 label: 'Use Manual Input',
+                 onClick: () => {
+                   // Scroll to manual input area
+                   const textArea = document.querySelector('textarea[placeholder*="Paste your resume content"]') as HTMLTextAreaElement;
+                   if (textArea) {
+                     textArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                     textArea.focus();
+                   }
+                 }
+               }
+             });
+           }
         }
       } else {
         // Handle unsupported file types
@@ -1842,6 +1866,14 @@ Sincerely,
                   Get ready with personalized interview questions based on the job requirements.
                 </p>
               </div>
+
+              {/* Mobile Instructions */}
+              <div className="lg:hidden text-center mb-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-3">Interview Preparation</h2>
+                <p className="text-sm text-gray-600 px-2">
+                  Practice with personalized questions for your interview at {jobData.company_name}.
+                </p>
+              </div>
               
               <div className="max-w-4xl mx-auto">
                 <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-2xl p-8 text-center">
@@ -1895,7 +1927,36 @@ Sincerely,
 
                       return (
                         <Tabs value={activeInterviewTab} onValueChange={setActiveInterviewTab} className="w-full">
-                          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 mb-6 bg-gray-100 p-1 rounded-lg">
+                          {/* Mobile: Horizontal scroll tabs */}
+                          <div className="sm:hidden mb-6">
+                            <div className="flex overflow-x-auto scrollbar-hide space-x-2 p-1 bg-gray-100 rounded-lg">
+                              {availableTabs.map((type) => {
+                                const config = typeConfig[type as keyof typeof typeConfig] || typeConfig.general;
+                                const questions = questionsByType[type];
+                                const isActive = activeInterviewTab === type;
+                                return (
+                                  <button
+                                    key={type}
+                                    onClick={() => setActiveInterviewTab(type)}
+                                    className={`flex-shrink-0 flex items-center space-x-1.5 px-3 py-2 rounded-md transition-all text-sm font-medium whitespace-nowrap ${
+                                      isActive
+                                        ? 'bg-white text-blue-600 shadow-sm'
+                                        : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
+                                    }`}
+                                  >
+                                    <span className="text-sm">{config.icon}</span>
+                                    <span className="text-xs">{config.title}</span>
+                                    <Badge variant="secondary" className="text-xs px-1.5 py-0.5 min-w-[20px] h-5">
+                                      {questions.length}
+                                    </Badge>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+
+                          {/* Desktop: Grid tabs */}
+                          <TabsList className="hidden sm:grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-5 mb-6 bg-gray-100 p-1 rounded-lg">
                             {availableTabs.map((type) => {
                               const config = typeConfig[type as keyof typeof typeConfig] || typeConfig.general;
                               const questions = questionsByType[type];
@@ -1903,12 +1964,12 @@ Sincerely,
                                 <TabsTrigger 
                                   key={type} 
                                   value={type}
-                                  className="flex items-center space-x-2 px-3 py-2 rounded-md transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                                  className="flex items-center justify-center space-x-1.5 px-2 py-2 rounded-md transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm text-sm"
                                 >
                                   <span>{config.icon}</span>
-                                  <span className="hidden sm:inline">{config.title}</span>
-                                  <span className="sm:hidden">{config.title.slice(0, 4)}</span>
-                                  <Badge variant="secondary" className="ml-1 text-xs">
+                                  <span className="hidden md:inline truncate">{config.title}</span>
+                                  <span className="md:hidden">{config.title.slice(0, 4)}</span>
+                                  <Badge variant="secondary" className="text-xs px-1.5 py-0.5 min-w-[20px] h-5">
                                     {questions.length}
                                   </Badge>
                                 </TabsTrigger>
@@ -1922,29 +1983,31 @@ Sincerely,
                             
                             return (
                               <TabsContent key={type} value={type} className="mt-0">
-                                <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-lg">
-                                  <div className="flex items-center space-x-3 mb-6">
-                                    <span className="text-2xl">{config.icon}</span>
-                                    <h4 className="text-xl font-bold text-gray-900">{config.title} Questions</h4>
-                                    <Badge variant="outline" className={`bg-${config.color}-50 text-${config.color}-700 border-${config.color}-200`}>
+                                <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 shadow-lg">
+                                  <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 mb-4 sm:mb-6">
+                                    <div className="flex items-center space-x-3">
+                                      <span className="text-xl sm:text-2xl">{config.icon}</span>
+                                      <h4 className="text-lg sm:text-xl font-bold text-gray-900">{config.title} Questions</h4>
+                                    </div>
+                                    <Badge variant="outline" className={`bg-${config.color}-50 text-${config.color}-700 border-${config.color}-200 self-start sm:self-auto`}>
                                       {questions.length} Questions
                                     </Badge>
                                   </div>
                                   
-                                  <div className="space-y-6">
+                                  <div className="space-y-4 sm:space-y-6">
                                     {questions.map((item: any, index: number) => (
-                                      <div key={index} className="bg-gray-50 rounded-xl p-6 space-y-4">
+                                      <div key={index} className="bg-gray-50 rounded-xl p-4 sm:p-6 space-y-3 sm:space-y-4">
                                         <div className="flex items-start justify-between">
-                                          <div className="flex items-center space-x-3">
-                                            <span className={`w-8 h-8 bg-${config.color}-500 text-white rounded-full flex items-center justify-center text-sm font-bold`}>
+                                          <div className="flex items-start space-x-3 flex-1">
+                                            <span className={`w-6 h-6 sm:w-8 sm:h-8 bg-${config.color}-500 text-white rounded-full flex items-center justify-center text-xs sm:text-sm font-bold flex-shrink-0 mt-0.5 sm:mt-0`}>
                                               {index + 1}
                                             </span>
-                                            <div className="flex items-center space-x-2">
-                                              <Badge variant="outline" className={`bg-${config.color}-50 text-${config.color}-700`}>
+                                            <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 flex-1 min-w-0">
+                                              <Badge variant="outline" className={`bg-${config.color}-50 text-${config.color}-700 text-xs self-start`}>
                                                 {item.category}
                                               </Badge>
                                               {item.difficulty && (
-                                                <Badge variant="outline" className={`${
+                                                <Badge variant="outline" className={`text-xs self-start ${
                                                   item.difficulty === 'easy' ? 'bg-green-50 text-green-700 border-green-200' :
                                                   item.difficulty === 'medium' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
                                                   'bg-red-50 text-red-700 border-red-200'
@@ -1956,26 +2019,26 @@ Sincerely,
                                           </div>
                                         </div>
                                         
-                                        <div className="pl-11">
-                                          <p className="text-gray-800 font-medium text-lg mb-4">{item.question}</p>
+                                        <div className="pl-0 sm:pl-11 space-y-3 sm:space-y-4">
+                                          <p className="text-gray-800 font-medium text-base sm:text-lg leading-relaxed">{item.question}</p>
                                           
                                           {item.tips && (
-                                            <div className="p-4 bg-blue-50 rounded-lg border border-blue-200 mb-4">
+                                            <div className="p-3 sm:p-4 bg-blue-50 rounded-lg border border-blue-200">
                                               <div className="flex items-center space-x-2 mb-2">
-                                                <Lightbulb className="w-4 h-4 text-blue-600" />
+                                                <Lightbulb className="w-4 h-4 text-blue-600 flex-shrink-0" />
                                                 <span className="text-sm font-medium text-blue-900">Answer Tips</span>
                                               </div>
-                                              <p className="text-sm text-blue-800">{item.tips}</p>
+                                              <p className="text-sm text-blue-800 leading-relaxed">{item.tips}</p>
                                             </div>
                                           )}
                                           
                                           {item.suggested_answer && (
-                                            <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                                            <div className="p-3 sm:p-4 bg-green-50 rounded-lg border border-green-200">
                                               <div className="flex items-center space-x-2 mb-2">
-                                                <Target className="w-4 h-4 text-green-600" />
+                                                <Target className="w-4 h-4 text-green-600 flex-shrink-0" />
                                                 <span className="text-sm font-medium text-green-900">Suggested Approach</span>
                                               </div>
-                                              <p className="text-sm text-green-800">{item.suggested_answer}</p>
+                                              <p className="text-sm text-green-800 leading-relaxed">{item.suggested_answer}</p>
                                             </div>
                                           )}
                                         </div>

@@ -51,10 +51,11 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
           success: false,
           text: '',
-          message: 'Could not extract sufficient text from the file. Please ensure the file contains readable text content.',
+          message: 'Could not extract sufficient text from the file. The file may be image-based or scanned. Please copy and paste your resume text manually instead.',
           fileName,
           fileType,
-          fileSize
+          fileSize,
+          fallbackAdvice: 'Try copying your resume text and pasting it in the manual input field below the upload area.'
         });
       }
 
@@ -92,6 +93,8 @@ export async function POST(request: NextRequest) {
 
 async function extractPDFText(file: File): Promise<string> {
   try {
+    console.log('📄 Starting PDF text extraction for:', file.name);
+    
     // Dynamic import to avoid bundling issues
     const pdfParse = (await import('pdf-parse')).default;
     
@@ -99,18 +102,58 @@ async function extractPDFText(file: File): Promise<string> {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     
-    // Parse PDF and extract text
-    const pdfData = await pdfParse(buffer);
+    console.log('📄 PDF buffer size:', buffer.length);
     
-    return pdfData.text || '';
+    // Parse PDF and extract text with options
+    const pdfData = await pdfParse(buffer, {
+      // PDF parsing options
+      max: 0, // Extract all pages
+      version: 'v1.10.100' // Use specific version for compatibility
+    });
+    
+    console.log('📄 PDF parsing result:', {
+      numPages: pdfData.numpages,
+      textLength: pdfData.text?.length || 0,
+      hasText: !!pdfData.text
+    });
+    
+    const extractedText = pdfData.text || '';
+    
+    // Check if we got meaningful text
+    if (!extractedText || extractedText.trim().length < 20) {
+      console.warn('📄 PDF text extraction yielded minimal content');
+      
+      // Try alternative approach - extract raw text data
+      if (pdfData.text && pdfData.text.length > 0) {
+        return pdfData.text;
+      }
+      
+      throw new Error('PDF appears to contain no extractable text content. This may be a scanned document or image-based PDF.');
+    }
+    
+    return extractedText;
   } catch (error) {
-    console.error('PDF parsing error:', error);
-    throw new Error('Failed to parse PDF file. The file may be corrupted, password-protected, or contain only images.');
+    console.error('💥 PDF parsing error:', error);
+    
+    // Provide more specific error messages
+    if (error instanceof Error) {
+      if (error.message.includes('Invalid PDF')) {
+        throw new Error('The uploaded file is not a valid PDF document.');
+      } else if (error.message.includes('Encrypted')) {
+        throw new Error('This PDF is password-protected. Please upload an unprotected version.');
+      } else if (error.message.includes('no extractable text')) {
+        throw new Error('This PDF appears to be a scanned document with no extractable text. Please upload a text-based PDF or copy/paste your resume content manually.');
+      }
+    }
+    
+    throw new Error('Failed to extract text from PDF. The file may be corrupted, password-protected, or contain only images.');
   }
 }
 
 async function extractDOCXText(file: File): Promise<string> {
   try {
+    console.log('📝 Starting DOCX text extraction for:', file.name);
+    
     // Dynamic import to avoid bundling issues
     const mammoth = await import('mammoth');
     
@@ -118,12 +161,38 @@ async function extractDOCXText(file: File): Promise<string> {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     
+    console.log('📝 DOCX buffer size:', buffer.length);
+    
     // Extract text from DOCX
     const result = await mammoth.extractRawText({ buffer });
     
-    return result.value || '';
+    console.log('📝 DOCX extraction result:', {
+      textLength: result.value?.length || 0,
+      hasText: !!result.value,
+      messages: result.messages?.length || 0
+    });
+    
+    const extractedText = result.value || '';
+    
+    // Check if we got meaningful text
+    if (!extractedText || extractedText.trim().length < 20) {
+      console.warn('📝 DOCX text extraction yielded minimal content');
+      throw new Error('DOCX appears to contain no extractable text content.');
+    }
+    
+    return extractedText;
   } catch (error) {
-    console.error('DOCX parsing error:', error);
+    console.error('💥 DOCX parsing error:', error);
+    
+    // Provide more specific error messages
+    if (error instanceof Error) {
+      if (error.message.includes('not a valid zip file')) {
+        throw new Error('The uploaded file is not a valid DOCX document.');
+      } else if (error.message.includes('no extractable text')) {
+        throw new Error('This DOCX file appears to contain no extractable text. Please try copying and pasting your content manually.');
+      }
+    }
+    
     throw new Error('Failed to parse DOCX file. The file may be corrupted or in an unsupported format.');
   }
 }
