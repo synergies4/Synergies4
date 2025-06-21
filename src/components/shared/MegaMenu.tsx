@@ -119,7 +119,7 @@ const menuCategories: MenuCategory[] = [
       {
         title: 'Industry Reports',
         description: 'Latest market insights and trends',
-        href: '/industry-insights',
+        href: '/blog',
         icon: BarChart3
       },
       {
@@ -275,6 +275,15 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
     setActiveCategory(activeCategory === categoryId ? null : categoryId);
   };
 
+  // Get conditional href based on authentication and item
+  const getConditionalHref = (item: any) => {
+    if (item.title === 'My Learning' || item.title === 'Certificates') {
+      // If user is logged in, go to dashboard/certificates, otherwise go to contact page for plans/pricing
+      return user ? item.href : '/contact#plans-pricing';
+    }
+    return item.href;
+  };
+
   return (
     <div ref={menuRef} className="relative">
       {/* Desktop Navigation */}
@@ -348,7 +357,7 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
                         return (
                           <Link
                             key={item.href}
-                            href={item.href}
+                            href={getConditionalHref(item)}
                             className="flex items-center p-3 rounded-lg hover:bg-teal-50 hover:border-teal-200 border border-transparent transition-all group/item w-full"
                             onClick={() => setActiveCategory(null)}
                           >
@@ -584,10 +593,11 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
                                 onMouseDown={(e) => {
                                   e.preventDefault();
                                   e.stopPropagation();
-                                  console.log('🔥 MENU ITEM MOUSEDOWN:', item.title, item.href);
+                                  const targetHref = getConditionalHref(item);
+                                  console.log('🔥 MENU ITEM MOUSEDOWN:', item.title, targetHref);
                                   setTimeout(() => {
-                                    console.log('🔥 NAVIGATING TO:', item.href);
-                                    window.location.href = item.href;
+                                    console.log('🔥 NAVIGATING TO:', targetHref);
+                                    window.location.href = targetHref;
                                   }, 50);
                                 }}
                                 className="flex items-center space-x-3 p-4 w-full text-left hover:bg-teal-50 transition-colors border-b border-gray-100 last:border-b-0 cursor-pointer select-none"
