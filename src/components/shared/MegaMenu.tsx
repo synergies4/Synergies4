@@ -497,13 +497,15 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
             <div className="p-4">
               {/* Featured Resume Customizer */}
               <div className="mb-6">
-                <Link
-                  href="/resume-customizer"
+                <div
                   onClick={(e) => {
+                    e.preventDefault();
                     e.stopPropagation();
-                    closeMobileMenu();
+                    console.log('Navigating to: /resume-customizer');
+                    router.push('/resume-customizer');
+                    setTimeout(() => closeMobileMenu(), 150);
                   }}
-                  className="block w-full p-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl text-white text-left hover:from-purple-600 hover:to-pink-600 transition-colors"
+                  className="block w-full p-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl text-white text-left hover:from-purple-600 hover:to-pink-600 transition-colors cursor-pointer"
                 >
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
@@ -517,7 +519,7 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                       <span className="px-2 py-1 bg-white/20 rounded-full text-xs font-bold">NEW</span>
                     </div>
                   </div>
-                </Link>
+                </div>
               </div>
 
               {/* Navigation Categories - Simplified */}
@@ -546,14 +548,16 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                           {category.items.map((item) => {
                             const ItemIcon = item.icon;
                             return (
-                              <Link
+                              <div
                                 key={item.href}
-                                href={item.href}
                                 onClick={(e) => {
-                                  e.stopPropagation(); // Prevent event bubbling
-                                  closeMobileMenu();
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  console.log('Navigating to:', item.href);
+                                  router.push(item.href);
+                                  setTimeout(() => closeMobileMenu(), 150);
                                 }}
-                                className="flex items-center space-x-3 p-4 w-full text-left hover:bg-teal-50 transition-colors border-b border-gray-100 last:border-b-0"
+                                className="flex items-center space-x-3 p-4 w-full text-left hover:bg-teal-50 transition-colors border-b border-gray-100 last:border-b-0 cursor-pointer"
                               >
                                 <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
                                   <ItemIcon className="w-4 h-4 text-gray-600" />
@@ -571,7 +575,7 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                                   <p className="text-xs text-gray-600 mt-0.5">{item.description}</p>
                                 </div>
                                 <ArrowRight className="w-4 h-4 text-gray-400" />
-                              </Link>
+                              </div>
                             );
                           })}
                         </div>
@@ -589,20 +593,23 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                       <p className="font-semibold text-blue-900">Welcome back!</p>
                       <p className="text-sm text-blue-700">{userProfile?.name || 'User'}</p>
                     </div>
-                    <Link
-                      href={userProfile?.role === 'ADMIN' ? '/admin' : '/dashboard'}
+                    <div
                       onClick={(e) => {
+                        e.preventDefault();
                         e.stopPropagation();
-                        closeMobileMenu();
+                        const href = userProfile?.role === 'ADMIN' ? '/admin' : '/dashboard';
+                        console.log('Navigating to:', href);
+                        router.push(href);
+                        setTimeout(() => closeMobileMenu(), 150);
                       }}
-                      className="flex items-center space-x-3 p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors w-full text-left"
+                      className="flex items-center space-x-3 p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors w-full text-left cursor-pointer"
                     >
                       <BarChart3 className="w-5 h-5 text-gray-600" />
                       <span className="font-medium text-gray-900">
                         {userProfile?.role === 'ADMIN' ? 'Admin Dashboard' : 'Dashboard'}
                       </span>
                       <ArrowRight className="w-4 h-4 text-gray-400 ml-auto" />
-                    </Link>
+                    </div>
                     <button
                       onClick={() => {
                         signOut();
@@ -617,28 +624,32 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    <Link
-                      href="/login"
+                    <div
                       onClick={(e) => {
+                        e.preventDefault();
                         e.stopPropagation();
-                        closeMobileMenu();
+                        console.log('Navigating to: /login');
+                        router.push('/login');
+                        setTimeout(() => closeMobileMenu(), 150);
                       }}
-                      className="flex items-center justify-center space-x-2 p-3 border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition-colors w-full"
+                      className="flex items-center justify-center space-x-2 p-3 border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition-colors w-full cursor-pointer"
                     >
                       <User className="w-5 h-5 text-gray-600" />
                       <span className="font-semibold text-gray-900">Login</span>
-                    </Link>
-                    <Link
-                      href="/signup"
+                    </div>
+                    <div
                       onClick={(e) => {
+                        e.preventDefault();
                         e.stopPropagation();
-                        closeMobileMenu();
+                        console.log('Navigating to: /signup');
+                        router.push('/signup');
+                        setTimeout(() => closeMobileMenu(), 150);
                       }}
-                      className="flex items-center justify-center space-x-2 p-3 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-lg hover:from-teal-600 hover:to-emerald-600 transition-colors w-full"
+                      className="flex items-center justify-center space-x-2 p-3 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-lg hover:from-teal-600 hover:to-emerald-600 transition-colors w-full cursor-pointer"
                     >
                       <span className="font-semibold">Get Started Free</span>
                       <ArrowRight className="w-5 h-5" />
-                    </Link>
+                    </div>
                   </div>
                 )}
               </div>
