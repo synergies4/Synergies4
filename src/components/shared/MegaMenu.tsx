@@ -291,6 +291,18 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
     setActiveCategory(isActive ? null : categoryId);
   };
 
+  // Handle mobile subitem navigation with proper event isolation
+  const handleMobileSubitemNavigation = (href: string, event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    // Close menu and navigate
+    closeMobileMenu();
+    setTimeout(() => {
+      router.push(href);
+    }, 100);
+  };
+
   return (
     <div ref={menuRef} className="relative">
       {/* Desktop Navigation */}
@@ -549,7 +561,7 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                             return (
                               <button
                                 key={item.href}
-                                onClick={() => handleMobileNavigation(item.href)}
+                                onClick={(e) => handleMobileSubitemNavigation(item.href, e)}
                                 className="flex items-center space-x-3 p-4 w-full text-left hover:bg-teal-50 transition-colors border-b border-gray-100 last:border-b-0"
                               >
                                 <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
