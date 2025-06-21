@@ -4,7 +4,6 @@ import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { PerformanceOptimizer } from "@/components/PerformanceOptimizer";
 import PWAInstaller from "@/components/PWAInstaller";
-import MeetingRecorder from "@/components/MeetingRecorder";
 import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -121,7 +120,6 @@ export default function RootLayout({
         <AuthProvider>
           {children}
           <PWAInstaller />
-          <MeetingRecorder />
           <Toaster />
         </AuthProvider>
       </body>

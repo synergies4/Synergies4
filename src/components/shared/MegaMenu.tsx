@@ -261,6 +261,14 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
     setActiveCategory(null);
   };
 
+  const handleMobileNavigation = (href: string) => {
+    // Close menu first
+    setIsMobileMenuOpen(false);
+    setActiveCategory(null);
+    // Navigate programmatically
+    router.push(href);
+  };
+
 
 
   // Simplified mobile category toggle
@@ -485,9 +493,12 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
             <div className="p-4">
               {/* Featured Resume Customizer */}
               <div className="mb-6">
-                <Link
-                  href="/resume-customizer"
-                  onClick={closeMobileMenu}
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleMobileNavigation('/resume-customizer');
+                  }}
                   className="block w-full p-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl text-white text-left hover:from-purple-600 hover:to-pink-600 transition-colors"
                 >
                   <div className="flex items-center space-x-3">
@@ -502,7 +513,7 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
                       <span className="px-2 py-1 bg-white/20 rounded-full text-xs font-bold">NEW</span>
                     </div>
                   </div>
-                </Link>
+                </button>
               </div>
 
               {/* Navigation Categories - Simplified */}
@@ -531,10 +542,13 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
                           {category.items.map((item) => {
                             const ItemIcon = item.icon;
                             return (
-                              <Link
+                              <button
                                 key={item.href}
-                                href={item.href}
-                                onClick={closeMobileMenu}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  handleMobileNavigation(item.href);
+                                }}
                                 className="flex items-center space-x-3 p-4 w-full text-left hover:bg-teal-50 transition-colors border-b border-gray-100 last:border-b-0"
                               >
                                 <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
@@ -553,7 +567,7 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
                                   <p className="text-xs text-gray-600 mt-0.5">{item.description}</p>
                                 </div>
                                 <ArrowRight className="w-4 h-4 text-gray-400" />
-                              </Link>
+                              </button>
                             );
                           })}
                         </div>
@@ -571,9 +585,12 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
                       <p className="font-semibold text-blue-900">Welcome back!</p>
                       <p className="text-sm text-blue-700">{userProfile?.name || 'User'}</p>
                     </div>
-                    <Link
-                      href={userProfile?.role === 'ADMIN' ? '/admin' : '/dashboard'}
-                      onClick={closeMobileMenu}
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleMobileNavigation(userProfile?.role === 'ADMIN' ? '/admin' : '/dashboard');
+                      }}
                       className="flex items-center space-x-3 p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors w-full text-left"
                     >
                       <BarChart3 className="w-5 h-5 text-gray-600" />
@@ -581,7 +598,7 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
                         {userProfile?.role === 'ADMIN' ? 'Admin Dashboard' : 'Dashboard'}
                       </span>
                       <ArrowRight className="w-4 h-4 text-gray-400 ml-auto" />
-                    </Link>
+                    </button>
                     <button
                       onClick={() => {
                         signOut();
@@ -596,22 +613,28 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    <Link
-                      href="/login"
-                      onClick={closeMobileMenu}
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleMobileNavigation('/login');
+                      }}
                       className="flex items-center justify-center space-x-2 p-3 border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition-colors w-full"
                     >
                       <User className="w-5 h-5 text-gray-600" />
                       <span className="font-semibold text-gray-900">Login</span>
-                    </Link>
-                    <Link
-                      href="/signup"
-                      onClick={closeMobileMenu}
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleMobileNavigation('/signup');
+                      }}
                       className="flex items-center justify-center space-x-2 p-3 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-lg hover:from-teal-600 hover:to-emerald-600 transition-colors w-full"
                     >
                       <span className="font-semibold">Get Started Free</span>
                       <ArrowRight className="w-5 h-5" />
-                    </Link>
+                    </button>
                   </div>
                 )}
               </div>
