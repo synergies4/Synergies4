@@ -273,34 +273,17 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
     setActiveCategory(null);
   };
 
-  // Mobile navigation handler
+  // Simplified mobile navigation handler
   const handleMobileNavigation = (href: string) => {
+    console.log('Navigating to:', href); // Debug log
     closeMobileMenu();
-    // Small delay to ensure menu closes before navigation
-    setTimeout(() => {
-      router.push(href);
-    }, 100);
+    router.push(href);
   };
 
-  // Handle mobile category toggle with better isolation
-  const handleMobileCategoryToggle = (categoryId: string, event: React.MouseEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
-    
-    const isActive = activeCategory === categoryId;
-    setActiveCategory(isActive ? null : categoryId);
-  };
-
-  // Handle mobile subitem navigation with proper event isolation
-  const handleMobileSubitemNavigation = (href: string, event: React.MouseEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
-    
-    // Close menu and navigate
-    closeMobileMenu();
-    setTimeout(() => {
-      router.push(href);
-    }, 100);
+  // Simplified mobile category toggle
+  const toggleMobileCategory = (categoryId: string) => {
+    console.log('Toggling category:', categoryId); // Debug log
+    setActiveCategory(activeCategory === categoryId ? null : categoryId);
   };
 
   return (
@@ -474,7 +457,10 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
         
         {/* Hamburger Menu Button */}
         <button
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          onClick={() => {
+            console.log('Hamburger clicked, current state:', isMobileMenuOpen); // Debug log
+            setIsMobileMenuOpen(!isMobileMenuOpen);
+          }}
           className="p-2 rounded-lg text-gray-700 hover:text-teal-600 hover:bg-gray-100 transition-colors"
           aria-label="Toggle mobile menu"
         >
@@ -486,12 +472,10 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
         </button>
       </div>
 
-      {/* Robust Mobile Menu - Improved Dropdown Handling */}
-      {isMobileMenuOpen && isMounted && createPortal(
+      {/* Simplified Mobile Menu - No Portal, Direct Rendering */}
+      {isMobileMenuOpen && (
         <div className="lg:hidden fixed inset-0 z-[9999] bg-black/50">
-          <div 
-            className="fixed top-0 right-0 w-80 max-w-[90vw] h-full bg-white shadow-xl overflow-y-auto"
-          >
+          <div className="fixed top-0 right-0 w-80 max-w-[90vw] h-full bg-white shadow-xl overflow-y-auto">
             {/* Header */}
             <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-teal-500 to-emerald-500">
               <div className="flex items-center justify-between">
@@ -502,7 +486,11 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                   <h2 className="text-lg font-bold text-white">Navigation</h2>
                 </div>
                 <button
-                  onClick={closeMobileMenu}
+                  onClick={() => {
+                    console.log('Close button clicked'); // Debug log
+                    setIsMobileMenuOpen(false);
+                    setActiveCategory(null);
+                  }}
                   className="p-2 rounded-lg bg-white/20 hover:bg-white/30 transition-colors"
                 >
                   <X className="w-5 h-5 text-white" />
@@ -533,7 +521,7 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                 </button>
               </div>
 
-              {/* Navigation Categories - Improved Dropdown System */}
+              {/* Navigation Categories - Simplified */}
               <div className="space-y-4">
                 {menuCategories.map((category) => {
                   const Icon = category.icon;
@@ -542,7 +530,7 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                   return (
                     <div key={category.id} className="border border-gray-200 rounded-lg overflow-hidden">
                       <button
-                        onClick={(e) => handleMobileCategoryToggle(category.id, e)}
+                        onClick={() => toggleMobileCategory(category.id)}
                         className="flex items-center justify-between w-full p-4 bg-gray-50 hover:bg-gray-100 transition-colors text-left"
                       >
                         <div className="flex items-center space-x-3">
@@ -561,7 +549,7 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                             return (
                               <button
                                 key={item.href}
-                                onClick={(e) => handleMobileSubitemNavigation(item.href, e)}
+                                onClick={() => handleMobileNavigation(item.href)}
                                 className="flex items-center space-x-3 p-4 w-full text-left hover:bg-teal-50 transition-colors border-b border-gray-100 last:border-b-0"
                               >
                                 <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
@@ -611,7 +599,8 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                     <button
                       onClick={() => {
                         signOut();
-                        closeMobileMenu();
+                        setIsMobileMenuOpen(false);
+                        setActiveCategory(null);
                       }}
                       className="flex items-center space-x-3 p-3 bg-red-50 hover:bg-red-100 rounded-lg transition-colors w-full text-left"
                     >
@@ -640,11 +629,10 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
               </div>
             </div>
           </div>
-        </div>,
-        document.body
+        </div>
       )}
 
-      {/* Search Modal would be handled by parent component */}
+      {/* Search Modal */}
       {isSearchOpen && (
         <div className="fixed inset-0 z-[10000] bg-black/50" onClick={() => setIsSearchOpen(false)}>
           <div 
