@@ -129,7 +129,7 @@ export default function ResumeCustomizer() {
       case 2:
         return jobData.job_title && jobData.company_name && jobData.job_description;
       case 3:
-        return analysisData; // Analysis completed
+        return jobData.job_title && jobData.company_name && jobData.job_description; // Can start analysis if job data is complete
       case 4:
         return tailoredResume; // Resume generated
       case 5:
@@ -148,7 +148,14 @@ export default function ResumeCustomizer() {
   };
 
   const analyzeJobFit = async () => {
-    if (!canProceed()) return;
+    console.log('🔥 ANALYZE FIT CLICKED - Starting analysis...');
+    console.log('🔥 Job data:', jobData);
+    console.log('🔥 Resume text length:', resumeText.length);
+    
+    if (!canProceed()) {
+      console.log('🔥 Cannot proceed - missing data');
+      return;
+    }
     
     setAnalyzing(true);
     setLoading(true);
@@ -809,8 +816,20 @@ Sincerely,
             </div>
           )}
 
-          {currentStep === 3 && (
+                        {currentStep === 3 && (
             <div className="space-y-8">
+              {/* Debug Info */}
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm">
+                <strong>Debug Info:</strong><br/>
+                Current Step: {currentStep}<br/>
+                Can Proceed: {canProceed() ? 'Yes' : 'No'}<br/>
+                Analysis Data: {analysisData ? 'Exists' : 'None'}<br/>
+                Job Title: {jobData.job_title || 'Empty'}<br/>
+                Company: {jobData.company_name || 'Empty'}<br/>
+                Job Description: {jobData.job_description ? `${jobData.job_description.length} chars` : 'Empty'}<br/>
+                Resume Text: {resumeText ? `${resumeText.length} chars` : 'Empty'}
+              </div>
+              
               <div className="text-center hidden lg:block">
                 <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                   <BarChart3 className="w-8 h-8 text-white" />
@@ -1148,6 +1167,7 @@ Sincerely,
               {currentStep === 3 && !analysisData && (
                 <button
                   onClick={analyzeJobFit}
+                  onMouseDown={() => console.log('🔥 ANALYZE FIT BUTTON PRESSED')}
                   disabled={!canProceed() || loading}
                   className="btn-modern flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
