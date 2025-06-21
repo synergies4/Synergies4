@@ -502,7 +502,7 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
                       <span className="px-2 py-1 bg-white/20 rounded-full text-xs font-bold">NEW</span>
                     </div>
                   </div>
-                </div>
+                </Link>
               </div>
 
               {/* Navigation Categories - Simplified */}
