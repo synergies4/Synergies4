@@ -38,6 +38,7 @@ import {
 import { toast } from 'sonner';
 import PageLayout from '@/components/shared/PageLayout';
 import ResumeEditor from '@/components/ResumeEditor';
+import jsPDF from 'jspdf';
 
 export default function ResumeCustomizer() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -343,6 +344,14 @@ There was an issue processing your file, but don't worry - we can still help!
     
     try {
       console.log('🔥 Making API call to analyze-fit...');
+      console.log('🔥 Request payload:', {
+        resume_content_length: resumeText.length,
+        job_description_length: jobData.job_description.length,
+        job_title: jobData.job_title,
+        company_name: jobData.company_name,
+        resume_preview: resumeText.substring(0, 200) + '...'
+      });
+      
       const response = await fetch('/api/resume-customizer/analyze-fit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -355,6 +364,7 @@ There was an issue processing your file, but don't worry - we can still help!
       });
 
       console.log('🔥 API Response status:', response.status);
+      console.log('🔥 API Response headers:', response.headers);
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -364,6 +374,8 @@ There was an issue processing your file, but don't worry - we can still help!
 
       const data = await response.json();
       console.log('🔥 Analysis data received:', data);
+      console.log('🔥 Analysis success:', data.success);
+      console.log('🔥 Analysis content keys:', Object.keys(data.analysis || {}));
       
       // Ensure minimum loading time for better UX
       const elapsedTime = Date.now() - startTime;
@@ -869,6 +881,107 @@ Sincerely,
     }
   };
 
+  // Helper functions for different export formats
+  const downloadAsPDF = (content: string, filename: string) => {
+    try {
+      const pdf = new jsPDF();
+      
+      // Set up PDF formatting
+      pdf.setFontSize(10);
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 20;
+      const maxWidth = pageWidth - 2 * margin;
+      
+      // Clean content for PDF
+      const cleanContent = content
+        .replace(/[^\x00-\x7F]/g, '') // Remove non-ASCII characters
+        .replace(/\*\*(.*?)\*\*/g, '$1') // Remove markdown bold
+        .replace(/\*(.*?)\*/g, '$1') // Remove markdown italic
+        .replace(/#{1,6}\s/g, '') // Remove markdown headers
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Convert links to text
+        .replace(/```[\s\S]*?```/g, '') // Remove code blocks
+        .trim();
+      
+      // Split content into lines that fit the page width
+      const lines = pdf.splitTextToSize(cleanContent, maxWidth);
+      
+      let yPosition = margin;
+      
+      // Add title
+      pdf.setFontSize(16);
+      pdf.setFont('helvetica', 'bold');
+      const title = filename.replace('.pdf', '').replace(/_/g, ' ');
+      pdf.text(title, margin, yPosition);
+      yPosition += 20;
+      
+      // Add content
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
+      
+      for (let i = 0; i < lines.length; i++) {
+        if (yPosition > pageHeight - margin) {
+          pdf.addPage();
+          yPosition = margin;
+        }
+        pdf.text(lines[i], margin, yPosition);
+        yPosition += 5;
+      }
+      
+      pdf.save(filename);
+      toast.success('PDF downloaded successfully!');
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      toast.error('PDF generation failed. Downloading as text instead.');
+      downloadAsTXT(content, filename.replace('.pdf', '.txt'));
+    }
+  };
+
+  const downloadAsRTF = (content: string, filename: string) => {
+    try {
+      // Clean content for RTF
+      const cleanContent = content
+        .replace(/\*\*(.*?)\*\*/g, '\\b $1 \\b0') // Convert markdown bold to RTF bold
+        .replace(/\*(.*?)\*/g, '\\i $1 \\i0') // Convert markdown italic to RTF italic
+        .replace(/#{1,6}\s(.*)/g, '\\b \\fs24 $1 \\b0\\fs20\\par') // Convert headers
+        .replace(/\n/g, '\\par ') // Convert line breaks
+        .replace(/[{}\\]/g, '\\$&'); // Escape RTF control characters
+      
+      // Create RTF document
+      const rtfContent = `{\\rtf1\\ansi\\deff0 {\\fonttbl {\\f0 Times New Roman;}}
+\\f0\\fs20 ${cleanContent}}`;
+      
+      const blob = new Blob([rtfContent], { type: 'application/rtf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success('Document downloaded successfully!');
+    } catch (error) {
+      console.error('RTF generation error:', error);
+      toast.error('Document generation failed. Downloading as text instead.');
+      downloadAsTXT(content, filename.replace('.docx', '.txt'));
+    }
+  };
+
+  const downloadAsTXT = (content: string, filename: string) => {
+    try {
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success('Text file downloaded successfully!');
+    } catch (error) {
+      console.error('Text download error:', error);
+      toast.error('Download failed. Please try again.');
+    }
+  };
+
   return (
     <PageLayout>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-teal-50">
@@ -941,49 +1054,82 @@ Sincerely,
               </div>
             </div>
 
-            {/* Desktop Progress Bar - Enhanced */}
-            <div className="hidden lg:flex items-center space-x-3 xl:space-x-4">
-              {steps.map((step, index) => {
-                const isActive = currentStep === index + 1;
-                const isCompleted = currentStep > index + 1;
-                const StepIcon = step.icon;
+            {/* Desktop Progress Bar - Enhanced & Aligned */}
+            <div className="hidden lg:block">
+              <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 shadow-xl border border-white/50">
+                <div className="flex items-center justify-between">
+                  {steps.map((step, index) => {
+                    const isActive = currentStep === index + 1;
+                    const isCompleted = currentStep > index + 1;
+                    const StepIcon = step.icon;
+                    
+                    return (
+                      <div key={index} className="flex items-center flex-1">
+                        {/* Step Circle and Content */}
+                        <div className="flex flex-col items-center text-center space-y-3 flex-1">
+                          {/* Icon Circle - Consistent Size */}
+                          <div className={`relative w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-500 flex-shrink-0 ${
+                            isCompleted 
+                              ? 'bg-gradient-to-br from-green-500 to-emerald-500 shadow-xl shadow-green-500/30 scale-105' 
+                              : isActive 
+                                ? 'bg-gradient-to-br from-teal-500 to-emerald-500 shadow-xl shadow-teal-500/30 scale-110' 
+                                : 'bg-white border-2 border-gray-200 hover:border-gray-300 hover:shadow-md'
+                          }`}>
+                            {/* Consistent Check Icon Size */}
+                            {isCompleted ? (
+                              <Check className="w-8 h-8 text-white" />
+                            ) : (
+                              <StepIcon className={`w-8 h-8 transition-colors ${isActive ? 'text-white' : 'text-gray-400'}`} />
+                            )}
+                            {isActive && (
+                              <div className="absolute -inset-2 bg-gradient-to-r from-teal-400 to-emerald-400 rounded-2xl opacity-20 animate-pulse"></div>
+                            )}
+                          </div>
+                          
+                          {/* Step Text - Aligned */}
+                          <div className="max-w-32">
+                            <h3 className={`font-bold text-sm leading-tight transition-colors ${
+                              isActive ? 'text-teal-700' : isCompleted ? 'text-green-700' : 'text-gray-600'
+                            }`}>
+                              {step.title}
+                            </h3>
+                            <p className={`text-xs mt-1 leading-tight transition-colors ${
+                              isActive ? 'text-teal-600' : isCompleted ? 'text-green-600' : 'text-gray-500'
+                            }`}>
+                              {step.description}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        {/* Connection Line */}
+                        {index < steps.length - 1 && (
+                          <div className={`w-16 h-1 mx-2 rounded-full transition-all duration-500 ${
+                            isCompleted ? 'bg-gradient-to-r from-green-500 to-emerald-500 shadow-sm' : 'bg-gray-200'
+                          }`} />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
                 
-                return (
-                  <div key={index} className="flex items-center flex-1">
-                    <div className="flex items-center space-x-3">
-                      <div className={`progress-step relative w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 ${
-                        isCompleted 
-                          ? 'bg-gradient-to-br from-green-500 to-emerald-500 shadow-xl shadow-green-500/30 scale-105' 
-                          : isActive 
-                            ? 'bg-gradient-to-br from-teal-500 to-emerald-500 shadow-xl shadow-teal-500/30 scale-110' 
-                            : 'bg-white border-2 border-gray-200 hover:border-gray-300 hover:shadow-md'
-                      }`}>
-                        {isCompleted ? (
-                          <Check className="w-7 h-7 text-white" />
-                        ) : (
-                          <StepIcon className={`w-7 h-7 transition-colors ${isActive ? 'text-white' : 'text-gray-400'}`} />
-                        )}
-                        {isActive && (
-                          <div className="absolute -inset-2 bg-gradient-to-r from-teal-400 to-emerald-400 rounded-2xl opacity-20 animate-pulse"></div>
-                        )}
-                      </div>
-                      <div className="min-w-0">
-                        <h3 className={`font-bold text-base transition-colors ${isActive ? 'text-teal-700' : isCompleted ? 'text-green-700' : 'text-gray-600'}`}>
-                          {step.title}
-                        </h3>
-                        <p className={`text-sm transition-colors ${isActive ? 'text-teal-600' : isCompleted ? 'text-green-600' : 'text-gray-500'}`}>
-                          {step.description}
-                        </p>
-                      </div>
-                    </div>
-                    {index < steps.length - 1 && (
-                      <div className={`flex-1 h-1 mx-4 rounded-full transition-all duration-500 ${
-                        isCompleted ? 'bg-gradient-to-r from-green-500 to-emerald-500 shadow-sm' : 'bg-gray-200'
-                      }`} />
-                    )}
-                  </div>
-                );
-              })}
+                {/* Progress Indicator */}
+                <div className="mt-6 w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className="bg-gradient-to-r from-teal-500 to-emerald-500 h-2 rounded-full transition-all duration-700 ease-out shadow-sm"
+                    style={{ width: `${(currentStep / steps.length) * 100}%` }}
+                  />
+                </div>
+                
+                {/* Step Counter */}
+                <div className="flex items-center justify-between mt-4 text-sm">
+                  <span className="font-semibold text-gray-700">
+                    Step {currentStep} of {steps.length}
+                  </span>
+                  <span className="font-medium text-teal-600">
+                    {Math.round((currentStep / steps.length) * 100)}% Complete
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1723,19 +1869,22 @@ Sincerely,
                           </h4>
                           <div className="space-y-2">
                             <button
-                              onClick={() => {
-                                const blob = new Blob([tailoredResume], { type: 'text/plain' });
-                                const url = URL.createObjectURL(blob);
-                                const a = document.createElement('a');
-                                a.href = url;
-                                a.download = `${jobData.company_name}_Resume.txt`;
-                                a.click();
-                                URL.revokeObjectURL(url);
-                                toast.success('Resume downloaded!');
-                              }}
+                              onClick={() => downloadAsTXT(tailoredResume, `${jobData.company_name}_Resume.txt`)}
                               className="w-full px-4 py-2 bg-green-100 hover:bg-green-200 text-green-800 rounded-lg transition-colors duration-200 text-sm font-medium"
                             >
                               Download as TXT
+                            </button>
+                            <button
+                              onClick={() => downloadAsPDF(tailoredResume, `${jobData.company_name}_Resume.pdf`)}
+                              className="w-full px-4 py-2 bg-red-100 hover:bg-red-200 text-red-800 rounded-lg transition-colors duration-200 text-sm font-medium"
+                            >
+                              Download as PDF
+                            </button>
+                            <button
+                              onClick={() => downloadAsRTF(tailoredResume, `${jobData.company_name}_Resume.docx`)}
+                              className="w-full px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-lg transition-colors duration-200 text-sm font-medium"
+                            >
+                              Download as DOCX
                             </button>
                           </div>
                         </div>
@@ -1749,19 +1898,22 @@ Sincerely,
                           </h4>
                           <div className="space-y-2">
                             <button
-                              onClick={() => {
-                                const blob = new Blob([coverLetter], { type: 'text/plain' });
-                                const url = URL.createObjectURL(blob);
-                                const a = document.createElement('a');
-                                a.href = url;
-                                a.download = `${jobData.company_name}_CoverLetter.txt`;
-                                a.click();
-                                URL.revokeObjectURL(url);
-                                toast.success('Cover letter downloaded!');
-                              }}
-                              className="w-full px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-lg transition-colors duration-200 text-sm font-medium"
+                              onClick={() => downloadAsTXT(coverLetter, `${jobData.company_name}_CoverLetter.txt`)}
+                              className="w-full px-4 py-2 bg-green-100 hover:bg-green-200 text-green-800 rounded-lg transition-colors duration-200 text-sm font-medium"
                             >
                               Download as TXT
+                            </button>
+                            <button
+                              onClick={() => downloadAsPDF(coverLetter, `${jobData.company_name}_CoverLetter.pdf`)}
+                              className="w-full px-4 py-2 bg-red-100 hover:bg-red-200 text-red-800 rounded-lg transition-colors duration-200 text-sm font-medium"
+                            >
+                              Download as PDF
+                            </button>
+                            <button
+                              onClick={() => downloadAsRTF(coverLetter, `${jobData.company_name}_CoverLetter.docx`)}
+                              className="w-full px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-lg transition-colors duration-200 text-sm font-medium"
+                            >
+                              Download as DOCX
                             </button>
                           </div>
                         </div>
@@ -1779,18 +1931,36 @@ Sincerely,
                                 const content = interviewQuestions.map((q: any, i: number) => 
                                   `Question ${i + 1}: ${q.question}\n\nTips: ${q.tips || 'No tips provided'}\n\nSuggested Approach: ${q.suggested_answer || 'No suggestions provided'}\n\n---\n\n`
                                 ).join('');
-                                const blob = new Blob([`Interview Preparation for ${jobData.job_title} at ${jobData.company_name}\n\n${content}`], { type: 'text/plain' });
-                                const url = URL.createObjectURL(blob);
-                                const a = document.createElement('a');
-                                a.href = url;
-                                a.download = `${jobData.company_name}_InterviewQuestions.txt`;
-                                a.click();
-                                URL.revokeObjectURL(url);
-                                toast.success('Interview questions downloaded!');
+                                const fullContent = `Interview Preparation for ${jobData.job_title} at ${jobData.company_name}\n\n${content}`;
+                                downloadAsTXT(fullContent, `${jobData.company_name}_InterviewQuestions.txt`);
                               }}
-                              className="w-full px-4 py-2 bg-purple-100 hover:bg-purple-200 text-purple-800 rounded-lg transition-colors duration-200 text-sm font-medium"
+                              className="w-full px-4 py-2 bg-green-100 hover:bg-green-200 text-green-800 rounded-lg transition-colors duration-200 text-sm font-medium"
                             >
                               Download as TXT
+                            </button>
+                            <button
+                              onClick={() => {
+                                const content = interviewQuestions.map((q: any, i: number) => 
+                                  `Question ${i + 1}: ${q.question}\n\nTips: ${q.tips || 'No tips provided'}\n\nSuggested Approach: ${q.suggested_answer || 'No suggestions provided'}\n\n---\n\n`
+                                ).join('');
+                                const fullContent = `Interview Preparation for ${jobData.job_title} at ${jobData.company_name}\n\n${content}`;
+                                downloadAsPDF(fullContent, `${jobData.company_name}_InterviewQuestions.pdf`);
+                              }}
+                              className="w-full px-4 py-2 bg-red-100 hover:bg-red-200 text-red-800 rounded-lg transition-colors duration-200 text-sm font-medium"
+                            >
+                              Download as PDF
+                            </button>
+                            <button
+                              onClick={() => {
+                                const content = interviewQuestions.map((q: any, i: number) => 
+                                  `Question ${i + 1}: ${q.question}\n\nTips: ${q.tips || 'No tips provided'}\n\nSuggested Approach: ${q.suggested_answer || 'No suggestions provided'}\n\n---\n\n`
+                                ).join('');
+                                const fullContent = `Interview Preparation for ${jobData.job_title} at ${jobData.company_name}\n\n${content}`;
+                                downloadAsRTF(fullContent, `${jobData.company_name}_InterviewQuestions.docx`);
+                              }}
+                              className="w-full px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-lg transition-colors duration-200 text-sm font-medium"
+                            >
+                              Download as DOCX
                             </button>
                           </div>
                         </div>
@@ -1801,9 +1971,10 @@ Sincerely,
                     <div className="border-t border-gray-200 pt-6">
                       <div className="text-center">
                         <h4 className="text-lg font-bold text-gray-900 mb-4">Complete Application Package</h4>
-                        <button
-                          onClick={() => {
-                            const packageContent = `JOB APPLICATION PACKAGE
+                        <div className="space-y-3">
+                          <button
+                            onClick={() => {
+                              const packageContent = `JOB APPLICATION PACKAGE
 ${jobData.job_title} at ${jobData.company_name}
 Generated on ${new Date().toLocaleDateString()}
 
@@ -1842,20 +2013,62 @@ ${analysisData?.improvements?.map((i: string) => `• ${i}`).join('\n') || 'No a
 Important Keywords:
 ${analysisData?.missing_keywords?.join(', ') || 'No keywords identified'}
 `;
-                            const blob = new Blob([packageContent], { type: 'text/plain' });
-                            const url = URL.createObjectURL(blob);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = `${jobData.company_name}_Complete_Application_Package.txt`;
-                            a.click();
-                            URL.revokeObjectURL(url);
-                            toast.success('Complete package downloaded!');
-                          }}
-                          className="px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl font-semibold text-lg transform hover:scale-[1.02] active:scale-[0.98]"
-                        >
-                          <Download className="w-5 h-5 inline mr-2" />
-                          Download Complete Package
-                        </button>
+                              downloadAsTXT(packageContent, `${jobData.company_name}_Complete_Application_Package.txt`);
+                            }}
+                            className="px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl font-semibold text-lg transform hover:scale-[1.02] active:scale-[0.98] w-full sm:w-auto"
+                          >
+                            <Download className="w-5 h-5 inline mr-2" />
+                            Download Package (TXT)
+                          </button>
+                          <button
+                            onClick={() => {
+                              const packageContent = `JOB APPLICATION PACKAGE
+${jobData.job_title} at ${jobData.company_name}
+Generated on ${new Date().toLocaleDateString()}
+
+========================================
+TAILORED RESUME
+========================================
+
+${tailoredResume || 'Resume not generated'}
+
+========================================
+COVER LETTER
+========================================
+
+${coverLetter || 'Cover letter not generated'}
+
+========================================
+INTERVIEW PREPARATION
+========================================
+
+${interviewQuestions.length > 0 ? interviewQuestions.map((q: any, i: number) => 
+  `Question ${i + 1}: ${q.question}\n\nTips: ${q.tips || 'No tips provided'}\n\nSuggested Approach: ${q.suggested_answer || 'No suggestions provided'}\n\n---\n\n`
+).join('') : 'Interview questions not generated'}
+
+========================================
+JOB FIT ANALYSIS
+========================================
+
+Overall Fit Score: ${analysisData?.fit_score || 'Not analyzed'}%
+
+Key Strengths:
+${analysisData?.strengths?.map((s: string) => `• ${s}`).join('\n') || 'No analysis available'}
+
+Areas for Improvement:
+${analysisData?.improvements?.map((i: string) => `• ${i}`).join('\n') || 'No analysis available'}
+
+Important Keywords:
+${analysisData?.missing_keywords?.join(', ') || 'No keywords identified'}
+`;
+                              downloadAsPDF(packageContent, `${jobData.company_name}_Complete_Application_Package.pdf`);
+                            }}
+                            className="px-8 py-4 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl font-semibold text-lg transform hover:scale-[1.02] active:scale-[0.98] w-full sm:w-auto"
+                          >
+                            <Download className="w-5 h-5 inline mr-2" />
+                            Download Package (PDF)
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
