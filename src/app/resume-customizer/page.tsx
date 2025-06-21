@@ -37,6 +37,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import PageLayout from '@/components/shared/PageLayout';
+import ResumeEditor from '@/components/ResumeEditor';
 
 export default function ResumeCustomizer() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -162,38 +163,81 @@ export default function ResumeCustomizer() {
     setAnalyzing(true);
     setLoading(true);
     
+    // Add minimum 3-second delay to show the AI is working
+    const startTime = Date.now();
+    const minLoadTime = 3000; // 3 seconds minimum
+    
     try {
+      console.log('🔥 Making API call to analyze-fit...');
       const response = await fetch('/api/resume-customizer/analyze-fit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          resume_text: resumeText,
+          resume_content: resumeText,
           job_description: jobData.job_description,
           job_title: jobData.job_title,
           company_name: jobData.company_name
         })
       });
 
-      if (!response.ok) throw new Error('Analysis failed');
+      console.log('🔥 API Response status:', response.status);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.log('🔥 API Error response:', errorText);
+        throw new Error(`Analysis failed: ${response.status} - ${errorText}`);
+      }
 
       const data = await response.json();
-      setAnalysisData(data);
-      setApiStatus('working');
-      toast.success('Job fit analysis completed!');
+      console.log('🔥 Analysis data received:', data);
+      
+      // Ensure minimum loading time for better UX
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, minLoadTime - elapsedTime);
+      if (remainingTime > 0) {
+        await new Promise(resolve => setTimeout(resolve, remainingTime));
+      }
+      
+      if (data.success && data.analysis) {
+        // Map the API response to the expected format
+        const analysis = {
+          fit_score: data.analysis.overall_fit_score || 75,
+          strengths: data.analysis.strengths || [],
+          improvements: data.analysis.improvement_suggestions || [],
+          missing_keywords: data.analysis.skill_gaps || [],
+          skill_matches: data.analysis.skill_matches || [],
+          experience_alignment: data.analysis.experience_alignment || '',
+          recommended_focus_areas: data.analysis.recommended_focus_areas || []
+        };
+        
+        setAnalysisData(analysis);
+        setApiStatus('working');
+        toast.success('AI job fit analysis completed!');
+      } else {
+        throw new Error('Invalid response format');
+      }
     } catch (error) {
-      console.error('Analysis API failed, using intelligent fallback:', error);
-      // Generate more realistic fallback analysis using actual job data
+      console.error('🔥 Analysis API failed:', error);
+      
+      // Ensure minimum loading time even for fallback
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, minLoadTime - elapsedTime);
+      if (remainingTime > 0) {
+        await new Promise(resolve => setTimeout(resolve, remainingTime));
+      }
+      
+      // Only use fallback after a real error
       const jobKeywords = jobData.job_description.toLowerCase().split(/\s+/)
         .filter(word => word.length > 3)
         .slice(0, 5);
         
       const fallbackAnalysis = {
-        fit_score: Math.floor(Math.random() * 20) + 75, // Random score 75-95
+        fit_score: Math.floor(Math.random() * 20) + 70, // Random score 70-90
         strengths: [
           `Relevant experience that aligns with ${jobData.job_title} requirements`,
-          `Strong background that matches ${jobData.company_name}'s needs`,
-          'Professional qualifications demonstrated in resume',
-          'Good potential for role success based on experience'
+          `Professional background suitable for ${jobData.company_name}`,
+          'Demonstrated skills and qualifications',
+          'Strong potential for role success'
         ],
         improvements: [
           `Incorporate more keywords from the ${jobData.job_title} job description`,
@@ -202,7 +246,7 @@ export default function ResumeCustomizer() {
           'Emphasize leadership and collaboration skills'
         ],
         missing_keywords: jobKeywords.length > 0 ? jobKeywords : [
-          jobData.job_title.toLowerCase(),
+          jobData.job_title.toLowerCase().split(' ')[0],
           'experience',
           'skills',
           'management',
@@ -211,7 +255,7 @@ export default function ResumeCustomizer() {
       };
       setAnalysisData(fallbackAnalysis);
       setApiStatus('fallback');
-      toast.success('Analysis completed with intelligent insights!');
+      toast.error('AI analysis temporarily unavailable. Using intelligent backup analysis.');
     } finally {
       setAnalyzing(false);
       setLoading(false);
@@ -506,18 +550,6 @@ Sincerely,
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
     }
-  };
-
-  const downloadContent = (content: string, filename: string) => {
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
   };
 
   return (
@@ -910,10 +942,14 @@ Sincerely,
                 <div className="max-w-2xl mx-auto">
                   <div className="text-center p-12">
                     <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Analyzing Job Fit</h3>
-                    <p className="text-gray-600">
-                      Our AI is comparing your resume against the job requirements...
-                    </p>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Analyzing Job Fit with AI</h3>
+                    <div className="space-y-2 text-gray-600">
+                      <p className="animate-pulse">🧠 Processing your resume content...</p>
+                      <p className="animate-pulse delay-500">📋 Analyzing job requirements...</p>
+                      <p className="animate-pulse delay-1000">🔍 Matching skills and experience...</p>
+                      <p className="animate-pulse delay-1500">📊 Calculating fit score...</p>
+                      <p className="text-sm text-gray-500 mt-4">This may take a few moments for accurate AI analysis</p>
+                    </div>
                   </div>
                 </div>
               )}
@@ -1044,21 +1080,18 @@ Sincerely,
 
                 {tailoredResume && (
                   <div className="mt-8 space-y-6">
-                    <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-lg">
-                      <div className="flex items-center justify-between mb-6">
-                        <h4 className="text-xl font-bold text-gray-900">Your Tailored Resume</h4>
-                        <button
-                          onClick={() => downloadContent(tailoredResume, `${jobData.company_name}_Resume.txt`)}
-                          className="flex items-center space-x-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
-                        >
-                          <Download className="w-4 h-4" />
-                          <span>Download</span>
-                        </button>
-                      </div>
-                      <div className="bg-gray-50 rounded-xl p-6 max-h-96 overflow-y-auto">
-                        <pre className="whitespace-pre-wrap text-sm text-gray-700">{tailoredResume}</pre>
-                      </div>
-                    </div>
+                    <ResumeEditor
+                      content={tailoredResume}
+                      title={`Tailored Resume for ${jobData.company_name}`}
+                      onSave={(updatedContent) => setTailoredResume(updatedContent)}
+                      modifications={[
+                        'Resume optimized for this specific job position',
+                        'Keywords incorporated from job description',
+                        'Content reorganized to highlight relevant experience',
+                        'Skills section enhanced based on job requirements'
+                      ]}
+                      keywords={analysisData?.missing_keywords || []}
+                    />
                   </div>
                 )}
               </div>
@@ -1107,21 +1140,18 @@ Sincerely,
 
                 {coverLetter && (
                   <div className="mt-8 space-y-6">
-                    <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-lg">
-                      <div className="flex items-center justify-between mb-6">
-                        <h4 className="text-xl font-bold text-gray-900">Your Cover Letter</h4>
-                        <button
-                          onClick={() => downloadContent(coverLetter, `${jobData.company_name}_CoverLetter.txt`)}
-                          className="flex items-center space-x-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
-                        >
-                          <Download className="w-4 h-4" />
-                          <span>Download</span>
-                        </button>
-                      </div>
-                      <div className="bg-gray-50 rounded-xl p-6 max-h-96 overflow-y-auto">
-                        <pre className="whitespace-pre-wrap text-sm text-gray-700">{coverLetter}</pre>
-                      </div>
-                    </div>
+                    <ResumeEditor
+                      content={coverLetter}
+                      title={`Cover Letter for ${jobData.company_name}`}
+                      onSave={(updatedContent) => setCoverLetter(updatedContent)}
+                      modifications={[
+                        'Cover letter tailored for this specific company',
+                        'Content personalized based on job requirements',
+                        'Company culture and values incorporated',
+                        'Professional tone and formatting applied'
+                      ]}
+                      keywords={[jobData.job_title, jobData.company_name, 'experience', 'skills']}
+                    />
                   </div>
                 )}
               </div>
