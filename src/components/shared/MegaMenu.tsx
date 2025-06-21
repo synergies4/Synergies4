@@ -166,15 +166,15 @@ const menuCategories: MenuCategory[] = [
 
 interface MegaMenuProps {
   isScrolled: boolean;
+  onSearchOpen: () => void;
 }
 
-export default function MegaMenu({ isScrolled }: MegaMenuProps) {
+export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
   const { user, userProfile, signOut } = useAuth();
   const router = useRouter();
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -217,19 +217,7 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
     };
   }, [isMobileMenuOpen]);
 
-  // Search functionality
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Open search with Cmd/Ctrl + K
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        setIsSearchOpen(true);
-      }
-    };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
 
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -312,7 +300,7 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
         <Button
           variant="outline"
           size="sm"
-          onClick={() => setIsSearchOpen(true)}
+          onClick={onSearchOpen}
           className="flex items-center space-x-2 text-gray-900 hover:text-teal-600 border-gray-400 hover:border-teal-500 hover:bg-teal-50 px-3 py-2 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-white mr-4"
           aria-label="Open search"
         >
@@ -459,7 +447,7 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
         <Button
           variant="outline"
           size="sm"
-          onClick={() => setIsSearchOpen(true)}
+          onClick={onSearchOpen}
           className="p-2 border-gray-400 hover:border-teal-500 hover:text-teal-600 hover:bg-teal-50 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-white text-gray-900"
           aria-label="Open search"
         >
@@ -672,27 +660,7 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
         document.body
       )}
 
-      {/* Search Modal */}
-      {isSearchOpen && isMounted && createPortal(
-        <div className="fixed inset-0 bg-black/50" style={{ zIndex: 1000001 }} onClick={() => setIsSearchOpen(false)}>
-          <div 
-            className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-white rounded-xl p-6 mx-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="text-center">
-              <Search className="w-12 h-12 text-teal-600 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Search Coming Soon</h3>
-              <p className="text-gray-600 mb-4">
-                We're working on an amazing search experience for you!
-              </p>
-              <Button onClick={() => setIsSearchOpen(false)} className="bg-teal-600 hover:bg-teal-700 text-white">
-                Close
-              </Button>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
+
     </div>
   );
 } 

@@ -168,26 +168,11 @@ function Navigation({ isSearchOpen, setIsSearchOpen, headerVisible, lastScrollY 
                 </Link>
               </div>
               
-              {/* Desktop Search Button */}
-              <div className="hidden lg:flex items-center space-x-3 ml-8 mr-6">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsSearchOpen(true)}
-                  className="flex items-center space-x-2 text-gray-900 hover:text-teal-600 border-gray-400 hover:border-teal-500 hover:bg-teal-50 px-3 py-2 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-white"
-                  aria-label="Open search"
-                >
-                  <Search className="w-4 h-4" />
-                  <span className="hidden xl:inline">Search</span>
-                  <kbd className="hidden xl:inline-flex h-5 select-none items-center gap-1 rounded border bg-gray-100 px-1.5 font-mono text-[10px] font-medium opacity-100 ml-2">
-                    <span className="text-xs">⌘</span>K
-                  </kbd>
-                </Button>
-              </div>
+
 
               {/* Navigation Menu - Desktop and Mobile */}
               <div className="flex flex-1 justify-end">
-                <MegaMenu isScrolled={lastScrollY > 50} />
+                <MegaMenu isScrolled={lastScrollY > 50} onSearchOpen={() => setIsSearchOpen(true)} />
               </div>
             </div>
           </div>
