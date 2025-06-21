@@ -190,41 +190,69 @@ export default function ResumeCustomizer() {
             
             const fallbackAdvice = 'Try copying your resume text and pasting it below.';
              
+             // Enhanced error message with specific guidance
              text = `⚠️ TEXT EXTRACTION ISSUE: ${file.name}
 
 📄 **${errorMessage}**
 
-**POSSIBLE CAUSES:**
+${errorMessage.includes('scanned document') ? `
+🔍 **DETECTED: SCANNED/IMAGE-BASED PDF**
+Your PDF contains images of text rather than actual text content. This is common with:
+• Scanned documents
+• PDFs created from photos
+• Mobile scanner app exports
+• Some resume templates
+
+` : `**POSSIBLE CAUSES:**
 • File may be password-protected or encrypted
-• File may contain only images/scanned content (like a photo of a resume)
+• File may contain only images/scanned content
 • File may be corrupted or in an unsupported format
-• Some PDFs are image-based and don't contain extractable text
 
-**IMMEDIATE SOLUTION:**
-✅ **Use the manual text input below** - Copy your resume content and paste it in the text area
+`}**✅ IMMEDIATE SOLUTION - MANUAL INPUT:**
+The manual text input below actually works better than PDF extraction!
 
-**ALTERNATIVE OPTIONS:**
-1. **Save as text-based PDF** - Re-export from Word/Google Docs as PDF
-2. **Convert to DOCX** - Save as Word document format
-3. **Use OCR software** - Convert scanned images to text first
+**📋 HOW TO USE MANUAL INPUT:**
+1. Open your original resume (Word, Google Docs, etc.)
+2. Select all text (Ctrl/Cmd + A)
+3. Copy (Ctrl/Cmd + C)  
+4. Paste in the text area below
+5. Continue with resume customization
 
-**FILE DETAILS:**
+**🔄 ALTERNATIVE OPTIONS:**
+• **Re-export PDF**: From Word/Google Docs, save as PDF with "Text" option
+• **Use DOCX**: Upload a Word document instead
+• **Try TXT file**: Save your resume as a plain text file
+
+**📊 FILE DETAILS:**
 • Name: ${file.name}
 • Size: ${(file.size / 1024 / 1024).toFixed(2)} MB
 • Type: ${fileTypeName}
 
-💡 **BEST OPTION:** Copy your resume text from the original document and paste it in the manual input field below.`;
+💡 **PRO TIP:** Manual input gives you full control and often produces better results!`;
 
-             toast.error(`Text extraction failed: ${errorMessage}`, {
-               duration: 5000,
+             // Enhanced toast notification
+             const isScannedPDF = errorMessage.includes('scanned document');
+             const toastMessage = isScannedPDF 
+               ? `📄 Scanned PDF detected! Use manual text input below for best results.`
+               : `📄 ${errorMessage}`;
+             
+             toast.error(toastMessage, {
+               duration: 8000,
                action: {
-                 label: 'Use Manual Input',
+                 label: '📝 Go to Manual Input',
                  onClick: () => {
                    // Scroll to manual input area
                    const textArea = document.querySelector('textarea[placeholder*="Paste your resume content"]') as HTMLTextAreaElement;
                    if (textArea) {
                      textArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
                      textArea.focus();
+                     // Add a visual highlight
+                     textArea.style.border = '2px solid #10b981';
+                     textArea.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.1)';
+                     setTimeout(() => {
+                       textArea.style.border = '';
+                       textArea.style.boxShadow = '';
+                     }, 3000);
                    }
                  }
                }
@@ -1424,6 +1452,14 @@ Sincerely,
                           filename: 'Manual Entry',
                           content: text
                         }));
+                        
+                        // Show encouraging message when user starts typing after upload failure
+                        if (text.length > 100 && uploadedFile && text.length === 101) {
+                          toast.success('✅ Perfect! Manual input often gives better results than PDF extraction.', {
+                            duration: 4000
+                          });
+                        }
+                        
                         // Clear uploaded file if user starts typing
                         if (text && uploadedFile) {
                           setUploadedFile(null);

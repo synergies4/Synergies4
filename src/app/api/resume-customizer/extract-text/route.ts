@@ -131,7 +131,8 @@ async function extractPDFText(file: File): Promise<string> {
     () => extractPDFWithMobileOptions(buffer),
     () => extractPDFWithLegacyOptions(buffer),
     () => extractPDFWithMinimalOptions(buffer),
-    () => extractPDFPageByPage(buffer)
+    () => extractPDFPageByPage(buffer),
+    () => extractPDFWithAdvancedFallback(buffer) // Advanced detection for scanned documents
   ];
   
   let lastError: Error | null = null;
@@ -304,6 +305,92 @@ async function extractPDFPageByPage(buffer: Buffer): Promise<string> {
     console.log('Page-by-page extraction failed:', error);
     throw error;
   }
+}
+
+async function extractPDFWithAdvancedFallback(buffer: Buffer): Promise<string> {
+  const pdfParse = (await import('pdf-parse')).default;
+  
+  try {
+    console.log('📄 Advanced fallback: Analyzing PDF structure');
+    
+    // First, get basic PDF info
+    const pdfInfo = await pdfParse(buffer, { max: 1 });
+    
+    console.log('📄 PDF Analysis:', {
+      pages: pdfInfo.numpages,
+      info: pdfInfo.info,
+      metadata: pdfInfo.metadata,
+      hasText: !!pdfInfo.text && pdfInfo.text.length > 0
+    });
+    
+    // Check if this looks like a scanned document
+    const isLikelyScanned = analyzePDFForScannedContent(pdfInfo, buffer);
+    
+    if (isLikelyScanned) {
+      throw new Error(`This appears to be a scanned document or image-based PDF (${pdfInfo.numpages} pages). These PDFs contain images of text rather than actual text content.
+
+🔧 SOLUTIONS:
+1. **Copy & Paste**: Open your original resume document and copy/paste the text into the manual input area below
+2. **Re-export**: If you have the original document (Word, Google Docs), export it as a new PDF with "Text" option selected
+3. **Use Manual Input**: This actually works great and gives you full control over the content
+
+💡 TIP: Manual text input often produces better results than PDF extraction anyway!`);
+    }
+    
+    // Try one final aggressive extraction
+    console.log('📄 Attempting final aggressive extraction');
+    const finalAttempt = await pdfParse(buffer, { max: 0 });
+    
+    if (finalAttempt.text && finalAttempt.text.trim().length > 10) {
+      return finalAttempt.text;
+    }
+    
+    throw new Error('No extractable text found in PDF despite multiple extraction attempts.');
+    
+  } catch (error) {
+    console.log('📄 Advanced fallback failed:', error);
+    throw error;
+  }
+}
+
+function analyzePDFForScannedContent(pdfInfo: any, buffer: Buffer): boolean {
+  // Heuristics to detect scanned documents
+  const bufferSize = buffer.length;
+  const pages = pdfInfo.numpages || 1;
+  const avgSizePerPage = bufferSize / pages;
+  
+  // Large file size per page often indicates images/scans
+  const hasLargeFileSize = avgSizePerPage > 500000; // 500KB per page
+  
+  // Check PDF metadata for scanning indicators
+  const creator = pdfInfo.info?.Creator || '';
+  const producer = pdfInfo.info?.Producer || '';
+  
+  const scanningKeywords = [
+    'scan', 'scanner', 'acrobat', 'adobe scan', 'camscanner', 
+    'genius scan', 'tiny scanner', 'clear scan', 'photo', 'image'
+  ];
+  
+  const isFromScanner = scanningKeywords.some(keyword => 
+    creator.toLowerCase().includes(keyword) || 
+    producer.toLowerCase().includes(keyword)
+  );
+  
+  // No text content is a strong indicator
+  const hasNoText = !pdfInfo.text || pdfInfo.text.trim().length === 0;
+  
+  console.log('📄 Scan detection analysis:', {
+    avgSizePerPage: Math.round(avgSizePerPage),
+    hasLargeFileSize,
+    creator,
+    producer,
+    isFromScanner,
+    hasNoText,
+    totalPages: pages
+  });
+  
+  // Return true if multiple indicators suggest it's scanned
+  return hasNoText && (hasLargeFileSize || isFromScanner || pages > 5);
 }
 
 async function extractDOCXText(file: File): Promise<string> {
