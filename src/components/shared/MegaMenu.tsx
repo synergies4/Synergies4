@@ -465,8 +465,25 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
 
       {/* Mobile Menu - Using Portal to Escape Stacking Context */}
       {isMobileMenuOpen && isMounted && createPortal(
-        <div className="lg:hidden fixed inset-0 bg-black/50" style={{ zIndex: 999999 }}>
-          <div className="fixed top-0 right-0 w-80 max-w-[90vw] h-full bg-white shadow-xl overflow-y-auto" style={{ zIndex: 1000000 }}>
+        <div 
+          className="lg:hidden fixed inset-0 bg-black/50" 
+          style={{ zIndex: 999999 }}
+          onClick={(e) => {
+            // Only close if clicking on the overlay itself, not the menu content
+            if (e.target === e.currentTarget) {
+              setIsMobileMenuOpen(false);
+              setActiveCategory(null);
+            }
+          }}
+        >
+          <div 
+            className="fixed top-0 right-0 w-80 max-w-[90vw] h-full bg-white shadow-xl overflow-y-auto" 
+            style={{ zIndex: 1000000 }}
+            onClick={(e) => {
+              // Prevent clicks inside the menu from bubbling up to the overlay
+              e.stopPropagation();
+            }}
+          >
             {/* Header */}
             <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-teal-500 to-emerald-500">
               <div className="flex items-center justify-between">

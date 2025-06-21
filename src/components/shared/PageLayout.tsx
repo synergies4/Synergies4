@@ -28,7 +28,6 @@ import {
   UserPlus
 } from 'lucide-react';
 import GlobalSearch from '@/components/shared/GlobalSearch';
-import MeetingRecorder from '@/components/MeetingRecorder';
 import MegaMenu from '@/components/shared/MegaMenu';
 
 // Scroll to top component
@@ -365,9 +364,6 @@ export default function PageLayout({ children, showStats = false }: PageLayoutPr
       {showScrollTop && (
         <ScrollToTop />
       )}
-      
-      {/* Meeting Recorder Floating Button */}
-      <MeetingRecorder />
       
       {/* Global Search Modal */}
       <GlobalSearch 
