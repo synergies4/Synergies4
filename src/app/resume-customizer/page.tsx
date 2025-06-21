@@ -338,6 +338,7 @@ export default function ResumeCustomizer() {
         credentials: 'include',
         body: JSON.stringify({
           original_resume: resumeData.content,
+          resume_content: resumeText, // Include full resume text for better analysis
           job_description: `Job Title: ${jobData.job_title}\nCompany: ${jobData.company_name}\n\n${jobData.job_description}`,
           job_title: jobData.job_title,
           company_name: jobData.company_name
@@ -412,35 +413,67 @@ Sincerely,
     return [
       {
         question: `Tell me about yourself and why you're interested in the ${jobData.job_title} role.`,
-        category: 'General'
+        type: 'behavioral',
+        category: 'Introduction',
+        difficulty: 'easy',
+        tips: 'Focus on relevant experience, keep it concise (2-3 minutes), and connect your background to the role.',
+        suggested_answer: `Based on your resume, you could highlight your ${resumeText.includes('experience') ? 'professional experience' : 'background'} and explain how it aligns with the ${jobData.job_title} position.`
       },
       {
         question: `What attracts you to working at ${jobData.company_name}?`,
-        category: 'Company Fit'
+        type: 'company',
+        category: 'Company Interest',
+        difficulty: 'medium',
+        tips: 'Research the company\'s mission, values, and recent developments. Show genuine enthusiasm.',
+        suggested_answer: `Research ${jobData.company_name}'s mission and values, then connect them to your career goals and the skills shown in your resume.`
       },
       {
         question: `Describe your relevant experience for this ${jobData.job_title} position.`,
-        category: 'Technical'
+        type: 'technical',
+        category: 'Experience',
+        difficulty: 'medium',
+        tips: 'Use specific examples from your background and quantify achievements where possible.',
+        suggested_answer: `Draw from the experiences listed in your resume, focusing on those most relevant to ${jobData.job_title}. Use the STAR method for structure.`
       },
       {
         question: 'What are your greatest strengths and how do they apply to this role?',
-        category: 'Behavioral'
+        type: 'behavioral',
+        category: 'Strengths',
+        difficulty: 'easy',
+        tips: 'Choose strengths that are relevant to the job and provide specific examples.',
+        suggested_answer: 'Based on your resume, identify 2-3 key strengths that align with the job requirements and provide concrete examples.'
       },
       {
         question: 'Describe a challenging project you worked on and how you overcame obstacles.',
-        category: 'Problem Solving'
+        type: 'behavioral',
+        category: 'Problem Solving',
+        difficulty: 'medium',
+        tips: 'Use the STAR method (Situation, Task, Action, Result) and focus on your specific contributions.',
+        suggested_answer: 'Think of a challenging project from your resume and structure your answer using STAR method, emphasizing your problem-solving approach.'
       },
       {
         question: 'Where do you see yourself in 5 years and how does this role fit into your career goals?',
-        category: 'Career Goals'
+        type: 'behavioral',
+        category: 'Career Goals',
+        difficulty: 'medium',
+        tips: 'Show ambition while being realistic, and align your goals with company growth opportunities.',
+        suggested_answer: 'Connect your career trajectory shown in your resume to future goals, showing how this role is a logical next step.'
       },
       {
         question: `What questions do you have about the ${jobData.job_title} role or ${jobData.company_name}?`,
-        category: 'Questions for Them'
+        type: 'role',
+        category: 'Questions for Them',
+        difficulty: 'easy',
+        tips: 'Prepare thoughtful questions that show genuine interest and research.',
+        suggested_answer: 'Ask about growth opportunities, team dynamics, success metrics, or specific challenges mentioned in the job description.'
       },
       {
         question: 'How do you handle working under pressure and tight deadlines?',
-        category: 'Work Style'
+        type: 'behavioral',
+        category: 'Work Style',
+        difficulty: 'medium',
+        tips: 'Provide specific examples and mention any stress management techniques you use.',
+        suggested_answer: 'Reference specific situations from your work history where you successfully managed pressure, using examples from your resume.'
       }
     ];
   };
@@ -1113,29 +1146,89 @@ Sincerely,
 
                 {interviewQuestions.length > 0 && (
                   <div className="mt-8 space-y-6">
-                    <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-lg">
-                      <div className="flex items-center justify-between mb-6">
-                        <h4 className="text-xl font-bold text-gray-900">Interview Questions</h4>
-                        <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
-                          {interviewQuestions.length} Questions
-                        </span>
-                      </div>
-                      <div className="space-y-4">
-                        {interviewQuestions.map((item, index) => (
-                          <div key={index} className="bg-gray-50 rounded-xl p-6">
-                            <div className="flex items-center space-x-3 mb-3">
-                              <span className="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                                {index + 1}
-                              </span>
-                              <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
-                                {item.category}
+                    {/* Questions grouped by category */}
+                    {(() => {
+                      const questionsByType = interviewQuestions.reduce((acc: any, question: any) => {
+                        const type = question.type || 'general';
+                        if (!acc[type]) acc[type] = [];
+                        acc[type].push(question);
+                        return acc;
+                      }, {});
+
+                      const typeConfig = {
+                        behavioral: { title: 'Behavioral Questions', icon: '🧠', color: 'blue' },
+                        technical: { title: 'Technical Questions', icon: '⚙️', color: 'green' },
+                        company: { title: 'Company-Specific Questions', icon: '🏢', color: 'purple' },
+                        role: { title: 'Role-Specific Questions', icon: '💼', color: 'orange' },
+                        general: { title: 'General Questions', icon: '💬', color: 'gray' }
+                      };
+
+                      return Object.entries(questionsByType).map(([type, questions]: [string, any]) => {
+                        const config = typeConfig[type as keyof typeof typeConfig] || typeConfig.general;
+                        return (
+                          <div key={type} className="bg-white border border-gray-200 rounded-2xl p-8 shadow-lg">
+                            <div className="flex items-center space-x-3 mb-6">
+                              <span className="text-2xl">{config.icon}</span>
+                              <h4 className="text-xl font-bold text-gray-900">{config.title}</h4>
+                              <span className={`px-3 py-1 bg-${config.color}-100 text-${config.color}-700 rounded-full text-sm font-medium`}>
+                                {questions.length} Questions
                               </span>
                             </div>
-                            <p className="text-gray-800 font-medium">{item.question}</p>
+                            <div className="space-y-6">
+                              {questions.map((item: any, index: number) => (
+                                <div key={index} className="bg-gray-50 rounded-xl p-6 space-y-4">
+                                  <div className="flex items-start justify-between">
+                                    <div className="flex items-center space-x-3">
+                                      <span className={`w-8 h-8 bg-${config.color}-500 text-white rounded-full flex items-center justify-center text-sm font-bold`}>
+                                        {index + 1}
+                                      </span>
+                                      <div className="flex items-center space-x-2">
+                                        <span className={`px-2 py-1 bg-${config.color}-100 text-${config.color}-700 rounded-full text-xs font-medium`}>
+                                          {item.category}
+                                        </span>
+                                        {item.difficulty && (
+                                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                            item.difficulty === 'easy' ? 'bg-green-100 text-green-700' :
+                                            item.difficulty === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                                            'bg-red-100 text-red-700'
+                                          }`}>
+                                            {item.difficulty}
+                                          </span>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  
+                                  <div className="pl-11">
+                                    <p className="text-gray-800 font-medium text-lg">{item.question}</p>
+                                    
+                                    {item.tips && (
+                                      <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                                        <div className="flex items-center space-x-2 mb-2">
+                                          <Lightbulb className="w-4 h-4 text-blue-600" />
+                                          <span className="text-sm font-medium text-blue-900">Answer Tips</span>
+                                        </div>
+                                        <p className="text-sm text-blue-800">{item.tips}</p>
+                                      </div>
+                                    )}
+                                    
+                                    {item.suggested_answer && (
+                                      <div className="mt-4 p-4 bg-green-50 rounded-lg border border-green-200">
+                                        <div className="flex items-center space-x-2 mb-2">
+                                          <Target className="w-4 h-4 text-green-600" />
+                                          <span className="text-sm font-medium text-green-900">Suggested Approach</span>
+                                        </div>
+                                        <p className="text-sm text-green-800">{item.suggested_answer}</p>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
                           </div>
-                        ))}
-                      </div>
-                    </div>
+                        );
+                      });
+                    })()}
                   </div>
                 )}
               </div>
