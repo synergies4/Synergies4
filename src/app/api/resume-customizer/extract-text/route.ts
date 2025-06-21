@@ -26,6 +26,7 @@ export async function POST(request: NextRequest) {
     console.log('📄 Processing file:', { fileName, fileType, fileSize });
 
     let extractedText = '';
+    let fileBuffer: Buffer | null = null;
 
     try {
       if (fileType === 'application/pdf') {
@@ -70,15 +71,42 @@ export async function POST(request: NextRequest) {
       });
 
     } catch (extractionError) {
-      console.error('Text extraction error:', extractionError);
-      return NextResponse.json({
-        success: false,
-        text: '',
-        message: 'Failed to extract text from the file. The file may be corrupted or password-protected.',
+      console.error('📄 Text extraction error for file:', fileName, extractionError);
+      
+      // Get buffer size for debugging if we can
+      if (!fileBuffer && (fileType === 'application/pdf' || fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')) {
+        try {
+          const arrayBuffer = await file.arrayBuffer();
+          fileBuffer = Buffer.from(arrayBuffer);
+        } catch (e) {
+          // Ignore buffer creation errors
+        }
+      }
+      
+      // Log additional debugging info for mobile uploads
+      console.error('📄 Debug info:', {
         fileName,
         fileType,
         fileSize,
-        error: extractionError instanceof Error ? extractionError.message : 'Unknown extraction error'
+        bufferSize: fileBuffer?.length || 0,
+        userAgent: request.headers.get('user-agent'),
+        isMobile: request.headers.get('user-agent')?.toLowerCase().includes('mobile')
+      });
+      
+      const errorMessage = extractionError instanceof Error ? extractionError.message : 'Unknown extraction error';
+      
+      return NextResponse.json({
+        success: false,
+        text: '',
+        message: errorMessage,
+        fileName,
+        fileType,
+        fileSize,
+        error: errorMessage,
+        debugInfo: {
+          bufferSize: fileBuffer?.length || 0,
+          isMobile: request.headers.get('user-agent')?.toLowerCase().includes('mobile') || false
+        }
       });
     }
 
@@ -92,61 +120,189 @@ export async function POST(request: NextRequest) {
 }
 
 async function extractPDFText(file: File): Promise<string> {
+  const arrayBuffer = await file.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+  
+  console.log('📄 Starting PDF text extraction for:', file.name, 'Size:', buffer.length);
+  
+  // Try multiple extraction methods in order of preference
+  const extractionMethods = [
+    () => extractPDFWithStandardOptions(buffer),
+    () => extractPDFWithMobileOptions(buffer),
+    () => extractPDFWithLegacyOptions(buffer),
+    () => extractPDFWithMinimalOptions(buffer),
+    () => extractPDFPageByPage(buffer)
+  ];
+  
+  let lastError: Error | null = null;
+  
+  for (let i = 0; i < extractionMethods.length; i++) {
+    try {
+      console.log(`📄 Trying PDF extraction method ${i + 1}/${extractionMethods.length}`);
+      const text = await extractionMethods[i]();
+      
+      if (text && text.trim().length >= 20) {
+        console.log(`✅ PDF extraction successful with method ${i + 1}, length:`, text.length);
+        return text;
+      } else {
+        console.log(`⚠️ Method ${i + 1} returned insufficient text:`, text?.length || 0);
+      }
+    } catch (error) {
+      console.log(`❌ Method ${i + 1} failed:`, error instanceof Error ? error.message : 'Unknown error');
+      lastError = error instanceof Error ? error : new Error('Unknown extraction error');
+    }
+  }
+  
+  // If all methods failed, provide helpful error message
+  const errorMessage = lastError?.message || 'Unknown error';
+  
+  if (errorMessage.includes('Invalid PDF') || errorMessage.includes('not a PDF')) {
+    throw new Error('The uploaded file is not a valid PDF document. Please check the file and try again.');
+  } else if (errorMessage.includes('Encrypted') || errorMessage.includes('password')) {
+    throw new Error('This PDF is password-protected. Please remove the password protection and try again.');
+  } else if (buffer.length < 1000) {
+    throw new Error('The uploaded file appears to be too small or corrupted. Please try a different file.');
+  } else {
+    throw new Error('This PDF appears to be a scanned document or image-based PDF with no extractable text. Please copy your resume text and paste it manually in the text area below.');
+  }
+}
+
+async function extractPDFWithStandardOptions(buffer: Buffer): Promise<string> {
+  const pdfParse = (await import('pdf-parse')).default;
+  
+  const pdfData = await pdfParse(buffer, {
+    max: 0 // Extract all pages
+  });
+  
+  console.log('📄 Standard extraction result:', {
+    numPages: pdfData.numpages,
+    textLength: pdfData.text?.length || 0
+  });
+  
+  return pdfData.text || '';
+}
+
+async function extractPDFWithLegacyOptions(buffer: Buffer): Promise<string> {
+  const pdfParse = (await import('pdf-parse')).default;
+  
+  const pdfData = await pdfParse(buffer, {
+    max: 50 // Limit to first 50 pages for performance
+  });
+  
+  console.log('📄 Legacy extraction result:', {
+    numPages: pdfData.numpages,
+    textLength: pdfData.text?.length || 0
+  });
+  
+  return pdfData.text || '';
+}
+
+async function extractPDFWithMobileOptions(buffer: Buffer): Promise<string> {
+  const pdfParse = (await import('pdf-parse')).default;
+  
+  // Mobile PDFs often have different encoding and structure
+  const pdfData = await pdfParse(buffer, {
+    max: 10 // Mobile resumes are usually short
+  });
+  
+  console.log('📄 Mobile extraction result:', {
+    numPages: pdfData.numpages,
+    textLength: pdfData.text?.length || 0
+  });
+  
+  let text = pdfData.text || '';
+  
+  // Mobile PDFs sometimes have extra cleanup needs
+  if (text) {
+    text = cleanMobilePDFText(text);
+  }
+  
+  return text;
+}
+
+async function extractPDFWithMinimalOptions(buffer: Buffer): Promise<string> {
+  const pdfParse = (await import('pdf-parse')).default;
+  
+  // Try with minimal options - sometimes simpler is better
+  const pdfData = await pdfParse(buffer);
+  
+  console.log('📄 Minimal extraction result:', {
+    numPages: pdfData.numpages,
+    textLength: pdfData.text?.length || 0
+  });
+  
+  return pdfData.text || '';
+}
+
+function cleanMobilePDFText(text: string): string {
+  if (!text) return '';
+  
+  return text
+    // Fix common mobile PDF encoding issues
+    .replace(/\u00A0/g, ' ') // Replace non-breaking spaces
+    .replace(/\u2022/g, '•') // Fix bullet points
+    .replace(/\u2013/g, '-') // Fix en-dashes
+    .replace(/\u2014/g, '--') // Fix em-dashes
+    .replace(/\u201C|\u201D/g, '"') // Fix smart quotes
+    .replace(/\u2018|\u2019/g, "'") // Fix smart apostrophes
+    // Remove weird spacing that mobile PDFs sometimes have
+    .replace(/\s*\n\s*\n\s*/g, '\n\n')
+    .replace(/([a-z])([A-Z])/g, '$1 $2') // Add space between camelCase words
+    // Clean up excessive whitespace
+    .replace(/[ \t]+/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+async function extractPDFPageByPage(buffer: Buffer): Promise<string> {
+  const pdfParse = (await import('pdf-parse')).default;
+  
   try {
-    console.log('📄 Starting PDF text extraction for:', file.name);
-    
-    // Dynamic import to avoid bundling issues
-    const pdfParse = (await import('pdf-parse')).default;
-    
-    // Convert File to Buffer
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    
-    console.log('📄 PDF buffer size:', buffer.length);
-    
-    // Parse PDF and extract text with options
+    // Try a different approach - force text extraction with different settings
     const pdfData = await pdfParse(buffer, {
-      // PDF parsing options
-      max: 0, // Extract all pages
-      version: 'v1.10.100' // Use specific version for compatibility
+      max: 20, // Limit to first 20 pages
+      // Custom render function for better text extraction
+      pagerender: (pageData: any) => {
+        try {
+          // Simple text extraction from page data
+          if (pageData && pageData.getTextContent) {
+            return pageData.getTextContent().then((textContent: any) => {
+              if (textContent && textContent.items) {
+                return textContent.items
+                  .map((item: any) => item.str || '')
+                  .filter((str: string) => str.trim().length > 0)
+                  .join(' ');
+              }
+              return '';
+            }).catch(() => '');
+          }
+        } catch (e) {
+          console.log('Custom pagerender failed, using default');
+        }
+        return null; // Fall back to default rendering
+      }
     });
     
-    console.log('📄 PDF parsing result:', {
+    console.log('📄 Enhanced extraction result:', {
       numPages: pdfData.numpages,
-      textLength: pdfData.text?.length || 0,
-      hasText: !!pdfData.text
+      textLength: pdfData.text?.length || 0
     });
     
-    const extractedText = pdfData.text || '';
-    
-    // Check if we got meaningful text
-    if (!extractedText || extractedText.trim().length < 20) {
-      console.warn('📄 PDF text extraction yielded minimal content');
-      
-      // Try alternative approach - extract raw text data
-      if (pdfData.text && pdfData.text.length > 0) {
-        return pdfData.text;
-      }
-      
-      throw new Error('PDF appears to contain no extractable text content. This may be a scanned document or image-based PDF.');
+    if (pdfData.text && pdfData.text.length > 0) {
+      return pdfData.text;
     }
     
-    return extractedText;
+    // If still no text, try one more approach with raw extraction
+    const rawData = await pdfParse(buffer, {
+      max: 5 // Just first 5 pages
+    });
+    
+    console.log('📄 Raw extraction fallback result:', rawData.text?.length || 0);
+    return rawData.text || '';
+    
   } catch (error) {
-    console.error('💥 PDF parsing error:', error);
-    
-    // Provide more specific error messages
-    if (error instanceof Error) {
-      if (error.message.includes('Invalid PDF')) {
-        throw new Error('The uploaded file is not a valid PDF document.');
-      } else if (error.message.includes('Encrypted')) {
-        throw new Error('This PDF is password-protected. Please upload an unprotected version.');
-      } else if (error.message.includes('no extractable text')) {
-        throw new Error('This PDF appears to be a scanned document with no extractable text. Please upload a text-based PDF or copy/paste your resume content manually.');
-      }
-    }
-    
-    throw new Error('Failed to extract text from PDF. The file may be corrupted, password-protected, or contain only images.');
+    console.log('Page-by-page extraction failed:', error);
+    throw error;
   }
 }
 
@@ -201,12 +357,23 @@ function cleanExtractedText(text: string): string {
   if (!text) return '';
   
   return text
-    // Remove excessive whitespace
-    .replace(/\s+/g, ' ')
+    // Fix common encoding issues from mobile PDFs
+    .replace(/\u00A0/g, ' ') // Non-breaking spaces
+    .replace(/\u2022/g, '•') // Bullet points
+    .replace(/\u2013/g, '-') // En-dashes
+    .replace(/\u2014/g, '--') // Em-dashes
+    .replace(/\u201C|\u201D/g, '"') // Smart quotes
+    .replace(/\u2018|\u2019/g, "'") // Smart apostrophes
+    .replace(/\u2026/g, '...') // Ellipsis
     // Remove control characters
     .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, '')
-    // Remove multiple line breaks
-    .replace(/\n\s*\n\s*\n/g, '\n\n')
-    // Trim whitespace
+    // Fix spacing issues common in mobile PDFs
+    .replace(/([a-z])([A-Z])/g, '$1 $2') // Add space between camelCase
+    .replace(/([a-zA-Z])(\d)/g, '$1 $2') // Add space between letter and number
+    .replace(/(\d)([a-zA-Z])/g, '$1 $2') // Add space between number and letter
+    // Clean up whitespace
+    .replace(/[ \t]+/g, ' ') // Multiple spaces to single space
+    .replace(/\n\s*\n\s*\n/g, '\n\n') // Multiple line breaks to double
+    .replace(/^\s+|\s+$/gm, '') // Trim each line
     .trim();
 } 
