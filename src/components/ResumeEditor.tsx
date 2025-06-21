@@ -351,7 +351,7 @@ ${editedContent.replace(/<[^>]*>/g, '').replace(/\n/g, '\\par ')}}`;
               <textarea
                 ref={editRef}
                 defaultValue={editedContent}
-                className="w-full h-96 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none font-mono text-sm"
+                className="w-full h-96 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none font-mono text-sm overflow-y-auto"
                 placeholder="Edit your content here..."
               />
               <div className="mt-4 p-4 bg-blue-50 rounded-lg">
@@ -365,21 +365,30 @@ ${editedContent.replace(/<[^>]*>/g, '').replace(/\n/g, '\\par ')}}`;
               </div>
             </div>
           ) : (
-            <div 
-              ref={contentRef}
-              className="p-8 bg-white"
-              style={{ 
-                fontFamily: 'Georgia, serif',
-                lineHeight: '1.6',
-                minHeight: '600px'
-              }}
-            >
+            <div className="relative">
               <div 
-                dangerouslySetInnerHTML={{ 
-                  __html: formatContent(editedContent) 
+                ref={contentRef}
+                className="p-8 bg-white overflow-y-auto max-h-[600px] border-b"
+                style={{ 
+                  fontFamily: 'system-ui, -apple-system, sans-serif',
+                  lineHeight: '1.6',
+                  fontSize: '14px'
                 }}
-                className="prose prose-lg max-w-none"
-              />
+              >
+                <div 
+                  dangerouslySetInnerHTML={{ 
+                    __html: formatContent(editedContent) 
+                  }}
+                  className="prose prose-sm max-w-none break-words"
+                  style={{
+                    wordWrap: 'break-word',
+                    overflowWrap: 'break-word',
+                    hyphens: 'auto'
+                  }}
+                />
+              </div>
+              {/* Scroll indicator */}
+              <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-gray-100 to-transparent pointer-events-none"></div>
             </div>
           )}
         </CardContent>

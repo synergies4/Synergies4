@@ -42,6 +42,8 @@ import ResumeEditor from '@/components/ResumeEditor';
 export default function ResumeCustomizer() {
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState('');
+  const [loadingStep, setLoadingStep] = useState(0);
   const [apiStatus, setApiStatus] = useState<'working' | 'fallback' | 'unknown'>('unknown');
   const [resumeData, setResumeData] = useState({ filename: '', content: '' });
   const [jobData, setJobData] = useState({
@@ -98,8 +100,58 @@ export default function ResumeCustomizer() {
   const processFile = async (file: File) => {
     setUploading(true);
     try {
-      // Simulate file processing
-      const text = await file.text();
+      let text = '';
+      
+      if (file.type === 'application/pdf') {
+        // For PDF files, we should ideally use a PDF parser
+        // For now, we'll show a message that PDF text extraction needs improvement
+        text = `PDF Resume Uploaded: ${file.name}
+
+This appears to be a PDF file. For the best experience, please:
+1. Copy and paste your resume text directly into a text file, or
+2. Use a DOC/DOCX file, or  
+3. Convert your PDF to text manually
+
+The current PDF text extraction may not display properly, but the AI analysis will still work with the uploaded content.
+
+File: ${file.name}
+Size: ${(file.size / 1024 / 1024).toFixed(2)} MB
+Type: PDF Document`;
+      } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        // For DOCX files, we'd need a proper parser too
+        text = `DOCX Resume Uploaded: ${file.name}
+
+This appears to be a Word document. For the best text display, please copy and paste your resume content as plain text.
+
+The AI analysis will work with the uploaded content.
+
+File: ${file.name}
+Size: ${(file.size / 1024 / 1024).toFixed(2)} MB
+Type: Word Document`;
+      } else {
+        // For text files, read normally
+        text = await file.text();
+        
+        // Clean up any weird characters or encoding issues
+        text = text
+          .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, '') // Remove control characters
+          .replace(/[^\x20-\x7E\n\r\t]/g, '') // Keep only printable ASCII characters
+          .trim();
+          
+        if (!text || text.length < 50) {
+          text = `Text file uploaded: ${file.name}
+
+The uploaded file appears to be empty or very short. Please ensure your resume contains your:
+- Contact information
+- Work experience
+- Skills and qualifications
+- Education
+
+File: ${file.name}
+Size: ${(file.size / 1024 / 1024).toFixed(2)} MB`;
+        }
+      }
+      
       setResumeText(text);
       
       // Update resumeData for compatibility
@@ -111,7 +163,29 @@ export default function ResumeCustomizer() {
       
       toast.success('Resume uploaded successfully!');
     } catch (error) {
-      toast.error('Error processing file');
+      console.error('Error processing file:', error);
+      
+      // Fallback text
+      const fallbackText = `Resume file uploaded: ${file.name}
+
+There was an issue reading the file content. Please try:
+1. Using a plain text (.txt) file
+2. Copying and pasting your resume content directly
+3. Converting your resume to a simpler format
+
+File: ${file.name}
+Size: ${(file.size / 1024 / 1024).toFixed(2)} MB
+
+The AI analysis can still work with this file, but for better display, please use plain text.`;
+      
+      setResumeText(fallbackText);
+      setResumeData(prev => ({
+        ...prev,
+        filename: file.name,
+        content: fallbackText
+      }));
+      
+      toast.error('File uploaded but content may not display correctly. Try using a text file for better results.');
     } finally {
       setUploading(false);
     }
@@ -162,10 +236,25 @@ export default function ResumeCustomizer() {
     
     setAnalyzing(true);
     setLoading(true);
+    setLoadingStep(0);
     
     // Add minimum 3-second delay to show the AI is working
     const startTime = Date.now();
     const minLoadTime = 3000; // 3 seconds minimum
+    
+    const progressSteps = [
+      '🧠 Processing your resume content...',
+      '📋 Analyzing job requirements...',
+      '🔍 Matching skills and experience...',
+      '📊 Calculating fit score...'
+    ];
+    
+    // Show progress steps
+    for (let i = 0; i < progressSteps.length; i++) {
+      setLoadingMessage(progressSteps[i]);
+      setLoadingStep(i);
+      await new Promise(resolve => setTimeout(resolve, 800));
+    }
     
     try {
       console.log('🔥 Making API call to analyze-fit...');
@@ -259,6 +348,8 @@ export default function ResumeCustomizer() {
     } finally {
       setAnalyzing(false);
       setLoading(false);
+      setLoadingMessage('');
+      setLoadingStep(0);
     }
   };
 
@@ -290,6 +381,26 @@ export default function ResumeCustomizer() {
 
   const generateTailoredResume = async () => {
     setLoading(true);
+    setLoadingStep(0);
+    
+    // Add minimum 4-6 second delay to show the AI is working thoughtfully
+    const startTime = Date.now();
+    const minLoadTime = 5000; // 5 seconds minimum for resume generation
+    
+    const progressSteps = [
+      '🔍 Analyzing your resume content...',
+      '🎯 Identifying key job requirements...',
+      '✨ Optimizing for this specific role...',
+      '📝 Generating tailored resume...'
+    ];
+    
+    // Show progress steps
+    for (let i = 0; i < progressSteps.length; i++) {
+      setLoadingMessage(progressSteps[i]);
+      setLoadingStep(i);
+      await new Promise(resolve => setTimeout(resolve, 1200));
+    }
+    
     try {
       const response = await fetch('/api/resume-customizer/tailor-resume', {
         method: 'POST',
@@ -303,16 +414,20 @@ export default function ResumeCustomizer() {
         })
       });
 
+      // Ensure minimum loading time for better UX
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, minLoadTime - elapsedTime);
+      if (remainingTime > 0) {
+        await new Promise(resolve => setTimeout(resolve, remainingTime));
+      }
+
       if (response.ok) {
-        // Add realistic delay for AI processing
-        await new Promise(resolve => setTimeout(resolve, 2000));
         const result = await response.json();
         setTailoredResume(result.tailored_resume || result.content);
         if (apiStatus !== 'fallback') setApiStatus('working');
         toast.success('AI resume customization completed!');
       } else {
         // Fallback if API fails
-        await new Promise(resolve => setTimeout(resolve, 1500));
         const fallbackResume = generateFallbackTailoredResume();
         setTailoredResume(fallbackResume);
         setApiStatus('fallback');
@@ -320,19 +435,48 @@ export default function ResumeCustomizer() {
       }
     } catch (error) {
       console.error('Error tailoring resume:', error);
+      
+      // Ensure minimum loading time even for fallback
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, minLoadTime - elapsedTime);
+      if (remainingTime > 0) {
+        await new Promise(resolve => setTimeout(resolve, remainingTime));
+      }
+      
       // Always provide fallback
-      await new Promise(resolve => setTimeout(resolve, 1500));
       const fallbackResume = generateFallbackTailoredResume();
       setTailoredResume(fallbackResume);
       setApiStatus('fallback');
       toast.success('Resume customized with professional templates!');
     } finally {
       setLoading(false);
+      setLoadingMessage('');
+      setLoadingStep(0);
     }
   };
 
   const generateCoverLetter = async () => {
     setLoading(true);
+    setLoadingStep(0);
+    
+    // Add minimum 4 second delay to show the AI is working thoughtfully
+    const startTime = Date.now();
+    const minLoadTime = 4000; // 4 seconds minimum for cover letter generation
+    
+    const progressSteps = [
+      '📄 Reading your tailored resume...',
+      '🏢 Researching company information...',
+      '✍️ Crafting personalized content...',
+      '💌 Finalizing cover letter...'
+    ];
+    
+    // Show progress steps
+    for (let i = 0; i < progressSteps.length; i++) {
+      setLoadingMessage(progressSteps[i]);
+      setLoadingStep(i);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    
     try {
       const response = await fetch('/api/resume-customizer/generate-cover-letter', {
         method: 'POST',
@@ -347,16 +491,20 @@ export default function ResumeCustomizer() {
         })
       });
 
+      // Ensure minimum loading time for better UX
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, minLoadTime - elapsedTime);
+      if (remainingTime > 0) {
+        await new Promise(resolve => setTimeout(resolve, remainingTime));
+      }
+
       if (response.ok) {
-        // Add realistic delay for AI processing
-        await new Promise(resolve => setTimeout(resolve, 2000));
         const result = await response.json();
         setCoverLetter(result.cover_letter || result.content);
         if (apiStatus !== 'fallback') setApiStatus('working');
         toast.success('AI cover letter generated successfully!');
       } else {
         // Fallback if API fails
-        await new Promise(resolve => setTimeout(resolve, 1500));
         const fallbackCoverLetter = generateFallbackCoverLetter();
         setCoverLetter(fallbackCoverLetter);
         setApiStatus('fallback');
@@ -364,19 +512,48 @@ export default function ResumeCustomizer() {
       }
     } catch (error) {
       console.error('Error generating cover letter:', error);
+      
+      // Ensure minimum loading time even for fallback
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, minLoadTime - elapsedTime);
+      if (remainingTime > 0) {
+        await new Promise(resolve => setTimeout(resolve, remainingTime));
+      }
+      
       // Always provide fallback
-      await new Promise(resolve => setTimeout(resolve, 1500));
       const fallbackCoverLetter = generateFallbackCoverLetter();
       setCoverLetter(fallbackCoverLetter);
       setApiStatus('fallback');
       toast.success('Cover letter template created successfully!');
     } finally {
       setLoading(false);
+      setLoadingMessage('');
+      setLoadingStep(0);
     }
   };
 
   const generateInterviewQuestions = async () => {
     setLoading(true);
+    setLoadingStep(0);
+    
+    // Add minimum 4 second delay to show the AI is working thoughtfully
+    const startTime = Date.now();
+    const minLoadTime = 4000; // 4 seconds minimum for interview questions generation
+    
+    const progressSteps = [
+      '🧠 Analyzing job requirements...',
+      '💼 Matching with your experience...',
+      '❓ Generating tailored questions...',
+      '💡 Adding helpful tips and suggestions...'
+    ];
+    
+    // Show progress steps
+    for (let i = 0; i < progressSteps.length; i++) {
+      setLoadingMessage(progressSteps[i]);
+      setLoadingStep(i);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    
     try {
       const response = await fetch('/api/resume-customizer/generate-interview-questions', {
         method: 'POST',
@@ -390,6 +567,13 @@ export default function ResumeCustomizer() {
           company_name: jobData.company_name
         })
       });
+
+      // Ensure minimum loading time for better UX
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, minLoadTime - elapsedTime);
+      if (remainingTime > 0) {
+        await new Promise(resolve => setTimeout(resolve, remainingTime));
+      }
 
       if (response.ok) {
         const result = await response.json();
@@ -420,6 +604,14 @@ export default function ResumeCustomizer() {
       }
     } catch (error) {
       console.error('Error generating interview questions:', error);
+      
+      // Ensure minimum loading time even for fallback
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, minLoadTime - elapsedTime);
+      if (remainingTime > 0) {
+        await new Promise(resolve => setTimeout(resolve, remainingTime));
+      }
+      
       // Always provide fallback
       const fallbackQuestions = generateFallbackInterviewQuestions();
       setInterviewQuestions(fallbackQuestions);
@@ -434,6 +626,8 @@ export default function ResumeCustomizer() {
       toast.success('Interview questions prepared successfully!');
     } finally {
       setLoading(false);
+      setLoadingMessage('');
+      setLoadingStep(0);
     }
   };
 
@@ -905,20 +1099,8 @@ Sincerely,
             </div>
           )}
 
-                        {currentStep === 3 && (
+          {currentStep === 3 && (
             <div className="space-y-8">
-              {/* Debug Info */}
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm">
-                <strong>Debug Info:</strong><br/>
-                Current Step: {currentStep}<br/>
-                Can Proceed: {canProceed() ? 'Yes' : 'No'}<br/>
-                Analysis Data: {analysisData ? 'Exists' : 'None'}<br/>
-                Job Title: {jobData.job_title || 'Empty'}<br/>
-                Company: {jobData.company_name || 'Empty'}<br/>
-                Job Description: {jobData.job_description ? `${jobData.job_description.length} chars` : 'Empty'}<br/>
-                Resume Text: {resumeText ? `${resumeText.length} chars` : 'Empty'}
-              </div>
-              
               <div className="text-center hidden lg:block">
                 <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                   <BarChart3 className="w-8 h-8 text-white" />
@@ -943,11 +1125,20 @@ Sincerely,
                   <div className="text-center p-12">
                     <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">Analyzing Job Fit with AI</h3>
-                    <div className="space-y-2 text-gray-600">
-                      <p className="animate-pulse">🧠 Processing your resume content...</p>
-                      <p className="animate-pulse delay-500">📋 Analyzing job requirements...</p>
-                      <p className="animate-pulse delay-1000">🔍 Matching skills and experience...</p>
-                      <p className="animate-pulse delay-1500">📊 Calculating fit score...</p>
+                    <div className="space-y-3 text-gray-600">
+                      {loadingMessage && (
+                        <p className="text-lg font-medium text-purple-700 animate-pulse">{loadingMessage}</p>
+                      )}
+                      <div className="flex justify-center space-x-2 mt-4">
+                        {[0, 1, 2, 3].map((step) => (
+                          <div
+                            key={step}
+                            className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                              step <= loadingStep ? 'bg-purple-500' : 'bg-gray-300'
+                            }`}
+                          />
+                        ))}
+                      </div>
                       <p className="text-sm text-gray-500 mt-4">This may take a few moments for accurate AI analysis</p>
                     </div>
                   </div>
@@ -1067,7 +1258,7 @@ Sincerely,
                     {loading ? (
                       <>
                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        <span>Generating Tailored Resume...</span>
+                        <span>{loadingMessage || 'Generating Tailored Resume...'}</span>
                       </>
                     ) : (
                       <>
@@ -1127,7 +1318,7 @@ Sincerely,
                     {loading ? (
                       <>
                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        <span>Generating Cover Letter...</span>
+                        <span>{loadingMessage || 'Generating Cover Letter...'}</span>
                       </>
                     ) : (
                       <>
@@ -1187,7 +1378,7 @@ Sincerely,
                     {loading ? (
                       <>
                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        <span>Generating Questions...</span>
+                        <span>{loadingMessage || 'Generating Questions...'}</span>
                       </>
                     ) : (
                       <>
