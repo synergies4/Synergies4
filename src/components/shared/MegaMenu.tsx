@@ -214,44 +214,42 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
     };
   }, [isMobileMenuOpen]);
 
-  const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
-      if (hoverTimeout) {
-        clearTimeout(hoverTimeout);
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
       }
     };
-  }, [hoverTimeout]);
+  }, []);
 
   const handleCategoryEnter = (categoryId: string) => {
-    if (hoverTimeout) {
-      clearTimeout(hoverTimeout);
-      setHoverTimeout(null);
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
     }
     setActiveCategory(categoryId);
   };
 
   const handleCategoryLeave = () => {
-    const timeout = setTimeout(() => {
+    hoverTimeoutRef.current = setTimeout(() => {
       setActiveCategory(null);
-    }, 200);
-    setHoverTimeout(timeout);
+    }, 150);
   };
 
   const handleDropdownEnter = () => {
-    if (hoverTimeout) {
-      clearTimeout(hoverTimeout);
-      setHoverTimeout(null);
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
     }
   };
 
   const handleDropdownLeave = () => {
-    const timeout = setTimeout(() => {
+    hoverTimeoutRef.current = setTimeout(() => {
       setActiveCategory(null);
-    }, 200);
-    setHoverTimeout(timeout);
+    }, 150);
   };
 
   const closeMobileMenu = () => {
@@ -295,52 +293,57 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                 <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isActive ? 'rotate-180' : ''}`} />
               </button>
 
-              {/* Mega Menu Dropdown */}
+              {/* Mega Menu Dropdown - Horizontal Layout */}
               {isActive && (
                 <div 
-                  className="absolute top-full left-0 mt-1 w-72 bg-white rounded-lg shadow-xl border border-gray-200 z-50"
+                  className="absolute top-full left-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-200 z-50"
                   onMouseEnter={handleDropdownEnter}
                   onMouseLeave={handleDropdownLeave}
                 >
-                  <div className="p-4">
+                  <div className="p-5">
                     {/* Header */}
-                    <div className="flex items-center space-x-3 mb-3 pb-3 border-b border-gray-100">
-                      <div className="w-8 h-8 bg-gradient-to-r from-teal-500 to-blue-500 rounded-md flex items-center justify-center flex-shrink-0">
-                        <Icon className="w-4 h-4 text-white" />
+                    <div className="flex items-center space-x-3 mb-4 pb-3 border-b border-gray-100">
+                      <div className="w-10 h-10 bg-gradient-to-r from-teal-500 to-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Icon className="w-5 h-5 text-white" />
                       </div>
                       <div className="min-w-0">
-                        <h3 className="font-semibold text-gray-900 text-sm">{category.title}</h3>
-                        <p className="text-xs text-gray-600 leading-tight">{category.description}</p>
+                        <h3 className="font-bold text-gray-900 text-base">{category.title}</h3>
+                        <p className="text-sm text-gray-600">{category.description}</p>
                       </div>
                     </div>
                     
-                    {/* Menu Items */}
-                    <div className="space-y-1">
+                    {/* Menu Items - Horizontal Layout */}
+                    <div className="space-y-2">
                       {category.items.map((item) => {
                         const ItemIcon = item.icon;
                         return (
                           <Link
                             key={item.href}
                             href={item.href}
-                            className="flex items-center space-x-3 p-2 rounded-md hover:bg-gray-50 transition-colors group/item"
+                            className="flex items-center justify-between p-3 rounded-lg hover:bg-teal-50 hover:border-teal-200 border border-transparent transition-all group/item"
                             onClick={() => setActiveCategory(null)}
                           >
-                            <div className="w-7 h-7 bg-gray-100 rounded-md flex items-center justify-center group-hover/item:bg-teal-100 transition-colors flex-shrink-0">
-                              <ItemIcon className="w-3.5 h-3.5 text-gray-600 group-hover/item:text-teal-600" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center space-x-2">
-                                <h4 className="font-medium text-gray-900 group-hover/item:text-teal-600 transition-colors text-sm truncate">
+                            <div className="flex items-center space-x-3 flex-1">
+                              <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center group-hover/item:bg-teal-100 transition-colors flex-shrink-0">
+                                <ItemIcon className="w-4 h-4 text-gray-600 group-hover/item:text-teal-600" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-semibold text-gray-900 group-hover/item:text-teal-700 transition-colors text-sm">
                                   {item.title}
                                 </h4>
-                                {item.isNew && (
-                                  <Badge className="bg-green-100 text-green-700 text-xs px-1.5 py-0.5 font-medium">New</Badge>
-                                )}
-                                {item.badge && (
-                                  <Badge className="bg-blue-100 text-blue-700 text-xs px-1.5 py-0.5 font-medium">{item.badge}</Badge>
-                                )}
+                                <p className="text-xs text-gray-500 group-hover/item:text-teal-600 transition-colors truncate">
+                                  {item.description}
+                                </p>
                               </div>
-                              <p className="text-xs text-gray-600 mt-0.5 leading-tight truncate">{item.description}</p>
+                            </div>
+                            <div className="flex items-center space-x-2 ml-3">
+                              {item.isNew && (
+                                <Badge className="bg-green-100 text-green-700 text-xs px-2 py-0.5 font-medium">New</Badge>
+                              )}
+                              {item.badge && (
+                                <Badge className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 font-medium">{item.badge}</Badge>
+                              )}
+                              <ArrowRight className="w-4 h-4 text-gray-400 group-hover/item:text-teal-500 transition-colors" />
                             </div>
                           </Link>
                         );
@@ -418,9 +421,17 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
         </button>
       </div>
 
-      {/* Reliable Mobile Menu */}
+      {/* Fixed Mobile Menu */}
       {isMobileMenuOpen && isMounted && createPortal(
-        <div className="lg:hidden fixed inset-0 z-[9999] bg-black/50" onClick={closeMobileMenu}>
+        <div 
+          className="lg:hidden fixed inset-0 z-[9999] bg-black/50" 
+          onClick={(e) => {
+            // Only close if clicking on the overlay, not the menu
+            if (e.target === e.currentTarget) {
+              closeMobileMenu();
+            }
+          }}
+        >
           <div 
             className="fixed top-0 right-0 w-80 max-w-[90vw] h-full bg-white shadow-xl overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
@@ -444,7 +455,10 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
             </div>
 
             {/* Menu Content */}
-            <div className="p-4">
+            <div 
+              className="p-4"
+              onClick={(e) => e.stopPropagation()}
+            >
               {/* Featured Resume Customizer */}
               <div className="mb-6">
                 <button
@@ -491,7 +505,10 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                       </button>
 
                       {isActive && (
-                        <div className="mt-2 space-y-1">
+                        <div 
+                          className="mt-2 space-y-1"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           {category.items.map((item) => {
                             const ItemIcon = item.icon;
                             return (
