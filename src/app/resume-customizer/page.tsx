@@ -466,46 +466,77 @@ Sincerely,
   return (
     <PageLayout>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-teal-50">
-      {/* Enhanced Header */}
-      <div className="bg-white/80 backdrop-blur-xl border-b border-white/20 sticky top-0 z-10" style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.1)' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg">
-                <FileText className="w-5 h-5 text-white" />
+      {/* Mobile-Optimized Header */}
+      <div className="bg-white/95 backdrop-blur-xl border-b border-white/20 sticky top-0 z-20 shadow-lg">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-14 sm:h-16">
+            <div className="flex items-center space-x-2 sm:space-x-4 min-w-0 flex-1">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
+                <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
-              <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+              <div className="min-w-0 flex-1">
+                <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent truncate">
                   Resume Customizer
                 </h1>
-                <p className="text-sm text-gray-500">AI-powered job application optimization</p>
+                <p className="text-xs sm:text-sm text-gray-500 hidden sm:block">AI-powered job application optimization</p>
               </div>
             </div>
-            <div className="flex items-center space-x-3">
-              <div className="hidden sm:flex items-center space-x-2 px-3 py-1.5 bg-teal-50 rounded-full border border-teal-200">
+            <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
+              <div className="hidden sm:flex items-center space-x-2 px-2 sm:px-3 py-1 sm:py-1.5 bg-teal-50 rounded-full border border-teal-200">
                 <div className="w-2 h-2 bg-teal-500 rounded-full animate-pulse"></div>
-                <span className="text-sm font-medium text-teal-700">
-                  {apiStatus === 'working' ? 'Full AI' : apiStatus === 'fallback' ? 'Optimized Mode' : 'AI Mode'}
+                <span className="text-xs sm:text-sm font-medium text-teal-700">
+                  {apiStatus === 'working' ? 'Full AI' : apiStatus === 'fallback' ? 'Smart Mode' : 'AI Ready'}
                 </span>
               </div>
-              <button
-                onClick={() => setIsOptimizedMode(!isOptimizedMode)}
-                className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
-                title="Toggle AI Mode"
-              >
-                <Settings className="w-4 h-4 text-gray-600" />
-              </button>
+              <div className="sm:hidden flex items-center px-2 py-1 bg-teal-50 rounded-full border border-teal-200">
+                <div className="w-1.5 h-1.5 bg-teal-500 rounded-full animate-pulse"></div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Enhanced Progress Steps */}
-        <div className="mb-12">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-6 lg:space-y-0">
-            {/* Desktop Progress Bar */}
-            <div className="hidden lg:flex items-center space-x-4 flex-1">
+        {/* Enhanced Mobile-First Progress */}
+        <div className="mb-6 sm:mb-8 lg:mb-12">
+          <div className="flex flex-col space-y-4 sm:space-y-6">
+            {/* Mobile Progress Overview */}
+            <div className="lg:hidden">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-semibold text-gray-900">
+                  Step {currentStep} of {steps.length}
+                </span>
+                <span className="text-sm font-medium text-teal-600">
+                  {Math.round((currentStep / steps.length) * 100)}% Complete
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+                <div 
+                  className="bg-gradient-to-r from-teal-500 to-emerald-500 h-2 rounded-full transition-all duration-700 ease-out shadow-sm"
+                  style={{ width: `${(currentStep / steps.length) * 100}%` }}
+                />
+              </div>
+              
+              {/* Mobile Current Step Card */}
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 sm:p-5 border border-teal-100/50 shadow-lg">
+                <div className="flex items-center space-x-3 sm:space-x-4">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
+                    {React.createElement(steps[currentStep - 1]?.icon || Upload, { className: "w-6 h-6 sm:w-7 sm:h-7 text-white" })}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">
+                      {steps[currentStep - 1]?.title}
+                    </h2>
+                    <p className="text-sm sm:text-base text-teal-600 leading-relaxed">
+                      {steps[currentStep - 1]?.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Desktop Progress Bar - Enhanced */}
+            <div className="hidden lg:flex items-center space-x-3 xl:space-x-4">
               {steps.map((step, index) => {
                 const isActive = currentStep === index + 1;
                 const isCompleted = currentStep > index + 1;
@@ -514,114 +545,73 @@ Sincerely,
                 return (
                   <div key={index} className="flex items-center flex-1">
                     <div className="flex items-center space-x-3">
-                      <div className={`progress-step relative w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                      <div className={`progress-step relative w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 ${
                         isCompleted 
-                          ? 'bg-gradient-to-br from-green-500 to-emerald-500 shadow-lg shadow-green-500/25 completed' 
+                          ? 'bg-gradient-to-br from-green-500 to-emerald-500 shadow-xl shadow-green-500/30 scale-105' 
                           : isActive 
-                            ? 'bg-gradient-to-br from-teal-500 to-emerald-500 shadow-lg shadow-teal-500/25 active' 
-                            : 'bg-gray-100 hover:bg-gray-200'
+                            ? 'bg-gradient-to-br from-teal-500 to-emerald-500 shadow-xl shadow-teal-500/30 scale-110' 
+                            : 'bg-white border-2 border-gray-200 hover:border-gray-300 hover:shadow-md'
                       }`}>
                         {isCompleted ? (
-                          <Check className="w-6 h-6 text-white" />
+                          <Check className="w-7 h-7 text-white" />
                         ) : (
-                          <StepIcon className={`w-6 h-6 ${isActive ? 'text-white' : 'text-gray-500'}`} />
+                          <StepIcon className={`w-7 h-7 transition-colors ${isActive ? 'text-white' : 'text-gray-400'}`} />
                         )}
                         {isActive && (
-                          <div className="absolute -inset-1 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-xl opacity-30 animate-pulse"></div>
+                          <div className="absolute -inset-2 bg-gradient-to-r from-teal-400 to-emerald-400 rounded-2xl opacity-20 animate-pulse"></div>
                         )}
                       </div>
                       <div className="min-w-0">
-                        <h3 className={`font-semibold text-sm ${isActive ? 'text-teal-700' : isCompleted ? 'text-green-700' : 'text-gray-600'}`}>
+                        <h3 className={`font-bold text-base transition-colors ${isActive ? 'text-teal-700' : isCompleted ? 'text-green-700' : 'text-gray-600'}`}>
                           {step.title}
                         </h3>
-                        <p className={`text-xs ${isActive ? 'text-teal-600' : isCompleted ? 'text-green-600' : 'text-gray-500'}`}>
+                        <p className={`text-sm transition-colors ${isActive ? 'text-teal-600' : isCompleted ? 'text-green-600' : 'text-gray-500'}`}>
                           {step.description}
                         </p>
                       </div>
                     </div>
                     {index < steps.length - 1 && (
-                      <div className={`flex-1 h-0.5 mx-4 transition-colors duration-300 ${
-                        isCompleted ? 'bg-gradient-to-r from-green-500 to-emerald-500' : 'bg-gray-200'
+                      <div className={`flex-1 h-1 mx-4 rounded-full transition-all duration-500 ${
+                        isCompleted ? 'bg-gradient-to-r from-green-500 to-emerald-500 shadow-sm' : 'bg-gray-200'
                       }`} />
                     )}
                   </div>
                 );
               })}
             </div>
-
-            {/* Mobile Progress Steps - Enhanced */}
-            <div className="lg:hidden space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-600">
-                  Step {currentStep} of {steps.length}
-                </span>
-                <span className="text-sm text-gray-500">
-                  {Math.round((currentStep / steps.length) * 100)}% Complete
-                </span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-3">
-                <div 
-                  className="bg-gradient-to-r from-teal-500 to-emerald-500 h-3 rounded-full transition-all duration-500 ease-out"
-                  style={{ width: `${(currentStep / steps.length) * 100}%` }}
-                />
-              </div>
-              <div className="bg-white rounded-2xl p-4 border-2 border-teal-100 shadow-lg">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg">
-                    {React.createElement(steps[currentStep - 1]?.icon || Upload, { className: "w-6 h-6 text-white" })}
-                  </div>
-                  <div className="flex-1">
-                    <h2 className="text-xl font-bold text-teal-700">{steps[currentStep - 1]?.title}</h2>
-                    <p className="text-sm text-teal-600">{steps[currentStep - 1]?.description}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 
-        {/* Mobile Step Header */}
-        <div className="lg:hidden mb-6">
-          <div className="bg-gradient-to-r from-teal-500 to-emerald-500 rounded-2xl p-6 text-white shadow-lg">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                {React.createElement(steps[currentStep - 1]?.icon || Upload, { className: "w-6 h-6 text-white" })}
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold">{steps[currentStep - 1]?.title}</h1>
-                <p className="text-white/90">{steps[currentStep - 1]?.description}</p>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        {/* Enhanced Step Content */}
-        <div className="card-modern rounded-3xl p-6 sm:p-8 lg:p-12 shadow-xl">
+
+        {/* Enhanced Mobile-First Step Content */}
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 xl:p-12 shadow-lg sm:shadow-xl border border-white/50">
           {currentStep === 1 && (
-            <div className="space-y-8">
+            <div className="space-y-6 sm:space-y-8">
+              {/* Desktop Header */}
               <div className="text-center hidden lg:block">
-                <div className="w-16 h-16 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                  <Upload className="w-8 h-8 text-white" />
+                <div className="w-20 h-20 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl">
+                  <Upload className="w-10 h-10 text-white" />
                 </div>
-                <h2 className="text-responsive-3xl font-bold text-gray-900 mb-4">
+                <h2 className="text-4xl font-bold text-gray-900 mb-6 leading-tight">
                   Upload Your Resume
                 </h2>
-                <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
                   Upload your current resume to begin the AI-powered optimization process. We support PDF, DOCX, and TXT formats.
                 </p>
               </div>
               
-              {/* Mobile Instructions */}
+              {/* Mobile Header */}
               <div className="lg:hidden text-center">
-                <p className="text-base text-gray-600 mb-6">
+                <p className="text-base sm:text-lg text-gray-600 mb-6 leading-relaxed">
                   Upload your current resume to begin the AI-powered optimization process. We support PDF, DOCX, and TXT formats.
                 </p>
               </div>
 
               <div className="max-w-2xl mx-auto">
-                {/* Mobile-First File Upload */}
+                {/* Enhanced Mobile-First File Upload */}
                 <div className="space-y-4">
-                  {/* Mobile Upload Button */}
+                  {/* Mobile Upload Button - Enhanced */}
                   <div className="block sm:hidden">
                     <input
                       type="file"
@@ -633,29 +623,31 @@ Sincerely,
                     />
                     <label
                       htmlFor="mobile-file-input"
-                      className="flex flex-col items-center justify-center w-full p-8 border-2 border-dashed border-teal-300 rounded-2xl bg-teal-50 hover:bg-teal-100 transition-colors cursor-pointer"
+                      className="flex flex-col items-center justify-center w-full p-8 border-3 border-dashed border-teal-300 rounded-3xl bg-gradient-to-br from-teal-50 to-emerald-50 hover:from-teal-100 hover:to-emerald-100 transition-all duration-300 cursor-pointer transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
                     >
-                      <div className="w-16 h-16 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
-                        <Upload className="w-8 h-8 text-white" />
+                      <div className="w-20 h-20 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-3xl flex items-center justify-center mb-6 shadow-xl transform transition-transform group-hover:scale-110">
+                        <Upload className="w-10 h-10 text-white" />
                       </div>
-                      <h3 className="text-lg font-bold text-teal-700 mb-2">Choose Resume File</h3>
-                      <p className="text-sm text-teal-600 text-center mb-4">
-                        Tap to select your resume file
+                      <h3 className="text-xl font-bold text-teal-700 mb-3">Choose Resume File</h3>
+                      <p className="text-base text-teal-600 text-center mb-6 max-w-xs leading-relaxed">
+                        Tap to select your resume file from your device
                       </p>
-                      <div className="flex items-center space-x-3 text-xs text-teal-500">
-                        <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full">PDF</span>
-                        <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full">DOCX</span>
-                        <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full">TXT</span>
+                      <div className="flex flex-wrap justify-center gap-2 text-sm">
+                        <span className="px-3 py-2 bg-green-100 text-green-700 rounded-full font-medium border border-green-200">PDF</span>
+                        <span className="px-3 py-2 bg-blue-100 text-blue-700 rounded-full font-medium border border-blue-200">DOCX</span>
+                        <span className="px-3 py-2 bg-purple-100 text-purple-700 rounded-full font-medium border border-purple-200">TXT</span>
                       </div>
                     </label>
                   </div>
 
-                  {/* Desktop Drag & Drop */}
+                  {/* Enhanced Desktop Drag & Drop */}
                   <div className="hidden sm:block">
                     <div
-                      className={`file-upload-area relative p-12 rounded-2xl text-center transition-all duration-300 ${
-                        isDragging ? 'drag-over' : ''
-                      }`}
+                      className={`relative p-12 lg:p-16 rounded-3xl text-center transition-all duration-500 cursor-pointer group ${
+                        isDragging 
+                          ? 'border-3 border-dashed border-teal-400 bg-gradient-to-br from-teal-100 to-emerald-100 scale-105 shadow-2xl' 
+                          : 'border-3 border-dashed border-gray-300 bg-gradient-to-br from-gray-50 to-white hover:border-teal-300 hover:bg-gradient-to-br hover:from-teal-50 hover:to-emerald-50'
+                      } shadow-lg hover:shadow-2xl transform hover:scale-[1.02] active:scale-[0.98]`}
                       onDragOver={handleDragOver}
                       onDragLeave={handleDragLeave}
                       onDrop={handleDrop}
@@ -669,29 +661,35 @@ Sincerely,
                         ref={fileInputRef}
                       />
                       
-                      <div className="space-y-6 cursor-pointer">
-                        <div className="w-20 h-20 bg-gradient-to-br from-teal-100 to-emerald-100 rounded-2xl flex items-center justify-center mx-auto">
-                          <FileText className="w-10 h-10 text-teal-600" />
+                      <div className="space-y-8">
+                        <div className={`w-24 h-24 lg:w-28 lg:h-28 rounded-3xl flex items-center justify-center mx-auto transition-all duration-300 ${
+                          isDragging 
+                            ? 'bg-gradient-to-br from-teal-500 to-emerald-500 shadow-2xl scale-110' 
+                            : 'bg-gradient-to-br from-teal-100 to-emerald-100 group-hover:from-teal-200 group-hover:to-emerald-200 shadow-xl group-hover:scale-110'
+                        }`}>
+                          <FileText className={`w-12 h-12 lg:w-14 lg:h-14 transition-colors ${
+                            isDragging ? 'text-white' : 'text-teal-600'
+                          }`} />
                         </div>
                         
                         <div>
-                          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                          <h3 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-4 group-hover:text-teal-700 transition-colors">
                             Drag & drop your resume here
                           </h3>
-                          <p className="text-gray-600 mb-4">
+                          <p className="text-lg text-gray-600 mb-6 group-hover:text-teal-600 transition-colors">
                             Or click to browse your files
                           </p>
-                          <div className="flex items-center justify-center space-x-4 text-sm text-gray-500">
-                            <span className="flex items-center space-x-1">
-                              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                          <div className="flex items-center justify-center space-x-6 text-base">
+                            <span className="flex items-center space-x-2 px-4 py-2 bg-green-100 text-green-700 rounded-full border border-green-200 font-medium">
+                              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                               <span>PDF</span>
                             </span>
-                            <span className="flex items-center space-x-1">
-                              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            <span className="flex items-center space-x-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-full border border-blue-200 font-medium">
+                              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
                               <span>DOCX</span>
                             </span>
-                            <span className="flex items-center space-x-1">
-                              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                            <span className="flex items-center space-x-2 px-4 py-2 bg-purple-100 text-purple-700 rounded-full border border-purple-200 font-medium">
+                              <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
                               <span>TXT</span>
                             </span>
                           </div>
@@ -702,32 +700,40 @@ Sincerely,
                 </div>
 
                 {uploading && (
-                  <div className="mt-6 p-4 bg-teal-50 rounded-xl border border-teal-200">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-6 h-6 border-2 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
-                      <span className="text-teal-700 font-medium">Uploading and analyzing your resume...</span>
+                  <div className="mt-6 p-4 sm:p-6 bg-gradient-to-r from-teal-50 to-emerald-50 rounded-2xl border border-teal-200 shadow-lg">
+                    <div className="flex flex-col sm:flex-row items-center sm:space-x-4 space-y-3 sm:space-y-0">
+                      <div className="w-8 h-8 border-3 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
+                      <div className="text-center sm:text-left">
+                        <span className="text-teal-700 font-semibold block">Uploading and analyzing your resume...</span>
+                        <span className="text-teal-600 text-sm">This may take a few moments</span>
+                      </div>
                     </div>
                   </div>
                 )}
 
                 {uploadedFile && (
-                  <div className="mt-6 p-6 bg-green-50 rounded-xl border border-green-200">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                        <Check className="w-6 h-6 text-green-600" />
+                  <div className="mt-6 p-4 sm:p-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl border border-green-200 shadow-lg animate-in slide-in-from-bottom-4 duration-500">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
+                      <div className="w-14 h-14 bg-gradient-to-br from-green-100 to-emerald-100 rounded-2xl flex items-center justify-center shadow-md border border-green-200 flex-shrink-0">
+                        <Check className="w-7 h-7 text-green-600" />
                       </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-green-900">{uploadedFile.name}</h4>
-                        <p className="text-sm text-green-700">
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-bold text-green-900 text-lg mb-1 truncate">{uploadedFile.name}</h4>
+                        <p className="text-green-700 font-medium">
                           {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB • Ready for analysis
                         </p>
+                        <div className="flex items-center mt-2 space-x-2">
+                          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                          <span className="text-green-600 text-sm font-medium">Upload successful</span>
+                        </div>
                       </div>
                       <button
                         onClick={() => {
                           setUploadedFile(null);
                           setResumeText('');
                         }}
-                        className="p-2 text-green-600 hover:text-green-800 transition-colors"
+                        className="p-3 text-green-600 hover:text-green-800 hover:bg-green-100 rounded-xl transition-all duration-200 self-start sm:self-center flex-shrink-0"
+                        title="Remove file"
                       >
                         <X className="w-5 h-5" />
                       </button>
@@ -1136,44 +1142,43 @@ Sincerely,
             </div>
           )}
 
-          {/* Navigation */}
-          <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center pt-8 border-t border-gray-200 space-y-4 lg:space-y-0">
+          {/* Enhanced Mobile-First Navigation */}
+          <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center pt-6 sm:pt-8 mt-6 sm:mt-8 border-t border-gray-200/60 space-y-4 lg:space-y-0">
             <button
               onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
               disabled={currentStep === 1}
-              className="btn-modern flex items-center space-x-2 px-6 py-3 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-all duration-200 w-full sm:w-auto justify-center"
+              className="flex items-center justify-center space-x-3 px-6 py-4 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-2xl transition-all duration-200 w-full sm:w-auto border border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-md font-medium text-gray-700 hover:text-gray-900"
             >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Previous</span>
+              <ArrowLeft className="w-5 h-5" />
+              <span>Previous Step</span>
             </button>
 
-            <div className="flex flex-col space-y-3 lg:flex-row lg:space-y-0 lg:space-x-3">
+            <div className="flex flex-col space-y-3 lg:flex-row lg:space-y-0 lg:space-x-3 lg:items-center">
               {currentStep < 3 && (
                 <button
                   onClick={nextStep}
                   disabled={!canProceed()}
-                  className="btn-modern flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl w-full sm:w-auto justify-center"
+                  className="flex items-center justify-center space-x-3 px-8 py-4 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 disabled:from-gray-400 disabled:to-gray-500 text-white rounded-2xl disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-300 shadow-lg hover:shadow-2xl w-full sm:max-w-xs font-semibold text-lg transform hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <span>Continue</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-5 h-5" />
                 </button>
               )}
               {currentStep === 3 && !analysisData && (
                 <button
                   onClick={analyzeJobFit}
-                  onMouseDown={() => console.log('🔥 ANALYZE FIT BUTTON PRESSED')}
                   disabled={!canProceed() || loading}
-                  className="btn-modern flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl w-full sm:w-auto justify-center"
+                  className="flex items-center justify-center space-x-3 px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 disabled:from-gray-400 disabled:to-gray-500 text-white rounded-2xl disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-300 shadow-lg hover:shadow-2xl w-full sm:max-w-xs font-semibold text-lg transform hover:scale-[1.02] active:scale-[0.98]"
                 >
                   {loading ? (
                     <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                       <span>Analyzing...</span>
                     </>
                   ) : (
                     <>
                       <span>Analyze Fit</span>
-                      <BarChart3 className="w-4 h-4" />
+                      <BarChart3 className="w-5 h-5" />
                     </>
                   )}
                 </button>
@@ -1181,29 +1186,34 @@ Sincerely,
               {currentStep === 3 && analysisData && (
                 <button
                   onClick={nextStep}
-                  className="btn-modern flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl w-full sm:w-auto justify-center"
+                  className="flex items-center justify-center space-x-3 px-6 py-4 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white rounded-2xl transition-all duration-300 shadow-lg hover:shadow-2xl w-full sm:max-w-sm font-semibold text-base sm:text-lg transform hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <span>Continue to Resume Customization</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-5 h-5" />
                 </button>
               )}
               {currentStep >= 4 && currentStep < 6 && (
                 <button
                   onClick={nextStep}
                   disabled={!canProceed()}
-                  className="btn-modern flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl w-full sm:w-auto justify-center"
+                  className="flex items-center justify-center space-x-3 px-8 py-4 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 disabled:from-gray-400 disabled:to-gray-500 text-white rounded-2xl disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-300 shadow-lg hover:shadow-2xl w-full sm:max-w-xs font-semibold text-lg transform hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <span>Continue</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-5 h-5" />
                 </button>
               )}
               {currentStep === 6 && interviewQuestions.length > 0 && (
-                <div className="w-full bg-green-50 border border-green-200 rounded-xl p-4 mt-4 lg:mt-0 lg:w-auto">
-                  <div className="flex flex-col lg:flex-row items-center space-y-2 lg:space-y-0 lg:space-x-3">
-                    <CheckCircle className="w-6 h-6 text-green-600" />
-                    <span className="text-green-800 font-medium text-center lg:text-left">
-                      Congratulations! You've completed all steps of the resume customization process.
-                    </span>
+                <div className="w-full lg:max-w-md bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-4 sm:p-6 shadow-lg animate-in slide-in-from-bottom-4 duration-500">
+                  <div className="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0">
+                      <CheckCircle className="w-7 h-7 text-white" />
+                    </div>
+                    <div className="flex-1 text-center sm:text-left">
+                      <h4 className="text-green-900 font-bold text-lg mb-1">Congratulations!</h4>
+                      <p className="text-green-800 font-medium text-sm leading-relaxed">
+                        You've completed all steps of the resume customization process.
+                      </p>
+                    </div>
                   </div>
                 </div>
               )}
@@ -1214,4 +1224,4 @@ Sincerely,
     </div>
     </PageLayout>
   );
-} 
+}
