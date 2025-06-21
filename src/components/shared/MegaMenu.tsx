@@ -317,12 +317,17 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
                 <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isActive ? 'rotate-180' : ''}`} />
               </button>
 
-              {/* Mega Menu Dropdown - Horizontal Layout */}
+              {/* Mega Menu Dropdown - Responsive Layout */}
               {isActive && (
                 <div 
-                  className="absolute top-full left-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-200 z-50"
+                  className="absolute top-full left-0 mt-2 w-80 max-w-[90vw] bg-white rounded-xl shadow-xl border border-gray-200 z-50 max-h-[80vh] overflow-y-auto"
                   onMouseEnter={handleDropdownEnter}
                   onMouseLeave={handleDropdownLeave}
+                  style={{
+                    transform: 'translateX(0)',
+                    left: 'auto',
+                    right: 'auto'
+                  }}
                 >
                   <div className="p-5">
                     {/* Header */}
@@ -336,38 +341,38 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
                       </div>
                     </div>
                     
-                    {/* Menu Items - Horizontal Layout */}
-                    <div className="space-y-2">
+                    {/* Menu Items - Responsive Grid Layout */}
+                    <div className="space-y-1">
                       {category.items.map((item) => {
                         const ItemIcon = item.icon;
                         return (
                           <Link
                             key={item.href}
                             href={item.href}
-                            className="flex items-center justify-between p-3 rounded-lg hover:bg-teal-50 hover:border-teal-200 border border-transparent transition-all group/item"
+                            className="flex items-center p-3 rounded-lg hover:bg-teal-50 hover:border-teal-200 border border-transparent transition-all group/item w-full"
                             onClick={() => setActiveCategory(null)}
                           >
-                            <div className="flex items-center space-x-3 flex-1">
+                            <div className="flex items-center space-x-3 flex-1 min-w-0">
                               <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center group-hover/item:bg-teal-100 transition-colors flex-shrink-0">
                                 <ItemIcon className="w-4 h-4 text-gray-600 group-hover/item:text-teal-600" />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <h4 className="font-semibold text-gray-900 group-hover/item:text-teal-700 transition-colors text-sm">
-                                  {item.title}
-                                </h4>
-                                <p className="text-xs text-gray-500 group-hover/item:text-teal-600 transition-colors truncate">
+                                <div className="flex items-center space-x-2">
+                                  <h4 className="font-semibold text-gray-900 group-hover/item:text-teal-700 transition-colors text-sm">
+                                    {item.title}
+                                  </h4>
+                                  {item.isNew && (
+                                    <Badge className="bg-green-100 text-green-700 text-xs px-1.5 py-0.5 font-medium flex-shrink-0">New</Badge>
+                                  )}
+                                  {item.badge && (
+                                    <Badge className="bg-blue-100 text-blue-700 text-xs px-1.5 py-0.5 font-medium flex-shrink-0">{item.badge}</Badge>
+                                  )}
+                                </div>
+                                <p className="text-xs text-gray-500 group-hover/item:text-teal-600 transition-colors line-clamp-1">
                                   {item.description}
                                 </p>
                               </div>
-                            </div>
-                            <div className="flex items-center space-x-2 ml-3">
-                              {item.isNew && (
-                                <Badge className="bg-green-100 text-green-700 text-xs px-2 py-0.5 font-medium">New</Badge>
-                              )}
-                              {item.badge && (
-                                <Badge className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 font-medium">{item.badge}</Badge>
-                              )}
-                              <ArrowRight className="w-4 h-4 text-gray-400 group-hover/item:text-teal-500 transition-colors" />
+                              <ArrowRight className="w-4 h-4 text-gray-400 group-hover/item:text-teal-500 transition-colors flex-shrink-0" />
                             </div>
                           </Link>
                         );

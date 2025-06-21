@@ -35,9 +35,10 @@ import {
   Check
 } from 'lucide-react';
 import { toast } from 'sonner';
+import PageLayout from '@/components/shared/PageLayout';
 
 export default function ResumeCustomizer() {
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [apiStatus, setApiStatus] = useState<'working' | 'fallback' | 'unknown'>('unknown');
   const [resumeData, setResumeData] = useState({ filename: '', content: '' });
@@ -433,7 +434,8 @@ Sincerely,
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-teal-50">
+    <PageLayout>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-teal-50">
       {/* Enhanced Header */}
       <div className="bg-white/80 backdrop-blur-xl border-b border-white/20 sticky top-0 z-10" style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.1)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -941,5 +943,6 @@ Sincerely,
         </div>
       </div>
     </div>
+    </PageLayout>
   );
 } 
