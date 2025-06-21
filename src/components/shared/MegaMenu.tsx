@@ -474,8 +474,8 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
 
       {/* Simplified Mobile Menu - No Portal, Direct Rendering */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 z-[9999] bg-black/50">
-          <div className="fixed top-0 right-0 w-80 max-w-[90vw] h-full bg-white shadow-xl overflow-y-auto">
+        <div className="lg:hidden fixed inset-0 bg-black/50" style={{ zIndex: 99999 }}>
+          <div className="fixed top-0 right-0 w-80 max-w-[90vw] h-full bg-white shadow-xl overflow-y-auto" style={{ zIndex: 100000 }}>
             {/* Header */}
             <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-teal-500 to-emerald-500">
               <div className="flex items-center justify-between">
@@ -634,7 +634,7 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
 
       {/* Search Modal */}
       {isSearchOpen && (
-        <div className="fixed inset-0 z-[10000] bg-black/50" onClick={() => setIsSearchOpen(false)}>
+        <div className="fixed inset-0 bg-black/50" style={{ zIndex: 100001 }} onClick={() => setIsSearchOpen(false)}>
           <div 
             className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-white rounded-xl p-6 mx-4"
             onClick={(e) => e.stopPropagation()}
