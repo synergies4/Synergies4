@@ -262,26 +262,9 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
   };
 
   const handleMobileNavigation = (href: string) => {
-    console.log('🔥 NAVIGATION CLICKED:', href); // Debug
-    
-    try {
-      // Close menu first
-      setIsMobileMenuOpen(false);
-      setActiveCategory(null);
-      
-      console.log('🔥 Menu closed, navigating to:', href); // Debug
-      
-      // Use window.location.href for more reliable navigation
-      setTimeout(() => {
-        console.log('🔥 About to navigate with window.location.href'); // Debug
-        window.location.href = href;
-      }, 100); // Small delay to ensure menu closes first
-      
-    } catch (error) {
-      console.error('🔥 Navigation error:', error);
-      // Fallback
-      window.location.href = href;
-    }
+    console.log('🔥 NAVIGATION CLICKED:', href);
+    // Immediately navigate - no delays, no complex logic
+    window.location.href = href;
   };
 
 
@@ -521,12 +504,10 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
             <div className="p-4">
               {/* Featured Resume Customizer */}
               <div className="mb-6">
-                <a
-                  href="/resume-customizer"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    console.log('🔥 RESUME ANCHOR CLICKED'); // Debug
-                    handleMobileNavigation('/resume-customizer');
+                <button
+                  onClick={() => {
+                    console.log('🔥 RESUME BUTTON CLICKED');
+                    window.location.href = '/resume-customizer';
                   }}
                   className="block w-full p-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl text-white text-left hover:from-purple-600 hover:to-pink-600 transition-colors cursor-pointer"
                 >
@@ -542,7 +523,7 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
                       <span className="px-2 py-1 bg-white/20 rounded-full text-xs font-bold">NEW</span>
                     </div>
                   </div>
-                </a>
+                </button>
               </div>
 
               {/* Navigation Categories - Simplified */}
@@ -571,13 +552,11 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
                           {category.items.map((item) => {
                             const ItemIcon = item.icon;
                             return (
-                              <a
+                              <button
                                 key={item.href}
-                                href={item.href}
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  console.log('🔥 ANCHOR CLICKED:', item.title, item.href); // Debug
-                                  handleMobileNavigation(item.href);
+                                onClick={() => {
+                                  console.log('🔥 BUTTON CLICKED:', item.title, item.href);
+                                  window.location.href = item.href;
                                 }}
                                 className="flex items-center space-x-3 p-4 w-full text-left hover:bg-teal-50 transition-colors border-b border-gray-100 last:border-b-0 cursor-pointer"
                               >
@@ -597,7 +576,7 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
                                   <p className="text-xs text-gray-600 mt-0.5">{item.description}</p>
                                 </div>
                                 <ArrowRight className="w-4 h-4 text-gray-400" />
-                              </a>
+                              </button>
                             );
                           })}
                         </div>
@@ -615,12 +594,10 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
                       <p className="font-semibold text-blue-900">Welcome back!</p>
                       <p className="text-sm text-blue-700">{userProfile?.name || 'User'}</p>
                     </div>
-                    <a
-                      href={userProfile?.role === 'ADMIN' ? '/admin' : '/dashboard'}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        console.log('🔥 DASHBOARD ANCHOR CLICKED'); // Debug
-                        handleMobileNavigation(userProfile?.role === 'ADMIN' ? '/admin' : '/dashboard');
+                    <button
+                      onClick={() => {
+                        console.log('🔥 DASHBOARD BUTTON CLICKED');
+                        window.location.href = userProfile?.role === 'ADMIN' ? '/admin' : '/dashboard';
                       }}
                       className="flex items-center space-x-3 p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors w-full text-left cursor-pointer"
                     >
@@ -629,7 +606,7 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
                         {userProfile?.role === 'ADMIN' ? 'Admin Dashboard' : 'Dashboard'}
                       </span>
                       <ArrowRight className="w-4 h-4 text-gray-400 ml-auto" />
-                    </a>
+                    </button>
                     <button
                       onClick={() => {
                         signOut();
@@ -644,30 +621,26 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    <a
-                      href="/login"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        console.log('🔥 LOGIN ANCHOR CLICKED'); // Debug
-                        handleMobileNavigation('/login');
+                    <button
+                      onClick={() => {
+                        console.log('🔥 LOGIN BUTTON CLICKED');
+                        window.location.href = '/login';
                       }}
                       className="flex items-center justify-center space-x-2 p-3 border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition-colors w-full cursor-pointer"
                     >
                       <User className="w-5 h-5 text-gray-600" />
                       <span className="font-semibold text-gray-900">Login</span>
-                    </a>
-                    <a
-                      href="/signup"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        console.log('🔥 SIGNUP ANCHOR CLICKED'); // Debug
-                        handleMobileNavigation('/signup');
+                    </button>
+                    <button
+                      onClick={() => {
+                        console.log('🔥 SIGNUP BUTTON CLICKED');
+                        window.location.href = '/signup';
                       }}
                       className="flex items-center justify-center space-x-2 p-3 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-lg hover:from-teal-600 hover:to-emerald-600 transition-colors w-full cursor-pointer"
                     >
                       <span className="font-semibold">Get Started Free</span>
                       <ArrowRight className="w-5 h-5" />
-                    </a>
+                    </button>
                   </div>
                 )}
               </div>
