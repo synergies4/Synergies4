@@ -185,33 +185,13 @@ function Navigation({ isSearchOpen, setIsSearchOpen, headerVisible, lastScrollY 
                 </Button>
               </div>
 
-              {/* MegaMenu Navigation - Only visible on desktop */}
-              <div className="hidden lg:flex flex-1 justify-end">
+              {/* Navigation Menu - Desktop and Mobile */}
+              <div className="flex flex-1 justify-end">
                 <MegaMenu isScrolled={lastScrollY > 50} />
-              </div>
-
-              {/* Mobile Search Button */}
-              <div className="lg:hidden ml-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsSearchOpen(true)}
-                  className="p-2 border-gray-400 hover:border-teal-500 hover:text-teal-600 hover:bg-teal-50 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-white text-gray-900"
-                  aria-label="Open search"
-                >
-                  <Search className="w-5 h-5" />
-                </Button>
               </div>
             </div>
           </div>
         </nav>
-      </div>
-
-      {/* Mobile Navigation Overlay - Always Visible on Mobile */}
-      <div className="lg:hidden fixed top-0 right-0 z-[100] p-4">
-        <div className="mobile-menu-container">
-          <MegaMenu isScrolled={lastScrollY > 50} />
-        </div>
       </div>
     </>
   );

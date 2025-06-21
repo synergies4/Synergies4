@@ -28,7 +28,8 @@ import {
   ArrowRight,
   Briefcase,
   GraduationCap,
-  Lightbulb
+  Lightbulb,
+  Search
 } from 'lucide-react';
 
 interface MenuCategory {
@@ -173,6 +174,7 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -184,7 +186,7 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setActiveCategory(null);
-        setIsMobileMenuOpen(false);
+        // Don't close mobile menu on outside clicks - only explicit close button
       }
     };
 
@@ -213,6 +215,20 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
       document.body.style.overflow = 'unset';
     };
   }, [isMobileMenuOpen]);
+
+  // Search functionality
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Open search with Cmd/Ctrl + K
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsSearchOpen(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -266,10 +282,34 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
     }, 100);
   };
 
+  // Handle mobile category toggle with better isolation
+  const handleMobileCategoryToggle = (categoryId: string, event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    const isActive = activeCategory === categoryId;
+    setActiveCategory(isActive ? null : categoryId);
+  };
+
   return (
     <div ref={menuRef} className="relative">
       {/* Desktop Navigation */}
       <div className="hidden lg:flex items-center space-x-1">
+        {/* Desktop Search Button */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setIsSearchOpen(true)}
+          className="flex items-center space-x-2 text-gray-900 hover:text-teal-600 border-gray-400 hover:border-teal-500 hover:bg-teal-50 px-3 py-2 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-white mr-4"
+          aria-label="Open search"
+        >
+          <Search className="w-4 h-4" />
+          <span className="hidden xl:inline">Search</span>
+          <kbd className="hidden xl:inline-flex h-5 select-none items-center gap-1 rounded border bg-gray-100 px-1.5 font-mono text-[10px] font-medium opacity-100 ml-2">
+            <span className="text-xs">⌘</span>K
+          </kbd>
+        </Button>
+
         {menuCategories.map((category) => {
           const Icon = category.icon;
           const isActive = activeCategory === category.id;
@@ -400,14 +440,27 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
         </div>
       </div>
 
-      {/* Mobile Menu Button */}
+      {/* Mobile Menu Buttons */}
       <div className="lg:hidden flex items-center space-x-2">
+        {/* Mobile Search Button */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setIsSearchOpen(true)}
+          className="p-2 border-gray-400 hover:border-teal-500 hover:text-teal-600 hover:bg-teal-50 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 bg-white text-gray-900"
+          aria-label="Open search"
+        >
+          <Search className="w-5 h-5" />
+        </Button>
+
+        {/* Contact Button */}
         <Link href="/contact">
           <Button size="sm" className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white">
             <MessageSquare className="w-4 h-4" />
           </Button>
         </Link>
         
+        {/* Hamburger Menu Button */}
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           className="p-2 rounded-lg text-gray-700 hover:text-teal-600 hover:bg-gray-100 transition-colors"
@@ -421,20 +474,11 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
         </button>
       </div>
 
-      {/* Fixed Mobile Menu */}
+      {/* Robust Mobile Menu - Improved Dropdown Handling */}
       {isMobileMenuOpen && isMounted && createPortal(
-        <div 
-          className="lg:hidden fixed inset-0 z-[9999] bg-black/50" 
-          onClick={(e) => {
-            // Only close if clicking on the overlay, not the menu
-            if (e.target === e.currentTarget) {
-              closeMobileMenu();
-            }
-          }}
-        >
+        <div className="lg:hidden fixed inset-0 z-[9999] bg-black/50">
           <div 
             className="fixed top-0 right-0 w-80 max-w-[90vw] h-full bg-white shadow-xl overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
             <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-teal-500 to-emerald-500">
@@ -455,10 +499,7 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
             </div>
 
             {/* Menu Content */}
-            <div 
-              className="p-4"
-              onClick={(e) => e.stopPropagation()}
-            >
+            <div className="p-4">
               {/* Featured Resume Customizer */}
               <div className="mb-6">
                 <button
@@ -480,20 +521,17 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                 </button>
               </div>
 
-              {/* Navigation Categories */}
+              {/* Navigation Categories - Improved Dropdown System */}
               <div className="space-y-4">
                 {menuCategories.map((category) => {
                   const Icon = category.icon;
                   const isActive = activeCategory === category.id;
                   
                   return (
-                    <div key={category.id}>
+                    <div key={category.id} className="border border-gray-200 rounded-lg overflow-hidden">
                       <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setActiveCategory(isActive ? null : category.id);
-                        }}
-                        className="flex items-center justify-between w-full p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+                        onClick={(e) => handleMobileCategoryToggle(category.id, e)}
+                        className="flex items-center justify-between w-full p-4 bg-gray-50 hover:bg-gray-100 transition-colors text-left"
                       >
                         <div className="flex items-center space-x-3">
                           <div className="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center">
@@ -505,17 +543,14 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
                       </button>
 
                       {isActive && (
-                        <div 
-                          className="mt-2 space-y-1"
-                          onClick={(e) => e.stopPropagation()}
-                        >
+                        <div className="bg-white border-t border-gray-200">
                           {category.items.map((item) => {
                             const ItemIcon = item.icon;
                             return (
                               <button
                                 key={item.href}
                                 onClick={() => handleMobileNavigation(item.href)}
-                                className="flex items-center space-x-3 p-3 ml-4 bg-white hover:bg-teal-50 rounded-lg border border-gray-100 hover:border-teal-200 transition-all w-full text-left"
+                                className="flex items-center space-x-3 p-4 w-full text-left hover:bg-teal-50 transition-colors border-b border-gray-100 last:border-b-0"
                               >
                                 <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
                                   <ItemIcon className="w-4 h-4 text-gray-600" />
@@ -595,6 +630,27 @@ export default function MegaMenu({ isScrolled }: MegaMenuProps) {
           </div>
         </div>,
         document.body
+      )}
+
+      {/* Search Modal would be handled by parent component */}
+      {isSearchOpen && (
+        <div className="fixed inset-0 z-[10000] bg-black/50" onClick={() => setIsSearchOpen(false)}>
+          <div 
+            className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-white rounded-xl p-6 mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="text-center">
+              <Search className="w-12 h-12 text-teal-600 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Search Coming Soon</h3>
+              <p className="text-gray-600 mb-4">
+                We're working on an amazing search experience for you!
+              </p>
+              <Button onClick={() => setIsSearchOpen(false)} className="bg-teal-600 hover:bg-teal-700 text-white">
+                Close
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
