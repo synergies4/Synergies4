@@ -1,12 +1,13 @@
 'use client';
 
+import React from 'react';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { UserAvatar } from '@/components/UserAvatar';
-import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '../ui/button';
+import { Badge } from '../ui/badge';
+import { Separator } from '../ui/separator';
+import { UserAvatar } from '../UserAvatar';
+import { useAuth } from '../../contexts/AuthContext';
 import Image from 'next/image';
 import { 
   ArrowRight, 
@@ -28,8 +29,8 @@ import {
   FileText,
   UserPlus
 } from 'lucide-react';
-import GlobalSearch from '@/components/shared/GlobalSearch';
-import MegaMenu from '@/components/shared/MegaMenu';
+import GlobalSearch from './GlobalSearch';
+import MegaMenu from './MegaMenu';
 
 // Scroll to top component
 function ScrollToTop() {
