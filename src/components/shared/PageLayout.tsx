@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { UserAvatar } from '@/components/UserAvatar';
 import { useAuth } from '@/contexts/AuthContext';
+import Image from 'next/image';
 import { 
   ArrowRight, 
   Brain,
@@ -161,9 +162,14 @@ function Navigation({ isSearchOpen, setIsSearchOpen, headerVisible, lastScrollY 
               {/* Logo */}
               <div className="flex-shrink-0 mr-4">
                 <Link href="/" className="flex items-center" aria-label="Synergies4 home">
-                  <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent hover:from-teal-700 hover:to-emerald-700 transition-all duration-300">
-                    Synergies4
-                  </span>
+                  <Image
+                    src="/synergies4_logo_new.svg"
+                    alt="Synergies4"
+                    width={180}
+                    height={40}
+                    className="h-8 w-auto hover:opacity-80 transition-opacity duration-300"
+                    priority
+                  />
                 </Link>
               </div>
 

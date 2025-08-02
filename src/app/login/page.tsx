@@ -206,15 +206,13 @@ export default function Login() {
             {/* Mobile Logo */}
             <div className="lg:hidden text-center mb-8">
               <Link href="/" className="inline-block">
-                <div className="flex items-center justify-center space-x-3">
-                  <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                    <Sparkles className="w-6 h-6 text-blue-600" />
-                  </div>
-                  <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Synergies4</h1>
-                    <p className="text-gray-600 text-xs">AI-Powered Learning</p>
-                  </div>
-                </div>
+                <Image
+                  src="/synergies4_logo_new.svg"
+                  alt="Synergies4"
+                  width={180}
+                  height={40}
+                  className="h-10 w-auto mx-auto"
+                />
               </Link>
             </div>
 
