@@ -2,10 +2,6 @@ import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
@@ -63,6 +59,15 @@ export async function POST(request: NextRequest) {
 
 async function analyzeJobFit(resumeContent: string, jobDescription: string, jobTitle: string = '') {
   try {
+    // Check if OpenAI API key is available
+    if (!process.env.OPENAI_API_KEY) {
+      console.warn('OpenAI API key not available, using fallback analysis');
+      throw new Error('OpenAI API key not configured');
+    }
+
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
     const prompt = `
 Analyze the fit between this resume and job description. Provide a comprehensive analysis with specific, actionable insights.
 

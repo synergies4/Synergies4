@@ -2,10 +2,6 @@ import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
@@ -100,6 +96,15 @@ async function extractJobFromUrl(jobUrl: string) {
 
 async function extractJobInfoWithAI(content: string, url: string) {
   try {
+    // Check if OpenAI API key is available
+    if (!process.env.OPENAI_API_KEY) {
+      console.warn('OpenAI API key not available, using fallback extraction');
+      throw new Error('OpenAI API key not configured');
+    }
+
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
     const prompt = `
 You are an expert at extracting job information from web content. Analyze the following webpage content and extract the key job details.
 
