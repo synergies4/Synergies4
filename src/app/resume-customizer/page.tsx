@@ -1191,17 +1191,17 @@ Sincerely,
               </div>
             </div>
 
-            {/* Desktop Progress Bar - Enhanced & Aligned */}
+            {/* Desktop Progress Bar - Enhanced & Top Aligned */}
             <div className="hidden lg:block">
               <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 shadow-xl border border-white/50">
-                <div className="flex items-center justify-between">
+                <div className="flex items-start justify-between">
                   {steps.map((step, index) => {
                     const isActive = currentStep === index + 1;
                     const isCompleted = currentStep > index + 1;
                     const StepIcon = step.icon;
                     
                     return (
-                      <div key={index} className="flex items-center flex-1">
+                      <div key={index} className="flex items-start flex-1">
                         {/* Step Circle and Content */}
                         <div className="flex flex-col items-center text-center space-y-3 flex-1">
                           {/* Icon Circle - Consistent Size */}
@@ -1223,14 +1223,14 @@ Sincerely,
                             )}
                           </div>
                           
-                          {/* Step Text - Aligned */}
-                          <div className="max-w-32">
-                            <h3 className={`font-bold text-sm leading-tight transition-colors ${
+                          {/* Step Text - Top Aligned for Clarity */}
+                          <div className="max-w-36 flex flex-col items-center">
+                            <h3 className={`font-bold text-sm leading-tight text-center transition-colors ${
                               isActive ? 'text-teal-700' : isCompleted ? 'text-green-700' : 'text-gray-600'
                             }`}>
                               {step.title}
                             </h3>
-                            <p className={`text-xs mt-1 leading-tight transition-colors ${
+                            <p className={`text-xs mt-1 leading-tight text-center transition-colors ${
                               isActive ? 'text-teal-600' : isCompleted ? 'text-green-600' : 'text-gray-500'
                             }`}>
                               {step.description}
@@ -1238,11 +1238,13 @@ Sincerely,
                           </div>
                         </div>
                         
-                        {/* Connection Line */}
+                        {/* Connection Line - Aligned with Icons */}
                         {index < steps.length - 1 && (
-                          <div className={`w-16 h-1 mx-2 rounded-full transition-all duration-500 ${
-                            isCompleted ? 'bg-gradient-to-r from-green-500 to-emerald-500 shadow-sm' : 'bg-gray-200'
-                          }`} />
+                          <div className="flex items-start pt-8">
+                            <div className={`w-16 h-1 rounded-full transition-all duration-500 ${
+                              isCompleted ? 'bg-gradient-to-r from-green-500 to-emerald-500 shadow-sm' : 'bg-gray-200'
+                            }`} />
+                          </div>
                         )}
                       </div>
                     );
