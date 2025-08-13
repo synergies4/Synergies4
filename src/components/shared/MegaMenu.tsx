@@ -123,32 +123,6 @@ const menuCategories: MenuCategory[] = [
         icon: BarChart3
       }
     ]
-  },
-  {
-    id: 'community',
-    title: 'Community & Support',
-    description: 'Tools and guidance for the agentic workforce',
-    icon: Users,
-    items: [
-      {
-        title: 'Community Hub',
-        description: 'Connect with other learners',
-        href: '/community',
-        icon: Users
-      },
-      {
-        title: 'Events & Webinars',
-        description: 'Join live learning sessions',
-        href: '/events',
-        icon: Calendar
-      },
-      {
-        title: 'Support Center',
-        description: 'Get help when you need it',
-        href: '/support',
-        icon: MessageSquare
-      }
-    ]
   }
 ];
 
