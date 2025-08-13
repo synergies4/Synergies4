@@ -521,7 +521,7 @@ export default function EditCourse({ params }: { params: Promise<{ id: string }>
                 </Link>
               </Button>
               <Button 
-                onClick={updateCourse} 
+                onClick={handleSave} 
                 disabled={saving}
                 className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
               >
