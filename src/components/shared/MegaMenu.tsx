@@ -121,18 +121,6 @@ const menuCategories: MenuCategory[] = [
         description: 'Latest market insights and trends',
         href: '/industry-insight',
         icon: BarChart3
-      },
-      {
-        title: 'Career Guidance',
-        description: 'Expert advice for career growth',
-        href: '/career-guidance',
-        icon: Users
-      },
-      {
-        title: 'Skills Assessment',
-        description: 'Evaluate your current skill level',
-        href: '/skills-assessment',
-        icon: Target
       }
     ]
   },
