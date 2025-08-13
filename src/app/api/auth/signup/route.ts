@@ -3,12 +3,17 @@ import { createClient } from '@/lib/supabase/server';
 import { emailService } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
+  console.log('🚀 Signup API called');
+  
   try {
     const body = await request.json();
+    console.log('📝 Request body received:', { email: body.email, name: body.name, hasPassword: !!body.password });
+    
     const { email, password, name } = body;
 
     // Validate required fields
     if (!email || !password || !name) {
+      console.log('❌ Missing required fields:', { email: !!email, password: !!password, name: !!name });
       return NextResponse.json(
         { error: 'Email, password, and name are required' },
         { status: 400 }
@@ -32,9 +37,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    console.log('🔧 Creating Supabase client...');
     const supabase = await createClient();
+    console.log('✅ Supabase client created');
 
     // Create user with Supabase Auth
+    console.log('👤 Calling supabase.auth.signUp...');
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -43,6 +51,12 @@ export async function POST(request: NextRequest) {
           name,
         }
       }
+    });
+    console.log('📊 Supabase signup result:', { 
+      hasUser: !!data.user, 
+      userId: data.user?.id, 
+      hasError: !!error,
+      errorMessage: error?.message 
     });
 
     if (error) {
@@ -67,66 +81,15 @@ export async function POST(request: NextRequest) {
     }
 
     if (data.user) {
-      // Ensure user records are created in our custom tables
-      // (Database triggers should handle this, but let's be defensive)
-      try {
-        const userId = data.user.id;
-        const userEmail = data.user.email!;
-        
-        // Check if user already exists in our users table
-        const { data: existingUser } = await supabase
-          .from('users')
-          .select('id')
-          .eq('id', userId)
-          .single();
-        
-        if (!existingUser) {
-          console.log('Creating user record in users table for:', userEmail);
-          
-          // Create user record
-          const { error: userInsertError } = await supabase
-            .from('users')
-            .insert([{
-              id: userId,
-              email: userEmail,
-              name: name,
-              role: 'USER'
-            }]);
-          
-          if (userInsertError) {
-            console.error('Error creating user record:', userInsertError);
-            // Don't fail the signup, but log the error
-          }
-        }
-        
-        // Check if user profile exists
-        const { data: existingProfile } = await supabase
-          .from('user_profiles')
-          .select('id')
-          .eq('user_id', userId)
-          .single();
-        
-        if (!existingProfile) {
-          console.log('Creating user profile for:', userEmail);
-          
-          // Create user profile record  
-          const { error: profileInsertError } = await supabase
-            .from('user_profiles')
-            .insert([{
-              user_id: userId,
-              name: name,
-              role: 'USER'
-            }]);
-          
-          if (profileInsertError) {
-            console.error('Error creating user profile:', profileInsertError);
-            // Don't fail the signup, but log the error
-          }
-        }
-      } catch (dbError) {
-        console.error('Error ensuring user records exist:', dbError);
-        // Continue anyway - the auth user was created successfully
-      }
+      // Log successful user creation - let database triggers handle the rest
+      console.log('User successfully created in Supabase Auth:', {
+        id: data.user.id,
+        email: data.user.email,
+        confirmed: data.user.email_confirmed_at ? 'confirmed' : 'pending'
+      });
+      
+      // The database triggers should automatically create user and user_profile records
+      // If they don't, that's a configuration issue to be fixed in the database setup
 
       // Send welcome email (but don't fail signup if email fails)
       try {
@@ -159,8 +122,14 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     console.error('Signup API error:', error);
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      name: error instanceof Error ? error.name : undefined
+    });
+    
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: `Database error saving new user: ${error instanceof Error ? error.message : 'Unknown error'}` },
       { status: 500 }
     );
   }
