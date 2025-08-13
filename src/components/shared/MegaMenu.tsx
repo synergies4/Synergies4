@@ -89,23 +89,10 @@ const menuCategories: MenuCategory[] = [
         badge: 'Public'
       },
       {
-        title: 'AI Interview Practice',
-        description: 'Practice interviews with AI coaching',
-        href: '/ai-interview-practice',
-        icon: Video,
-        isNew: true
-      },
-      {
-        title: 'Goal Setting',
-        description: 'Set and track your career goals',
-        href: '/goal-setting',
-        icon: Target
-      },
-      {
-        title: 'ROI Calculator',
-        description: 'Calculate personalized course ROI & value projections',
-        href: '/roi-engine',
-        icon: TrendingUp,
+        title: 'AI Chat Assistant',
+        description: '24/7 AI coaching for daily challenges and questions',
+        href: '/pocket-coach',
+        icon: MessageSquare,
         isNew: true
       }
     ]
