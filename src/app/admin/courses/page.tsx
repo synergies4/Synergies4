@@ -115,81 +115,8 @@ export default function CoursesManagement() {
   };
 
   const setSampleCourses = () => {
-    const sampleCourses: CourseData[] = [
-      {
-        id: 'course-1',
-        title: 'AI-Powered Executive Leadership',
-        slug: 'ai-powered-executive-leadership',
-        short_desc: 'Master AI strategy from an executive perspective and lead digital transformation with confidence.',
-        level: 'Advanced',
-        duration: '8 weeks',
-        price: 299,
-        image: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=250&fit=crop&auto=format',
-        published: true,
-        category: 'Leadership',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        enrollments_count: 1250,
-        instructor_name: 'Dr. Sarah Johnson',
-        rating: 4.9,
-        total_lessons: 24
-      },
-      {
-        id: 'course-2',
-        title: 'AI-Powered Scrum Master',
-        slug: 'ai-powered-scrum-master',
-        short_desc: 'Master AI-enhanced Scrum methodologies and lead high-performing agile teams.',
-        level: 'Intermediate',
-        duration: '6 weeks',
-        price: 199,
-        image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=250&fit=crop&auto=format',
-        published: true,
-        category: 'Agile',
-        created_at: new Date(Date.now() - 86400000).toISOString(),
-        updated_at: new Date(Date.now() - 86400000).toISOString(),
-        enrollments_count: 2100,
-        instructor_name: 'Michael Chen',
-        rating: 4.8,
-        total_lessons: 18
-      },
-      {
-        id: 'course-3',
-        title: 'AI Product Owner Mastery',
-        slug: 'ai-product-owner-mastery',
-        short_desc: 'Drive product excellence using AI-enhanced strategies and data-driven decisions.',
-        level: 'Intermediate',
-        duration: '7 weeks',
-        price: 249,
-        image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=250&fit=crop&auto=format',
-        published: true,
-        category: 'Product',
-        created_at: new Date(Date.now() - 172800000).toISOString(),
-        updated_at: new Date(Date.now() - 172800000).toISOString(),
-        enrollments_count: 1800,
-        instructor_name: 'Emily Davis',
-        rating: 4.7,
-        total_lessons: 21
-      },
-      {
-        id: 'course-4',
-        title: 'Mental Fitness for Leaders',
-        slug: 'mental-fitness-for-leaders',
-        short_desc: 'Build resilience and mental agility for high-performance leadership.',
-        level: 'Beginner',
-        duration: '4 weeks',
-        price: 149,
-        image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop&auto=format',
-        published: false,
-        category: 'Wellness',
-        created_at: new Date(Date.now() - 259200000).toISOString(),
-        updated_at: new Date(Date.now() - 259200000).toISOString(),
-        enrollments_count: 950,
-        instructor_name: 'Dr. James Wilson',
-        rating: 4.9,
-        total_lessons: 12
-      }
-    ];
-    setCourses(sampleCourses);
+    // No more sample courses - removed fake course data
+    setCourses([]);
   };
 
   const handleTogglePublish = async (courseId: string, currentStatus: boolean) => {
@@ -206,11 +133,34 @@ export default function CoursesManagement() {
 
   const handleDeleteCourse = async (courseId: string) => {
     try {
-      // In a real app, you'd call your API to delete the course
+      const { createClient } = await import('@/lib/supabase/client');
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        alert('You must be logged in to delete a course');
+        return;
+      }
+
+      // Call the API to delete the course
+      const response = await fetch(`/api/courses/${courseId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to delete course');
+      }
+
+      // Remove from local state
       setCourses(courses.filter(course => course.id !== courseId));
-      console.log(`Course ${courseId} deleted`);
+      console.log(`Course ${courseId} deleted successfully`);
     } catch (error) {
       console.error('Error deleting course:', error);
+      alert(`Error deleting course: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -533,6 +483,16 @@ export default function CoursesManagement() {
                       className="flex-1 text-xs sm:text-sm"
                     >
                       {course.published ? 'Unpublish' : 'Publish'}
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      asChild
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-4"
+                    >
+                      <Link href={`/admin/courses/${course.id}`}>
+                        <Edit className="h-3 w-3 mr-1" />
+                        Edit
+                      </Link>
                     </Button>
                     <Button 
                       size="sm" 

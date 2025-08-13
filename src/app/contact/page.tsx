@@ -421,17 +421,17 @@ export default function Contact() {
                     icon: <Mail className="h-6 w-6" />,
                     title: "Email Us",
                     description: "Send us an email anytime",
-                    contact: "hello@synergies4.com",
-                    href: "mailto:hello@synergies4.com",
+                    contact: "info@synergies4.com",
+                    href: "mailto:info@synergies4.com",
                     gradient: "from-blue-500 to-cyan-400",
                     bgGradient: "from-blue-50 to-cyan-50"
                   },
                   {
                     icon: <Phone className="h-6 w-6" />,
                     title: "Call Us",
-                    description: "Mon-Fri from 8am to 5pm PST",
-                    contact: "+1 (555) 123-4567",
-                    href: "tel:+1-555-123-4567",
+                    description: "Mon-Fri from 9am to 6pm EST",
+                    contact: "+1 (647) 123-4567",
+                    href: "tel:+1-647-123-4567",
                     gradient: "from-green-500 to-emerald-400",
                     bgGradient: "from-green-50 to-emerald-50"
                   },

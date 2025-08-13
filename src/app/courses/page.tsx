@@ -70,9 +70,9 @@ export default function Courses() {
           href: "#course-directory"
         }}
         secondaryCTA={{
-          text: "Download Brochure",
-          href: "#brochure",
-          icon: <Download className="w-4 h-4" />
+          text: "Get Course Summary",
+          href: "#summary",
+          icon: <MessageSquare className="w-4 h-4" />
         }}
         backgroundVariant="gradient"
         customColors={{
@@ -85,8 +85,8 @@ export default function Courses() {
       {/* Course Directory Section */}
       <CourseDirectorySection />
 
-      {/* Get Your Brochure Section */}
-      <BrochureSection />
+      {/* Get Course Summary Section */}
+      <CourseSummarySection />
     </PageLayout>
   );
 }
@@ -522,8 +522,8 @@ function CourseDirectorySection() {
   );
 }
 
-// Brochure Section Component
-function BrochureSection() {
+// Course Summary Section Component
+function CourseSummarySection() {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -554,7 +554,7 @@ function BrochureSection() {
   };
 
   return (
-    <section id="brochure" className="py-24 bg-gradient-to-br from-slate-900 via-gray-900 to-slate-900 relative overflow-hidden">
+    <section id="summary" className="py-24 bg-gradient-to-br from-slate-900 via-gray-900 to-slate-900 relative overflow-hidden">
       {/* Enhanced Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-blue-500/20 to-cyan-600/20 rounded-full blur-3xl animate-pulse"></div>
@@ -577,17 +577,17 @@ function BrochureSection() {
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-16">
           <div className="inline-flex items-center px-6 py-3 bg-white/80 backdrop-blur-sm rounded-full border border-blue-200/50 mb-8">
-            <Download className="w-5 h-5 text-blue-600 mr-3" />
-            <span className="text-blue-700 font-medium">Course Catalog</span>
+            <MessageSquare className="w-5 h-5 text-blue-600 mr-3" />
+            <span className="text-blue-700 font-medium">Course Information</span>
           </div>
           
           <h2 className="text-4xl md:text-6xl font-bold mb-8 leading-tight">
             <span className="bg-gradient-to-r from-white via-blue-200 to-cyan-300 bg-clip-text text-transparent">
-              Get Your Course
+              Get Your Personalized
             </span>
             <br />
             <span className="bg-gradient-to-r from-cyan-300 via-blue-300 to-teal-300 bg-clip-text text-transparent">
-              Brochure
+              Course Summary
             </span>
           </h2>
           
@@ -611,9 +611,9 @@ function BrochureSection() {
                     <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl animate-bounce">
                       <CheckCircle className="h-10 w-10 text-white" />
                     </div>
-                    <h3 className="text-3xl font-bold text-white mb-4">Brochure Sent Successfully!</h3>
+                    <h3 className="text-3xl font-bold text-white mb-4">Course Summary Sent!</h3>
                     <p className="text-blue-200/90 text-lg leading-relaxed">
-                      Check your email for the download link. Our comprehensive course catalog is on its way to you.
+                      Check your email for your personalized course recommendations and next steps to get started.
                     </p>
                   </div>
                 ) : (
@@ -668,12 +668,12 @@ function BrochureSection() {
                         {isSubmitting ? (
                           <>
                             <Loader2 className="mr-3 h-6 w-6 animate-spin" />
-                            Sending Brochure...
+                            Sending Summary...
                           </>
                         ) : (
                           <>
-                            <Download className="mr-3 h-6 w-6 group-hover:scale-110 transition-transform" />
-                            Download Course Brochure
+                            <MessageSquare className="mr-3 h-6 w-6 group-hover:scale-110 transition-transform" />
+                            Get Course Summary
                           </>
                         )}
                       </Button>

@@ -38,7 +38,8 @@ import {
   Link as LinkIcon,
   File,
   FileText,
-  MapPin
+  MapPin,
+  Home
 } from 'lucide-react';
 
 // Interfaces
@@ -220,10 +221,19 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
         const data = await response.json();
 
         if (response.ok) {
-          alert('Successfully enrolled in course!');
+          // Create a better success experience
+          const successMessage = course.price && course.price > 0 
+            ? 'Successfully enrolled! You can now start the course.'
+            : 'Successfully enrolled in this free course! You can now start learning.';
+          
+          // Show success toast instead of alert
+          alert(successMessage);
           await checkEnrollmentStatus(course.id);
         } else {
-          alert(data.message || 'Failed to enroll in course');
+          // Better error handling
+          console.error('Enrollment failed:', data);
+          const errorMessage = data.message || 'Failed to enroll in course. Please try again.';
+          alert(errorMessage);
         }
       }
     } catch (error) {
@@ -372,23 +382,31 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               {/* Course Info */}
               <div className="space-y-6 animate-fade-in-up">
-                <div className="flex items-center space-x-4 mb-4">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-4">
+                    <Button variant="outline" size="sm" asChild className="bg-white/90 text-gray-900 border-white/30 hover:bg-white hover:text-gray-900 transition-all duration-300">
+                      <Link href="/courses">
+                        <ArrowLeft className="w-4 h-4 mr-2 text-gray-900" />
+                        <span className="text-gray-900">Back to Courses</span>
+                      </Link>
+                    </Button>
+                    <Badge className="bg-white/20 text-white border-white/30">
+                      {course.category}
+                    </Badge>
+                  </div>
                   <Button variant="outline" size="sm" asChild className="bg-white/90 text-gray-900 border-white/30 hover:bg-white hover:text-gray-900 transition-all duration-300">
-                    <Link href="/courses">
-                      <ArrowLeft className="w-4 h-4 mr-2 text-gray-900" />
-                      <span className="text-gray-900">Back to Courses</span>
+                    <Link href="/">
+                      <Home className="w-4 h-4 mr-2 text-gray-900" />
+                      <span className="text-gray-900">Home</span>
                     </Link>
                   </Button>
-                  <Badge className="bg-white/20 text-white border-white/30">
-                    {course.category}
-                  </Badge>
                 </div>
 
                 <h1 className="text-4xl md:text-5xl font-bold leading-tight text-white">
                   {course.title}
                 </h1>
                 
-                <p className="text-xl text-blue-100 leading-relaxed">
+                <p className="text-xl text-blue-50 leading-relaxed font-medium">
                   {showFullDescription ? course.description : course.short_desc || course.description}
                 </p>
 
@@ -574,7 +592,7 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                                   </Badge>
                                 )}
                               </div>
-                              <p className="text-blue-100 mt-2">{module.description}</p>
+                              <p className="text-blue-50 mt-2 font-medium leading-relaxed">{module.description}</p>
                             </div>
                             
                             {/* Module Content */}

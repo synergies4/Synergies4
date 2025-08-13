@@ -119,7 +119,7 @@ const menuCategories: MenuCategory[] = [
       {
         title: 'Industry Reports',
         description: 'Latest market insights and trends',
-        href: '/blog',
+        href: '/industry-insight',
         icon: BarChart3
       },
       {

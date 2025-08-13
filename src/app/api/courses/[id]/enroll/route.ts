@@ -8,6 +8,7 @@ async function getAuthenticatedUser(request: NextRequest) {
   try {
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.log('No valid auth header found');
       return null;
     }
 
@@ -16,20 +17,21 @@ async function getAuthenticatedUser(request: NextRequest) {
     
     const { data: { user }, error } = await supabase.auth.getUser(token);
     if (error || !user) {
+      console.log('User auth failed:', error?.message);
       return null;
     }
 
-    // Get user data to check role
+    // Get user data from user_profiles table (more reliable)
     const { data: userData } = await supabase
-      .from('users')
-      .select('role, name, email')
-      .eq('id', user.id)
+      .from('user_profiles')
+      .select('role, name')
+      .eq('user_id', user.id)
       .single();
 
     return {
       id: user.id,
       email: user.email,
-      name: userData?.name,
+      name: userData?.name || user.user_metadata?.name || user.email,
       role: userData?.role || 'USER'
     };
   } catch (error) {

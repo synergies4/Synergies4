@@ -503,18 +503,39 @@ export default function EditCourse({ params }: { params: Promise<{ id: string }>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center space-x-3">
-              <BookOpen className="h-8 w-8 text-blue-600" />
+              <div className="h-12 w-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                <Edit className="h-6 w-6 text-white" />
+              </div>
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">Edit Course</h1>
-                <p className="text-gray-600">Update course information and modules</p>
+                <p className="text-gray-600">
+                  {course?.title ? `Editing: ${course.title}` : 'Update course information and modules'}
+                </p>
               </div>
             </div>
             <div className="flex space-x-3">
               <Button variant="outline" asChild>
-                <Link href="/admin">
+                <Link href="/admin/courses">
                   <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Admin
+                  Back to Courses
                 </Link>
+              </Button>
+              <Button 
+                onClick={updateCourse} 
+                disabled={saving}
+                className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+              >
+                {saving ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4 mr-2" />
+                    Save Changes
+                  </>
+                )}
               </Button>
             </div>
           </div>

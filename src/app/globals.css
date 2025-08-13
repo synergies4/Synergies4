@@ -394,6 +394,25 @@ a:focus {
   .scrollbar-hide::-webkit-scrollbar { 
     display: none;  /* Safari and Chrome */
   }
+
+  /* Ensure minimum contrast for accessibility (WCAG AA compliance) */
+  .text-on-blue {
+    color: white !important;
+  }
+  
+  .text-on-dark {
+    color: white !important;
+  }
+  
+  /* Fix common contrast issues */
+  .bg-blue-600,
+  .bg-blue-700,
+  .bg-teal-600,
+  .bg-teal-700,
+  .bg-slate-900,
+  .bg-gray-900 {
+    color: white;
+  }
 }
 
 /* ================================
@@ -405,9 +424,25 @@ a:focus {
   .text-gray-500 { color: #4b5563; }
   .text-gray-400 { color: #6b7280; }
   
+  /* Ensure text on blue backgrounds is white for sufficient contrast */
+  .bg-blue-600 .text-black,
+  .bg-blue-500 .text-black,
+  .bg-teal-600 .text-black,
+  .bg-teal-500 .text-black {
+    color: white !important;
+  }
+  
+  /* Improve button contrast */
   button:not([class*="bg-gradient"]) {
     border: 2px solid currentColor;
     font-weight: 600;
+  }
+  
+  /* Ensure all text on dark backgrounds is light enough */
+  .bg-slate-900 *,
+  .bg-gray-900 *,
+  .bg-black * {
+    color: white !important;
   }
 }
 
