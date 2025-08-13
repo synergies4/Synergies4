@@ -46,14 +46,88 @@ export async function POST(request: NextRequest) {
     });
 
     if (error) {
-      console.error('Signup error:', error);
+      console.error('Supabase signup error:', error);
+      
+      // Provide more specific error messages
+      let errorMessage = error.message;
+      if (error.message.includes('already registered')) {
+        errorMessage = 'An account with this email already exists. Please try signing in instead.';
+      } else if (error.message.includes('invalid email')) {
+        errorMessage = 'Please enter a valid email address.';
+      } else if (error.message.includes('weak password')) {
+        errorMessage = 'Password is too weak. Please choose a stronger password.';
+      } else if (error.message.includes('signup disabled')) {
+        errorMessage = 'Account creation is temporarily disabled. Please try again later.';
+      }
+      
       return NextResponse.json(
-        { error: error.message },
+        { error: errorMessage },
         { status: 400 }
       );
     }
 
     if (data.user) {
+      // Ensure user records are created in our custom tables
+      // (Database triggers should handle this, but let's be defensive)
+      try {
+        const userId = data.user.id;
+        const userEmail = data.user.email!;
+        
+        // Check if user already exists in our users table
+        const { data: existingUser } = await supabase
+          .from('users')
+          .select('id')
+          .eq('id', userId)
+          .single();
+        
+        if (!existingUser) {
+          console.log('Creating user record in users table for:', userEmail);
+          
+          // Create user record
+          const { error: userInsertError } = await supabase
+            .from('users')
+            .insert([{
+              id: userId,
+              email: userEmail,
+              name: name,
+              role: 'USER'
+            }]);
+          
+          if (userInsertError) {
+            console.error('Error creating user record:', userInsertError);
+            // Don't fail the signup, but log the error
+          }
+        }
+        
+        // Check if user profile exists
+        const { data: existingProfile } = await supabase
+          .from('user_profiles')
+          .select('id')
+          .eq('user_id', userId)
+          .single();
+        
+        if (!existingProfile) {
+          console.log('Creating user profile for:', userEmail);
+          
+          // Create user profile record  
+          const { error: profileInsertError } = await supabase
+            .from('user_profiles')
+            .insert([{
+              user_id: userId,
+              name: name,
+              role: 'USER'
+            }]);
+          
+          if (profileInsertError) {
+            console.error('Error creating user profile:', profileInsertError);
+            // Don't fail the signup, but log the error
+          }
+        }
+      } catch (dbError) {
+        console.error('Error ensuring user records exist:', dbError);
+        // Continue anyway - the auth user was created successfully
+      }
+
       // Send welcome email (but don't fail signup if email fails)
       try {
         await emailService.sendWelcomeEmail({
