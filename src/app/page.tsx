@@ -97,11 +97,10 @@ export default function HomePage() {
             </div>
           </div>
           
-          {/* Enhanced Subtitle - Mobile Optimized */}
+          {/* Enhanced Subtitle - Modern Focused Branding */}
           <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-700 mb-12 sm:mb-16 max-w-4xl mx-auto leading-relaxed font-light px-4 sm:px-0">
-            Learn practical frameworks in 
-            <span className="text-gray-900 font-medium bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent"> Agile, leadership, and mental fitness </span>
-            that teams and leaders actually use
+            <span className="text-gray-900 font-medium bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent text-2xl sm:text-3xl md:text-4xl block mb-4">Learn Agile—and beyond.</span>
+            Master the frameworks that drive high-performing teams and resilient leadership in today's AI-powered world.
           </p>
           
           {/* Enhanced CTA Buttons - Fixed Mobile Layout */}
@@ -157,6 +156,42 @@ export default function HomePage() {
                 </span>
               </Link>
             </Button>
+          </div>
+
+          {/* Founder/Expert Introduction with Human Photo */}
+          <div className="flex flex-col md:flex-row items-center justify-center max-w-5xl mx-auto mb-16 sm:mb-20 px-4 sm:px-0 gap-8 md:gap-12">
+            {/* Professional Photo */}
+            <div className="relative group">
+              <div className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-full overflow-hidden border-4 border-white shadow-2xl group-hover:shadow-teal-500/25 transition-all duration-300 group-hover:scale-105">
+                <Image
+                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&auto=format&q=80"
+                  alt="Paul Wallace, Founder & Lead Instructor"
+                  width={192}
+                  height={192}
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                />
+              </div>
+              {/* Trust indicators */}
+              <div className="absolute -bottom-2 -right-2 bg-teal-600 text-white rounded-full p-2 shadow-lg">
+                <Award className="w-5 h-5" />
+              </div>
+            </div>
+            
+            {/* Introduction Text */}
+            <div className="text-center md:text-left max-w-2xl">
+              <div className="mb-4">
+                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Meet Your Guide</h3>
+                <p className="text-base sm:text-lg text-gray-700 font-medium">Paul Wallace, Founder & Lead Instructor</p>
+              </div>
+              <p className="text-sm sm:text-base text-gray-600 leading-relaxed mb-4">
+                "After 15+ years helping teams and leaders transform through agile practices, I've distilled the most effective frameworks into practical, AI-enhanced learning experiences that deliver real results."
+              </p>
+              <div className="flex flex-wrap gap-2 justify-center md:justify-start">
+                <Badge variant="outline" className="text-xs font-medium">Certified Agile Coach</Badge>
+                <Badge variant="outline" className="text-xs font-medium">15+ Years Experience</Badge>
+                <Badge variant="outline" className="text-xs font-medium">10K+ Students Trained</Badge>
+              </div>
+            </div>
           </div>
 
           {/* Enhanced Stats with Cards - Fixed Spacing */}
@@ -533,15 +568,16 @@ function FeaturedCoursesSection() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {displayCourses.map((course, index) => (
-              <div 
+              <Link 
                 key={course.id} 
-                className={`group relative animate-fade-in-up animation-delay-${index * 200}`}
+                href={`/courses/${createCourseSlug(course.title)}`}
+                className={`group relative animate-fade-in-up animation-delay-${index * 200} block`}
               >
                 {/* Card Glow Effect */}
                 <div className="absolute -inset-1 bg-gradient-to-r from-teal-500 via-emerald-500 to-cyan-500 rounded-2xl blur opacity-0 group-hover:opacity-75 transition-opacity"></div>
                 
                 {/* Main Card */}
-                <div className="relative bg-white/10 rounded-2xl border border-white/20 overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-105 flex flex-col h-full">
+                <div className="relative bg-white/10 rounded-2xl border border-white/20 overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-105 flex flex-col h-full cursor-pointer">
                   {/* Course Image with Enhanced Overlay */}
                   <div className="relative h-48 overflow-hidden flex-shrink-0">
                     <img 
@@ -615,20 +651,15 @@ function FeaturedCoursesSection() {
                     </div>
 
                     {/* CTA Button */}
-                    <Button 
-                      asChild 
-                      className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all group-hover:scale-105 rounded-xl border-0 group"
-                    >
-                      <Link href={`/courses/${createCourseSlug(course.title)}`}>
-                        <span className="flex items-center justify-center text-white group-hover:text-white font-semibold">
-                          Start Learning
-                          <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform text-white group-hover:text-white" />
-                        </span>
-                      </Link>
-                    </Button>
+                    <div className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all group-hover:scale-105 rounded-xl border-0 group px-4 py-3 text-center">
+                      <span className="flex items-center justify-center text-white group-hover:text-white font-semibold">
+                        Start Learning
+                        <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform text-white group-hover:text-white" />
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}

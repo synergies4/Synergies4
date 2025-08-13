@@ -395,12 +395,16 @@ function CourseDirectorySection() {
         {!loading && !error && filteredCourses.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
             {filteredCourses.map((course, index) => (
-              <div key={course.id} className={`group relative animate-fade-in-up animation-delay-${index * 100}`}>
+              <Link 
+                key={course.id} 
+                href={`/courses/${createCourseSlug(course.title)}`}
+                className={`group relative animate-fade-in-up animation-delay-${index * 100} block`}
+              >
                 {/* Glow Effect */}
                 <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-teal-500 rounded-2xl blur opacity-0 group-hover:opacity-25 transition-opacity"></div>
                 
                 {/* Main Card */}
-                <div className="relative bg-white/90 rounded-2xl border border-white/50 shadow-lg hover:shadow-2xl transition-all duration-300 group-hover:scale-105 overflow-hidden flex flex-col h-full">
+                <div className="relative bg-white/90 rounded-2xl border border-white/50 shadow-lg hover:shadow-2xl transition-all duration-300 group-hover:scale-105 overflow-hidden flex flex-col h-full cursor-pointer">
                   {/* Course Image */}
                   <div className="relative h-48 overflow-hidden flex-shrink-0">
                     <Image
@@ -499,21 +503,16 @@ function CourseDirectorySection() {
                       <div className="text-2xl font-bold text-blue-600">
                         {formatPrice(course.price)}
                       </div>
-                      <Button 
-                        asChild 
-                        className="bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all group-hover:scale-105 rounded-xl border-0"
-                      >
-                        <Link href={`/courses/${createCourseSlug(course.title)}`}>
-                          <span className="flex items-center text-white">
-                            Start Learning
-                            <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform text-white" />
-                          </span>
-                        </Link>
-                      </Button>
+                      <div className="bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all group-hover:scale-105 rounded-xl border-0 px-4 py-2">
+                        <span className="flex items-center text-white">
+                          Start Learning
+                          <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform text-white" />
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}
