@@ -434,15 +434,6 @@ export default function Contact() {
                     href: "tel:+1-743-837-3746",
                     gradient: "from-green-500 to-emerald-400",
                     bgGradient: "from-green-50 to-emerald-50"
-                  },
-                  {
-                    icon: <MessageSquare className="h-6 w-6" />,
-                    title: "Live Chat",
-                    description: "Chat with our support team",
-                    contact: "Start Chat",
-                    href: "#",
-                    gradient: "from-purple-500 to-pink-400",
-                    bgGradient: "from-purple-50 to-pink-50"
                   }
                 ].map((item, index) => (
                   <div key={index} className={`group relative animate-fade-in-up animation-delay-${index * 100}`}>
@@ -462,44 +453,19 @@ export default function Contact() {
                       <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-teal-700 transition-colors-smooth">
                         {item.title}
                       </h3>
-                      <p className="text-gray-600 text-sm leading-relaxed">
+                      <p className="text-gray-600 text-sm leading-relaxed mb-4">
                         {item.description}
                       </p>
+                      <Link 
+                        href={item.href}
+                        className="inline-flex items-center text-lg font-semibold text-gray-900 hover:text-teal-600 transition-colors"
+                      >
+                        {item.contact}
+                        <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                      </Link>
                     </div>
                   </div>
                 ))}
-
-                {/* Business Hours */}
-                <div className="group relative">
-                  {/* Glow Effect */}
-                  <div className="absolute -inset-1 bg-gradient-to-r from-orange-400 to-yellow-500 rounded-2xl blur opacity-0 group-hover:opacity-20 transition-opacity-smooth"></div>
-                  
-                  {/* Hours Card */}
-                  <div className="relative bg-gradient-to-br from-orange-50 to-yellow-50 rounded-2xl border border-white/50 p-6 hover:bg-white/80 card-hover-optimized shadow-lg hover:shadow-2xl">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-yellow-500 rounded-xl flex items-center justify-center flex-shrink-0 text-white shadow-lg transition-transform-smooth group-hover:scale-110">
-                        <Clock className="h-6 w-6" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-bold text-gray-900 mb-3 text-lg group-hover:text-orange-700 transition-colors-smooth">Business Hours</h3>
-                        <div className="space-y-2 text-sm text-gray-700">
-                          <div className="flex justify-between items-center py-1 px-3 bg-white/50 rounded-lg">
-                            <span className="font-medium">Monday - Friday</span>
-                            <span className="text-orange-600 font-semibold">8:00 AM - 5:00 PM PST</span>
-                          </div>
-                          <div className="flex justify-between items-center py-1 px-3 bg-white/50 rounded-lg">
-                            <span className="font-medium">Saturday</span>
-                            <span className="text-orange-600 font-semibold">9:00 AM - 2:00 PM PST</span>
-                          </div>
-                          <div className="flex justify-between items-center py-1 px-3 bg-white/50 rounded-lg">
-                            <span className="font-medium">Sunday</span>
-                            <span className="text-gray-500 font-semibold">Closed</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
