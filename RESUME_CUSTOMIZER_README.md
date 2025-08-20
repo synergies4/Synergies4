@@ -66,10 +66,10 @@ resume_file_type VARCHAR(50)
 Run the following SQL files in order:
 ```bash
 # First, update user onboarding schema to include resume storage
-psql -d your_database -f user-onboarding-schema.sql
+psql -d your_database -f sql/user-onboarding-schema.sql
 
 # Then, create Resume Customizer tables
-psql -d your_database -f resume-customizer-schema.sql
+psql -d your_database -f sql/resume-customizer-schema.sql
 ```
 
 ### 2. Environment Variables

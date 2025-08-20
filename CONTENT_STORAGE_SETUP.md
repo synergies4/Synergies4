@@ -11,13 +11,13 @@ You need to apply two SQL schema files to your Supabase database:
 #### Apply Stripe Schema (if not already done)
 ```bash
 # In your Supabase SQL Editor, run:
-cat stripe-schema.sql
+cat sql/stripe-schema.sql
 ```
 
 #### Apply User Content Schema
 ```bash
 # In your Supabase SQL Editor, run:
-cat user-content-schema.sql
+cat sql/user-content-schema.sql
 ```
 
 ### 2. Database Tables Created

@@ -45,10 +45,10 @@ Run the Stripe schema to add necessary tables:
 
 ```bash
 # Apply the Stripe schema to your Supabase database
-psql -h your-supabase-host -U postgres -d postgres -f stripe-schema.sql
+psql -h your-supabase-host -U postgres -d postgres -f sql/stripe-schema.sql
 ```
 
-Or copy the contents of `stripe-schema.sql` and run it in your Supabase SQL editor.
+Or copy the contents of `sql/stripe-schema.sql` and run it in your Supabase SQL editor.
 
 ## Features Implemented
 
