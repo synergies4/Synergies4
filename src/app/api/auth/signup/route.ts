@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
       password,
       options: {
         data: {
-          name,
+          name: name,
         }
       }
     });
@@ -72,6 +72,8 @@ export async function POST(request: NextRequest) {
         errorMessage = 'Password is too weak. Please choose a stronger password.';
       } else if (error.message.includes('signup disabled')) {
         errorMessage = 'Account creation is temporarily disabled. Please try again later.';
+      } else if (error.message.includes('Database error')) {
+        errorMessage = 'Account creation failed due to a database error. Please try again or contact support.';
       }
       
       return NextResponse.json(
@@ -82,14 +84,59 @@ export async function POST(request: NextRequest) {
 
     if (data.user) {
       // Log successful user creation - let database triggers handle the rest
-      console.log('User successfully created in Supabase Auth:', {
+      console.log('✅ User successfully created in Supabase Auth:', {
         id: data.user.id,
         email: data.user.email,
         confirmed: data.user.email_confirmed_at ? 'confirmed' : 'pending'
       });
       
-      // The database triggers should automatically create user and user_profile records
-      // If they don't, that's a configuration issue to be fixed in the database setup
+      // Verify that the database trigger created the user records
+      try {
+        console.log('🔍 Verifying database records were created...');
+        
+        // Check if user record was created
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('id, email, name, role')
+          .eq('auth_user_id', data.user.id)
+          .single();
+          
+        if (userError) {
+          console.error('❌ Error checking user record:', userError);
+        } else {
+          console.log('✅ User record created:', userData);
+        }
+        
+        // Check if user profile was created
+        const { data: profileData, error: profileError } = await supabase
+          .from('user_profiles')
+          .select('id, user_id, full_name, email')
+          .eq('user_id', userData?.id)
+          .single();
+          
+        if (profileError) {
+          console.error('❌ Error checking user profile:', profileError);
+        } else {
+          console.log('✅ User profile created:', profileData);
+        }
+        
+        // Check if user content settings were created
+        const { data: settingsData, error: settingsError } = await supabase
+          .from('user_content_settings')
+          .select('id, user_id, max_presentations, max_conversations')
+          .eq('user_id', userData?.id)
+          .single();
+          
+        if (settingsError) {
+          console.error('❌ Error checking user content settings:', settingsError);
+        } else {
+          console.log('✅ User content settings created:', settingsData);
+        }
+        
+      } catch (verificationError) {
+        console.error('❌ Error during database verification:', verificationError);
+        // Don't fail signup if verification fails - the trigger might still have worked
+      }
 
       // Send welcome email (but don't fail signup if email fails)
       try {
@@ -98,8 +145,9 @@ export async function POST(request: NextRequest) {
           userName: name,
           loginLink: `${process.env.NEXT_PUBLIC_SITE_URL}/login`,
         });
+        console.log('✅ Welcome email sent successfully');
       } catch (emailError) {
-        console.error('Error sending welcome email:', emailError);
+        console.error('❌ Error sending welcome email:', emailError);
         // Continue anyway - don't fail signup because of email issues
       }
 
@@ -121,7 +169,7 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   } catch (error) {
-    console.error('Signup API error:', error);
+    console.error('❌ Signup API error:', error);
     console.error('Error details:', {
       message: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined,
