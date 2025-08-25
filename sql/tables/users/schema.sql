@@ -166,7 +166,7 @@ CREATE TABLE IF NOT EXISTS public.user_profiles (
 );
 
 -- ============================================================================
--- USER COACHING SESSIONS TABLE
+-- USER COACHING SESSIONS TABLE | ONE TO MANY
 -- ============================================================================
 CREATE TABLE IF NOT EXISTS public.user_coaching_sessions (
   id TEXT DEFAULT generate_short_id('user_coaching_sessions') PRIMARY KEY,

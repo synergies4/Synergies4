@@ -57,6 +57,8 @@ async function testDatabase() {
   } catch (error) {
     console.error('Database test failed:', error);
   }
+
 }
 
+testDatabase(); 
 testDatabase(); 

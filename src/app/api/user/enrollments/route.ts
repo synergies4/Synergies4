@@ -40,21 +40,13 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient();
 
     const { data: enrollments, error } = await supabase
-      .from('course_enrollments')
+      .from('enrollments')
       .select(`
         id,
         status,
         enrolled_at,
         progress,
-        courses (
-          id,
-          title,
-          description,
-          image,
-          category,
-          level,
-          duration
-        )
+        completed_at
       `)
       .eq('user_id', user.id)
       .order('enrolled_at', { ascending: false });
