@@ -423,19 +423,19 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                 )}
 
                 <div className="flex flex-wrap gap-4 text-sm">
-                  <div className="flex items-center bg-white/10 px-3 py-2 rounded-lg">
+                  <div className="flex items-center bg-white/10 px-3 py-2 text-white rounded-lg">
                     <Target className="w-4 h-4 mr-2" />
-                    <span>{course.level}</span>
+                    <span className="text-white">{course.level}</span>
                   </div>
                   {course.duration && (
-                    <div className="flex items-center bg-white/10 px-3 py-2 rounded-lg">
+                    <div className="flex items-center bg-white/10 px-3 py-2 text-white rounded-lg">
                       <Clock className="w-4 h-4 mr-2" />
-                      <span>{course.duration}</span>
+                      <span className="text-white">{course.duration}</span>
                     </div>
                   )}
-                  <div className="flex items-center bg-white/10 px-3 py-2 rounded-lg">
+                  <div className="flex items-center bg-white/10 px-3 py-2 text-white rounded-lg">
                     <Award className="w-4 h-4 mr-2" />
-                    <span>Certificate Included</span>
+                    <span className="text-white">Certificate Included</span>
                   </div>
                 </div>
 
