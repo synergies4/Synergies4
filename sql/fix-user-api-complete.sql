@@ -213,19 +213,29 @@ CREATE OR REPLACE FUNCTION get_user_enrollments_count(user_uuid UUID)
 RETURNS INTEGER AS $$
 DECLARE
   enrollment_count INTEGER := 0;
+  user_text_id TEXT;
 BEGIN
+  -- First, get the user's TEXT ID from the users table
+  SELECT u.id INTO user_text_id
+  FROM public.users u
+  WHERE u.auth_user_id = user_uuid;
+  
+  IF user_text_id IS NULL THEN
+    RETURN 0;
+  END IF;
+  
   -- Try course_enrollments first (newer schema)
   BEGIN
     SELECT COUNT(*) INTO enrollment_count
     FROM public.course_enrollments
-    WHERE user_id = user_uuid AND status = 'ACTIVE';
+    WHERE user_id = user_text_id AND status = 'ACTIVE';
   EXCEPTION
     WHEN undefined_table THEN
       -- Fallback to enrollments table (older schema)
       BEGIN
         SELECT COUNT(*) INTO enrollment_count
         FROM public.enrollments
-        WHERE user_id = user_uuid AND status = 'ACTIVE';
+        WHERE user_id = user_text_id AND status = 'ACTIVE';
       EXCEPTION
         WHEN undefined_table THEN
           enrollment_count := 0;
@@ -358,6 +368,9 @@ CREATE TABLE IF NOT EXISTS public.enrollments (
 
 -- Enable RLS on enrollments table
 ALTER TABLE public.enrollments ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policy if it exists
+DROP POLICY IF EXISTS "Users can view own enrollments" ON public.enrollments;
 
 -- Create policy for enrollments
 CREATE POLICY "Users can view own enrollments" ON public.enrollments

@@ -53,7 +53,7 @@ interface UserData {
 }
 
 export default function UserManagement() {
-  const { user, userProfile, loading: authLoading } = useAuth();
+  const { user, userProfile, loading: authLoading, isAdmin, canAccessAdmin } = useAuth();
   const router = useRouter();
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -63,13 +63,13 @@ export default function UserManagement() {
   useEffect(() => {
     if (authLoading) return;
     
-    if (!user || userProfile?.role !== 'ADMIN') {
+    if (!user || !canAccessAdmin) {
       router.push('/login');
       return;
     }
 
     fetchUsers();
-  }, [user, userProfile, authLoading, router]);
+  }, [user, canAccessAdmin, authLoading, router]);
 
   const fetchUsers = async () => {
     try {
@@ -335,7 +335,7 @@ export default function UserManagement() {
     );
   }
 
-  if (!user || userProfile?.role !== 'ADMIN') {
+  if (!user || !canAccessAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-teal-50 to-cyan-50">
         <Card className="w-full max-w-md shadow-xl border-0">

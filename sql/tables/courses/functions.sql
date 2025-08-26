@@ -14,6 +14,15 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
+-- Function to update ranking_date_only when ranking_date changes
+CREATE OR REPLACE FUNCTION update_ranking_date_only()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.ranking_date_only = NEW.ranking_date::DATE;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
 -- ============================================================================
 -- COURSE MANAGEMENT FUNCTIONS
 -- ============================================================================
@@ -22,10 +31,10 @@ $$ language 'plpgsql';
 CREATE OR REPLACE FUNCTION create_course(
     p_title TEXT,
     p_description TEXT,
+    p_category TEXT,
     p_short_desc TEXT DEFAULT NULL,
     p_image TEXT DEFAULT NULL,
     p_price DECIMAL(10,2) DEFAULT 0,
-    p_category TEXT,
     p_level course_level DEFAULT 'BEGINNER',
     p_duration TEXT DEFAULT '4 weeks',
     p_instructor_id TEXT DEFAULT NULL,
@@ -640,3 +649,239 @@ CREATE TRIGGER update_course_roi_calculations_updated_at
 CREATE TRIGGER update_enhanced_course_metadata_updated_at 
     BEFORE UPDATE ON public.enhanced_course_metadata 
     FOR EACH ROW EXECUTE FUNCTION update_course_updated_at_column();
+
+-- Trigger to update ranking_date_only when ranking_date changes
+CREATE TRIGGER update_ranking_date_only_trigger
+    BEFORE INSERT OR UPDATE ON public.user_course_rankings
+    FOR EACH ROW EXECUTE FUNCTION update_ranking_date_only();
+
+-- ============================================================================
+-- RLS POLICIES AND PERMISSIONS
+-- ============================================================================
+
+-- Enable Row Level Security on courses table
+ALTER TABLE public.courses ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies that might be causing conflicts
+DROP POLICY IF EXISTS "Courses are publicly readable" ON public.courses;
+DROP POLICY IF EXISTS "Admins can create courses" ON public.courses;
+DROP POLICY IF EXISTS "Admins can update courses" ON public.courses;
+DROP POLICY IF EXISTS "Admins can view all courses" ON public.courses;
+
+-- Create a simple policy that allows reading published courses
+CREATE POLICY "Courses are publicly readable" ON public.courses 
+  FOR SELECT USING (status = 'PUBLISHED');
+
+-- Create policy for admins to manage all courses
+CREATE POLICY "Admins can manage all courses" ON public.courses 
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM public.users 
+      WHERE auth_user_id = auth.uid() AND role = 'ADMIN'
+    )
+  );
+
+-- Grant permissions
+GRANT ALL ON public.courses TO authenticated;
+
+-- ============================================================================
+-- SAMPLE DATA CREATION
+-- ============================================================================
+
+-- Insert sample courses for testing
+INSERT INTO public.courses (
+  id,
+  title,
+  description,
+  short_desc,
+  image,
+  price,
+  category,
+  level,
+  duration,
+  status,
+  featured,
+  created_at,
+  updated_at
+) VALUES 
+(
+  'course_leadership_101',
+  'Leadership Fundamentals',
+  'Master the essential skills needed to become an effective leader. This comprehensive course covers communication, decision-making, team building, and strategic thinking.',
+  'Essential leadership skills for modern professionals',
+  'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=250&fit=crop&auto=format',
+  99.99,
+  'leadership',
+  'BEGINNER',
+  '6 weeks',
+  'PUBLISHED',
+  true,
+  current_epoch(),
+  current_epoch()
+),
+(
+  'course_agile_mastery',
+  'Agile Project Management',
+  'Learn the principles and practices of Agile methodology. From Scrum to Kanban, master the frameworks that drive successful project delivery.',
+  'Master Agile methodologies and frameworks',
+  'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=250&fit=crop&auto=format',
+  149.99,
+  'agile',
+  'INTERMEDIATE',
+  '8 weeks',
+  'PUBLISHED',
+  true,
+  current_epoch(),
+  current_epoch()
+),
+(
+  'course_product_strategy',
+  'Product Strategy & Development',
+  'Develop winning product strategies and learn the complete product development lifecycle from ideation to launch.',
+  'Strategic product development and management',
+  'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=250&fit=crop&auto=format',
+  199.99,
+  'product',
+  'ADVANCED',
+  '10 weeks',
+  'PUBLISHED',
+  false,
+  current_epoch(),
+  current_epoch()
+),
+(
+  'course_tech_leadership',
+  'Technical Leadership',
+  'Bridge the gap between technical expertise and leadership skills. Learn to lead technical teams and drive innovation.',
+  'Lead technical teams and drive innovation',
+  'https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=400&h=250&fit=crop&auto=format',
+  179.99,
+  'technology',
+  'INTERMEDIATE',
+  '7 weeks',
+  'PUBLISHED',
+  true,
+  current_epoch(),
+  current_epoch()
+),
+(
+  'course_wellness_workplace',
+  'Workplace Wellness & Productivity',
+  'Create a healthy, productive work environment. Learn strategies for stress management, work-life balance, and team well-being.',
+  'Build healthy and productive work environments',
+  'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop&auto=format',
+  79.99,
+  'wellness',
+  'BEGINNER',
+  '4 weeks',
+  'PUBLISHED',
+  false,
+  current_epoch(),
+  current_epoch()
+),
+(
+  'course_communication_skills',
+  'Advanced Communication Skills',
+  'Master the art of effective communication in professional settings. From presentations to difficult conversations.',
+  'Master professional communication techniques',
+  'https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=400&h=250&fit=crop&auto=format',
+  89.99,
+  'leadership',
+  'INTERMEDIATE',
+  '5 weeks',
+  'DRAFT',
+  false,
+  current_epoch(),
+  current_epoch()
+)
+ON CONFLICT (id) DO UPDATE SET
+  title = EXCLUDED.title,
+  description = EXCLUDED.description,
+  short_desc = EXCLUDED.short_desc,
+  image = EXCLUDED.image,
+  price = EXCLUDED.price,
+  category = EXCLUDED.category,
+  level = EXCLUDED.level,
+  duration = EXCLUDED.duration,
+  status = EXCLUDED.status,
+  featured = EXCLUDED.featured,
+  updated_at = current_epoch();
+
+-- ============================================================================
+-- UTILITY FUNCTIONS
+-- ============================================================================
+
+-- Function to update all course instructor IDs to a specific user
+CREATE OR REPLACE FUNCTION update_all_course_instructors(p_instructor_id TEXT DEFAULT 'acct_34bc473baed09048c7138454')
+RETURNS INTEGER AS $$
+DECLARE
+    v_updated_count INTEGER;
+BEGIN
+    -- Update all courses to use the specified instructor
+    UPDATE public.courses 
+    SET instructor_id = p_instructor_id,
+        updated_at = current_epoch()
+    WHERE instructor_id IS NULL OR instructor_id != p_instructor_id;
+    
+    -- Get the count of updated rows
+    GET DIAGNOSTICS v_updated_count = ROW_COUNT;
+    
+    -- Log the update
+    RAISE NOTICE 'Updated % courses with instructor ID: %', v_updated_count, p_instructor_id;
+    
+    RETURN v_updated_count;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Function to verify instructor assignments
+CREATE OR REPLACE FUNCTION verify_course_instructors(p_instructor_id TEXT DEFAULT 'acct_34bc473baed09048c7138454')
+RETURNS TABLE(
+    course_id TEXT,
+    course_title TEXT,
+    instructor_id TEXT,
+    instructor_name TEXT
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        c.id as course_id,
+        c.title as course_title,
+        c.instructor_id,
+        u.name as instructor_name
+    FROM public.courses c
+    LEFT JOIN public.users u ON c.instructor_id = u.id
+    WHERE c.instructor_id = p_instructor_id
+    ORDER BY c.created_at DESC;
+END;
+$$ LANGUAGE plpgsql;
+
+-- ============================================================================
+-- VERIFICATION QUERIES
+-- ============================================================================
+
+-- Verify the policies were created
+SELECT schemaname, tablename, policyname, permissive, roles, cmd, qual 
+FROM pg_policies 
+WHERE tablename = 'courses';
+
+-- Check if there are any published courses
+SELECT COUNT(*) as published_courses_count FROM public.courses WHERE status = 'PUBLISHED';
+
+-- Verify the courses were created
+SELECT 
+  id,
+  title,
+  category,
+  level,
+  status,
+  featured,
+  price
+FROM public.courses 
+ORDER BY created_at DESC;
+
+-- Count published courses
+SELECT 
+  COUNT(*) as total_courses,
+  COUNT(CASE WHEN status = 'PUBLISHED' THEN 1 END) as published_courses,
+  COUNT(CASE WHEN featured = true THEN 1 END) as featured_courses
+FROM public.courses;

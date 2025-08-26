@@ -38,11 +38,13 @@ import {
   Globe
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAuthRedirect } from '@/hooks/useAuthRedirect';
 import PageLayout from '@/components/shared/PageLayout';
 import ResumeEditor from '@/components/ResumeEditor';
 import jsPDF from 'jspdf';
 
 export default function ResumeCustomizer() {
+  const { canAccess } = useAuthRedirect({ requireAuth: true });
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
@@ -69,6 +71,20 @@ export default function ResumeCustomizer() {
   const [resumeText, setResumeText] = useState('');
   const [analyzing, setAnalyzing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Show loading state while checking authentication
+  if (!canAccess) {
+    return (
+      <PageLayout>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Redirecting to home page...</p>
+          </div>
+        </div>
+      </PageLayout>
+    );
+  }
 
   const steps = [
     { id: 'upload', title: 'Upload Resume', description: 'Add your current resume', icon: Upload },

@@ -20,24 +20,67 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [mounted, setMounted] = useState(false);
+  const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
   const router = useRouter();
   const { user, userProfile, loading } = useAuth();
 
-  const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
-  const redirectUrl = searchParams.get('redirect');
+  // Prevent hydration issues
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Get redirect URL on client side only
+  useEffect(() => {
+    if (mounted) {
+      const searchParams = new URLSearchParams(window.location.search);
+      setRedirectUrl(searchParams.get('redirect'));
+    }
+  }, [mounted]);
 
   // Redirect if already logged in
   useEffect(() => {
-    if (user && userProfile && !loading) {
+    console.log('🔄 Login - Auth state changed:', { user: !!user, userProfile: !!userProfile, loading });
+    
+    if (!loading && user && userProfile) {
+      console.log('🔄 Login - User authenticated, redirecting...');
+      
       if (redirectUrl) {
-        router.push(redirectUrl);
+        console.log('🔄 Login - Redirecting to:', redirectUrl);
+        window.location.href = redirectUrl;
       } else if (userProfile.role === 'ADMIN') {
-        router.push('/admin');
+        console.log('🔄 Login - Redirecting admin to /admin');
+        window.location.href = '/admin';
       } else {
-        router.push('/dashboard');
+        console.log('🔄 Login - Redirecting user to /dashboard');
+        window.location.href = '/dashboard';
       }
     }
-  }, [user, userProfile, router, loading, redirectUrl]);
+  }, [user, userProfile, loading, redirectUrl]);
+
+  // Don't render anything until mounted
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show loading state while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center" suppressHydrationWarning>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -130,7 +173,9 @@ export default function Login() {
           <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
             <Sparkles className="h-8 w-8 text-blue-600 animate-spin" />
           </div>
-          <p className="text-gray-700 text-lg font-medium">Loading your experience...</p>
+          <p className="text-gray-700 text-lg font-medium">
+            {loading ? 'Checking your session...' : 'Loading your experience...'}
+          </p>
         </div>
       </div>
     );

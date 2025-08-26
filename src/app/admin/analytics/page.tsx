@@ -75,7 +75,7 @@ interface UserListItem {
 }
 
 export default function Analytics() {
-  const { user, userProfile, loading: authLoading } = useAuth();
+  const { user, userProfile, loading: authLoading, isAdmin, canAccessAdmin } = useAuth();
   const router = useRouter();
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -87,13 +87,13 @@ export default function Analytics() {
   useEffect(() => {
     if (authLoading) return;
     
-    if (!user || userProfile?.role !== 'ADMIN') {
+    if (!user || !canAccessAdmin) {
       router.push('/login');
       return;
     }
 
     fetchAnalytics();
-  }, [user, userProfile, authLoading, router, timeRange]);
+  }, [user, canAccessAdmin, authLoading, router, timeRange]);
 
   const fetchAnalytics = async () => {
     try {

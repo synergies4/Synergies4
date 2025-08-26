@@ -76,10 +76,24 @@ export default function CoursesManagement() {
     try {
       setLoading(true);
       
-      // Fetch courses from your API
-      const response = await fetch('/api/courses');
+      // Get auth token for API call
+      const { createClient } = await import('@/lib/supabase/client');
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      // Fetch courses from your API with auth token
+      const response = await fetch('/api/courses?page=1&per_page=100', {
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token && {
+            'Authorization': `Bearer ${session.access_token}`
+          })
+        }
+      });
+      
       if (response.ok) {
         const data = await response.json();
+        console.log('Courses API response:', data);
         
         // Transform the data to match our interface
         const transformedCourses: CourseData[] = data.courses.map((course: any) => ({
@@ -91,7 +105,7 @@ export default function CoursesManagement() {
           duration: course.duration || '6 weeks',
           price: course.price || 0,
           image: course.image || `https://images.unsplash.com/photo-${1560472354 + Math.floor(Math.random() * 1000)}?w=400&h=250&fit=crop&auto=format`,
-          published: course.published !== undefined ? course.published : true,
+          published: course.status === 'PUBLISHED',
           category: course.category || 'Agile',
           created_at: course.created_at || new Date().toISOString(),
           updated_at: course.updated_at || new Date().toISOString(),
@@ -103,6 +117,7 @@ export default function CoursesManagement() {
         
         setCourses(transformedCourses);
       } else {
+        console.error('Courses API error:', response.status, response.statusText);
         // Fallback to sample data if API fails
         setSampleCourses();
       }

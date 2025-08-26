@@ -32,11 +32,13 @@ import {
   Sparkles,
   Activity,
   MessageSquare,
-  Check
+  Check,
+  Shield
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedirect } from '@/hooks/useAuthRedirect';
 import PageLayout from '@/components/shared/PageLayout';
 import { UserAvatar } from '@/components/UserAvatar';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -96,7 +98,7 @@ const formatRelativeTime = (date: string | Date) => {
 };
 
 function DashboardContent() {
-  const { user, userProfile, loading: authLoading, isLoggingOut } = useAuth();
+  const { user, userProfile, loading: authLoading, isLoggingOut, isAdmin, canAccessAdmin } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
@@ -153,6 +155,26 @@ function DashboardContent() {
   const completionPercentage = Math.round((completionItems.filter(item => item.completed).length / completionItems.length) * 100);
 
   useEffect(() => {
+    console.log('🔄 Dashboard useEffect - userProfile changed:', userProfile);
+    console.log('🔄 Dashboard useEffect - userProfile.name:', userProfile?.name);
+    console.log('🔄 Dashboard useEffect - user.user_metadata.name:', user?.user_metadata?.name);
+    console.log('🔄 Dashboard useEffect - isLoggingOut:', isLoggingOut);
+    
+    // Don't fetch data if user is logging out
+    if (isLoggingOut) {
+      console.log('🔄 Dashboard useEffect - User is logging out, skipping data fetch');
+      return;
+    }
+    
+    // Redirect to home if not authenticated and auth loading is complete
+    if (!authLoading && !user) {
+      console.log('🔄 Dashboard useEffect - No user found, redirecting to home');
+      if (typeof window !== 'undefined') {
+        window.location.href = '/';
+      }
+      return;
+    }
+    
     if (user && !authLoading) {
       fetchDashboardData();
       
@@ -163,7 +185,7 @@ function DashboardContent() {
         setTimeout(() => refreshSubscriptionData(0, true), 2000);
       }
     }
-  }, [user, authLoading, searchParams]);
+  }, [user, authLoading, searchParams, userProfile, isLoggingOut]);
 
   const refreshSubscriptionData = async (retryCount = 0, useAPI = false) => {
     if (retryCount >= 3) {
@@ -249,32 +271,73 @@ function DashboardContent() {
   };
 
   const fetchDashboardData = async () => {
+    // Don't fetch data if user is logging out
+    if (isLoggingOut) {
+      console.log('🔄 fetchDashboardData - User is logging out, skipping data fetch');
+      return;
+    }
+    
+    // Add a timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      console.log('🔄 fetchDashboardData - Timeout reached, stopping loading');
+      setLoading(false);
+    }, 10000); // 10 second timeout
+    
     try {
       setLoading(true);
+      
       const supabase = createClient();
       const { data: { session } } = await supabase.auth.getSession();
       
-      if (!session) return;
+      if (!session) {
+        console.log('🔄 fetchDashboardData - No session found');
+        setLoading(false);
+        return;
+      }
+
+      console.log('🔄 fetchDashboardData - Starting data fetch for user:', session.user.id);
 
       // Fetch enrollments
-      const { data: enrollmentsData } = await supabase
-        .from('course_enrollments')
-        .select(`
-          *,
-          course:courses(*)
-        `)
-        .eq('user_id', session.user.id)
-        .order('enrolled_at', { ascending: false });
+      let enrollmentsData = [];
+      try {
+        const { data, error } = await supabase
+          .from('enrollments')
+          .select(`
+            *,
+            course:courses(*)
+          `)
+          .eq('user_id', session.user.id)
+          .order('enrolled_at', { ascending: false });
+        
+        if (error) {
+          console.error('Error fetching enrollments:', error);
+        } else {
+          enrollmentsData = data || [];
+        }
+      } catch (error) {
+        console.error('Exception fetching enrollments:', error);
+      }
 
       // Fetch quiz attempts
-      const { data: quizData } = await supabase
-        .from('quiz_attempts')
-        .select(`
-          *,
-          course:courses(title)
-        `)
-        .eq('user_id', session.user.id)
-        .order('completed_at', { ascending: false });
+      let quizData = [];
+      try {
+        const { data, error } = await supabase
+          .from('quiz_attempts')
+          .select(`
+            *,
+            course:courses(title)
+          `)
+          .eq('user_id', session.user.id)
+          .order('completed_at', { ascending: false });
+        
+        if (error) {
+          console.error('Error fetching quiz attempts:', error);
+        } else {
+          quizData = data || [];
+        }
+      } catch (error) {
+        console.error('Exception fetching quiz attempts:', error);
+      }
 
       // Fetch meetings
       const { data: meetingsData } = await supabase
@@ -305,18 +368,27 @@ function DashboardContent() {
         .order('created_at', { ascending: false })
         .limit(10);
 
-      setEnrollments(enrollmentsData || []);
-      setQuizAttempts(quizData || []);
+      setEnrollments(enrollmentsData);
+      setQuizAttempts(quizData);
       setMeetings(meetingsData || []);
       setActiveBots(botsData || []);
       setGoals(goalsData || []);
       setRecentActivities(activitiesData || []);
-
+      
+            console.log('🔄 fetchDashboardData - Data fetch completed successfully');
+      
       // Calculate stats
       const completedCourses = enrollmentsData?.filter(e => e.progress_percentage === 100).length || 0;
       const totalHours = enrollmentsData?.reduce((acc, e) => acc + (e.course?.duration || 0), 0) || 0;
       const avgScore = quizData?.length ? 
         Math.round(quizData.reduce((acc, q) => acc + q.percentage, 0) / quizData.length) : 0;
+      
+      console.log('🔄 fetchDashboardData - Stats calculated:', { 
+        totalCourses: enrollmentsData?.length || 0, 
+        completedCourses, 
+        totalHours, 
+        avgScore 
+      });
 
       setStats({
         totalCourses: enrollmentsData?.length || 0,
@@ -367,7 +439,25 @@ function DashboardContent() {
 
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
+      // Even if there's an error, set some default data so the dashboard can still render
+      setEnrollments([]);
+      setQuizAttempts([]);
+      setMeetings([]);
+      setActiveBots([]);
+      setGoals([]);
+      setRecentActivities([]);
+      setStats({
+        totalCourses: 0,
+        completedCourses: 0,
+        totalHours: 0,
+        averageScore: 0,
+        totalMeetings: 0,
+        activeBots: 0,
+        completedMilestones: 0,
+        totalGoals: 0
+      });
     } finally {
+      clearTimeout(timeoutId);
       setLoading(false);
     }
   };
@@ -467,15 +557,43 @@ function DashboardContent() {
     }
   };
 
-  if (authLoading || loading || isLoggingOut) {
+  if (authLoading || loading) {
+    console.log('🔄 Dashboard - Showing loading state:', { authLoading, loading, user: !!user });
     return (
       <PageLayout>
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">
-              {isLoggingOut ? 'Logging out...' : 'Loading your dashboard...'}
-            </p>
+            <p className="text-gray-600">Loading your dashboard...</p>
+          </div>
+        </div>
+      </PageLayout>
+    );
+  }
+
+  // Show logout state
+  if (isLoggingOut) {
+    return (
+      <PageLayout>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Logging out...</p>
+          </div>
+        </div>
+      </PageLayout>
+    );
+  }
+
+  // Show redirect state for unauthenticated users
+  if (!authLoading && !user) {
+    console.log('🔄 Dashboard - Showing redirect state:', { authLoading, user: !!user });
+    return (
+      <PageLayout>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Redirecting to home page...</p>
           </div>
         </div>
       </PageLayout>
@@ -489,20 +607,34 @@ function DashboardContent() {
         <div className="bg-white/80 backdrop-blur-xl border-b border-white/20" style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.1)' }}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-8 lg:space-y-0">
-              <div className="flex-1">
-                <div className="flex items-center space-x-4 mb-6">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center shadow-xl">
-                    <User className="w-8 h-8 text-white" />
-                  </div>
-                  <div>
-                    <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                      Welcome back{userProfile?.name ? `, ${userProfile.name}` : ''}!
+                                <div className="flex-1">
+                    <div className="flex items-center space-x-4 mb-6">
+                      <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center shadow-xl">
+                        <User className="w-8 h-8 text-white" />
+                      </div>
+                      <div>
+                        <div className="flex items-center space-x-3 mb-2">
+                                              <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                      Welcome back{userProfile?.name ? `, ${userProfile.name}` : user?.user_metadata?.name ? `, ${user.user_metadata.name}` : ''}!
                     </h1>
-                    <p className="text-lg text-gray-600 mt-1">
-                      Ready to accelerate your career growth?
-                    </p>
-                  </div>
-                </div>
+                          {isAdmin && (
+                            <Badge className="bg-gradient-to-r from-red-500 to-pink-500 text-white border-0 px-3 py-1 text-sm font-semibold">
+                              <Shield className="w-3 h-3 mr-1" />
+                              ADMIN
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-lg text-gray-600 mt-1">
+                          Ready to accelerate your career growth?
+                        </p>
+                        {/* Debug info - remove in production */}
+                        {process.env.NODE_ENV === 'development' && (
+                          <div className="mt-2 text-xs text-gray-500">
+                            Role: {userProfile?.role} | Admin: {isAdmin ? 'Yes' : 'No'} | Can Access Admin: {canAccessAdmin ? 'Yes' : 'No'} | Name: {userProfile?.name} | User Meta: {user?.user_metadata?.name}
+                          </div>
+                        )}
+                      </div>
+                    </div>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="card-modern p-6 rounded-2xl text-center">
@@ -564,6 +696,65 @@ function DashboardContent() {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Admin Quick Access */}
+          {isAdmin && (
+            <div className="mb-8">
+              <div className="card-modern p-6 rounded-2xl bg-gradient-to-r from-red-50 to-pink-50 border-2 border-red-200/50">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
+                      <Shield className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-gray-900">Admin Panel</h3>
+                      <p className="text-sm text-gray-600">Manage your platform</p>
+                    </div>
+                  </div>
+                  <Button 
+                    onClick={() => router.push('/admin')}
+                    className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white px-4 py-2 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                  >
+                    Go to Admin
+                  </Button>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <Button 
+                    variant="outline"
+                    onClick={() => router.push('/admin/users')}
+                    className="bg-white/80 border-red-200 text-red-700 hover:bg-red-50 hover:border-red-300"
+                  >
+                    <Users className="w-4 h-4 mr-2" />
+                    Users
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    onClick={() => router.push('/admin/courses')}
+                    className="bg-white/80 border-red-200 text-red-700 hover:bg-red-50 hover:border-red-300"
+                  >
+                    <BookOpen className="w-4 h-4 mr-2" />
+                    Courses
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    onClick={() => router.push('/admin/analytics')}
+                    className="bg-white/80 border-red-200 text-red-700 hover:bg-red-50 hover:border-red-300"
+                  >
+                    <BarChart3 className="w-4 h-4 mr-2" />
+                    Analytics
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    onClick={() => router.push('/admin/blog')}
+                    className="bg-white/80 border-red-200 text-red-700 hover:bg-red-50 hover:border-red-300"
+                  >
+                    <FileText className="w-4 h-4 mr-2" />
+                    Blog
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Enhanced Quick Actions */}
           <div className="mb-12">
             <div className="flex items-center justify-between mb-8">
@@ -840,3 +1031,4 @@ export default function StudentDashboard() {
     </Suspense>
   );
 } 
+

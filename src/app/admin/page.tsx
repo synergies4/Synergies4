@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedirect } from '@/hooks/useAuthRedirect';
 import { UserAvatar } from '@/components/UserAvatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -36,7 +37,8 @@ interface Course {
 }
 
 export default function AdminDashboard() {
-  const { user, userProfile, loading: authLoading } = useAuth();
+  const { user, userProfile, loading: authLoading, isAdmin, canAccessAdmin } = useAuth();
+  const { canAccessAdminArea } = useAuthRedirect({ requireAuth: true, requireAdmin: true });
   const router = useRouter();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
@@ -54,21 +56,11 @@ export default function AdminDashboard() {
     console.log('Admin Dashboard - authLoading:', authLoading);
     console.log('Admin Dashboard - user:', user?.email);
     console.log('Admin Dashboard - userProfile:', userProfile);
-    console.log('Admin Dashboard - userProfile.role:', userProfile?.role);
+    console.log('Admin Dashboard - isAdmin:', isAdmin);
+    console.log('Admin Dashboard - canAccessAdmin:', canAccessAdmin);
+    console.log('Admin Dashboard - canAccessAdminArea:', canAccessAdminArea);
     
     if (authLoading) return;
-    
-    if (!user) {
-      console.log('Admin Dashboard - No user, redirecting to login');
-      router.push('/login');
-      return;
-    }
-    
-    if (userProfile && userProfile.role !== 'ADMIN') {
-      console.log('Admin Dashboard - User is not admin, redirecting to login');
-      router.push('/login');
-      return;
-    }
     
     // If userProfile is null, wait for it to load
     if (!userProfile) {
@@ -76,18 +68,34 @@ export default function AdminDashboard() {
       return;
     }
 
-    console.log('Admin Dashboard - Admin user confirmed, fetching courses');
-    fetchDashboardData();
-  }, [user, userProfile, authLoading, router]);
+    // Only fetch data if user can access admin area
+    if (canAccessAdminArea) {
+      console.log('Admin Dashboard - Admin user confirmed, fetching courses');
+      fetchDashboardData();
+    }
+  }, [user, userProfile, authLoading, isAdmin, canAccessAdmin, canAccessAdminArea]);
 
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
       
-      // Fetch courses
-      const coursesResponse = await fetch('/api/courses');
+      // Get auth token for API call
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      // Fetch courses with auth token
+      const coursesResponse = await fetch('/api/courses?page=1&per_page=100', {
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token && {
+            'Authorization': `Bearer ${session.access_token}`
+          })
+        }
+      });
+      
       if (coursesResponse.ok) {
         const coursesData = await coursesResponse.json();
+        console.log('Admin dashboard courses response:', coursesData);
         setCourses(coursesData.courses || []);
         
         const totalCourses = coursesData.courses?.length || 0;
@@ -98,11 +106,18 @@ export default function AdminDashboard() {
           totalCourses,
           publishedCourses
         }));
+      } else {
+        console.error('Courses API error:', coursesResponse.status, coursesResponse.statusText);
+        // Set empty courses array to avoid errors
+        setCourses([]);
+        setStats(prev => ({
+          ...prev,
+          totalCourses: 0,
+          publishedCourses: 0
+        }));
       }
 
-      // Fetch enrollment analytics
-      const supabase = createClient();
-      const { data: { session } } = await supabase.auth.getSession();
+      // Fetch enrollment analytics (reuse existing supabase client)
       
       if (session) {
         // Fetch enrollment stats
@@ -151,29 +166,15 @@ export default function AdminDashboard() {
     );
   }
 
-  if (!user || userProfile?.role !== 'ADMIN') {
+  // Show redirect state for unauthenticated users (handled by useAuthRedirect hook)
+  if (!authLoading && !canAccessAdminArea) {
     return (
       <PageLayout>
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-teal-50 to-cyan-50">
-          <Card className="w-full max-w-md shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
-            <CardHeader>
-              <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="h-8 w-8 text-white" />
-              </div>
-              <CardTitle className="text-center text-2xl font-bold text-gray-900">Access Denied</CardTitle>
-              <CardDescription className="text-center text-gray-600">
-                You need admin privileges to access this page.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="text-center">
-              <Button asChild className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-medium w-full">
-                <Link href="/">
-                  <Home className="w-4 h-4 mr-2" />
-                  Return Home
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
+          <div className="text-center">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-red-600" />
+            <p className="text-gray-600">Redirecting to home page...</p>
+          </div>
         </div>
       </PageLayout>
     );
@@ -195,7 +196,7 @@ export default function AdminDashboard() {
                     Admin Dashboard
                   </h1>
                   <p className="text-sm md:text-base text-gray-600 font-medium">
-                    Welcome back, {userProfile?.name || user.user_metadata?.name || user.email}
+                    Welcome back, {userProfile?.name || user?.user_metadata?.name || user?.email}
                   </p>
                 </div>
               </div>

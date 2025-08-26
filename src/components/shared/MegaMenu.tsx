@@ -119,7 +119,16 @@ interface MegaMenuProps {
 }
 
 export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
-  const { user, userProfile, signOut } = useAuth();
+  const { user, userProfile, signOut, isLoggingOut, loading: authLoading } = useAuth();
+  
+  // Debug authentication state
+  console.log('🔄 MegaMenu - Auth state:', { 
+    user: !!user, 
+    userEmail: user?.email, 
+    userProfile: !!userProfile, 
+    authLoading, 
+    isLoggingOut 
+  });
   const router = useRouter();
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -353,7 +362,12 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
 
         {/* User Menu */}
         <div className="ml-4 flex items-center space-x-2">
-          {user ? (
+          {authLoading ? (
+            <div className="flex items-center space-x-2">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-teal-600"></div>
+              <span className="text-sm text-gray-500">Loading...</span>
+            </div>
+          ) : user ? (
             <div className="flex items-center space-x-2">
               <Link href={userProfile?.role === 'ADMIN' ? '/admin' : '/dashboard'}>
                 <Button variant="outline" size="sm" className="text-gray-700 hover:text-teal-600 border-gray-300 hover:border-teal-500">
@@ -365,9 +379,11 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
                 variant="outline"
                 size="sm"
                 onClick={() => signOut()}
-                className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-300"
+                disabled={isLoggingOut}
+                className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <LogOut className="w-4 h-4" />
+                {isLoggingOut && <span className="ml-2">...</span>}
               </Button>
             </div>
           ) : (
@@ -580,7 +596,14 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
 
               {/* User Section */}
               <div className="mt-6 pt-6 border-t border-gray-200">
-                {user ? (
+                {authLoading ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-center space-x-2 p-3">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-teal-600"></div>
+                      <span className="text-sm text-gray-500">Loading...</span>
+                    </div>
+                  </div>
+                ) : user ? (
                   <div className="space-y-3">
                     <div className="p-3 bg-blue-50 rounded-lg">
                       <p className="font-semibold text-blue-900">Welcome back!</p>
@@ -612,10 +635,13 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
                         setIsMobileMenuOpen(false);
                         setActiveCategory(null);
                       }}
-                      className="flex items-center space-x-3 p-3 bg-red-50 hover:bg-red-100 rounded-lg transition-colors w-full text-left"
+                      disabled={isLoggingOut}
+                      className="flex items-center space-x-3 p-3 bg-red-50 hover:bg-red-100 rounded-lg transition-colors w-full text-left disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <LogOut className="w-5 h-5 text-red-600" />
-                      <span className="font-medium text-red-900">Sign Out</span>
+                      <span className="font-medium text-red-900">
+                        {isLoggingOut ? 'Signing Out...' : 'Sign Out'}
+                      </span>
                     </button>
                   </div>
                 ) : (

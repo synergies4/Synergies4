@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -46,9 +46,69 @@ export default function Signup() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
   const router = useRouter();
-  const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-  const redirectUrl = searchParams ? searchParams.get('redirect') : null;
+  const { user, userProfile, loading } = useAuth();
+
+  // Prevent hydration issues
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Get redirect URL on client side only
+  useEffect(() => {
+    if (mounted) {
+      const searchParams = new URLSearchParams(window.location.search);
+      setRedirectUrl(searchParams.get('redirect'));
+    }
+  }, [mounted]);
+
+  // Redirect if already logged in
+  useEffect(() => {
+    console.log('🔄 Signup - Auth state changed:', { user: !!user, userProfile: !!userProfile, loading });
+    
+    if (!loading && user && userProfile) {
+      console.log('🔄 Signup - User authenticated, redirecting...');
+      
+      if (redirectUrl) {
+        console.log('🔄 Signup - Redirecting to:', redirectUrl);
+        window.location.href = redirectUrl;
+      } else if (userProfile.role === 'ADMIN') {
+        console.log('🔄 Signup - Redirecting admin to /admin');
+        window.location.href = '/admin';
+      } else {
+        console.log('🔄 Signup - Redirecting user to /dashboard');
+        window.location.href = '/dashboard';
+      }
+    }
+  }, [user, userProfile, loading, redirectUrl]);
+
+  // Don't render anything until mounted
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show loading state while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
+
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -166,6 +226,22 @@ export default function Signup() {
       setError('An error occurred with Google sign up.');
     }
   };
+
+  // Show loading if auth is loading, or user exists but no profile yet
+  if (loading || (user && !userProfile)) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <Sparkles className="h-8 w-8 text-blue-600 animate-spin" />
+          </div>
+          <p className="text-gray-700 text-lg font-medium">
+            {loading ? 'Checking your session...' : 'Loading your experience...'}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (success) {
     return (
@@ -494,4 +570,4 @@ export default function Signup() {
       </div>
     </div>
   );
-} 
+}

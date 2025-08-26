@@ -307,6 +307,7 @@ CREATE TABLE IF NOT EXISTS public.user_course_rankings (
   
   -- Ranking Data
   ranking_date TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  ranking_date_only DATE DEFAULT CURRENT_DATE,
   top_courses JSONB, -- Array of course IDs with scores
   ranking_methodology VARCHAR(50) DEFAULT 'roi_fit_score',
   
@@ -320,7 +321,7 @@ CREATE TABLE IF NOT EXISTS public.user_course_rankings (
   expires_at TIMESTAMP WITH TIME ZONE DEFAULT (NOW() + INTERVAL '3 days'),
   created_at BIGINT DEFAULT current_epoch(),
   
-  UNIQUE(user_id, ranking_date::DATE)
+  UNIQUE(user_id, ranking_date_only)
 );
 
 -- ============================================================================
@@ -417,6 +418,11 @@ CREATE INDEX IF NOT EXISTS idx_quiz_attempts_created_at ON public.quiz_attempts(
 
 -- Quiz answers indexes
 CREATE INDEX IF NOT EXISTS idx_quiz_answers_attempt_id ON public.quiz_answers(attempt_id);
+
+-- User course rankings indexes
+CREATE INDEX IF NOT EXISTS idx_user_course_rankings_user_id ON public.user_course_rankings(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_course_rankings_ranking_date ON public.user_course_rankings(ranking_date DESC);
+CREATE INDEX IF NOT EXISTS idx_user_course_rankings_ranking_date_only ON public.user_course_rankings(ranking_date_only DESC);
 CREATE INDEX IF NOT EXISTS idx_quiz_answers_question_id ON public.quiz_answers(question_id);
 
 -- Course certificates indexes
