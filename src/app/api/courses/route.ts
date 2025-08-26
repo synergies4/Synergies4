@@ -61,6 +61,8 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get('category');
     const level = searchParams.get('level');
     const featured = searchParams.get('featured');
+    const userId = searchParams.get('user_id');
+    const statusFilter = searchParams.get('status');
     
     // Pagination parameters
     const page = parseInt(searchParams.get('page') || '1');
@@ -79,6 +81,46 @@ export async function GET(request: NextRequest) {
         { message: 'Per page must be between 1 and 100' },
         { status: 400 }
       );
+    }
+
+    // Check if user is requesting their own courses or is an admin
+    let authenticatedUser = null;
+    let isOwnCourses = false;
+    let isAdmin = false;
+    
+    // Always try to get authenticated user to check admin status
+    authenticatedUser = await getAuthenticatedUser(request);
+    
+    if (authenticatedUser) {
+      isAdmin = authenticatedUser.role === 'ADMIN';
+      console.log('👤 Authenticated user:', { id: authenticatedUser.id, role: authenticatedUser.role });
+    }
+    
+    if (userId) {
+      // User is requesting specific user's courses
+      if (authenticatedUser && authenticatedUser.id === userId) {
+        isOwnCourses = true;
+        console.log('✅ User requesting their own courses');
+      } else if (isAdmin) {
+        isOwnCourses = true;
+        console.log('✅ Admin requesting courses for user:', userId);
+      } else if (authenticatedUser) {
+        console.log('❌ User not authorized to view courses for user:', userId);
+        return NextResponse.json(
+          { message: 'Unauthorized - You can only view your own courses' },
+          { status: 403 }
+        );
+      } else {
+        console.log('❌ No authentication provided for user-specific request');
+        return NextResponse.json(
+          { message: 'Authentication required to view user-specific courses' },
+          { status: 401 }
+        );
+      }
+    } else if (isAdmin) {
+      // Admin requesting all courses (no user_id specified)
+      isOwnCourses = true;
+      console.log('✅ Admin requesting all courses');
     }
 
     const supabase = await createClient();
@@ -107,10 +149,26 @@ export async function GET(request: NextRequest) {
     // Build base query for counting total records
     let countQuery = supabase
       .from('courses')
-      .select('id', { count: 'exact' })
-      .eq('status', 'PUBLISHED');
+      .select('id', { count: 'exact' });
 
-    // Apply filters to count query
+    // Apply status filter based on context
+    if (isOwnCourses) {
+      // User is requesting their own courses - show all statuses
+      if (statusFilter && statusFilter !== 'ANY') {
+        countQuery = countQuery.eq('status', statusFilter);
+      }
+      // If status is 'ANY' or not specified, don't filter by status
+    } else {
+      // Public request - only show published courses
+      countQuery = countQuery.eq('status', 'PUBLISHED');
+    }
+
+    // Apply user filter if specified
+    if (userId) {
+      countQuery = countQuery.eq('instructor_id', userId);
+    }
+
+    // Apply other filters to count query
     if (category) {
       countQuery = countQuery.eq('category', category);
     }
@@ -153,13 +211,30 @@ export async function GET(request: NextRequest) {
         duration,
         status,
         featured,
+        instructor_id,
         created_at
       `)
-      .eq('status', 'PUBLISHED')
       .order('created_at', { ascending: false })
       .range(offset, offset + per_page - 1);
 
-    // Apply filters
+    // Apply status filter based on context
+    if (isOwnCourses) {
+      // User is requesting their own courses - show all statuses
+      if (statusFilter && statusFilter !== 'ANY') {
+        query = query.eq('status', statusFilter);
+      }
+      // If status is 'ANY' or not specified, don't filter by status
+    } else {
+      // Public request - only show published courses
+      query = query.eq('status', 'PUBLISHED');
+    }
+
+    // Apply user filter if specified
+    if (userId) {
+      query = query.eq('instructor_id', userId);
+    }
+
+    // Apply other filters
     if (category) {
       query = query.eq('category', category);
     }

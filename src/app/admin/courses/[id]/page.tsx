@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState, use } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -181,7 +182,7 @@ export default function EditCourse({ params }: { params: Promise<{ id: string }>
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
-        alert('You must be logged in to update a course');
+        toast.error('You must be logged in to update a course');
         return;
       }
 
@@ -195,14 +196,14 @@ export default function EditCourse({ params }: { params: Promise<{ id: string }>
       });
 
       if (response.ok) {
-        alert('Course updated successfully!');
+        toast.success('Course updated successfully!');
         router.push('/admin');
       } else {
-        alert('Failed to update course');
+        toast.error('Failed to update course');
       }
     } catch (error) {
       console.error('Error updating course:', error);
-      alert('Error updating course');
+      toast.error('Error updating course');
     } finally {
       setSaving(false);
     }
@@ -245,7 +246,7 @@ export default function EditCourse({ params }: { params: Promise<{ id: string }>
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
-        alert('You must be logged in');
+        toast.error('You must be logged in');
         return;
       }
 
@@ -271,13 +272,13 @@ export default function EditCourse({ params }: { params: Promise<{ id: string }>
       if (response.ok) {
         setShowModuleModal(false);
         fetchModules();
-        alert(editingModule ? 'Module updated successfully!' : 'Module created successfully!');
+        toast.success(editingModule ? 'Module updated successfully!' : 'Module created successfully!');
       } else {
-        alert('Failed to save module');
+        toast.error('Failed to save module');
       }
     } catch (error) {
       console.error('Error saving module:', error);
-      alert('Error saving module');
+      toast.error('Error saving module');
     }
   };
 
@@ -288,7 +289,7 @@ export default function EditCourse({ params }: { params: Promise<{ id: string }>
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
-        alert('You must be logged in');
+        toast.error('You must be logged in');
         return;
       }
 
@@ -301,13 +302,13 @@ export default function EditCourse({ params }: { params: Promise<{ id: string }>
 
       if (response.ok) {
         fetchModules();
-        alert('Module deleted successfully!');
+        toast.success('Module deleted successfully!');
       } else {
-        alert('Failed to delete module');
+        toast.error('Failed to delete module');
       }
     } catch (error) {
       console.error('Error deleting module:', error);
-      alert('Error deleting module');
+      toast.error('Error deleting module');
     }
   };
 
@@ -347,7 +348,7 @@ export default function EditCourse({ params }: { params: Promise<{ id: string }>
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
-        alert('You must be logged in');
+        toast.error('You must be logged in');
         return;
       }
 
@@ -377,13 +378,13 @@ export default function EditCourse({ params }: { params: Promise<{ id: string }>
       if (response.ok) {
         setShowLessonModal(false);
         fetchModules();
-        alert(editingLesson ? 'Lesson updated successfully!' : 'Lesson created successfully!');
+        toast.success(editingLesson ? 'Lesson updated successfully!' : 'Lesson created successfully!');
       } else {
-        alert('Failed to save lesson');
+        toast.error('Failed to save lesson');
       }
     } catch (error) {
       console.error('Error saving lesson:', error);
-      alert('Error saving lesson');
+      toast.error('Error saving lesson');
     }
   };
 
@@ -394,7 +395,7 @@ export default function EditCourse({ params }: { params: Promise<{ id: string }>
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
-        alert('You must be logged in');
+        toast.error('You must be logged in');
         return;
       }
 
@@ -407,13 +408,13 @@ export default function EditCourse({ params }: { params: Promise<{ id: string }>
 
       if (response.ok) {
         fetchModules();
-        alert('Lesson deleted successfully!');
+        toast.success('Lesson deleted successfully!');
       } else {
-        alert('Failed to delete lesson');
+        toast.error('Failed to delete lesson');
       }
     } catch (error) {
       console.error('Error deleting lesson:', error);
-      alert('Error deleting lesson');
+      toast.error('Error deleting lesson');
     }
   };
 

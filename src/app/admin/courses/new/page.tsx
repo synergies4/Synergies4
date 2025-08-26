@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import PageLayout from '@/components/shared/PageLayout';
+import { toast } from 'sonner';
 import { 
   ArrowLeft,
   Save, 
@@ -222,7 +223,7 @@ export default function CreateCourse() {
 
   const generateAIContent = async (field: 'description' | 'shortDesc') => {
     if (!formData.title || !formData.category || !formData.level) {
-      alert('Please fill in the course title, category, and level first to generate AI content.');
+      toast.error('Please fill in the course title, category, and level first to generate AI content.');
       return;
     }
 
@@ -262,7 +263,7 @@ export default function CreateCourse() {
       }
     } catch (error) {
       console.error('Error generating AI content:', error);
-      alert(`Failed to generate ${field}. Please try again or write it manually.`);
+      toast.error(`Failed to generate ${field}. Please try again or write it manually.`);
     } finally {
       setLoading(false);
     }
@@ -430,7 +431,7 @@ export default function CreateCourse() {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
-        alert('You must be logged in to create a course');
+        toast.error('You must be logged in to create a course');
         return;
       }
 
@@ -521,10 +522,11 @@ export default function CreateCourse() {
         }
       }
       
+      toast.success('Course created successfully!');
       router.push('/admin/courses');
     } catch (error) {
       console.error('Error creating course:', error);
-      alert(`Error creating course: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      toast.error(`Error creating course: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setLoading(false);
     }
@@ -597,9 +599,9 @@ export default function CreateCourse() {
                     <SelectValue placeholder="Select course type" />
                   </SelectTrigger>
                   <SelectContent className="bg-white">
-                    <SelectItem value="digital">🌐 Digital Course (Online)</SelectItem>
+                    <SelectItem value="digital" disabled className="text-gray-400 cursor-not-allowed">🌐 Digital Course (Online) - Coming Soon</SelectItem>
                     <SelectItem value="in_person">🏢 In-Person Course</SelectItem>
-                    <SelectItem value="hybrid">🔄 Hybrid (Digital + In-Person)</SelectItem>
+                    <SelectItem value="hybrid" disabled className="text-gray-400 cursor-not-allowed">🔄 Hybrid (Digital + In-Person) - Coming Soon</SelectItem>
                   </SelectContent>
                 </Select>
                 {formErrors.course_type && <p className="text-red-600 text-sm flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{formErrors.course_type}</p>}
@@ -751,7 +753,7 @@ export default function CreateCourse() {
                       value={formData.materials_included}
                       onChange={(e) => handleInputChange('materials_included', e.target.value)}
                       placeholder="Workbook, certificate, refreshments, course materials..."
-                      className="bg-white border-2 border-gray-200 focus:border-teal-500 text-gray-900 placeholder-gray-500 font-medium"
+                      className="bg-white resize-none border-2 border-gray-200 focus:border-teal-500 text-gray-900 placeholder-gray-500 font-medium"
                       rows={3}
                     />
                   </div>

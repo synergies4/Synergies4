@@ -8,31 +8,49 @@ async function getAuthenticatedUser(request: NextRequest) {
   try {
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.log('❌ No Bearer token found');
       return null;
     }
 
     const token = authHeader.substring(7);
+    console.log('🔑 Token extracted:', token.substring(0, 20) + '...');
+    
     const supabase = await createClient();
     
     const { data: { user }, error } = await supabase.auth.getUser(token);
     if (error || !user) {
+      console.log('❌ Auth error or no user:', error);
       return null;
     }
 
+    console.log('✅ Auth user found:', { id: user.id, email: user.email });
+
     // Get user data to check role (role is stored in users table)
-    const { data: userData } = await supabase
+    const { data: userData, error: userError } = await supabase
       .from('users')
-      .select('role')
-      .eq('id', user.id)
+      .select('id, role')
+      .eq('auth_user_id', user.id)
       .single();
 
+    if (userError) {
+      console.log('❌ Error fetching user data:', userError);
+      return null;
+    }
+
+    if (!userData) {
+      console.log('❌ User not found in users table for auth_user_id:', user.id);
+      return null;
+    }
+
+    console.log('✅ User data found:', userData);
+
     return {
-      id: user.id,
+      id: userData.id, // Use the TEXT id from users table, not the UUID from auth
       email: user.email,
-      role: userData?.role || 'USER'
+      role: userData.role || 'USER'
     };
   } catch (error) {
-    console.error('Auth error:', error);
+    console.error('💥 Auth error:', error);
     return null;
   }
 }
@@ -101,12 +119,26 @@ export async function PUT(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    console.log('🚀 PUT /api/courses/[id] - Starting course update...');
+    
     const params = await context.params;
+    console.log('📝 Course ID:', params.id);
+    
     const user = await getAuthenticatedUser(request);
+    console.log('👤 Authenticated user:', user);
 
-    if (!user || user.role !== 'ADMIN') {
+    if (!user) {
+      console.log('❌ No authenticated user found');
       return NextResponse.json(
-        { message: 'Unauthorized' },
+        { message: 'Unauthorized - No authenticated user' },
+        { status: 401 }
+      );
+    }
+
+    if (user.role !== 'ADMIN') {
+      console.log('❌ User is not admin. Role:', user.role);
+      return NextResponse.json(
+        { message: 'Unauthorized - Admin access required' },
         { status: 401 }
       );
     }

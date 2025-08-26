@@ -120,24 +120,111 @@ interface MegaMenuProps {
 
 export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
   const { user, userProfile, signOut, isLoggingOut, loading: authLoading } = useAuth();
+  const router = useRouter();
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  
+  // Fast user role detection
+  const [fastUserRole, setFastUserRole] = useState<{
+    role: string;
+    isAdmin: boolean;
+    canAccessAdmin: boolean;
+    loading: boolean;
+  }>({ role: 'USER', isAdmin: false, canAccessAdmin: false, loading: false });
   
   // Debug authentication state
   console.log('🔄 MegaMenu - Auth state:', { 
     user: !!user, 
     userEmail: user?.email, 
     userProfile: !!userProfile, 
+    userProfileRole: userProfile?.role,
     authLoading, 
-    isLoggingOut 
+    isLoggingOut,
+    fastUserRole,
+    finalAdminStatus: fastUserRole.isAdmin || userProfile?.role === 'ADMIN'
   });
-  const router = useRouter();
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  // Fast user role detection - check localStorage first, then fetch user data
+  useEffect(() => {
+    const checkUserRole = async () => {
+      try {
+        // Check if we have an access token in localStorage
+        const accessToken = localStorage.getItem('sb-tgrhwzhgmdhbuceesodf-auth-token');
+        if (!accessToken) {
+          console.log('🔍 MegaMenu - No access token found');
+          setFastUserRole({ role: 'USER', isAdmin: false, canAccessAdmin: false, loading: false });
+          return;
+        }
+
+        // Parse the token to get user info
+        let tokenData;
+        try {
+          tokenData = JSON.parse(accessToken);
+        } catch (e) {
+          console.log('🔍 MegaMenu - Invalid token format');
+          setFastUserRole({ role: 'USER', isAdmin: false, canAccessAdmin: false, loading: false });
+          return;
+        }
+
+        if (!tokenData.access_token) {
+          console.log('🔍 MegaMenu - No access token in parsed data');
+          setFastUserRole({ role: 'USER', isAdmin: false, canAccessAdmin: false, loading: false });
+          return;
+        }
+
+        console.log('🔍 MegaMenu - Found access token, fetching user data...');
+        setFastUserRole(prev => ({ ...prev, loading: true }));
+
+        // Fetch user data directly from API
+        const response = await fetch('/api/users', {
+          headers: {
+            'Authorization': `Bearer ${tokenData.access_token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log('✅ MegaMenu - User data fetched:', data.user);
+          
+          const isAdmin = data.user.is_admin || data.user.role === 'ADMIN';
+          const canAccessAdmin = data.user.can_access_admin || isAdmin;
+          
+          console.log('🔍 MegaMenu - Role detection:', {
+            role: data.user.role,
+            is_admin: data.user.is_admin,
+            can_access_admin: data.user.can_access_admin,
+            final_isAdmin: isAdmin,
+            final_canAccessAdmin: canAccessAdmin
+          });
+          
+          setFastUserRole({
+            role: data.user.role || 'USER',
+            isAdmin: isAdmin,
+            canAccessAdmin: canAccessAdmin,
+            loading: false
+          });
+        } else {
+          console.log('❌ MegaMenu - Failed to fetch user data:', response.status);
+          setFastUserRole({ role: 'USER', isAdmin: false, canAccessAdmin: false, loading: false });
+        }
+      } catch (error) {
+        console.error('💥 MegaMenu - Error checking user role:', error);
+        setFastUserRole({ role: 'USER', isAdmin: false, canAccessAdmin: false, loading: false });
+      }
+    };
+
+    // Only check if we're mounted and not already loading
+    if (isMounted && !fastUserRole.loading) {
+      checkUserRole();
+    }
+  }, [isMounted, userProfile]); // Re-check when userProfile changes
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -362,17 +449,17 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
 
         {/* User Menu */}
         <div className="ml-4 flex items-center space-x-2">
-          {authLoading ? (
+          {fastUserRole.loading && authLoading ? (
             <div className="flex items-center space-x-2">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-teal-600"></div>
               <span className="text-sm text-gray-500">Loading...</span>
             </div>
-          ) : user ? (
+          ) : fastUserRole.isAdmin || userProfile?.role === 'ADMIN' || user ? (
             <div className="flex items-center space-x-2">
-              <Link href={userProfile?.role === 'ADMIN' ? '/admin' : '/dashboard'}>
+              <Link href={fastUserRole.isAdmin || userProfile?.role === 'ADMIN' ? '/admin' : '/dashboard'}>
                 <Button variant="outline" size="sm" className="text-gray-700 hover:text-teal-600 border-gray-300 hover:border-teal-500">
                   <BarChart3 className="w-4 h-4 mr-2" />
-                  {userProfile?.role === 'ADMIN' ? 'Admin' : 'Dashboard'}
+                  {fastUserRole.isAdmin || userProfile?.role === 'ADMIN' ? 'Admin' : 'Dashboard'}
                 </Button>
               </Link>
               <Button
@@ -596,14 +683,14 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
 
               {/* User Section */}
               <div className="mt-6 pt-6 border-t border-gray-200">
-                {authLoading ? (
+                {fastUserRole.loading && authLoading ? (
                   <div className="space-y-3">
                     <div className="flex items-center justify-center space-x-2 p-3">
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-teal-600"></div>
                       <span className="text-sm text-gray-500">Loading...</span>
                     </div>
                   </div>
-                ) : user ? (
+                ) : fastUserRole.isAdmin || userProfile?.role === 'ADMIN' || user ? (
                   <div className="space-y-3">
                     <div className="p-3 bg-blue-50 rounded-lg">
                       <p className="font-semibold text-blue-900">Welcome back!</p>
@@ -614,7 +701,7 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
                         e.preventDefault();
                         e.stopPropagation();
                         console.log('🔥 DASHBOARD BUTTON MOUSEDOWN');
-                        const url = userProfile?.role === 'ADMIN' ? '/admin' : '/dashboard';
+                        const url = fastUserRole.isAdmin || userProfile?.role === 'ADMIN' ? '/admin' : '/dashboard';
                         setTimeout(() => {
                           console.log('🔥 NAVIGATING TO DASHBOARD:', url);
                           window.location.href = url;
@@ -625,7 +712,7 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
                     >
                       <BarChart3 className="w-5 h-5 text-gray-600" />
                       <span className="font-medium text-gray-900">
-                        {userProfile?.role === 'ADMIN' ? 'Admin Dashboard' : 'Dashboard'}
+                        {fastUserRole.isAdmin || userProfile?.role === 'ADMIN' ? 'Admin Dashboard' : 'Dashboard'}
                       </span>
                       <ArrowRight className="w-4 h-4 text-gray-400 ml-auto" />
                     </button>

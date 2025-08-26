@@ -32,6 +32,7 @@ import {
 import { UserAvatar } from '@/components/UserAvatar';
 import PageLayout from '@/components/shared/PageLayout';
 import Image from 'next/image';
+import { toast } from 'sonner';
 
 interface CourseData {
   id: string;
@@ -153,7 +154,7 @@ export default function CoursesManagement() {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
-        alert('You must be logged in to delete a course');
+        toast.error('You must be logged in to delete a course');
         return;
       }
 
@@ -172,10 +173,11 @@ export default function CoursesManagement() {
 
       // Remove from local state
       setCourses(courses.filter(course => course.id !== courseId));
+      toast.success('Course deleted successfully');
       console.log(`Course ${courseId} deleted successfully`);
     } catch (error) {
       console.error('Error deleting course:', error);
-      alert(`Error deleting course: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      toast.error(`Error deleting course: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 

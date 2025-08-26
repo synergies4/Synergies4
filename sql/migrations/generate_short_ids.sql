@@ -25,7 +25,7 @@ BEGIN
     WHEN 'user_onboarding' THEN prefix := 'onbrd_';
     
     -- Courses and Learning
-    WHEN 'courses' THEN prefix := 'crs_';
+    WHEN 'courses' THEN prefix := 'cour_';
     WHEN 'course_modules' THEN prefix := 'mod_';
     WHEN 'lessons' THEN prefix := 'lesn_';
     WHEN 'enrollments' THEN prefix := 'enrl_';
