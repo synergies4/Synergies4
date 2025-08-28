@@ -96,10 +96,11 @@ export default function AdminDashboard() {
       if (coursesResponse.ok) {
         const coursesData = await coursesResponse.json();
         console.log('Admin dashboard courses response:', coursesData);
-        setCourses(coursesData.courses || []);
+        const coursesWithEnrollments = await fetchEnrollmentDataForCourses(coursesData.courses || [], session);
+        setCourses(coursesWithEnrollments);
         
-        const totalCourses = coursesData.courses?.length || 0;
-        const publishedCourses = coursesData.courses?.filter((c: any) => c.status === 'PUBLISHED').length || 0;
+        const totalCourses = coursesWithEnrollments.length || 0;
+        const publishedCourses = coursesWithEnrollments.filter((c: any) => c.status === 'PUBLISHED').length || 0;
         
         setStats(prev => ({
           ...prev,
@@ -144,6 +145,40 @@ export default function AdminDashboard() {
       console.error('Error fetching dashboard data:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchEnrollmentDataForCourses = async (coursesData: any[], session: any) => {
+    try {
+      // Fetch enrollment data for each course
+      const enrollmentPromises = coursesData.map(async (course) => {
+        try {
+          const response = await fetch(`/api/enrollments?course_id=${course.id}&page=1&per_page=1`, {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session.access_token}`,
+            },
+          });
+
+          if (response.ok) {
+            const enrollmentData = await response.json();
+            return {
+              ...course,
+              enrollments: enrollmentData.pagination?.count_total || 0
+            };
+          }
+          return { ...course, enrollments: 0 };
+        } catch (error) {
+          console.error(`Error fetching enrollments for course ${course.id}:`, error);
+          return { ...course, enrollments: 0 };
+        }
+      });
+
+      const coursesWithEnrollments = await Promise.all(enrollmentPromises);
+      return coursesWithEnrollments;
+    } catch (error) {
+      console.error('Error fetching enrollment data for courses:', error);
+      return coursesData.map(course => ({ ...course, enrollments: 0 }));
     }
   };
 

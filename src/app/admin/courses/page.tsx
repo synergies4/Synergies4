@@ -384,7 +384,7 @@ export default function CoursesManagement() {
               </CardHeader>
               <CardContent>
                 <div className="text-xl sm:text-3xl font-bold text-gray-900">
-                  {courses.length > 0 ? (courses.reduce((sum, course) => sum + course.rating, 0) / courses.length).toFixed(1) : '0.0'}
+                  {courses.length > 0 ? (courses.reduce((sum, course) => sum + course.rating, 0) / courses.length).toFixed(2) : '0.00'}
                 </div>
                 <p className="text-xs sm:text-sm text-gray-600 mt-1">
                   Rating
@@ -536,7 +536,7 @@ export default function CoursesManagement() {
                           </svg>
                         ))}
                       </div>
-                      <span className="text-xs sm:text-sm font-medium text-gray-700 ml-1">{course.rating}</span>
+                      <span className="text-xs sm:text-sm font-medium text-gray-700 ml-1">{course.rating.toFixed(2)}</span>
                     </div>
                     <Badge variant="outline" className="text-xs">
                       {course.category}
