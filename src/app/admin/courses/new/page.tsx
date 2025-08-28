@@ -111,7 +111,7 @@ export default function CreateCourse() {
     status: 'DRAFT',
     image: '',
     featured: false,
-    course_type: 'digital',
+    course_type: 'in_person',
     max_participants: '',
     location: '',
     instructor_name: '',
@@ -219,6 +219,64 @@ export default function CreateCourse() {
 
   const prevStep = () => {
     setCurrentStep(prev => Math.max(prev - 1, 1));
+  };
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select a valid image file');
+      return;
+    }
+
+    // Validate file size (10MB limit)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('Image file size must be less than 10MB');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Get Supabase client
+      const { createClient } = await import('@/lib/supabase/client');
+      const supabase = createClient();
+      
+      // Generate unique filename
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `course-images/${fileName}`;
+
+      // Upload to Supabase storage
+      const { data, error } = await supabase.storage
+        .from('synergies4')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (error) {
+        throw new Error(`Upload failed: ${error.message}`);
+      }
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from('synergies4')
+        .getPublicUrl(filePath);
+
+      if (urlData.publicUrl) {
+        handleInputChange('image', urlData.publicUrl);
+        toast.success('Image uploaded successfully!');
+      } else {
+        throw new Error('Failed to get public URL');
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast.error(`Failed to upload image: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const generateAIContent = async (field: 'description' | 'shortDesc') => {
@@ -599,8 +657,8 @@ export default function CreateCourse() {
                     <SelectValue placeholder="Select course type" />
                   </SelectTrigger>
                   <SelectContent className="bg-white">
+                     <SelectItem value="in_person">🏢 In-Person Course</SelectItem>
                     <SelectItem value="digital" disabled className="text-gray-400 cursor-not-allowed">🌐 Digital Course (Online) - Coming Soon</SelectItem>
-                    <SelectItem value="in_person">🏢 In-Person Course</SelectItem>
                     <SelectItem value="hybrid" disabled className="text-gray-400 cursor-not-allowed">🔄 Hybrid (Digital + In-Person) - Coming Soon</SelectItem>
                   </SelectContent>
                 </Select>
@@ -846,28 +904,59 @@ export default function CreateCourse() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="image" className="text-sm font-semibold text-gray-900 flex items-center">
+              <Label className="text-sm font-semibold text-gray-900 flex items-center">
                 <Upload className="w-4 h-4 mr-2 text-purple-600" />
-                Course Image URL
+                Course Image
               </Label>
-              <Input
-                id="image"
-                value={formData.image}
-                onChange={(e) => handleInputChange('image', e.target.value)}
-                placeholder="https://example.com/course-image.jpg"
-                className="bg-white border-2 border-gray-200 focus:border-teal-500 text-gray-900 placeholder-gray-500 font-medium"
-              />
+              <div className="relative">
+                <input
+                  type="file"
+                  id="image-upload"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+                <label
+                  htmlFor="image-upload"
+                  className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors duration-200"
+                >
+                  {formData.image ? (
+                    <div className="relative w-full h-full">
+                      <img
+                        src={formData.image}
+                        alt="Course preview"
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                      <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-30 transition-all duration-200 rounded-lg flex items-center justify-center">
+                        <div className="text-white opacity-0 hover:opacity-100 transition-opacity duration-200 text-center">
+                          <Upload className="w-8 h-8 mx-auto mb-2" />
+                          <p className="text-sm font-medium">Click to change image</p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <Upload className="w-8 h-8 mb-4 text-gray-400" />
+                      <p className="mb-2 text-sm text-gray-500">
+                        <span className="font-semibold">Click to upload</span> or drag and drop
+                      </p>
+                      <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                    </div>
+                  )}
+                </label>
+              </div>
               {formData.image && (
-                <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                  <p className="text-sm font-medium text-gray-700 mb-2">Image Preview:</p>
-                  <img
-                    src={formData.image}
-                    alt="Course preview"
-                    className="w-full max-w-md h-48 object-cover rounded-lg border-2 border-gray-200"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
+                <div className="flex items-center justify-between mt-2">
+                  <p className="text-xs text-gray-500">Image uploaded successfully</p>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleInputChange('image', '')}
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                  >
+                    Remove
+                  </Button>
                 </div>
               )}
             </div>
