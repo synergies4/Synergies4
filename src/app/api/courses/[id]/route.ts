@@ -157,6 +157,24 @@ export async function PUT(
       status,
     } = data;
 
+    // Clean and validate the image URL
+    let cleanedImage = image;
+    if (image && typeof image === 'string') {
+      cleanedImage = image.trim();
+      console.log('Original image URL:', image);
+      console.log('Cleaned image URL:', cleanedImage);
+      
+      // Validate the URL format
+      try {
+        new URL(cleanedImage);
+        console.log('✅ Valid image URL format');
+      } catch (urlError) {
+        console.warn('⚠️ Invalid image URL format:', cleanedImage);
+        // Set to null if invalid URL
+        cleanedImage = null;
+      }
+    }
+
     const supabase = await createClient();
 
     const { data: course, error } = await supabase
@@ -165,7 +183,7 @@ export async function PUT(
         title,
         description,
         short_desc,
-        image,
+        image: cleanedImage,
         price: price ? parseFloat(price) : null,
         category,
         level,

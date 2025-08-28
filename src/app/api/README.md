@@ -312,9 +312,42 @@ curl -X GET http://localhost:3000/api/user/enrollments \
 
 ## Enrollment Management
 
-### Get All Enrollments (Admin Only)
+### Get Course Enrollments (Public - No Authentication Required)
 ```bash
+# Development
+curl -X GET "http://localhost:3000/api/enrollments?course_id=course-id-123"
+
+# Production
+curl -X GET "https://synergies4.vercel.app/api/enrollments?course_id=course-id-123"
+
+# With Pagination
+curl -X GET "https://synergies4.vercel.app/api/enrollments?course_id=course-id-123&page=1&per_page=10"
+```
+
+### Get User Enrollments (Public - No Authentication Required)
+```bash
+# Development
+curl -X GET "http://localhost:3000/api/enrollments?user_id=user-id-123"
+
+# Production
+curl -X GET "https://synergies4.vercel.app/api/enrollments?user_id=user-id-123"
+
+# With Pagination
+curl -X GET "https://synergies4.vercel.app/api/enrollments?user_id=user-id-123&page=2&per_page=20"
+```
+
+### Get User's Own Enrollments (Authentication Required)
+```bash
+# Development
 curl -X GET http://localhost:3000/api/enrollments \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+
+# Production
+curl -X GET https://synergies4.vercel.app/api/enrollments \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+
+# With Pagination
+curl -X GET "https://synergies4.vercel.app/api/enrollments?page=1&per_page=5" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 

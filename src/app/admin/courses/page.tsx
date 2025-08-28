@@ -110,13 +110,16 @@ export default function CoursesManagement() {
           category: course.category || 'Agile',
           created_at: course.created_at || new Date().toISOString(),
           updated_at: course.updated_at || new Date().toISOString(),
-          enrollments_count: course.enrollments_count || Math.floor(Math.random() * 2000),
+          enrollments_count: course.enrollments_count || 0,
           instructor_name: course.instructor_name || 'Expert Instructor',
           rating: course.rating || (4.5 + Math.random() * 0.5),
           total_lessons: course.total_lessons || Math.floor(Math.random() * 20) + 10
         }));
         
         setCourses(transformedCourses);
+        
+        // Fetch real enrollment data for each course
+        await fetchEnrollmentData(transformedCourses);
       } else {
         console.error('Courses API error:', response.status, response.statusText);
         // Fallback to sample data if API fails
@@ -133,6 +136,55 @@ export default function CoursesManagement() {
   const setSampleCourses = () => {
     // No more sample courses - removed fake course data
     setCourses([]);
+  };
+
+  const fetchEnrollmentData = async (coursesData: CourseData[]) => {
+    try {
+      const { createClient } = await import('@/lib/supabase/client');
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) return;
+
+      // Fetch enrollment data for each course
+      const enrollmentPromises = coursesData.map(async (course) => {
+        try {
+          const response = await fetch(`/api/enrollments?course_id=${course.id}&page=1&per_page=1`, {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session.access_token}`,
+            },
+          });
+
+          if (response.ok) {
+            const enrollmentData = await response.json();
+            return {
+              courseId: course.id,
+              enrollmentCount: enrollmentData.pagination?.count_total || 0
+            };
+          }
+          return { courseId: course.id, enrollmentCount: 0 };
+        } catch (error) {
+          console.error(`Error fetching enrollments for course ${course.id}:`, error);
+          return { courseId: course.id, enrollmentCount: 0 };
+        }
+      });
+
+      const enrollmentResults = await Promise.all(enrollmentPromises);
+      
+      // Update courses with real enrollment data
+      setCourses(prevCourses => 
+        prevCourses.map(course => {
+          const enrollmentResult = enrollmentResults.find(result => result.courseId === course.id);
+          return {
+            ...course,
+            enrollments_count: enrollmentResult?.enrollmentCount || 0
+          };
+        })
+      );
+    } catch (error) {
+      console.error('Error fetching enrollment data:', error);
+    }
   };
 
   const handleTogglePublish = async (courseId: string, currentStatus: boolean) => {

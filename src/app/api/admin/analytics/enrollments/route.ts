@@ -22,12 +22,12 @@ async function getAuthenticatedUser(request: NextRequest) {
     // Get user data to check role
     const { data: userData } = await supabase
       .from('users')
-      .select('role')
-      .eq('id', user.id)
+      .select('id, role')
+      .eq('auth_user_id', user.id)
       .single();
 
     return {
-      id: user.id,
+      id: userData?.id || user.id,
       role: userData?.role || 'USER'
     };
   } catch (error) {
@@ -40,9 +40,18 @@ export async function GET(request: NextRequest) {
   try {
     const user = await getAuthenticatedUser(request);
 
-    if (!user || user.role !== 'ADMIN') {
+    console.log('🔍 Analytics API - Auth user:', user);
+
+    if (!user) {
       return NextResponse.json(
-        { message: 'Admin access required' },
+        { message: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
+    if (user.role !== 'ADMIN') {
+      return NextResponse.json(
+        { message: 'Admin access required', userRole: user.role },
         { status: 403 }
       );
     }

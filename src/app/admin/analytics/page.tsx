@@ -34,9 +34,12 @@ import { Modal } from '@/components/ui/modal';
 interface AnalyticsData {
   overview: {
     totalUsers: number;
+    totalStudents: number;
     totalCourses: number;
     totalRevenue: number;
     totalEnrollments: number;
+    completionRate: number;
+    averageQuizScore: number;
     userGrowth: number;
     revenueGrowth: number;
     enrollmentGrowth: number;
@@ -51,6 +54,17 @@ interface AnalyticsData {
     category: string;
     completionRate?: number;
     avgQuizScore?: number;
+  }>;
+  recentEnrollments: Array<{
+    id: string;
+    enrolled_at: string;
+    course: {
+      title: string;
+    };
+    user: {
+      name: string;
+      email: string;
+    };
   }>;
   userActivity: Array<{
     date: string;
@@ -98,59 +112,84 @@ export default function Analytics() {
   const fetchAnalytics = async () => {
     try {
       const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
       
-      // Fetch overview statistics
+      if (!session) {
+        console.error('No session found');
+        return;
+      }
+
+      // Fetch enrollment analytics from API
+      const enrollmentResponse = await fetch('/api/admin/analytics/enrollments', {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!enrollmentResponse.ok) {
+        console.error('Failed to fetch enrollment analytics:', enrollmentResponse.status);
+        return;
+      }
+
+      const enrollmentData = await enrollmentResponse.json();
+      console.log('📊 Enrollment analytics data:', enrollmentData);
+
+      // Fetch additional data from Supabase
       const [
         { count: totalUsers },
         { count: totalCourses },
-        { count: totalEnrollments },
-        { data: courses },
-        { data: enrollments }
+        { data: courses }
       ] = await Promise.all([
         supabase.from('user_profiles').select('*', { count: 'exact', head: true }),
         supabase.from('courses').select('*', { count: 'exact', head: true }),
-        supabase.from('enrollments').select('*', { count: 'exact', head: true }),
         supabase.from('courses').select(`
           id,
           title,
           category,
-          price,
-          enrollments(count)
-        `),
-        supabase.from('enrollments').select('enrolled_at, courses(price)')
+          price
+        `)
       ]);
 
-      // Calculate total revenue
-      const totalRevenue = enrollments?.reduce((sum, enrollment) => {
-        const course = Array.isArray(enrollment.courses) ? enrollment.courses[0] : enrollment.courses;
-        return sum + (course?.price || 0);
-      }, 0) || 0;
+      // Get top courses by enrollment (using recent enrollments data)
+      const courseEnrollmentCounts = enrollmentData.recentEnrollments.reduce((acc: any, enrollment: any) => {
+        const courseTitle = enrollment.course?.title;
+        if (courseTitle) {
+          acc[courseTitle] = (acc[courseTitle] || 0) + 1;
+        }
+        return acc;
+      }, {});
 
-      // Get top courses by enrollment
       const topCourses = courses?.map(course => ({
         id: course.id,
         title: course.title,
         category: course.category,
-        enrollments: course.enrollments?.[0]?.count || 0,
-        revenue: (course.enrollments?.[0]?.count || 0) * (course.price || 0),
+        enrollments: courseEnrollmentCounts[course.title] || 0,
+        revenue: (courseEnrollmentCounts[course.title] || 0) * (course.price || 0),
         rating: 4.5 + Math.random() * 0.5, // Mock rating for now
+        completionRate: enrollmentData.completionRate,
+        avgQuizScore: enrollmentData.averageQuizScore
       }))
       .sort((a, b) => b.enrollments - a.enrollments)
       .slice(0, 5) || [];
 
-      // Generate mock growth data (in a real app, you'd calculate this from historical data)
-      const mockAnalytics: AnalyticsData = {
+      // Create analytics data using real enrollment data
+      const analyticsData: AnalyticsData = {
         overview: {
           totalUsers: totalUsers || 0,
+          totalStudents: enrollmentData.totalStudents,
           totalCourses: totalCourses || 0,
-          totalRevenue: totalRevenue,
-          totalEnrollments: totalEnrollments || 0,
+          totalRevenue: enrollmentData.totalRevenue,
+          totalEnrollments: enrollmentData.totalEnrollments,
+          completionRate: enrollmentData.completionRate,
+          averageQuizScore: enrollmentData.averageQuizScore,
           userGrowth: 12.5, // Mock growth - calculate from historical data
           revenueGrowth: 8.3,
           enrollmentGrowth: 15.2,
           courseGrowth: 4.1
         },
         topCourses: topCourses,
+        recentEnrollments: enrollmentData.recentEnrollments,
         userActivity: [
           { date: '2024-01-01', newUsers: 45, activeUsers: 234, enrollments: 67 },
           { date: '2024-01-02', newUsers: 52, activeUsers: 267, enrollments: 73 },
@@ -171,7 +210,7 @@ export default function Analytics() {
         ]
       };
       
-      setAnalytics(mockAnalytics);
+      setAnalytics(analyticsData);
     } catch (error) {
       console.error('Error fetching analytics:', error);
     } finally {
@@ -296,12 +335,12 @@ export default function Analytics() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         {/* Overview Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Students</p>
-                <p className="text-2xl font-bold text-gray-900">{analytics.overview.totalUsers.toLocaleString()}</p>
+                <p className="text-2xl font-bold text-gray-900">{analytics.overview.totalStudents.toLocaleString()}</p>
                 <p className="text-xs text-green-600 flex items-center mt-1">
                   {analytics.overview.userGrowth >= 0 ? (
                     <ArrowUp className="h-3 w-3 mr-1" />
@@ -322,21 +361,21 @@ export default function Analytics() {
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Active Courses</p>
-                <p className="text-2xl font-bold text-gray-900">{analytics.overview.totalCourses}</p>
+                <p className="text-sm font-medium text-gray-600">Total Enrollments</p>
+                <p className="text-2xl font-bold text-gray-900">{analytics.overview.totalEnrollments.toLocaleString()}</p>
                 <p className="text-xs text-green-600 flex items-center mt-1">
-                  {analytics.overview.courseGrowth >= 0 ? (
+                  {analytics.overview.enrollmentGrowth >= 0 ? (
                     <ArrowUp className="h-3 w-3 mr-1" />
                   ) : (
                     <ArrowDown className="h-3 w-3 mr-1" />
                   )}
-                  <span className={analytics.overview.courseGrowth >= 0 ? 'text-green-600' : 'text-red-600'}>
-                    {formatPercentage(analytics.overview.courseGrowth)}
+                  <span className={analytics.overview.enrollmentGrowth >= 0 ? 'text-green-600' : 'text-red-600'}>
+                    {formatPercentage(analytics.overview.enrollmentGrowth)}
                   </span>
                 </p>
               </div>
-              <div className="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <BookOpen className="h-6 w-6 text-green-600" />
+              <div className="h-12 w-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                <BookOpen className="h-6 w-6 text-yellow-600" />
               </div>
             </div>
           </div>
@@ -366,21 +405,53 @@ export default function Analytics() {
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Enrollments</p>
-                <p className="text-2xl font-bold text-gray-900">{analytics.overview.totalEnrollments.toLocaleString()}</p>
+                <p className="text-sm font-medium text-gray-600">Completion Rate</p>
+                <p className="text-2xl font-bold text-gray-900">{analytics.overview.completionRate}%</p>
+                <p className="text-xs text-blue-600 flex items-center mt-1">
+                  <Target className="h-3 w-3 mr-1" />
+                  <span>Course completion</span>
+                </p>
+              </div>
+              <div className="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center">
+                <Target className="h-6 w-6 text-green-600" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Avg Quiz Score</p>
+                <p className="text-2xl font-bold text-gray-900">{analytics.overview.averageQuizScore}%</p>
+                <p className="text-xs text-indigo-600 flex items-center mt-1">
+                  <Star className="h-3 w-3 mr-1" />
+                  <span>Quiz performance</span>
+                </p>
+              </div>
+              <div className="h-12 w-12 bg-indigo-100 rounded-lg flex items-center justify-center">
+                <Star className="h-6 w-6 text-indigo-600" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Active Courses</p>
+                <p className="text-2xl font-bold text-gray-900">{analytics.overview.totalCourses}</p>
                 <p className="text-xs text-green-600 flex items-center mt-1">
-                  {analytics.overview.enrollmentGrowth >= 0 ? (
+                  {analytics.overview.courseGrowth >= 0 ? (
                     <ArrowUp className="h-3 w-3 mr-1" />
                   ) : (
                     <ArrowDown className="h-3 w-3 mr-1" />
                   )}
-                  <span className={analytics.overview.enrollmentGrowth >= 0 ? 'text-green-600' : 'text-red-600'}>
-                    {formatPercentage(analytics.overview.enrollmentGrowth)}
+                  <span className={analytics.overview.courseGrowth >= 0 ? 'text-green-600' : 'text-red-600'}>
+                    {formatPercentage(analytics.overview.courseGrowth)}
                   </span>
                 </p>
               </div>
-              <div className="h-12 w-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                <BookOpen className="h-6 w-6 text-yellow-600" />
+              <div className="h-12 w-12 bg-teal-100 rounded-lg flex items-center justify-center">
+                <BookOpen className="h-6 w-6 text-teal-600" />
               </div>
             </div>
           </div>
@@ -500,6 +571,57 @@ export default function Analytics() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Recent Enrollments */}
+        <div className="bg-white rounded-lg shadow-sm border p-6 mt-8">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">Recent Enrollments</h3>
+            <Button variant="outline" size="sm">
+              <Download className="h-4 w-4 mr-2" />
+              Export
+            </Button>
+          </div>
+          <div className="space-y-4">
+            {analytics.recentEnrollments && analytics.recentEnrollments.length > 0 ? (
+              analytics.recentEnrollments.map((enrollment, index) => (
+                <div key={enrollment.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                      <span className="text-sm font-bold text-green-600">#{index + 1}</span>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900">{enrollment.course?.title || 'Course Title'}</h4>
+                      <div className="flex items-center space-x-4 text-sm text-gray-500">
+                        <span className="flex items-center space-x-1">
+                          <Users className="h-3 w-3" />
+                          <span>{enrollment.user?.name || 'Unknown User'}</span>
+                        </span>
+                        <span className="text-gray-400">•</span>
+                        <span>{enrollment.user?.email || 'No email'}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-medium text-gray-900">
+                      {new Date(enrollment.enrolled_at).toLocaleDateString()}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      {new Date(enrollment.enrolled_at).toLocaleTimeString()}
+                    </p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-8">
+                <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <BookOpen className="w-8 h-8 text-gray-400" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">No recent enrollments</h3>
+                <p className="text-gray-600">No new enrollments in the selected time period.</p>
+              </div>
+            )}
           </div>
         </div>
 

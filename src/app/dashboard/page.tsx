@@ -297,25 +297,25 @@ function DashboardContent() {
 
       console.log('🔄 fetchDashboardData - Starting data fetch for user:', session.user.id);
 
-      // Fetch enrollments
+      // Fetch enrollments using the API endpoint
       let enrollmentsData = [];
       try {
-        const { data, error } = await supabase
-          .from('enrollments')
-          .select(`
-            *,
-            course:courses(*)
-          `)
-          .eq('user_id', session.user.id)
-          .order('enrolled_at', { ascending: false });
-        
-        if (error) {
-          console.error('Error fetching enrollments:', error);
+        const response = await fetch(`/api/enrollments?user_id=${session.user.id}&page=1&per_page=50`, {
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.ok) {
+          const enrollmentsResponse = await response.json();
+          enrollmentsData = enrollmentsResponse.enrollments || [];
+          console.log('🔄 fetchDashboardData - Enrollments fetched successfully:', enrollmentsData.length);
         } else {
-          enrollmentsData = data || [];
+          console.error('Error fetching enrollments from API:', response.status, response.statusText);
         }
       } catch (error) {
-        console.error('Exception fetching enrollments:', error);
+        console.error('Exception fetching enrollments from API:', error);
       }
 
       // Fetch quiz attempts
@@ -378,10 +378,10 @@ function DashboardContent() {
             console.log('🔄 fetchDashboardData - Data fetch completed successfully');
       
       // Calculate stats
-      const completedCourses = enrollmentsData?.filter(e => e.progress_percentage === 100).length || 0;
-      const totalHours = enrollmentsData?.reduce((acc, e) => acc + (e.course?.duration || 0), 0) || 0;
+      const completedCourses = enrollmentsData?.filter((e: any) => e.progress_percentage === 100).length || 0;
+      const totalHours = enrollmentsData?.reduce((acc: number, e: any) => acc + (e.course?.duration || 0), 0) || 0;
       const avgScore = quizData?.length ? 
-        Math.round(quizData.reduce((acc, q) => acc + q.percentage, 0) / quizData.length) : 0;
+        Math.round(quizData.reduce((acc: number, q: any) => acc + q.percentage, 0) / quizData.length) : 0;
       
       console.log('🔄 fetchDashboardData - Stats calculated:', { 
         totalCourses: enrollmentsData?.length || 0, 
@@ -850,6 +850,126 @@ function DashboardContent() {
             </div>
           </div>
 
+          {/* My Enrollments */}
+          <div className="mb-12">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">My Enrollments</h2>
+                <p className="text-gray-600 mt-1">Your current course enrollments and progress</p>
+              </div>
+              <Button 
+                onClick={() => router.push('/courses')}
+                className="btn-modern bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white px-6 py-2 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+              >
+                Browse Courses
+              </Button>
+            </div>
+
+            {enrollments.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {enrollments.map((enrollment: any, index: number) => (
+                  <div key={enrollment.id || index} className="card-modern p-6 rounded-2xl hover:shadow-lg transition-all duration-200 group cursor-pointer" 
+                       onClick={() => router.push(`/courses/${createCourseSlug(enrollment.course?.title || '')}`)}>
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-3 mb-3">
+                          {enrollment.course?.image ? (
+                            <div className="w-12 h-12 rounded-xl overflow-hidden bg-gray-100">
+                              <Image
+                                src={enrollment.course.image}
+                                alt={enrollment.course.title}
+                                width={48}
+                                height={48}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          ) : (
+                            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center">
+                              <BookOpen className="w-6 h-6 text-white" />
+                            </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold text-gray-900 text-sm leading-tight">
+                              {enrollment.course?.title || 'Course Title'}
+                            </h3>
+                            <div className="flex items-center space-x-2 mt-1">
+                              <Badge className={`text-xs px-2 py-1 ${getLevelBadgeStyle(enrollment.course?.level)}`}>
+                                {enrollment.course?.level || 'Beginner'}
+                              </Badge>
+                              <Badge className="text-xs px-2 py-1 bg-gray-100 text-gray-700 border-gray-200">
+                                {enrollment.course?.category || 'General'}
+                              </Badge>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-3">
+                          {/* Progress Bar */}
+                          <div>
+                            <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
+                              <span>Progress</span>
+                              <span>{enrollment.progress_percentage || 0}%</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                              <div 
+                                className="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full transition-all duration-500 ease-out"
+                                style={{ width: `${enrollment.progress_percentage || 0}%` }}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Status and Enrollment Info */}
+                          <div className="flex items-center justify-between text-xs">
+                            <div className="flex items-center space-x-2">
+                              <div className={`w-2 h-2 rounded-full ${
+                                enrollment.status === 'ACTIVE' ? 'bg-green-500' : 
+                                enrollment.status === 'COMPLETED' ? 'bg-blue-500' : 'bg-gray-400'
+                              }`} />
+                              <span className="text-gray-600 capitalize">
+                                {enrollment.status?.toLowerCase() || 'Active'}
+                              </span>
+                            </div>
+                            <span className="text-gray-500">
+                              {formatRelativeTime(enrollment.enrolled_at || '')}
+                            </span>
+                          </div>
+
+                          {/* Course Details */}
+                          <div className="flex items-center justify-between text-xs text-gray-500">
+                            <span>{enrollment.course?.duration || 0} weeks</span>
+                            <span>${enrollment.course?.price || 0}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Action Button */}
+                    <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                      <span className="text-sm text-gray-600">
+                        {enrollment.progress_percentage === 100 ? 'Completed' : 'Continue Learning'}
+                      </span>
+                      <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 transition-all duration-200" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <BookOpen className="w-8 h-8 text-gray-400" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">No enrollments yet</h3>
+                <p className="text-gray-600 mb-6">Start your learning journey by enrolling in your first course!</p>
+                <Button 
+                  onClick={() => router.push('/courses')}
+                  className="btn-modern bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white px-6 py-2 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                >
+                  Browse Courses
+                </Button>
+              </div>
+            )}
+          </div>
+
           {/* Enhanced Recent Activity & Goals */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Recent Activity */}
@@ -1009,6 +1129,8 @@ function DashboardContent() {
               ))}
             </div>
           </div>
+
+
         </div>
       </div>
     </PageLayout>

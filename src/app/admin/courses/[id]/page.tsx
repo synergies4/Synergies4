@@ -40,7 +40,8 @@ import {
   FileText,
   Link as LinkIcon,
   File,
-  X
+  X,
+  Users
 } from 'lucide-react';
 
 interface Course {
@@ -97,6 +98,53 @@ interface LessonFormData {
   duration?: string;
 }
 
+interface Enrollment {
+  id: string;
+  user_id: string;
+  status: string;
+  enrolled_at: string;
+  progress_percentage: number;
+  completed_at?: string;
+  certificate_issued: boolean;
+  payment_status: string;
+  payment_amount: number;
+  course: {
+    id: string;
+    title: string;
+    description: string;
+    image?: string;
+    category: string;
+    level: string;
+    duration: string;
+    price: number;
+  };
+  user: {
+    id: string;
+    name: string;
+    role: string;
+    email: string;
+    created_at: number;
+  };
+}
+
+interface EnrollmentsResponse {
+  enrollments: Enrollment[];
+  pagination: {
+    has_next: boolean;
+    has_prev: boolean;
+    count_total: number;
+    count_queried: number;
+    count_page: number;
+    page: number;
+    per_page: number;
+    total_pages: number;
+  };
+  filters: {
+    course_id: string | null;
+    user_id: string | null;
+  };
+}
+
 export default function EditCourse({ params }: { params: Promise<{ id: string }> }) {
   const { user, userProfile, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -104,7 +152,7 @@ export default function EditCourse({ params }: { params: Promise<{ id: string }>
   const [saving, setSaving] = useState(false);
   const [course, setCourse] = useState<Course | null>(null);
   const [modules, setModules] = useState<Module[]>([]);
-  const [activeTab, setActiveTab] = useState<'course' | 'modules'>('course');
+  const [activeTab, setActiveTab] = useState<'course' | 'modules' | 'enrollments'>('course');
   
   // Modal states
   const [showModuleModal, setShowModuleModal] = useState(false);
@@ -112,6 +160,11 @@ export default function EditCourse({ params }: { params: Promise<{ id: string }>
   const [editingModule, setEditingModule] = useState<Module | null>(null);
   const [editingLesson, setEditingLesson] = useState<{ lesson: Lesson; moduleId: string } | null>(null);
   const [selectedModuleForLesson, setSelectedModuleForLesson] = useState<string | null>(null);
+  
+  // Enrollment states
+  const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
+  const [enrollmentsLoading, setEnrollmentsLoading] = useState(false);
+  const [enrollmentsPagination, setEnrollmentsPagination] = useState<EnrollmentsResponse['pagination'] | null>(null);
   
   // Form states
   const [moduleForm, setModuleForm] = useState<ModuleFormData>({
@@ -140,6 +193,7 @@ export default function EditCourse({ params }: { params: Promise<{ id: string }>
 
     fetchCourse();
     fetchModules();
+    fetchEnrollments();
   }, [user, userProfile, authLoading, router, id]);
 
   const fetchCourse = async () => {
@@ -169,6 +223,24 @@ export default function EditCourse({ params }: { params: Promise<{ id: string }>
       }
     } catch (error) {
       console.error('Error fetching modules:', error);
+    }
+  };
+
+  const fetchEnrollments = async () => {
+    try {
+      setEnrollmentsLoading(true);
+      const response = await fetch(`/api/enrollments?course_id=${id}&page=1&per_page=50`);
+      if (response.ok) {
+        const enrollmentsData: EnrollmentsResponse = await response.json();
+        setEnrollments(enrollmentsData.enrollments);
+        setEnrollmentsPagination(enrollmentsData.pagination);
+      } else {
+        console.error('Failed to fetch enrollments');
+      }
+    } catch (error) {
+      console.error('Error fetching enrollments:', error);
+    } finally {
+      setEnrollmentsLoading(false);
     }
   };
 
@@ -456,6 +528,14 @@ export default function EditCourse({ params }: { params: Promise<{ id: string }>
     return 'text-gray-600 bg-gray-50';
   };
 
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0
+    }).format(amount);
+  };
+
   if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -566,6 +646,16 @@ export default function EditCourse({ params }: { params: Promise<{ id: string }>
               }`}
             >
               Modules ({modules.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('enrollments')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'enrollments'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Enrollments ({enrollmentsPagination?.count_total || 0})
             </button>
           </nav>
         </div>
@@ -831,6 +921,153 @@ export default function EditCourse({ params }: { params: Promise<{ id: string }>
                         ) : (
                           <p className="text-gray-500 text-sm">No lessons in this module yet.</p>
                         )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'enrollments' && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Course Enrollments</h2>
+                <p className="text-gray-600">
+                  View and manage student enrollments for this course
+                  {enrollmentsPagination && (
+                    <span className="ml-2 text-sm text-gray-500">
+                      ({enrollmentsPagination.count_total} total enrollments)
+                    </span>
+                  )}
+                </p>
+              </div>
+            </div>
+
+            {enrollmentsLoading ? (
+              <Card>
+                <CardContent className="text-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
+                  <p className="text-gray-600">Loading enrollments...</p>
+                </CardContent>
+              </Card>
+            ) : enrollments.length === 0 ? (
+              <Card>
+                <CardContent className="text-center py-12">
+                  <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No enrollments yet</h3>
+                  <p className="text-gray-600">No students have enrolled in this course yet.</p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-4">
+                {enrollments.map((enrollment) => (
+                  <Card key={enrollment.id}>
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
+                            <span className="text-white font-semibold text-sm">
+                              {enrollment.user.name.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-gray-900">{enrollment.user.name}</h3>
+                            <p className="text-sm text-gray-600">{enrollment.user.email}</p>
+                            <div className="flex items-center space-x-4 mt-1">
+                              <span className="text-xs text-gray-500">
+                                Enrolled: {new Date(enrollment.enrolled_at).toLocaleDateString()}
+                              </span>
+                              <span className="text-xs text-gray-500">
+                                Role: {enrollment.user.role}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center space-x-6">
+                          <div className="text-center">
+                            <div className="text-lg font-semibold text-gray-900">
+                              {enrollment.progress_percentage}%
+                            </div>
+                            <div className="text-xs text-gray-500">Progress</div>
+                          </div>
+                          
+                          <div className="text-center">
+                            <div className="text-lg font-semibold text-gray-900">
+                              {formatCurrency(enrollment.payment_amount)}
+                            </div>
+                            <div className="text-xs text-gray-500">Paid</div>
+                          </div>
+                          
+                          <div className="flex flex-col items-end space-y-2">
+                            <div className="flex items-center space-x-2">
+                              <div className={`w-2 h-2 rounded-full ${
+                                enrollment.status === 'ACTIVE' ? 'bg-green-500' : 
+                                enrollment.status === 'COMPLETED' ? 'bg-blue-500' : 'bg-gray-400'
+                              }`} />
+                              <span className="text-sm font-medium capitalize">
+                                {enrollment.status.toLowerCase()}
+                              </span>
+                            </div>
+                            
+                            <div className="flex items-center space-x-2">
+                              <div className={`w-2 h-2 rounded-full ${
+                                enrollment.payment_status === 'PAID' ? 'bg-green-500' : 
+                                enrollment.payment_status === 'PENDING' ? 'bg-yellow-500' : 'bg-red-500'
+                              }`} />
+                              <span className="text-sm font-medium capitalize">
+                                {enrollment.payment_status.toLowerCase()}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Progress Bar */}
+                      <div className="mt-4">
+                        <div className="flex items-center justify-between text-sm text-gray-600 mb-1">
+                          <span>Course Progress</span>
+                          <span>{enrollment.progress_percentage}%</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div 
+                            className="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full transition-all duration-500"
+                            style={{ width: `${enrollment.progress_percentage}%` }}
+                          />
+                        </div>
+                      </div>
+                      
+                      {/* Additional Details */}
+                      <div className="mt-4 pt-4 border-t border-gray-100">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                          <div>
+                            <span className="text-gray-500">Certificate:</span>
+                            <span className="ml-2 font-medium">
+                              {enrollment.certificate_issued ? 'Issued' : 'Not issued'}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-gray-500">Completed:</span>
+                            <span className="ml-2 font-medium">
+                              {enrollment.completed_at ? new Date(enrollment.completed_at).toLocaleDateString() : 'Not completed'}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-gray-500">User ID:</span>
+                            <span className="ml-2 font-medium text-xs font-mono">
+                              {enrollment.user_id}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-gray-500">Enrollment ID:</span>
+                            <span className="ml-2 font-medium text-xs font-mono">
+                              {enrollment.id}
+                            </span>
+                          </div>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>

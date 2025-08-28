@@ -318,6 +318,24 @@ export async function POST(request: NextRequest) {
       tags = []
     } = data;
 
+    // Clean and validate the image URL
+    let cleanedImage = image;
+    if (image && typeof image === 'string') {
+      cleanedImage = image.trim();
+      console.log('Original image URL:', image);
+      console.log('Cleaned image URL:', cleanedImage);
+      
+      // Validate the URL format
+      try {
+        new URL(cleanedImage);
+        console.log('✅ Valid image URL format');
+      } catch (urlError) {
+        console.warn('⚠️ Invalid image URL format:', cleanedImage);
+        // Set to null if invalid URL
+        cleanedImage = null;
+      }
+    }
+
     // Get the user's ID from the authenticated user to use as instructor_id
     const instructor_id = user.id;
 
@@ -337,7 +355,7 @@ export async function POST(request: NextRequest) {
         title,
         description,
         short_desc,
-        image,
+        image: cleanedImage,
         price: parseFloat(price) || 0,
         category,
         level,
