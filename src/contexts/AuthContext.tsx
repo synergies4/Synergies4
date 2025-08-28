@@ -104,6 +104,10 @@ async function fetchUserData(supabase: any, user: User): Promise<UserProfile | n
       clearTimeout(timeoutId);
       return null;
     }
+  } catch (error) {
+    console.error('Error in fetchUserData:', error);
+    return null;
+  }
 }
 
 async function getOrCreateUserProfile(supabase: any, user: User): Promise<UserProfile | null> {
@@ -254,7 +258,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               setTimeout(() => reject(new Error('Profile fetch timeout')), 5000)
             );
             
-            const profile = await Promise.race([profilePromise, timeoutPromise]);
+            const profile = await Promise.race([profilePromise, timeoutPromise]) as UserProfile | null;
             console.log('🔄 AuthContext - Final user profile:', profile);
             setUserProfile(profile);
           } catch (profileError) {
@@ -307,7 +311,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               setTimeout(() => reject(new Error('Profile fetch timeout')), 5000)
             );
             
-            const profile = await Promise.race([profilePromise, timeoutPromise]);
+            const profile = await Promise.race([profilePromise, timeoutPromise]) as UserProfile | null;
             setUserProfile(profile);
           } catch (profileError) {
             console.error('🔄 AuthContext - Profile fetch failed:', profileError);
