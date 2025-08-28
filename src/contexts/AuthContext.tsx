@@ -72,42 +72,38 @@ async function fetchUserData(supabase: any, user: User): Promise<UserProfile | n
       
       clearTimeout(timeoutId);
 
-    if (!response.ok) {
-      console.warn('Failed to fetch user data:', response.status, response.statusText);
+      if (!response.ok) {
+        console.warn('Failed to fetch user data:', response.status, response.statusText);
+        return null;
+      }
+
+      const data = await response.json();
+      console.log('User data from API:', data);
+
+      if (data.success && data.user) {
+        const userData = data.user;
+        console.log('✅ API user data received:', userData);
+        console.log('✅ Using name from API:', userData.name);
+        return {
+          id: userData.id,
+          user_id: userData.auth_user_id,
+          name: userData.name,
+          role: userData.role,
+          created_at: userData.created_at,
+          updated_at: userData.updated_at,
+          is_admin: userData.is_admin,
+          is_instructor: userData.is_instructor,
+          can_access_admin: userData.can_access_admin,
+        };
+      }
+
+      console.warn('No user data in response');
+      return null;
+    } catch (fetchError) {
+      console.error('Error fetching user data (timeout or network error):', fetchError);
+      clearTimeout(timeoutId);
       return null;
     }
-
-    const data = await response.json();
-  } catch (fetchError) {
-    console.error('Error fetching user data (timeout or network error):', fetchError);
-    clearTimeout(timeoutId);
-    return null;
-  }
-    console.log('User data from API:', data);
-
-    if (data.success && data.user) {
-      const userData = data.user;
-      console.log('✅ API user data received:', userData);
-      console.log('✅ Using name from API:', userData.name);
-      return {
-        id: userData.id,
-        user_id: userData.auth_user_id,
-        name: userData.name,
-        role: userData.role,
-        created_at: userData.created_at,
-        updated_at: userData.updated_at,
-        is_admin: userData.is_admin,
-        is_instructor: userData.is_instructor,
-        can_access_admin: userData.can_access_admin,
-      };
-    }
-
-    console.warn('No user data in response');
-    return null;
-  } catch (error) {
-    console.error('Error fetching user data:', error);
-    return null;
-  }
 }
 
 async function getOrCreateUserProfile(supabase: any, user: User): Promise<UserProfile | null> {
