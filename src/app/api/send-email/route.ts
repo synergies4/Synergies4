@@ -126,7 +126,7 @@ const getEmailTemplate = (type: 'course_signup' | 'meeting_summary', data: any) 
           </div>
           
           <div class="footer">
-            <p>© 2024 Synergies4. All rights reserved.</p>
+            <p>© 2025 Synergies4. All rights reserved.</p>
             <p>AI-powered professional development for the future of work.</p>
           </div>
         </div>
@@ -206,7 +206,7 @@ const getEmailTemplate = (type: 'course_signup' | 'meeting_summary', data: any) 
           </div>
           
           <div class="footer">
-            <p>© 2024 Synergies4. All rights reserved.</p>
+            <p>© 2025 Synergies4. All rights reserved.</p>
             <p>Transforming meetings with AI-powered insights.</p>
           </div>
         </div>

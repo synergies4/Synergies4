@@ -40,10 +40,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!process.env.NEXT_PUBLIC_URL) {
-      console.error('NEXT_PUBLIC_URL environment variable is not set');
+    // Validate and set base URL
+    const baseUrl = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000';
+    
+    // Validate URL format
+    try {
+      new URL(baseUrl);
+    } catch (urlError) {
+      console.error('Invalid NEXT_PUBLIC_URL:', baseUrl);
       return NextResponse.json(
-        { message: 'Application configuration error' },
+        { message: 'Invalid application URL configuration' },
         { status: 500 }
       );
     }
@@ -64,6 +70,32 @@ export async function POST(request: NextRequest) {
         { message: 'Course ID is required' },
         { status: 400 }
       );
+    }
+
+    // Validate custom URLs if provided
+    let validatedSuccessUrl = successUrl;
+    let validatedCancelUrl = cancelUrl;
+
+    if (successUrl) {
+      try {
+        new URL(successUrl);
+      } catch (urlError) {
+        return NextResponse.json(
+          { message: 'Invalid success URL provided' },
+          { status: 400 }
+        );
+      }
+    }
+
+    if (cancelUrl) {
+      try {
+        new URL(cancelUrl);
+      } catch (urlError) {
+        return NextResponse.json(
+          { message: 'Invalid cancel URL provided' },
+          { status: 400 }
+        );
+      }
     }
 
     const supabase = await createClient();
@@ -105,6 +137,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate course image URL if provided
+    let imageUrls: string[] = [];
+    if (course.image) {
+      try {
+        new URL(course.image);
+        imageUrls = [course.image];
+      } catch (imageUrlError) {
+        console.warn('Invalid course image URL:', course.image);
+        // Continue without image rather than failing
+      }
+    }
+
     // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
       customer_email: user.email,
@@ -116,7 +160,7 @@ export async function POST(request: NextRequest) {
             product_data: {
               name: course.title,
               description: course.description || '',
-              images: course.image ? [course.image] : [],
+              images: imageUrls,
             },
             unit_amount: Math.round(course.price * 100), // Convert to cents
           },
@@ -124,8 +168,8 @@ export async function POST(request: NextRequest) {
         },
       ],
       mode: 'payment',
-      success_url: successUrl || `${process.env.NEXT_PUBLIC_URL}/courses/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: cancelUrl || `${process.env.NEXT_PUBLIC_URL}/courses/${course.id}`,
+      success_url: validatedSuccessUrl || `${baseUrl}/courses/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: validatedCancelUrl || `${baseUrl}/courses/${course.id}`,
       metadata: {
         courseId: course.id,
         userId: user.id,

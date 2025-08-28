@@ -252,7 +252,7 @@ export function generateAssessmentPDF(data: AssessmentData): void {
     pdf.setTextColor(100, 100, 100);
     pdf.setFontSize(10);
     pdf.setFont('helvetica', 'normal');
-    pdf.text('© 2024 Synergies4. All rights reserved.', margin + 10, yPosition + 12);
+    pdf.text('© 2025 Synergies4. All rights reserved.', margin + 10, yPosition + 12);
     pdf.text('For questions about this assessment, contact us at synergies4ai.com', margin + 10, yPosition + 22);
 
     // Generate filename
