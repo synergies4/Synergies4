@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate and set base URL
-    const baseUrl = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000';
+    const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://synergies4.vercel.app';
     
     // Validate URL format
     try {
@@ -73,8 +73,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate custom URLs if provided
-    let validatedSuccessUrl = successUrl;
-    let validatedCancelUrl = cancelUrl;
 
     if (successUrl) {
       try {
@@ -140,16 +138,52 @@ export async function POST(request: NextRequest) {
     // Validate course image URL if provided
     let imageUrls: string[] = [];
     if (course.image) {
-      try {
-        new URL(course.image);
-        imageUrls = [course.image];
-      } catch (imageUrlError) {
-        console.warn('Invalid course image URL:', course.image);
-        // Continue without image rather than failing
+      console.log('Original course image URL:', course.image);
+      
+      // Check if the image URL is a valid HTTP/HTTPS URL
+      if (course.image && typeof course.image === 'string') {
+        // Trim whitespace from the URL
+        const trimmedImageUrl = course.image.trim();
+        console.log('Trimmed image URL:', trimmedImageUrl);
+        
+        try {
+          const url = new URL(trimmedImageUrl);
+          // Ensure it's HTTP or HTTPS
+          if (url.protocol === 'http:' || url.protocol === 'https:') {
+            imageUrls = [trimmedImageUrl];
+            console.log('Valid image URL, using:', trimmedImageUrl);
+          } else {
+            console.warn('Invalid protocol for image URL:', trimmedImageUrl);
+            imageUrls = [];
+          }
+        } catch (imageUrlError) {
+          console.warn('Invalid course image URL:', trimmedImageUrl);
+          console.warn('Image URL error:', imageUrlError);
+          imageUrls = [];
+        }
+      } else {
+        console.warn('Course image is not a valid string:', course.image);
+        imageUrls = [];
       }
+    } else {
+      console.log('No course image provided');
     }
+    console.log('Final imageUrls array:', imageUrls);
+    console.log('baseUrl', baseUrl);
 
     // Create Stripe checkout session
+    const productData: any = {
+      name: course.title,
+      description: course.description || '',
+    };
+    
+    // Only add images if we have valid URLs
+    if (imageUrls.length > 0) {
+      productData.images = imageUrls;
+    }
+    
+    console.log('Product data for Stripe:', productData);
+    
     const session = await stripe.checkout.sessions.create({
       customer_email: user.email,
       payment_method_types: ['card'],
@@ -157,19 +191,15 @@ export async function POST(request: NextRequest) {
         {
           price_data: {
             currency: 'usd',
-            product_data: {
-              name: course.title,
-              description: course.description || '',
-              images: imageUrls,
-            },
+            product_data: productData,
             unit_amount: Math.round(course.price * 100), // Convert to cents
           },
           quantity: 1,
         },
       ],
       mode: 'payment',
-      success_url: validatedSuccessUrl || `${baseUrl}/courses/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: validatedCancelUrl || `${baseUrl}/courses/${course.id}`,
+      success_url: successUrl || `${baseUrl}/courses/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: cancelUrl || `${baseUrl}/courses/${course.id}`,
       metadata: {
         courseId: course.id,
         userId: user.id,

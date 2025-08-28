@@ -3,8 +3,15 @@
 This document provides cURL examples for all API routes in the Synergies4 application.
 
 ## Base URL
+
+### Development
 ```
 http://localhost:3000/api
+```
+
+### Production
+```
+https://synergies4.vercel.app/api
 ```
 
 ## Authentication
@@ -18,7 +25,17 @@ Most routes require authentication via Bearer token. Include the token in the Au
 
 ### User Signup
 ```bash
+# Development
 curl -X POST http://localhost:3000/api/auth/signup \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com",
+    "password": "password123",
+    "name": "John Doe"
+  }'
+
+# Production
+curl -X POST https://synergies4.vercel.app/api/auth/signup \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
@@ -313,6 +330,7 @@ curl -X GET http://localhost:3000/api/quiz-attempts \
 
 ### Create Checkout Session
 ```bash
+# Development
 curl -X POST http://localhost:3000/api/stripe/create-checkout-session \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
@@ -320,6 +338,16 @@ curl -X POST http://localhost:3000/api/stripe/create-checkout-session \
     "courseId": "course-id-123",
     "successUrl": "http://localhost:3000/success",
     "cancelUrl": "http://localhost:3000/cancel"
+  }'
+
+# Production
+curl -X POST https://synergies4.vercel.app/api/stripe/create-checkout-session \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -d '{
+    "courseId": "course-id-123",
+    "successUrl": "https://synergies4.vercel.app/success",
+    "cancelUrl": "https://synergies4.vercel.app/cancel"
   }'
 ```
 
@@ -911,7 +939,7 @@ NEXT_PUBLIC_URL=http://localhost:3000
 
 **For Production:**
 ```bash
-NEXT_PUBLIC_URL=https://yourdomain.com
+NEXT_PUBLIC_URL=https://synergies4.vercel.app
 ```
 
 **Invalid Course Image URLs:**
@@ -937,7 +965,8 @@ Make sure these are set in your `.env.local` file:
 ```bash
 # Required for Stripe
 STRIPE_SECRET_KEY=sk_test_...
-NEXT_PUBLIC_URL=http://localhost:3000
+NEXT_PUBLIC_URL=https://synergies4.vercel.app
+```
 
 # Required for OpenAI
 OPENAI_API_KEY=sk-...

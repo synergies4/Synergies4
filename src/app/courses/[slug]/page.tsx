@@ -195,8 +195,8 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
           },
           body: JSON.stringify({
             courseId: course.id,
-            successUrl: `${window.location.origin}/courses/success?course_id=${course.id}`,
-            cancelUrl: window.location.href
+            successUrl: `${process.env.NEXT_PUBLIC_URL || 'https://synergies4.vercel.app'}/courses/success?course_id=${course.id}`,
+            cancelUrl: `${process.env.NEXT_PUBLIC_URL || 'https://synergies4.vercel.app'}/courses/${slug}`
           }),
         });
 
