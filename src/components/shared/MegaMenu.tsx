@@ -60,18 +60,7 @@ const menuCategories: MenuCategory[] = [
         href: '/courses',
         icon: BookOpen
       },
-      {
-        title: 'My Learning',
-        description: 'Continue your enrolled courses',
-        href: '/dashboard',
-        icon: GraduationCap
-      },
-      {
-        title: 'Certificates',
-        description: 'View and download your certificates',
-        href: '/certificates',
-        icon: Trophy
-      }
+      
     ]
   },
   {
