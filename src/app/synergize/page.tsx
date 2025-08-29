@@ -4583,6 +4583,19 @@ export default function SynergizeAgile() {
     dismissOnboarding,
     getAIContext
   } = usePersonalization();
+  // Enable direct deep-linking to full chat via URL params
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const view = params.get('view');
+    const modeParam = params.get('mode');
+    if (view === 'chat' && !isFullChatView) {
+      setIsFullChatView(true);
+    }
+    if (modeParam && ['chat','presentation','scenario','advisor'].includes(modeParam)) {
+      setSelectedMode(modeParam);
+    }
+  }, []);
 
 
 
@@ -6739,68 +6752,7 @@ Format as a realistic conversation with clear speaker labels and include decisio
         }}
       />
 
-      {/* Record Meeting Section */}
-      <section className="py-16 bg-gradient-to-br from-red-50 via-orange-50 to-amber-50 border-b">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-flex items-center px-6 py-3 bg-red-100 rounded-full border border-red-200 mb-8">
-              <Mic className="w-5 h-5 text-red-600 mr-3" />
-              <span className="text-red-700 font-medium">Meeting Recording</span>
-            </div>
-            
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-              Record & Transform Your Meetings
-            </h2>
-            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
-              Capture live meetings, generate AI transcripts, and instantly create training content from your discussions
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-              <Button 
-                size="lg" 
-                className="w-full sm:w-auto text-lg px-8 py-6 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-semibold shadow-2xl hover:shadow-red-500/25 transition-all hover:scale-105 border-0 group"
-                asChild
-              >
-                <Link href="/record-meeting">
-                  <Mic className="w-6 h-6 mr-3" />
-                  Start Recording Session
-                </Link>
-              </Button>
-              
-              <div className="text-gray-500 text-sm">
-                Professional meeting capture & AI analysis
-              </div>
-            </div>
-            
-            {/* Features */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-orange-200/50 shadow-lg">
-                <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <Mic className="w-6 h-6 text-red-600" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Live Recording</h3>
-                <p className="text-gray-600 text-sm">Capture meetings up to 2 hours with professional-grade audio quality and real-time processing.</p>
-              </div>
-              
-              <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-orange-200/50 shadow-lg">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <FileText className="w-6 h-6 text-blue-600" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">AI Transcription</h3>
-                <p className="text-gray-600 text-sm">Generate accurate transcripts with speaker identification and automatic formatting.</p>
-              </div>
-              
-              <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-orange-200/50 shadow-lg">
-                <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <BookOpen className="w-6 h-6 text-emerald-600" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Course Creation</h3>
-                <p className="text-gray-600 text-sm">Transform meeting insights into structured training content and learning modules.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Meeting Recording feature temporarily disabled */}
 
       {/* Features Section */}
       <section id="features" className="py-20 bg-gradient-to-br from-slate-50 via-gray-50 to-teal-50">

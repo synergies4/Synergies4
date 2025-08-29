@@ -91,7 +91,7 @@ const menuCategories: MenuCategory[] = [
       {
         title: 'AI Chat Assistant',
         description: '24/7 AI coaching for daily challenges and questions',
-        href: '/pocket-coach',
+        href: '/synergize?view=chat',
         icon: MessageSquare,
         isNew: true
       }

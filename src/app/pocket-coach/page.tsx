@@ -1,12 +1,15 @@
 'use client';
 
-import PageLayout from '@/components/shared/PageLayout';
-import PocketCoach from '@/components/PocketCoach';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function PocketCoachPage() {
-  return (
-    <PageLayout>
-      <PocketCoach />
-    </PageLayout>
-  );
-} 
+  const router = useRouter();
+
+  useEffect(() => {
+    // Temporary redirect while Pocket Coach is shelved
+    router.replace('/synergize?view=chat');
+  }, [router]);
+
+  return null;
+}
