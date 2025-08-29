@@ -123,7 +123,7 @@ export default function HomePage() {
               className="w-full sm:w-auto text-base sm:text-lg px-8 sm:px-10 py-3 sm:py-4 bg-gradient-to-r from-teal-600 to-emerald-600 text-white hover:from-teal-700 hover:to-emerald-700 transition-all font-semibold rounded-xl shadow-2xl hover:shadow-teal-500/25 hover:scale-105 border-0 group h-auto" 
               asChild
             >
-              <Link href="/synergize">
+              <Link href="/synergize?view=chat&mode=scenario">
                 <span className="flex items-center justify-center text-white group-hover:text-white">
                   <Brain className="h-4 sm:h-5 w-4 sm:w-5 mr-2 group-hover:scale-110 transition-transform text-white group-hover:text-white" />
                   Try AI Assistant
@@ -131,18 +131,7 @@ export default function HomePage() {
               </Link>
             </Button>
 
-            <Button 
-              size="lg" 
-              className="w-full sm:w-auto text-base sm:text-lg px-8 sm:px-10 py-3 sm:py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 transition-all font-semibold rounded-xl shadow-2xl hover:shadow-purple-500/25 hover:scale-105 border-0 group h-auto" 
-              asChild
-            >
-              <Link href="/pocket-coach">
-                <span className="flex items-center justify-center text-white group-hover:text-white">
-                  <MessageSquare className="h-4 sm:h-5 w-4 sm:w-5 mr-2 group-hover:scale-110 transition-transform text-white group-hover:text-white" />
-                  Pocket Coach
-                </span>
-              </Link>
-            </Button>
+            {/* Pocket Coach temporarily removed */}
 
             <Button 
               size="lg" 
@@ -393,7 +382,7 @@ function ValuePropositionsSection() {
               className="w-full sm:w-auto bg-white text-teal-600 hover:bg-gray-100 px-8 py-4 rounded-xl shadow-2xl hover:shadow-white/25 transition-all hover:scale-105 border-0 font-semibold group"
               asChild
             >
-              <Link href="/synergize">
+              <Link href="/synergize?view=chat&mode=scenario">
                 <span className="flex items-center justify-center text-teal-600 group-hover:text-teal-600">
                   <Brain className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform text-teal-600 group-hover:text-teal-600" />
                   Try AI Assistant
