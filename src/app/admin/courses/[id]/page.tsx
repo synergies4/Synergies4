@@ -187,7 +187,7 @@ export default function EditCourse({ params }: { params: Promise<{ id: string }>
     if (authLoading) return;
     
     if (!user || userProfile?.role !== 'ADMIN') {
-      router.push('/login');
+      router.push(`/login?redirect=/admin/courses/${id}`);
       return;
     }
 

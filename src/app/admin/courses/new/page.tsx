@@ -122,6 +122,20 @@ export default function CreateCourse() {
   // Multi-select categories (primary category remains the first selected)
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
+  const toggleCategory = (value: string) => {
+    setSelectedCategories(prev => {
+      const exists = prev.includes(value);
+      const updated = exists ? prev.filter(v => v !== value) : [...prev, value];
+      // Keep legacy single category in sync for API that expects a primary category
+      handleInputChange('category', updated[0] || '');
+      // Clear validation error when first picked
+      if (updated.length > 0 && formErrors.category) {
+        setFormErrors(prevErr => ({ ...prevErr, category: '' }));
+      }
+      return updated;
+    });
+  };
+
   const getStepsForCourseType = (courseType: string) => {
     const baseSteps = [
       { number: 1, title: 'Basic Info', description: 'Course fundamentals', icon: BookOpen },
@@ -158,7 +172,7 @@ export default function CreateCourse() {
     if (authLoading) return;
     
     if (!user || userProfile?.role !== 'ADMIN') {
-      router.push('/login');
+      router.push('/login?redirect=/admin/courses/new');
       return;
     }
   }, [user, userProfile, authLoading, router]);
@@ -501,6 +515,7 @@ export default function CreateCourse() {
         description: formData.description,
         shortDesc: formData.shortDesc,
         category: formData.category,
+        categories: selectedCategories, // send multi-select for future-proof backend
         level: formData.level,
         price: formData.price ? parseFloat(formData.price) : null,
         duration: formData.duration,
@@ -670,20 +685,25 @@ export default function CreateCourse() {
 
               <div className="space-y-2">
                 <Label htmlFor="category" className="text-sm font-semibold text-gray-900">Category *</Label>
-                <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
-                  <SelectTrigger className={`bg-white border-2 ${formErrors.category ? 'border-red-300' : 'border-gray-200'} focus:border-teal-500 text-gray-900`}>
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white">
-                    {categories.map((cat) => (
-                      <SelectItem key={cat.value} value={cat.value}>
-                        <div className="flex items-center">
-                          <Badge className={`${cat.color} mr-2 text-xs`}>{cat.label}</Badge>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className={`grid grid-cols-2 sm:grid-cols-3 gap-2 p-3 rounded-lg border-2 ${formErrors.category ? 'border-red-300' : 'border-gray-200'} bg-white`}>
+                  {categories.map((cat) => {
+                    const checked = selectedCategories.includes(cat.value);
+                    return (
+                      <label key={cat.value} className={`flex items-center gap-2 cursor-pointer rounded-md px-2 py-1 border ${checked ? 'border-teal-400 bg-teal-50' : 'border-gray-200 hover:bg-gray-50'}`}>
+                        <input
+                          type="checkbox"
+                          className="accent-teal-600"
+                          checked={checked}
+                          onChange={() => toggleCategory(cat.value)}
+                        />
+                        <Badge className={`${cat.color} text-xs`}>{cat.label}</Badge>
+                      </label>
+                    );
+                  })}
+                </div>
+                {selectedCategories.length > 0 && (
+                  <p className="text-xs text-gray-600">Primary category: <span className="font-medium">{selectedCategories[0]}</span></p>
+                )}
                 {formErrors.category && <p className="text-red-600 text-sm flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{formErrors.category}</p>}
               </div>
 

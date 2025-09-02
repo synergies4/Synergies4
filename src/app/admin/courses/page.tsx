@@ -66,7 +66,7 @@ export default function CoursesManagement() {
     if (authLoading) return;
     
     if (!user || userProfile?.role !== 'ADMIN') {
-      router.push('/login');
+      router.push('/login?redirect=/admin/courses');
       return;
     }
 
