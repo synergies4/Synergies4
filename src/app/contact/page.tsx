@@ -472,7 +472,8 @@ export default function Contact() {
         </div>
       </section>
 
-      {/* Plans and Pricing Section */}
+      {/* Plans and Pricing Section - removed for now */}
+      {false && (
       <section id="plans-pricing" className="py-24 bg-gradient-to-br from-indigo-50 via-blue-50 to-teal-50 relative overflow-hidden">
         {/* Enhanced Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
@@ -710,6 +711,7 @@ export default function Contact() {
           </div>
         </div>
       </section>
+      )}
 
       {/* Get in Touch Section */}
       <section id="locations" className="py-24 bg-gradient-to-br from-slate-900 via-gray-900 to-slate-900 relative overflow-hidden">

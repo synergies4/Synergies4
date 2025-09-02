@@ -679,7 +679,7 @@ function FeaturedCoursesSection() {
   );
 }
 
-// Certifications Section
+// Certifications Section (temporarily disabled)
 function CertificationsSection() {
   const getLevelColor = (level: string) => {
     switch (level?.toLowerCase()) {
@@ -707,7 +707,7 @@ function CertificationsSection() {
   };
 
   return (
-    <section className="py-20 bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden">
+    <section className="py-20 bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden hidden">
       {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-20 right-10 w-32 h-32 bg-gradient-to-br from-teal-200/30 to-emerald-200/30 rounded-full blur-xl"></div>
@@ -726,18 +726,19 @@ function CertificationsSection() {
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-16">
-          <Badge className="mb-4 bg-teal-100 text-teal-700 hover:bg-teal-200 border-teal-200">
+          {/* Certifications hidden */}
+          <Badge className="mb-4 bg-teal-100 text-teal-700 hover:bg-teal-200 border-teal-200 hidden">
             <Award className="w-4 h-4 mr-2" />
             Professional Certifications
           </Badge>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 hidden">
             <span className="bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent">
               Advance Your Career
             </span>
             <br />
             with Industry Certifications
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed hidden">
             Earn globally recognized certifications that validate your expertise and open doors to new opportunities
           </p>
         </div>
