@@ -102,6 +102,50 @@ export default function ResumeCustomizer() {
     setIsDragging(true);
   };
 
+  // Client-side OCR fallback for scanned PDFs (first 1-3 pages)
+  const clientSideOcrPdf = async (file: File): Promise<string> => {
+    try {
+      if (typeof window === 'undefined') return '';
+      const pdfjsLib: any = await import('pdfjs-dist/build/pdf');
+      // Use CDN worker to avoid bundling a local worker file
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+      const arrayBuffer = await file.arrayBuffer();
+      const typedArray = new Uint8Array(arrayBuffer);
+      const pdf = await pdfjsLib.getDocument({ data: typedArray }).promise;
+
+      // Tesseract.js for OCR
+      // Some builds expose default, others the module itself
+      const tlib: any = await import('tesseract.js');
+      const Tesseract: any = (tlib as any).default || tlib;
+
+      let extracted = '';
+      const maxPages = Math.min(pdf.numPages || 1, 3);
+
+      for (let pageNum = 1; pageNum <= maxPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const viewport = page.getViewport({ scale: 2 });
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        if (!context) continue;
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        await page.render({ canvasContext: context, viewport }).promise;
+        const dataUrl = canvas.toDataURL('image/png');
+        const result = await Tesseract.recognize(dataUrl, 'eng');
+        const pageText: string = (result?.data?.text || '').trim();
+        if (pageText) extracted += (extracted ? '\n\n' : '') + pageText;
+        // Cleanup
+        canvas.width = 0; canvas.height = 0;
+      }
+
+      return extracted.trim();
+    } catch (error) {
+      console.error('clientSideOcrPdf error:', error);
+      return '';
+    }
+  };
+
   const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
@@ -167,13 +211,38 @@ export default function ResumeCustomizer() {
               fileType: file.type
             });
                     } else {
-            // API returned error or no text
-            throw new Error(result.message || 'Text extraction failed');
+            // API returned error or no text. If PDF, try client-side OCR fallback
+            if (file.type === 'application/pdf') {
+              const ocrText = await clientSideOcrPdf(file);
+              if (ocrText && ocrText.length >= 50) {
+                text = ocrText;
+                extractionSuccess = true;
+                toast.success('✅ Extracted text from scanned PDF using OCR.');
+              } else {
+                throw new Error(result.message || 'Text extraction failed');
+              }
+            } else {
+              throw new Error(result.message || 'Text extraction failed');
+            }
           }
           
         } catch (extractionError) {
           console.error('Text extraction API error:', extractionError);
           
+          // Try client-side OCR if still no text and it's a PDF
+          if (!extractionSuccess && file.type === 'application/pdf') {
+            try {
+              const ocrText = await clientSideOcrPdf(file);
+              if (ocrText && ocrText.length >= 50) {
+                text = ocrText;
+                extractionSuccess = true;
+                toast.success('✅ Extracted text from scanned PDF using OCR.');
+              }
+            } catch (ocrErr) {
+              console.error('Client-side OCR error:', ocrErr);
+            }
+          }
+
           // Fallback to manual text entry for text files
           if (file.type === 'text/plain') {
             try {
