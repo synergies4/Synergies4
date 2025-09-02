@@ -362,11 +362,6 @@ const INTERACTION_MODES = {
     icon: <MessageSquare className="w-5 h-5" />,
     description: 'Get instant answers to your Agile questions'
   },
-  'presentation': {
-    name: 'Presentation Generator',
-    icon: <Presentation className="w-5 h-5" />,
-    description: 'Create role-specific presentations and training materials'
-  },
   'scenario': {
     name: 'Scenario Simulator',
     icon: <PlayCircle className="w-5 h-5" />,
@@ -726,7 +721,6 @@ const SlidePresentation = ({
     </div>
   );
 };
-
 // Enhanced Draggable Text Component with Rich Text Formatting
 const DraggableText = React.memo(({ 
   id, 
@@ -1523,9 +1517,7 @@ const DraggableText = React.memo(({
     </>
   );
 });
-
 DraggableText.displayName = 'DraggableText';
-
 // Enhanced Draggable Image Component with Better PDF Support & Performance
 const DraggableImage = React.memo(({ 
   id, 
@@ -1974,9 +1966,7 @@ const DraggableImage = React.memo(({
     </>
   );
 });
-
 DraggableImage.displayName = 'DraggableImage';
-
 // Enhanced Editable Slide Presentation Component with Advanced Features
 const EditableSlidePresentation = ({ 
   slides, 
@@ -2687,7 +2677,6 @@ const EditableSlidePresentation = ({
       addToast('Failed to generate AI content. Please try again.', 'error');
     }
   }, [currentSlideData, currentSlide, addToHistory, addToast]);
-
   return (
     <div className="fixed inset-0 z-50 bg-gray-100 flex flex-col">
       {/* Mobile-Optimized Editor Header */}
@@ -3488,32 +3477,6 @@ const EditableSlidePresentation = ({
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Toast Notifications */}
-      <AnimatePresence>
-        {toasts.map((toast) => (
-          <motion.div
-            key={toast.id}
-            initial={{ opacity: 0, y: 50, x: '50%' }}
-            animate={{ opacity: 1, y: 0, x: '50%' }}
-            exit={{ opacity: 0, y: 50, x: '50%' }}
-            className={`
-              fixed ${isMobile ? 'bottom-28' : 'bottom-4'} left-1/2 transform -translate-x-1/2 z-[10000]
-              px-4 py-2 rounded-lg shadow-lg max-w-sm mx-auto
-              ${toast.type === 'success' ? 'bg-green-600 text-white' : 
-                toast.type === 'error' ? 'bg-red-600 text-white' : 
-                'bg-blue-600 text-white'}
-            `}
-          >
-            <div className="flex items-center space-x-2">
-              {toast.type === 'success' && <CheckCircle className="h-4 w-4" />}
-              {toast.type === 'error' && <X className="h-4 w-4" />}
-              {toast.type === 'info' && <Zap className="h-4 w-4" />}
-              <span className="text-sm font-medium">{toast.message}</span>
-            </div>
-          </motion.div>
-        ))}
-      </AnimatePresence>
     </div>
   );
 };
@@ -4284,7 +4247,6 @@ const ScenarioSimulator = ({
     </div>
   );
 };
-
 const RoleBasedAdvisor = ({ 
   currentRole, 
   inputMessage, 
@@ -5021,7 +4983,7 @@ export default function SynergizeAgile() {
         
         // Auto-switch to full chat view and set the appropriate mode
         setIsFullChatView(true);
-        setSelectedMode(mode === 'presentation' ? 'presentation' : 'advisor');
+        setSelectedMode('advisor');
         
         let prompt = '';
         
@@ -5082,53 +5044,8 @@ ${transcript}
     }
   ]
 }
-
 Create 6-8 slides total based on the meeting content. Focus on the most important information that would be valuable for stakeholders. Make sure all content is professional and well-structured.
-
 DO NOT include any additional text, explanations, or markdown formatting - respond with ONLY the JSON object.`;
-        } else {
-          // Create course creation prompt
-          prompt = `🎯 **COURSE CREATION REQUEST**
-
-I need you to create a comprehensive training course from this meeting transcript. Please analyze the content and create structured learning materials.
-
-**Meeting Details:**
-- Title: ${title || 'Meeting Recording'}
-- Type: ${type || 'team-meeting'}
-
-**Meeting Transcript:**
-${transcript}
-
-**Please create a complete training course that includes:**
-
-## 1. Course Overview
-- Course title and description
-- Learning objectives
-- Target audience
-- Duration estimate
-
-## 2. Learning Modules
-Break down the content into clear modules based on the main topics discussed
-
-## 3. Practical Exercises
-Create hands-on activities based on the decisions made and problems solved in the meeting
-
-## 4. Assessment Materials
-- Knowledge check questions
-- Practical assessments
-- Success criteria
-
-## 5. Implementation Guide
-- Step-by-step action items
-- Best practices identified
-- Common pitfalls to avoid
-
-## 6. Supporting Materials
-- Templates mentioned or discussed
-- Checklists for key processes
-- Reference materials
-
-Please structure this as a ready-to-deliver training course that someone could use to teach others about the topics, methodologies, and decisions covered in this meeting.`;
         }
 
         // Clear messages first to start fresh
@@ -5137,7 +5054,7 @@ Please structure this as a ready-to-deliver training course that someone could u
         // Store the prompt to send after component is fully loaded
         const sendPrompt = async () => {
           console.log(`Sending ${mode} creation prompt...`);
-          console.log('Selected mode set to:', mode === 'presentation' ? 'presentation' : 'advisor');
+          console.log('Selected mode set to advisor');
           console.log('Prompt preview:', prompt.substring(0, 200) + '...');
           console.log('Full chat view active:', isFullChatView);
           
@@ -5151,7 +5068,7 @@ Please structure this as a ready-to-deliver training course that someone could u
             type: 'user' as const,
             content: messageToSend,
             timestamp: new Date(),
-            mode: mode === 'presentation' ? 'presentation' : 'advisor',
+            mode: 'advisor',
             role: selectedRole,
             provider: selectedProvider
           };
@@ -5161,7 +5078,7 @@ Please structure this as a ready-to-deliver training course that someone could u
 
           try {
             const role = AGILE_ROLES[selectedRole as keyof typeof AGILE_ROLES];
-            const currentMode = INTERACTION_MODES[mode === 'presentation' ? 'presentation' : 'advisor' as keyof typeof INTERACTION_MODES];
+            const currentMode = INTERACTION_MODES['advisor' as keyof typeof INTERACTION_MODES];
             const provider = AI_PROVIDERS[selectedProvider];
 
             // Enhanced prompt based on role and mode
@@ -5180,7 +5097,7 @@ Please structure this as a ready-to-deliver training course that someone could u
             - If asked about technical topics outside your expertise, politely redirect to your core areas
             - Be encouraging and supportive while maintaining professionalism`;
 
-            if (mode === 'presentation') {
+            if (false) {
               systemPrompt += ` Generate presentation content with clear slides, talking points, and visual suggestions.`;
             } else {
               systemPrompt += ` Provide personalized advice with specific actions, best practices, and potential pitfalls to avoid.`;
@@ -5209,7 +5126,7 @@ Please structure this as a ready-to-deliver training course that someone could u
               type: 'ai' as const,
               content: data.content || data.response,
               timestamp: new Date(),
-              mode: mode === 'presentation' ? 'presentation' : 'advisor',
+              mode: 'advisor',
               role: selectedRole,
               provider: selectedProvider
             };
@@ -5224,7 +5141,7 @@ Please structure this as a ready-to-deliver training course that someone could u
               type: 'ai' as const,
               content: 'I apologize, but I encountered an issue processing your meeting transcript. Please try again.',
               timestamp: new Date(),
-              mode: mode === 'presentation' ? 'presentation' : 'advisor',
+              mode: 'advisor',
               role: selectedRole,
               provider: selectedProvider
             };
@@ -5486,7 +5403,6 @@ Please structure this as a ready-to-deliver training course that someone could u
         />
       );
     }
-
     return (
       <div className="bg-white rounded-2xl border-2 border-teal-200 shadow-2xl overflow-hidden transform transition-all duration-300 hover:shadow-3xl hover:scale-[1.01]">
         {/* Enhanced Header with Animation */}
@@ -5924,9 +5840,6 @@ Please structure this as a ready-to-deliver training course that someone could u
       </div>
     );
   };
-
-
-
   // Full Chat View Component
   const FullChatView = () => (
     <div className="h-screen flex bg-gray-50">
@@ -6306,8 +6219,6 @@ Please structure this as a ready-to-deliver training course that someone could u
             </div>
           ))}
 
-          {/* Session limit banner removed */}
-
           {isLoading && (
             <div className="flex justify-start">
               <div className="bg-white border rounded-2xl p-4 shadow-sm max-w-[80%]">
@@ -6377,49 +6288,10 @@ Please structure this as a ready-to-deliver training course that someone could u
           {selectedMode !== 'chat' && (
             <div className="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
               <h3 className="text-sm font-medium text-gray-700 mb-3">
-                {selectedMode === 'presentation' && 'Presentation Generator'}
+                {selectedMode === 'presentation' && ''}
                 {selectedMode === 'scenario' && 'Scenario Simulator'}
                 {selectedMode === 'advisor' && 'Role-Based Advisor'}
               </h3>
-              
-              {selectedMode === 'presentation' && (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label className="text-sm font-medium text-gray-700">Topic</Label>
-                      <Input
-                        placeholder="Enter presentation topic"
-                        className="mt-1 bg-white border-gray-300 text-gray-900"
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            const topic = (e.target as HTMLInputElement).value;
-                            setInputMessage(`Create a presentation about: ${topic}`);
-                            handleSendMessage();
-                          }
-                        }}
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-sm font-medium text-gray-700">Audience</Label>
-                      <Input
-                        placeholder="Target audience"
-                        className="mt-1 bg-white border-gray-300 text-gray-900"
-                      />
-                    </div>
-                  </div>
-                  <Button
-                    onClick={() => {
-                      setInputMessage('Generate a presentation with the details provided above');
-                      handleSendMessage();
-                    }}
-                    disabled={isLoading}
-                    className="bg-teal-600 hover:bg-teal-700 text-white"
-                  >
-                    <Presentation className="h-4 w-4 mr-2" />
-                    Generate Presentation
-                  </Button>
-                </div>
-              )}
               
               {selectedMode === 'scenario' && (
                 <div className="space-y-6">
@@ -6497,9 +6369,7 @@ Please structure this as a ready-to-deliver training course that someone could u
                       
                       if (person1Context?.value && person2Context?.value && scenarioContext?.value) {
                         const prompt = `Create a realistic Agile scenario simulation between a ${person1Role.value} and a ${person2Role.value}.
-
 Scenario Context: ${scenarioContext.value}
-
 ${person1Role.value} Context: ${person1Context.value}
 ${person2Role.value} Context: ${person2Context.value}
 
@@ -7074,8 +6944,6 @@ Format as a realistic conversation with clear speaker labels and include decisio
                       </div>
                     ))}
                     
-                    {/* Session limit banner removed */}
-                    
                     {isLoading && (
                       <div className="flex justify-start">
                         <div className="bg-white border shadow-sm rounded-lg p-4 max-w-[80%]">
@@ -7298,41 +7166,6 @@ Format as a realistic conversation with clear speaker labels and include decisio
           </div>
         </div>
       </section>
-
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-teal-600 to-emerald-600 text-white">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Ready to Master Agile with AI?
-          </h2>
-          <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
-            Join thousands of professionals who are accelerating their Agile journey with our AI-powered training platform.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              size="lg" 
-              className="text-lg px-8 py-6 bg-white text-teal-600 hover:bg-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-              onClick={() => document.getElementById('agile-assistant')?.scrollIntoView({ behavior: 'smooth' })}
-            >
-              Start Training Now
-              <Zap className="h-5 w-5 ml-2" />
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="text-lg px-8 py-6 border-2 border-white text-gray-900 bg-white hover:bg-white hover:text-teal-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-              asChild
-            >
-              <Link href="/courses">
-                Explore Courses
-                <BookOpen className="h-5 w-5 ml-2" />
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </section>
-
       {/* Onboarding Modal */}
       <OnboardingModal
         isOpen={showOnboardingModal}
