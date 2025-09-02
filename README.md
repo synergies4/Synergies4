@@ -1,3 +1,13 @@
+### Optional OCR for scanned PDFs
+
+To enable OCR fallback for scanned/image-based PDFs in Resume Customizer, add the following to your `.env.local` (or Vercel Project Environment Variables):
+
+```
+OCR_SPACE_API_KEY=your_ocr_space_api_key
+```
+
+When set, the API route `POST /api/resume-customizer/extract-text` will attempt OCR via OCR.space if native PDF text extraction returns empty.
+
 # Synergies4 - AI-Powered Learning Platform
 
 <!-- Test deployment after webhook removal -->
