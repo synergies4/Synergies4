@@ -164,7 +164,7 @@ function Navigation({ isSearchOpen, setIsSearchOpen, headerVisible, lastScrollY 
               <div className="flex-shrink-0 mr-4">
                 <Link href="/" className="flex items-center" aria-label="Synergies4 home">
                   <Image
-                    src="/Minimalist Consulting Firm Logo 'Synergies4'.png"
+                    src="/synergies4_logo.svg"
                     alt="Synergies4"
                     width={360}
                     height={90}
