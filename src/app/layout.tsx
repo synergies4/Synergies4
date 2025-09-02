@@ -122,7 +122,7 @@ export default function RootLayout({
         <AuthProvider>
           {children}
           <AdminFloatingButton />
-          <PWAInstaller />
+          {/* PWA install prompt disabled for now */}
           <AuthDebugger />
           <Toaster />
         </AuthProvider>
