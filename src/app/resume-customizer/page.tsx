@@ -106,8 +106,10 @@ export default function ResumeCustomizer() {
   const clientSideOcrPdf = async (file: File): Promise<string> => {
     try {
       if (typeof window === 'undefined') return '';
-      const pdfjsLib: any = await import('pdfjs-dist/build/pdf');
-      // Use CDN worker to avoid bundling a local worker file
+      // Load pdf.js from CDN to avoid server-side bundling issues
+      await loadPdfJsFromCdn();
+      const pdfjsLib: any = (window as any).pdfjsLib;
+      // Use CDN worker
       pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
       const arrayBuffer = await file.arrayBuffer();
@@ -144,6 +146,28 @@ export default function ResumeCustomizer() {
       console.error('clientSideOcrPdf error:', error);
       return '';
     }
+  };
+
+  const loadPdfJsFromCdn = async (): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      if (typeof window === 'undefined') return resolve();
+      const w = window as any;
+      if (w.pdfjsLib) return resolve();
+      const existing = document.querySelector('script[data-pdfjs]') as HTMLScriptElement | null;
+      if (existing) {
+        existing.addEventListener('load', () => resolve());
+        existing.addEventListener('error', () => reject(new Error('Failed to load pdf.js')));
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+      script.async = true;
+      script.defer = true;
+      script.setAttribute('data-pdfjs', 'true');
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error('Failed to load pdf.js'));
+      document.head.appendChild(script);
+    });
   };
 
   const handleDragLeave = (e: React.DragEvent) => {
