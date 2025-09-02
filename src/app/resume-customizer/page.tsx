@@ -44,7 +44,8 @@ import ResumeEditor from '@/components/ResumeEditor';
 import jsPDF from 'jspdf';
 
 export default function ResumeCustomizer() {
-  const { canAccess } = useAuthRedirect({ requireAuth: true });
+  // Require sign-in; if not, send to login and bounce back here after
+  const { canAccess } = useAuthRedirect({ requireAuth: true, redirectTo: '/login?redirect=/resume-customizer' });
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
