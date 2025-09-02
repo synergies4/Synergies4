@@ -166,9 +166,9 @@ function Navigation({ isSearchOpen, setIsSearchOpen, headerVisible, lastScrollY 
                   <Image
                     src="/synergies4_logo.svg"
                     alt="Synergies4"
-                    width={360}
-                    height={90}
-                    className="h-16 w-auto md:h-20 hover:opacity-80 transition-opacity duration-300"
+                    width={280}
+                    height={70}
+                    className="h-12 w-auto md:h-14 hover:opacity-80 transition-opacity duration-300"
                     priority
                   />
                 </Link>
