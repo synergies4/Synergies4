@@ -4564,13 +4564,13 @@ export default function SynergizeAgile() {
   const inputMessageRef = useRef<HTMLTextAreaElement>(null);
   // Mobile scroll indicator state
   const [showScrollIndicator, setShowScrollIndicator] = useState(false);
-  // Response counter for session limit
+  // Unlimited chat; counters only for potential analytics
   const [responseCount, setResponseCount] = useState(0);
-  const [maxResponses, setMaxResponses] = useState(3); // Will be updated based on subscription
+  const [maxResponses, setMaxResponses] = useState<number>(Number.POSITIVE_INFINITY);
   const [userLimits, setUserLimits] = useState({
-    maxConversations: 10,
+    maxConversations: Number.POSITIVE_INFINITY,
     currentConversations: 0,
-    isSubscribed: false
+    isSubscribed: true
   });
 
   // Personalization
@@ -4599,72 +4599,19 @@ export default function SynergizeAgile() {
 
 
 
-  // Fetch user's conversation limits
+  // No subscription checks; simply record that we allow unlimited for logged-in users
   useEffect(() => {
-    const fetchUserLimits = async () => {
+    const init = async () => {
       try {
         const supabase = createClient();
         const { data: { session } } = await supabase.auth.getSession();
-        
-        if (session) {
-          console.log('🔍 Checking subscription for user:', session.user.id);
-          
-          // Check subscription status
-          const { data: subscription, error: subError } = await supabase
-            .from('subscriptions')
-            .select('plan_id, status')
-            .eq('user_id', session.user.id)
-            .eq('status', 'active')
-            .single();
-
-          console.log('📋 Subscription query result:', { subscription, error: subError });
-
-          // Get user content settings
-          const { data: settings, error: settingsError } = await supabase
-            .from('user_content_settings')
-            .select('max_conversations, current_conversations')
-            .eq('user_id', session.user.id)
-            .single();
-
-          console.log('⚙️ Settings query result:', { settings, error: settingsError });
-
-          const isSubscribed = Boolean(subscription && subscription.status === 'active');
-          let maxConversations = 10; // Free tier default
-
-          if (isSubscribed) {
-            // Set unlimited for subscribed users
-            maxConversations = 999999;
-            console.log('✅ User is subscribed with plan:', subscription?.plan_id);
-          } else if (settings) {
-            maxConversations = settings.max_conversations;
-            console.log('📊 Using settings max conversations:', maxConversations);
-          } else {
-            console.log('🆓 Using free tier defaults');
-          }
-
-          console.log('🎯 Final limits:', {
-            maxConversations,
-            currentConversations: settings?.current_conversations || 0,
-            isSubscribed,
-            maxResponses: isSubscribed ? 999999 : 3
-          });
-
-          setUserLimits({
-            maxConversations,
-            currentConversations: settings?.current_conversations || 0,
-            isSubscribed
-          });
-
-          // Set session response limit based on subscription
-          setMaxResponses(isSubscribed ? 999999 : 3);
-        }
-      } catch (error) {
-        console.error('Error fetching user limits:', error);
-        // Keep default limits on error
+        setUserLimits({ maxConversations: Number.POSITIVE_INFINITY, currentConversations: 0, isSubscribed: !!session?.user });
+        setMaxResponses(Number.POSITIVE_INFINITY);
+      } catch {
+        setMaxResponses(Number.POSITIVE_INFINITY);
       }
     };
-
-    fetchUserLimits();
+    init();
   }, []);
 
   // Check for mobile device and speech recognition support
@@ -4888,10 +4835,15 @@ export default function SynergizeAgile() {
     const messageToSend = messageContent || inputMessage;
     if (!messageToSend.trim() && files.length === 0) return;
 
-    // Check if we've reached the response limit
-    if (responseCount >= maxResponses) {
-      return; // Don't allow more messages
-    }
+    // Require sign-in to use chat
+    try {
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) {
+        window.location.href = `/login?redirect=${encodeURIComponent('/synergize?view=chat')}`;
+        return;
+      }
+    } catch {}
 
     // Switch to full chat view after first message
     if (!isFullChatView) {
@@ -4988,29 +4940,8 @@ export default function SynergizeAgile() {
 
       setMessages(prev => [...prev, aiMessage]);
       
-      // Increment response count
-      const newCount = responseCount + 1;
-      setResponseCount(newCount);
-      
-      // If we've reached the limit, add the "Get in Touch" message (without S4 branding)
-      if (newCount >= maxResponses) {
-        setTimeout(() => {
-          const limitMessage: Message = {
-            id: (Date.now() + 2).toString(),
-            type: 'ai',
-            content: userLimits.isSubscribed 
-              ? "🎯 **Session Complete!**\n\nGreat conversation! Feel free to start a new session anytime with your unlimited access.\n\n• **Unlimited AI conversations**\n• **Advanced presentation tools**\n• **Priority support**\n• **Custom training scenarios**\n\nYour subscription gives you full access to all features!" 
-              : "🎯 **You've reached your session limit!**\n\nWant to continue your Agile learning journey with unlimited access? Our premium plans offer:\n\n• **Unlimited AI conversations**\n• **Advanced presentation tools**\n• **Priority support**\n• **Custom training scenarios**\n\nReady to unlock your full potential?",
-            timestamp: new Date(),
-            mode: selectedMode,
-            role: selectedRole,
-            provider: selectedProvider
-          };
-          setMessages(prev => [...prev, limitMessage]);
-          // Force scroll to show the limit message
-          setTimeout(() => scrollToBottom(true), 100);
-        }, 800);
-      }
+      // Increment response count (no limits enforced)
+      setResponseCount(prev => prev + 1);
       
     } catch (error) {
       console.error('Chat Error:', error);
@@ -6375,34 +6306,7 @@ Please structure this as a ready-to-deliver training course that someone could u
             </div>
           ))}
 
-          {/* Session Limit Banner */}
-          {responseCount >= maxResponses && (
-            <div className="mx-auto max-w-md p-6 bg-gradient-to-r from-emerald-500 to-cyan-600 rounded-2xl shadow-lg text-center text-white my-4">
-              <div className="mb-4">
-                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Zap className="h-6 w-6 text-white" />
-                </div>
-                <h3 className="text-lg font-bold mb-2">Session Complete!</h3>
-                <p className="text-sm opacity-90">
-                  Ready to continue your Agile learning journey?
-                </p>
-              </div>
-              <Button 
-                className="w-full bg-white text-emerald-600 hover:bg-gray-100 font-semibold rounded-xl shadow-lg transition-all hover:scale-105"
-                asChild
-              >
-                {userLimits.isSubscribed ? (
-                  <a href="/synergize" onClick={() => window.location.reload()}>
-                    Start New Session
-                  </a>
-                ) : (
-                  <a href="/contact" target="_blank" rel="noopener noreferrer">
-                    Get Unlimited Access
-                  </a>
-                )}
-              </Button>
-            </div>
-          )}
+          {/* Session limit banner removed */}
 
           {isLoading && (
             <div className="flex justify-start">
@@ -7170,34 +7074,7 @@ Format as a realistic conversation with clear speaker labels and include decisio
                       </div>
                     ))}
                     
-                    {/* Session Limit Banner */}
-                    {responseCount >= maxResponses && (
-                      <div className="mx-auto max-w-xs p-4 bg-gradient-to-r from-emerald-500 to-cyan-600 rounded-2xl shadow-lg text-center text-white my-4">
-                        <div className="mb-3">
-                          <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-2">
-                            <Zap className="h-5 w-5 text-white" />
-                          </div>
-                          <h3 className="text-base font-bold mb-1">Session Complete!</h3>
-                          <p className="text-xs opacity-90">
-                            Ready to continue learning?
-                          </p>
-                        </div>
-                        <Button 
-                          className="w-full bg-white text-emerald-600 hover:bg-gray-100 font-semibold rounded-lg shadow-lg transition-all hover:scale-105 text-sm py-2"
-                          asChild
-                        >
-                          {userLimits.isSubscribed ? (
-                            <a href="/synergize" onClick={() => window.location.reload()}>
-                              Start New Session
-                            </a>
-                          ) : (
-                            <a href="/contact" target="_blank" rel="noopener noreferrer">
-                              Get Unlimited Access
-                            </a>
-                          )}
-                        </Button>
-                      </div>
-                    )}
+                    {/* Session limit banner removed */}
                     
                     {isLoading && (
                       <div className="flex justify-start">

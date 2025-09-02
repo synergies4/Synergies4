@@ -119,6 +119,9 @@ export default function CreateCourse() {
     prerequisites: '',
   });
 
+  // Multi-select categories (primary category remains the first selected)
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+
   const getStepsForCourseType = (courseType: string) => {
     const baseSteps = [
       { number: 1, title: 'Basic Info', description: 'Course fundamentals', icon: BookOpen },
@@ -165,7 +168,7 @@ export default function CreateCourse() {
     
     if (step === 1) {
       if (!formData.title) errors.title = 'Course title is required';
-      if (!formData.category) errors.category = 'Category is required';
+      if (selectedCategories.length === 0) errors.category = 'At least one category is required';
       if (!formData.level) errors.level = 'Level is required';
       if (!formData.course_type) errors.course_type = 'Course type is required';
     }
