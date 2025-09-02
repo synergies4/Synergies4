@@ -233,6 +233,38 @@ export default function CoursesManagement() {
     }
   };
 
+  const duplicateCourse = async (courseId: string) => {
+    try {
+      const { createClient } = await import('@/lib/supabase/client');
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error('You must be logged in to duplicate a course');
+        return;
+      }
+
+      const response = await fetch(`/api/courses/${courseId}/duplicate`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ newStatus: 'DRAFT' })
+      });
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.message || 'Failed to duplicate course');
+      }
+
+      toast.success('Course duplicated as draft');
+      fetchCourses();
+    } catch (error) {
+      console.error('Duplicate error:', error);
+      toast.error(error instanceof Error ? error.message : 'Error duplicating course');
+    }
+  };
+
   const filteredCourses = courses.filter(course => {
     const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          course.short_desc.toLowerCase().includes(searchTerm.toLowerCase());
@@ -552,6 +584,14 @@ export default function CoursesManagement() {
                       className="flex-1 text-xs sm:text-sm"
                     >
                       {course.published ? 'Unpublish' : 'Publish'}
+                    </Button>
+                    <Button 
+                      size="sm"
+                      variant="outline"
+                      className="text-teal-700 hover:text-teal-800 hover:bg-teal-50 px-2 sm:px-3"
+                      onClick={() => duplicateCourse(course.id)}
+                    >
+                      Duplicate
                     </Button>
                     <Button 
                       size="sm" 
