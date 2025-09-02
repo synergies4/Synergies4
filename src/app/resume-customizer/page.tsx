@@ -1152,7 +1152,7 @@ Sincerely,
             const wrapped = pdf.splitTextToSize(block.text, maxWidth - 10);
             // Draw bullet dot
             pdf.circle(margin + 2, y + 2, 0.7, 'F');
-            wrapped.forEach((ln, idx) => {
+            wrapped.forEach((ln: string, idx: number) => {
               ensureSpace();
               pdf.text(ln, margin + bulletIndent, y + 4);
               y += idx === wrapped.length - 1 ? 7 : 6;
@@ -1162,8 +1162,8 @@ Sincerely,
           default: {
             pdf.setFont('helvetica', 'normal');
             pdf.setFontSize(10);
-            const wrapped = pdf.splitTextToSize(block.text, maxWidth);
-            wrapped.forEach((ln) => {
+            const wrapped = pdf.splitTextToSize(block.text, maxWidth) as string[];
+            wrapped.forEach((ln: string) => {
               ensureSpace();
               pdf.text(ln, margin, y + 4);
               y += 6;
