@@ -252,7 +252,7 @@ export default function Login() {
             <div className="lg:hidden text-center mb-8">
               <Link href="/" className="inline-block">
                 <Image
-                  src="/synergies4_logo.svg"
+                  src="/Minimalist Consulting Firm Logo 'Synergies4'.png"
                   alt="Synergies4"
                   width={240}
                   height={60}
