@@ -32,23 +32,34 @@ export const metadata: Metadata = {
     shortcut: "/favicon.ico"
   },
   
-  // Open Graph / Facebook - Removed specific image to use defaults
+  // Open Graph / Facebook
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "https://synergies4.com",
     siteName: "Synergies4",
     title: "Synergies4 - AI-Powered Professional Development",
-    description: "Transform your career with AI-powered learning. Master Agile, leadership, and mental fitness with expert-led training programs."
+    description: "Transform your career with AI-powered learning. Master Agile, leadership, and mental fitness with expert-led training programs.",
+    images: [
+      {
+        url: "/Minimalist Consulting Firm Logo 'Synergies4'.png",
+        width: 1200,
+        height: 630,
+        alt: "Synergies4"
+      }
+    ]
   },
   
-  // Twitter - Removed specific image to use defaults
+  // Twitter
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     site: "@synergies4",
     creator: "@synergies4",
     title: "Synergies4 - AI-Powered Professional Development",
-    description: "Transform your career with AI-powered learning. Master Agile, leadership, and mental fitness with expert-led training programs."
+    description: "Transform your career with AI-powered learning. Master Agile, leadership, and mental fitness with expert-led training programs.",
+    images: [
+      "/Minimalist Consulting Firm Logo 'Synergies4'.png"
+    ]
   },
   
   // Additional metadata
@@ -105,6 +116,7 @@ export default function RootLayout({
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <link rel="apple-touch-icon" sizes="1024x1024" href="/Minimalist Consulting Firm Logo 'Synergies4'.png" />
         <link rel="manifest" href="/manifest.webmanifest" />
         <meta name="theme-color" content="#0d9488" />
         

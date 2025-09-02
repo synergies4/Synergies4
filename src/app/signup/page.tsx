@@ -360,9 +360,9 @@ export default function Signup() {
                 <Image
                   src="/Minimalist Consulting Firm Logo 'Synergies4'.png"
                   alt="Synergies4"
-                  width={240}
-                  height={60}
-                  className="h-12 w-auto mx-auto"
+                  width={320}
+                  height={80}
+                  className="h-16 w-auto mx-auto"
                 />
               </Link>
             </div>

@@ -13,6 +13,12 @@
   "categories": ["education", "productivity", "business"],
   "icons": [
     {
+      "src": "/Minimalist Consulting Firm Logo 'Synergies4'.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
       "src": "/android-chrome-36x36.png",
       "sizes": "36x36",
       "type": "image/png",

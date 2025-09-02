@@ -166,9 +166,9 @@ function Navigation({ isSearchOpen, setIsSearchOpen, headerVisible, lastScrollY 
                   <Image
                     src="/Minimalist Consulting Firm Logo 'Synergies4'.png"
                     alt="Synergies4"
-                    width={240}
-                    height={60}
-                    className="h-12 w-auto hover:opacity-80 transition-opacity duration-300"
+                    width={360}
+                    height={90}
+                    className="h-16 w-auto md:h-20 hover:opacity-80 transition-opacity duration-300"
                     priority
                   />
                 </Link>
