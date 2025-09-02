@@ -40,6 +40,65 @@ export async function POST(request: NextRequest) {
   }
 }
 
+function extractJobInfoHeuristically(html: string, text: string, url: string) {
+  try {
+    const clean = (s: string) => s.replace(/<[^>]*>/g, ' ').replace(/&amp;/g, '&').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+    const match = (re: RegExp) => {
+      const m = html.match(re);
+      return m && m[1] ? clean(m[1]) : '';
+    };
+
+    const h1 = match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
+    const ogTitle = match(/<meta[^>]*property=["']og:title["'][^>]*content=["']([^"']+)["'][^>]*>/i);
+    const title = h1 || ogTitle;
+
+    const ogSite = match(/<meta[^>]*property=["']og:site_name["'][^>]*content=["']([^"']+)["'][^>]*>/i);
+    const domain = (() => { try { const u = new URL(url); return u.hostname.replace('www.', ''); } catch { return ''; } })();
+    const company = ogSite || (domain ? domain.split('.')[0].replace(/-/g, ' ') : '');
+
+    let description = match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["'][^>]*>/i) ||
+                      match(/<meta[^>]*property=["']og:description["'][^>]*content=["']([^"']+)["'][^>]*>/i);
+    if (!description) {
+      const lower = text.toLowerCase();
+      const startIdx = lower.indexOf('job description');
+      let endIdx = -1;
+      const endMarkers = ['benefits', 'our benefits', 'apply now', 'location', 'responsibilities', 'qualifications'];
+      for (const m of endMarkers) {
+        const idx = lower.indexOf(m, startIdx + 16);
+        if (idx !== -1) endIdx = endIdx === -1 ? idx : Math.min(endIdx, idx);
+      }
+      const slice = startIdx !== -1 ? text.slice(startIdx, endIdx !== -1 ? endIdx : Math.min(text.length, startIdx + 4000)) : text.slice(0, 4000);
+      description = slice.trim();
+    }
+
+    return {
+      job_title: title || '',
+      company_name: company || '',
+      job_description: description || '',
+      location: '',
+      employment_type: '',
+      salary_range: '',
+      key_requirements: [],
+      key_responsibilities: [],
+      extraction_status: description ? 'success' : 'partial',
+      original_url: url
+    };
+  } catch (e) {
+    return {
+      job_title: '',
+      company_name: '',
+      job_description: '',
+      location: '',
+      employment_type: '',
+      salary_range: '',
+      key_requirements: [],
+      key_responsibilities: [],
+      extraction_status: 'failed',
+      original_url: url
+    };
+  }
+}
+
 async function extractJobFromUrl(jobUrl: string) {
   try {
     console.log('🔍 Starting job extraction for URL:', jobUrl);
@@ -142,71 +201,6 @@ Please extract and return the following information in JSON format:
   "key_requirements": ["<array of key requirements>"],
   "key_responsibilities": ["<array of main responsibilities>"],
   "extraction_status": "success"
-}
-
-function extractJobInfoHeuristically(html: string, text: string, url: string) {
-  try {
-    const clean = (s: string) => s.replace(/<[^>]*>/g, ' ').replace(/&amp;/g, '&').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
-    const match = (re: RegExp) => {
-      const m = html.match(re);
-      return m && m[1] ? clean(m[1]) : '';
-    };
-
-    // Title candidates
-    const h1 = match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
-    const ogTitle = match(/<meta[^>]*property=["']og:title["'][^>]*content=["']([^"']+)["'][^>]*>/i);
-    const title = h1 || ogTitle;
-
-    // Company from og:site_name or domain
-    const ogSite = match(/<meta[^>]*property=["']og:site_name["'][^>]*content=["']([^"']+)["'][^>]*>/i);
-    const domain = (() => {
-      try { const u = new URL(url); return u.hostname.replace('www.', ''); } catch { return ''; }
-    })();
-    const company = ogSite || (domain ? domain.split('.')[0].replace(/-/g, ' ') : '');
-
-    // Description: try og:description, or slice between known headers
-    let description = match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["'][^>]*>/i) ||
-                      match(/<meta[^>]*property=["']og:description["'][^>]*content=["']([^"']+)["'][^>]*>/i);
-
-    if (!description) {
-      const lower = text.toLowerCase();
-      const startIdx = lower.indexOf('job description');
-      let endIdx = -1;
-      const endMarkers = ['benefits', 'our benefits', 'apply now', 'location', 'responsibilities', 'qualifications'];
-      for (const m of endMarkers) {
-        const idx = lower.indexOf(m, startIdx + 16);
-        if (idx !== -1) { endIdx = endIdx === -1 ? idx : Math.min(endIdx, idx); }
-      }
-      const slice = startIdx !== -1 ? text.slice(startIdx, endIdx !== -1 ? endIdx : Math.min(text.length, startIdx + 4000)) : text.slice(0, 4000);
-      description = slice.trim();
-    }
-
-    return {
-      job_title: title || '',
-      company_name: company || '',
-      job_description: description || '',
-      location: '',
-      employment_type: '',
-      salary_range: '',
-      key_requirements: [],
-      key_responsibilities: [],
-      extraction_status: description ? 'success' : 'partial',
-      original_url: url
-    };
-  } catch (e) {
-    return {
-      job_title: '',
-      company_name: '',
-      job_description: '',
-      location: '',
-      employment_type: '',
-      salary_range: '',
-      key_requirements: [],
-      key_responsibilities: [],
-      extraction_status: 'failed',
-      original_url: url
-    };
-  }
 }
 
 IMPORTANT GUIDELINES:
