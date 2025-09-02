@@ -1035,53 +1035,144 @@ Sincerely,
     }
   };
 
+  // --- Export helpers: structure content into styled blocks ---
+  type ContentBlock = {
+    type: 'h1' | 'h2' | 'h3' | 'bullet' | 'paragraph';
+    text: string;
+  };
+
+  const stripMarkdown = (text: string) =>
+    text
+      .replace(/^#+\s*/g, '')
+      .replace(/\*\*(.*?)\*\*/g, '$1')
+      .replace(/\*(.*?)\*/g, '$1')
+      .replace(/`{1,3}([^`]+)`{1,3}/g, '$1')
+      .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')
+      .trim();
+
+  const parseContentToBlocks = (content: string): ContentBlock[] => {
+    const lines = content.split(/\r?\n/);
+    const blocks: ContentBlock[] = [];
+
+    for (let i = 0; i < lines.length; i++) {
+      const raw = lines[i];
+      const line = raw.trim();
+      if (!line) continue;
+
+      // Markdown headings
+      if (/^###\s+/.test(line)) {
+        blocks.push({ type: 'h3', text: stripMarkdown(line) });
+        continue;
+      }
+      if (/^##\s+/.test(line)) {
+        blocks.push({ type: 'h2', text: stripMarkdown(line) });
+        continue;
+      }
+      if (/^#\s+/.test(line)) {
+        blocks.push({ type: 'h1', text: stripMarkdown(line) });
+        continue;
+      }
+
+      // Section labels like "Summary:" / "Experience:" on their own line
+      if (/^[A-Za-z][A-Za-z\s/&-]{2,40}:$/.test(line)) {
+        blocks.push({ type: 'h2', text: line.replace(/:$/, '').trim() });
+        continue;
+      }
+
+      // Bullets
+      if (/^[-*•]\s+/.test(line)) {
+        blocks.push({ type: 'bullet', text: stripMarkdown(line.replace(/^[-*•]\s+/, '')) });
+        continue;
+      }
+
+      // Default paragraph
+      blocks.push({ type: 'paragraph', text: stripMarkdown(line) });
+    }
+    return blocks;
+  };
+
+  const escapeRTF = (text: string) =>
+    text
+      .replace(/\\/g, '\\\\')
+      .replace(/{/g, '\\{')
+      .replace(/}/g, '\\}')
+      .replace(/\n/g, ' ');
+
   // Helper functions for different export formats
   const downloadAsPDF = (content: string, filename: string) => {
     try {
       const pdf = new jsPDF();
-      
-      // Set up PDF formatting
-      pdf.setFontSize(10);
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
       const margin = 20;
       const maxWidth = pageWidth - 2 * margin;
-      
-      // Clean content for PDF
-      const cleanContent = content
-        .replace(/[^\x00-\x7F]/g, '') // Remove non-ASCII characters
-        .replace(/\*\*(.*?)\*\*/g, '$1') // Remove markdown bold
-        .replace(/\*(.*?)\*/g, '$1') // Remove markdown italic
-        .replace(/#{1,6}\s/g, '') // Remove markdown headers
-        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Convert links to text
-        .replace(/```[\s\S]*?```/g, '') // Remove code blocks
-        .trim();
-      
-      // Split content into lines that fit the page width
-      const lines = pdf.splitTextToSize(cleanContent, maxWidth);
-      
-      let yPosition = margin;
-      
-      // Add title
-      pdf.setFontSize(16);
+      let y = margin;
+
+      const blocks = parseContentToBlocks(content);
+
+      // Title from filename
       pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(16);
       const title = filename.replace('.pdf', '').replace(/_/g, ' ');
-      pdf.text(title, margin, yPosition);
-      yPosition += 20;
-      
-      // Add content
-      pdf.setFontSize(10);
-      pdf.setFont('helvetica', 'normal');
-      
-      for (let i = 0; i < lines.length; i++) {
-        if (yPosition > pageHeight - margin) {
+      pdf.text(title, margin, y);
+      y += 10;
+
+      const ensureSpace = (extra = 0) => {
+        if (y > pageHeight - margin - extra) {
           pdf.addPage();
-          yPosition = margin;
+          y = margin;
         }
-        pdf.text(lines[i], margin, yPosition);
-        yPosition += 5;
-      }
-      
+      };
+
+      blocks.forEach((block) => {
+        ensureSpace(12);
+        switch (block.type) {
+          case 'h1':
+            pdf.setFont('helvetica', 'bold');
+            pdf.setFontSize(14);
+            pdf.text(block.text, margin, y + 6);
+            y += 12;
+            break;
+          case 'h2':
+            pdf.setFont('helvetica', 'bold');
+            pdf.setFontSize(12);
+            pdf.text(block.text, margin, y + 6);
+            y += 10;
+            break;
+          case 'h3':
+            pdf.setFont('helvetica', 'bold');
+            pdf.setFontSize(11);
+            pdf.text(block.text, margin, y + 5);
+            y += 8;
+            break;
+          case 'bullet': {
+            pdf.setFont('helvetica', 'normal');
+            pdf.setFontSize(10);
+            const bulletIndent = 6;
+            const wrapped = pdf.splitTextToSize(block.text, maxWidth - 10);
+            // Draw bullet dot
+            pdf.circle(margin + 2, y + 2, 0.7, 'F');
+            wrapped.forEach((ln, idx) => {
+              ensureSpace();
+              pdf.text(ln, margin + bulletIndent, y + 4);
+              y += idx === wrapped.length - 1 ? 7 : 6;
+            });
+            break;
+          }
+          default: {
+            pdf.setFont('helvetica', 'normal');
+            pdf.setFontSize(10);
+            const wrapped = pdf.splitTextToSize(block.text, maxWidth);
+            wrapped.forEach((ln) => {
+              ensureSpace();
+              pdf.text(ln, margin, y + 4);
+              y += 6;
+            });
+            y += 2;
+          }
+        }
+      });
+
       pdf.save(filename);
       toast.success('PDF downloaded successfully!');
     } catch (error) {
@@ -1093,18 +1184,35 @@ Sincerely,
 
   const downloadAsRTF = (content: string, filename: string) => {
     try {
-      // Clean content for RTF
-      const cleanContent = content
-        .replace(/\*\*(.*?)\*\*/g, '\\b $1 \\b0') // Convert markdown bold to RTF bold
-        .replace(/\*(.*?)\*/g, '\\i $1 \\i0') // Convert markdown italic to RTF italic
-        .replace(/#{1,6}\s(.*)/g, '\\b \\fs24 $1 \\b0\\fs20\\par') // Convert headers
-        .replace(/\n/g, '\\par ') // Convert line breaks
-        .replace(/[{}\\]/g, '\\$&'); // Escape RTF control characters
-      
-      // Create RTF document
-      const rtfContent = `{\\rtf1\\ansi\\deff0 {\\fonttbl {\\f0 Times New Roman;}}
-\\f0\\fs20 ${cleanContent}}`;
-      
+      const blocks = parseContentToBlocks(content);
+
+      const rtfParts: string[] = [];
+      rtfParts.push('{\\rtf1\\ansi\\deff0');
+      rtfParts.push('{\\fonttbl{\\f0 Helvetica;}}');
+      rtfParts.push('\\f0\\fs20');
+
+      blocks.forEach((b) => {
+        switch (b.type) {
+          case 'h1':
+            rtfParts.push(`\\par \\b \\fs30 ${escapeRTF(b.text)} \\b0 \\fs20`);
+            break;
+          case 'h2':
+            rtfParts.push(`\\par \\b \\fs26 ${escapeRTF(b.text)} \\b0 \\fs20`);
+            break;
+          case 'h3':
+            rtfParts.push(`\\par \\b \\fs22 ${escapeRTF(b.text)} \\b0 \\fs20`);
+            break;
+          case 'bullet':
+            rtfParts.push(`\\par \\pard\\li720 \\tx720 \\fs20 \\bullet\\tab ${escapeRTF(b.text)} \\pard`);
+            break;
+          default:
+            rtfParts.push(`\\par ${escapeRTF(b.text)}`);
+        }
+      });
+
+      rtfParts.push('}');
+      const rtfContent = rtfParts.join(' ');
+
       const blob = new Blob([rtfContent], { type: 'application/rtf' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
