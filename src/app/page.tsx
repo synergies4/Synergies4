@@ -228,8 +228,8 @@ export default function HomePage() {
       {/* Testimonials */}
       <TestimonialsSection />
 
-      {/* Newsletter Section */}
-      <NewsletterSection />
+      {/* Newsletter Section temporarily removed */}
+      {/* <NewsletterSection /> */}
 
       {/* Partners */}
       <PartnersSection />
@@ -974,86 +974,10 @@ function TestimonialsSection() {
   );
 }
 
-// Newsletter Section
-function NewsletterSection() {
-  const [email, setEmail] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [error, setError] = useState('');
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setError('');
-    
-    try {
-      const response = await fetch('/api/newsletter', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to subscribe');
-      }
-
-      setIsSubmitted(true);
-      setEmail('');
-      
-      setTimeout(() => setIsSubmitted(false), 5000);
-    } catch (error) {
-      console.error('Newsletter subscription error:', error);
-      setError(error instanceof Error ? error.message : 'Failed to subscribe. Please try again.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  return (
-    <section className="py-20 bg-teal-600">
-      <div className="container mx-auto px-4 text-center">
-        <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-          Stay Updated
-        </h2>
-        <p className="text-xl text-teal-100 mb-8 max-w-2xl mx-auto">
-          Get the latest insights on AI, leadership, and professional development
-        </p>
-        
-        <form onSubmit={handleSubmit} className="max-w-md mx-auto">
-          <div className="flex gap-4">
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-              className="flex-1 px-4 py-3 rounded-lg bg-white text-gray-900 placeholder:text-gray-500"
-              required
-              disabled={isSubmitting}
-            />
-            <Button 
-              type="submit" 
-              disabled={isSubmitting}
-              className="bg-white text-teal-600 hover:bg-gray-100 px-6 py-3 font-medium"
-            >
-              {isSubmitting ? 'Subscribing...' : 'Subscribe'}
-            </Button>
-          </div>
-          
-          {error && (
-            <p className="text-red-200 mt-3 text-sm">{error}</p>
-          )}
-        </form>
-        
-        {isSubmitted && (
-          <p className="text-green-200 mt-4 font-medium">Thanks for subscribing! Check your email for confirmation.</p>
-        )}
-      </div>
-    </section>
-  );
-}
+// Newsletter Section temporarily removed
+// function NewsletterSection() {
+//   return null;
+// }
 
 // Partners Section
 function PartnersSection() {

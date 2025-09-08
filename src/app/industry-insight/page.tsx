@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import PageLayout from '@/components/shared/PageLayout';
 import HeroSection from '@/components/shared/HeroSection';
 import { 
@@ -29,8 +28,7 @@ import {
   MessageSquare,
   Eye,
   Clock,
-  Loader2,
-  Mail
+  Loader2
 } from 'lucide-react';
 
 // Blog post interface
@@ -65,11 +63,7 @@ export default function IndustryInsight() {
           text: "Explore All Insights",
           href: "#insights"
         }}
-        secondaryCTA={{
-          text: "Subscribe to Updates",
-          href: "#newsletter",
-          icon: <ArrowRight className="w-4 h-4" />
-        }}
+        // secondary CTA removed (newsletter paused)
         backgroundVariant="gradient"
         customColors={{
           background: "bg-gradient-to-br from-purple-50 via-violet-50 to-indigo-50",
@@ -84,8 +78,7 @@ export default function IndustryInsight() {
       {/* Blog Posts Section */}
       <BlogPostsSection />
 
-      {/* Newsletter Section */}
-      <NewsletterSection />
+      {/* Newsletter Section temporarily removed */}
     </PageLayout>
   );
 }

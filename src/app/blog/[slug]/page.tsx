@@ -341,20 +341,7 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
                   </Card>
                 )}
 
-                {/* Newsletter Signup */}
-                <Card className="bg-gradient-to-br from-blue-600 to-purple-600 text-white">
-                  <CardHeader>
-                    <CardTitle>Stay Updated</CardTitle>
-                    <CardDescription className="text-blue-100">
-                      Get the latest insights delivered to your inbox
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Button className="w-full bg-white text-blue-600 hover:bg-gray-100">
-                      Subscribe to Newsletter
-                    </Button>
-                  </CardContent>
-                </Card>
+                {/* Newsletter Signup removed temporarily */}
 
                 {/* Back to Blog */}
                 <Card>

@@ -156,18 +156,9 @@ export default function Contact() {
           icon: <MessageSquare className="w-4 h-4" />,
           text: "Get In Touch"
         }}
-        title="Let's Start a"
-        highlightText="Conversation"
-        description="Ready to transform your organization with AI-powered learning? We're here to help you every step of the way."
-        primaryCTA={{
-          text: "Start Conversation",
-          href: "#contact-form"
-        }}
-        secondaryCTA={{
-          text: "Get in Touch",
-          href: "#contact-form",
-          icon: <ArrowRight className="w-4 h-4" />
-        }}
+        title="Contact"
+        highlightText="Us"
+        description="Ready to unlock real results with AI-powered learning for yourself, team, or entire organization? We’re here to guide the journey, every step of the way."
         backgroundVariant="gradient"
         customColors={{
           background: "bg-gradient-to-br from-rose-50 via-pink-50 to-red-50",
@@ -743,17 +734,17 @@ export default function Contact() {
             
             <h2 className="text-4xl md:text-6xl font-bold mb-8 leading-tight">
               <span className="bg-gradient-to-r from-white via-blue-200 to-cyan-300 bg-clip-text text-transparent">
-                Let's Start the
+                Contact
               </span>
               <br />
               <span className="bg-gradient-to-r from-purple-300 via-pink-300 to-orange-300 bg-clip-text text-transparent">
-                Conversation
+                Us
               </span>
             </h2>
             
             <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed font-light mb-12">
-              Ready to transform your organization with AI-powered learning? 
-              <span className="text-cyan-300 font-medium"> We're here to help you every step of the way.</span>
+              Ready to unlock real results with AI-powered learning for yourself, team, or entire organization? 
+              <span className="text-cyan-300 font-medium"> We’re here to guide the journey, every step of the way.</span>
             </p>
 
             <Button 
