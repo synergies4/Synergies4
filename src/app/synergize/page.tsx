@@ -4509,7 +4509,7 @@ export default function SynergizeAgile() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [selectedRole, setSelectedRole] = useState<string>('scrum-master');
-  const [selectedMode, setSelectedMode] = useState<string>('chat');
+  const [selectedMode, setSelectedMode] = useState<string>('scenario');
   const [selectedProvider, setSelectedProvider] = useState<keyof typeof AI_PROVIDERS>('anthropic');
   const [isLoading, setIsLoading] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
@@ -4553,6 +4553,10 @@ export default function SynergizeAgile() {
     const modeParam = params.get('mode');
     if (view === 'chat' && !isFullChatView) {
       setIsFullChatView(true);
+    }
+    // Default to scenario simulator on initial load if no mode specified
+    if (!modeParam) {
+      setSelectedMode('scenario');
     }
     if (modeParam && ['chat','presentation','scenario','advisor'].includes(modeParam)) {
       setSelectedMode(modeParam);
@@ -5212,8 +5216,10 @@ DO NOT include any additional text, explanations, or markdown formatting - respo
   }, [isMobile]);
 
   const stableMainPlaceholder = useMemo(() => {
-    return isMobile ? "Ask your AI assistant..." : "Ask your assistant anything about Agile...";
-  }, [isMobile]);
+    return selectedMode === 'scenario'
+      ? (isMobile ? "Describe a scenario to simulate..." : "Describe the scenario you want to simulate...")
+      : (isMobile ? "Ask your AI assistant..." : "Ask your assistant anything about Agile...");
+  }, [isMobile, selectedMode]);
 
   const stableClassName = useMemo(() => {
     return `min-h-[50px] max-h-[150px] resize-none pr-12 text-gray-900 bg-white border-gray-300 placeholder:text-gray-500`;
@@ -5842,7 +5848,7 @@ DO NOT include any additional text, explanations, or markdown formatting - respo
   };
   // Full Chat View Component
   const FullChatView = () => (
-    <div className="h-screen flex bg-gray-50">
+    <div className="h-[90vh] md:h-screen flex bg-gray-50">
       {/* Sidebar */}
       <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 fixed lg:relative z-30 w-80 h-full bg-white border-r border-gray-200 shadow-lg transition-transform duration-300 ease-in-out`} data-sidebar-container="true">
         <div className="flex flex-col h-full">
@@ -6510,7 +6516,7 @@ Format as a realistic conversation with clear speaker labels and include decisio
         highlightText="AI-Powered Learning"
         description="Your personalized Agile training assistant. Get role-specific guidance, generate presentations, simulate scenarios, and accelerate your Scrum mastery with AI."
         primaryCTA={{
-          text: "Start Training",
+          text: "Start Using Our Scenario Simulator",
           href: "#agile-assistant"
         }}
         secondaryCTA={{
