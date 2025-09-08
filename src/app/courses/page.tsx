@@ -69,11 +69,7 @@ export default function Courses() {
           text: "Explore Courses",
           href: "#course-directory"
         }}
-        secondaryCTA={{
-          text: "Get Course Summary",
-          href: "#summary",
-          icon: <MessageSquare className="w-4 h-4" />
-        }}
+        // secondary CTA temporarily removed
         backgroundVariant="gradient"
         customColors={{
           background: "bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50",
@@ -85,8 +81,7 @@ export default function Courses() {
       {/* Course Directory Section */}
       <CourseDirectorySection />
 
-      {/* Get Course Summary Section */}
-      <CourseSummarySection />
+      {/* Course Summary Section temporarily removed */}
     </PageLayout>
   );
 }
