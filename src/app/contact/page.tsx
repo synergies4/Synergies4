@@ -222,8 +222,8 @@ export default function Contact() {
                     icon: <Phone className="h-6 w-6" />,
                     title: "Call Us",
                     description: "Mon-Fri from 9am to 6pm EST",
-                    contact: "(743) 837-3746",
-                    href: "tel:+1-743-837-3746",
+                    contact: "619-268-8924",
+                    href: "tel:+1-619-268-8924",
                     gradient: "from-green-500 to-emerald-400",
                     bgGradient: "from-green-50 to-emerald-50"
                   }
