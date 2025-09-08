@@ -111,7 +111,7 @@ export default function CreateCourse() {
     status: 'DRAFT',
     image: '',
     featured: false,
-    course_type: 'in_person',
+    course_type: 'digital',
     max_participants: '',
     location: '',
     instructor_name: '',
@@ -675,9 +675,9 @@ export default function CreateCourse() {
                     <SelectValue placeholder="Select course type" />
                   </SelectTrigger>
                   <SelectContent className="bg-white">
-                     <SelectItem value="in_person">🏢 In-Person Course</SelectItem>
-                    <SelectItem value="digital" disabled className="text-gray-400 cursor-not-allowed">🌐 Digital Course (Online) - Coming Soon</SelectItem>
-                    <SelectItem value="hybrid" disabled className="text-gray-400 cursor-not-allowed">🔄 Hybrid (Digital + In-Person) - Coming Soon</SelectItem>
+                    <SelectItem value="digital">A) Instructor-led (digital/remote)</SelectItem>
+                    <SelectItem value="in_person">B) Instructor-led (in-person)</SelectItem>
+                    <SelectItem value="self_paced" disabled className="text-gray-400 cursor-not-allowed">C) Self-Paced (disabled)</SelectItem>
                   </SelectContent>
                 </Select>
                 {formErrors.course_type && <p className="text-red-600 text-sm flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{formErrors.course_type}</p>}
