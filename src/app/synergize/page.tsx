@@ -6632,7 +6632,7 @@ Format as a realistic conversation with clear speaker labels and include decisio
               </p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 overflow-visible">
               {/* Role Selection */}
               <Card className="bg-gradient-to-br from-teal-50 to-emerald-50 border-0 shadow-lg">
                 <CardHeader className="pb-4">
@@ -6970,7 +6970,7 @@ Format as a realistic conversation with clear speaker labels and include decisio
                   </div>
 
                   {/* Specialized Mode Interface */}
-                  <div className="border-t bg-white p-4 flex-shrink-0 max-h-[300px] overflow-y-auto relative">
+                  <div className="border-t bg-white p-4 relative">
                     {selectedMode === 'presentation' && (
                       <PresentationGenerator
                         currentRole={currentRole}
