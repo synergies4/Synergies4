@@ -6268,7 +6268,7 @@ DO NOT include any additional text, explanations, or markdown formatting - respo
         )}
 
         {/* Input Area */}
-        <div className={`bg-white border-t border-gray-200 ${isMobile ? 'fixed bottom-0 left-0 right-0 z-50 shadow-lg touch-manipulation p-4 safe-area-inset-bottom' : 'p-4'}`}>
+        <div className={`bg-white border-t border-gray-200 p-4`}>
           {files.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-4">
               {files.map((file, index) => (
@@ -6292,7 +6292,7 @@ DO NOT include any additional text, explanations, or markdown formatting - respo
 
           {/* Specialized Mode Input - Only show for non-chat modes */}
           {selectedMode !== 'chat' && (
-            <div className="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <div className="mb-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
               <h3 className="text-sm font-medium text-gray-700 mb-3">
                 {selectedMode === 'presentation' && ''}
                 {selectedMode === 'scenario' && 'Scenario Simulator'}
@@ -6378,7 +6378,6 @@ DO NOT include any additional text, explanations, or markdown formatting - respo
 Scenario Context: ${scenarioContext.value}
 ${person1Role.value} Context: ${person1Context.value}
 ${person2Role.value} Context: ${person2Context.value}
-
 Generate a dialogue with:
 1. Initial situation setup
 2. 3-4 exchanges between both roles
