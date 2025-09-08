@@ -2598,6 +2598,54 @@ ${analysisData?.missing_keywords?.join(', ') || 'No keywords identified'}
                             <Download className="w-5 h-5 inline mr-2" />
                             Download Package (PDF)
                           </button>
+                          <button
+                            onClick={() => {
+                              const parts = [
+                                `JOB APPLICATION PACKAGE\n${jobData.job_title} at ${jobData.company_name}\nGenerated on ${new Date().toLocaleDateString()}\n`,
+                                '========================================',
+                                'TAILORED RESUME',
+                                '========================================',
+                                tailoredResume || 'Resume not generated',
+                                '========================================',
+                                'COVER LETTER',
+                                '========================================',
+                                coverLetter || 'Cover letter not generated',
+                                '========================================',
+                                'INTERVIEW PREPARATION',
+                                '========================================',
+                                (interviewQuestions.length > 0 ? interviewQuestions.map((q: any, i: number) => `Question ${i + 1}: ${q.question}\n\nTips: ${q.tips || 'No tips provided'}\n\nSuggested Approach: ${q.suggested_answer || 'No suggestions provided'}\n\n---\n`).join('') : 'Interview questions not generated'),
+                                '========================================',
+                                'JOB FIT ANALYSIS',
+                                '========================================',
+                                `Overall Fit Score: ${analysisData?.fit_score || 'Not analyzed'}%`,
+                                'Key Strengths:',
+                                (analysisData?.strengths?.map((s: string) => `• ${s}`).join('\n') || 'No analysis available'),
+                                'Areas for Improvement:',
+                                (analysisData?.improvements?.map((i: string) => `• ${i}`).join('\n') || 'No analysis available'),
+                                'Important Keywords:',
+                                (analysisData?.missing_keywords?.join(', ') || 'No keywords identified')
+                              ].join('\n');
+
+                              // Fallback simple .doc if DOCX helper not present
+                              // @ts-ignore
+                              if (typeof downloadAsDOCX === 'function') {
+                                // @ts-ignore
+                                downloadAsDOCX(parts, `${jobData.company_name}_Complete_Application_Package.docx`);
+                              } else {
+                                const blob = new Blob([parts], { type: 'application/msword' });
+                                const url = URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.download = `${jobData.company_name}_Complete_Application_Package.doc`;
+                                a.click();
+                                URL.revokeObjectURL(url);
+                              }
+                            }}
+                            className="px-8 py-4 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl font-semibold text-lg transform hover:scale-[1.02] active:scale-[0.98] w-full sm:w-auto"
+                          >
+                            <Download className="w-5 h-5 inline mr-2" />
+                            Download Package (DOCX)
+                          </button>
                         </div>
                       </div>
                     </div>
