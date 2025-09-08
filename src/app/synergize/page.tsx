@@ -6292,7 +6292,7 @@ DO NOT include any additional text, explanations, or markdown formatting - respo
 
           {/* Specialized Mode Input - Only show for non-chat modes */}
           {selectedMode !== 'chat' && (
-            <div className="mb-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
+            <div className="mb-12 p-8 bg-gray-50 rounded-lg border border-gray-200">
               <h3 className="text-sm font-medium text-gray-700 mb-3">
                 {selectedMode === 'presentation' && ''}
                 {selectedMode === 'scenario' && 'Scenario Simulator'}
@@ -6618,9 +6618,9 @@ Format as a realistic conversation with clear speaker labels and include decisio
       </section>
 
       {/* AI Assistant Interface */}
-      <section id="agile-assistant" className="py-6 md:py-8 bg-white">
+      <section id="agile-assistant" className="py-6 md:py-10 bg-white">
         <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto min-h-[85vh] md:min-h-[90vh] flex flex-col">
+          <div className="max-w-7xl mx-auto min-h-[95vh] md:min-h-[100vh] flex flex-col">
             {/* Header */}
             <div className="text-center mb-6">
               <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
@@ -6631,7 +6631,7 @@ Format as a realistic conversation with clear speaker labels and include decisio
               </p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 overflow-visible">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 flex-1 overflow-visible">
               {/* Role Selection */}
               <Card className="bg-gradient-to-br from-teal-50 to-emerald-50 border-0 shadow-lg">
                 <CardHeader className="pb-4">
