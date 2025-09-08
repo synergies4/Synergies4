@@ -6619,9 +6619,9 @@ Format as a realistic conversation with clear speaker labels and include decisio
       </section>
 
       {/* AI Assistant Interface */}
-      <section id="agile-assistant" className="py-12 bg-white">
+      <section id="agile-assistant" className="py-6 md:py-8 bg-white">
         <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-6xl mx-auto min-h-[85vh] md:min-h-[90vh] flex flex-col">
             {/* Header */}
             <div className="text-center mb-6">
               <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
@@ -6632,7 +6632,7 @@ Format as a realistic conversation with clear speaker labels and include decisio
               </p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1">
               {/* Role Selection */}
               <Card className="bg-gradient-to-br from-teal-50 to-emerald-50 border-0 shadow-lg">
                 <CardHeader className="pb-4">
