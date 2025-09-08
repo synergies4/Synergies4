@@ -6550,7 +6550,7 @@ Format as a realistic conversation with clear speaker labels and include decisio
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {Object.entries(INTERACTION_MODES).map(([key, mode]) => (
               <Card key={key} className="text-center hover:shadow-xl transition-all duration-300 group border-0 shadow-lg bg-white/90 backdrop-blur-sm hover:scale-105">
                 <CardHeader>
