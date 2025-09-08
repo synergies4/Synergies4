@@ -6828,7 +6828,7 @@ Format as a realistic conversation with clear speaker labels and include decisio
 
             {/* Enhanced Mobile-First Chat Interface */}
             <div className="mt-6">
-              <Card className={`${isMobile ? 'h-[70vh] min-h-[500px]' : 'h-[500px]'} flex flex-col border-0 shadow-xl overflow-hidden relative`}>
+              <Card className={`flex flex-col border-0 shadow-xl relative`}>
                 <CardHeader className={`bg-gradient-to-r ${currentRole.color} text-white rounded-t-lg flex-shrink-0 ${isMobile ? 'p-4' : 'p-6'}`}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
@@ -6852,121 +6852,92 @@ Format as a realistic conversation with clear speaker labels and include decisio
                   </div>
                 </CardHeader>
 
-                <CardContent className="flex-1 flex flex-col p-0 min-h-0 overflow-hidden">
-                  {/* Enhanced Mobile Messages Area */}
-                  <div 
-                    className={`flex-1 overflow-y-auto ${isMobile ? 'p-3' : 'p-4'} space-y-4 bg-gray-50 min-h-0 overscroll-contain`}
-                    data-chat-container="true"
-                    style={{
-                      WebkitOverflowScrolling: 'touch',
-                      scrollBehavior: 'smooth',
-                      touchAction: 'pan-y pinch-zoom',
-                      overscrollBehavior: 'contain'
-                    }}
-                  >
-                    {messages.length === 0 && (
-                      <div className="flex items-center justify-center h-full">
-                        <div className="text-center">
-                          <div className={`w-16 h-16 bg-gradient-to-r ${currentRole.color} rounded-full flex items-center justify-center mx-auto mb-4`}>
-                            <Bot className="h-8 w-8 text-white" />
+                <CardContent className="flex-1 flex flex-col p-0 min-h-0">
+                  {/* Messages area only for Chat mode */}
+                  {selectedMode === 'chat' && (
+                    <div 
+                      className={`flex-1 overflow-y-auto ${isMobile ? 'p-3' : 'p-4'} space-y-4 bg-gray-50 min-h-0 overscroll-contain`}
+                      data-chat-container="true"
+                      style={{
+                        WebkitOverflowScrolling: 'touch',
+                        scrollBehavior: 'smooth',
+                        touchAction: 'pan-y pinch-zoom',
+                        overscrollBehavior: 'contain'
+                      }}
+                    >
+                      {messages.length === 0 && (
+                        <div className="flex items-center justify-center h-full">
+                          <div className="text-center">
+                            <div className={`w-16 h-16 bg-gradient-to-r ${currentRole.color} rounded-full flex items-center justify-center mx-auto mb-4`}>
+                              <Bot className="h-8 w-8 text-white" />
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                              {currentRole.name} Assistant
+                            </h3>
+                            <p className="text-gray-600 max-w-sm">
+                              Ready to help with {currentMode.description.toLowerCase()}. Start by typing your question below.
+                            </p>
                           </div>
-                          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                            {currentRole.name} Assistant
-                          </h3>
-                          <p className="text-gray-600 max-w-sm">
-                            Ready to help with {currentMode.description.toLowerCase()}. Start by typing your question below.
-                          </p>
                         </div>
-                      </div>
-                    )}
-                    
-                    {messages.map((message) => (
-                      <div
-                        key={message.id}
-                        className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'} ${isMobile ? 'px-1' : ''}`}
-                      >
-                        <div
-                          className={`${isMobile ? 'max-w-[85%]' : 'max-w-[80%]'} rounded-lg ${isMobile ? 'p-3' : 'p-4'} break-words shadow-sm ${
-                            message.type === 'user'
-                              ? 'bg-gradient-to-r from-teal-600 to-emerald-600 text-white'
-                              : 'bg-white border border-gray-200'
-                          }`}
-                        >
-                          <div className="flex items-start space-x-3">
-                            {message.type === 'ai' && (
-                              <div className={`w-6 h-6 rounded-full bg-gradient-to-r ${currentRole.color} flex items-center justify-center flex-shrink-0 mt-1`}>
-                                <Bot className="h-3 w-3 text-white" />
-                              </div>
-                            )}
-                            <div className="flex-1 min-w-0">
-                                                          {/* Check if message contains presentation JSON */}
-                            {message.type === 'ai' && (
-                              message.content.includes('"slides"') && 
-                              message.content.includes('"slideNumber"') && 
-                              (message.content.includes('"title"') || message.content.includes('"layout"'))
-                            ) ? (
-                              <div className="space-y-4">
-                                <p className="text-sm text-green-600 font-medium">
-                                  ✅ Presentation generated successfully!
-                                </p>
-                                <PresentationDisplay 
-                                  messageContent={message.content} 
-                                  messageId={message.id}
-                                  onUpdateMessage={updateMessage}
-                                />
-                              </div>
-                            ) : (
-                              <p className={`text-sm leading-relaxed whitespace-pre-wrap break-words ${message.type === 'user' ? 'text-white' : 'text-gray-900'}`}>
-                                {message.content}
-                              </p>
-                            )}
-                              <div className="flex items-center justify-between mt-3">
-                                <div className="flex items-center space-x-2">
-                                  <span className={`text-xs ${message.type === 'user' ? 'text-teal-100' : 'text-gray-500'}`}>
-                                    {message.timestamp.toLocaleTimeString()}
-                                  </span>
-                                  {message.type === 'ai' && message.provider && (
-                                    <Badge className={`text-xs ${AI_PROVIDERS[message.provider].badgeColor} border-0`}>
-                                      {AI_PROVIDERS[message.provider].icon}
-                                      <span className="ml-1">{AI_PROVIDERS[message.provider].badge}</span>
-                                    </Badge>
+                      )}
+                      {messages.map((message) => (
+                        <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'} ${isMobile ? 'px-1' : ''}`}>
+                          <div className={`${isMobile ? 'max-w-[85%]' : 'max-w-[80%]'} rounded-lg ${isMobile ? 'p-3' : 'p-4'} break-words shadow-sm ${message.type === 'user' ? 'bg-gradient-to-r from-teal-600 to-emerald-600 text-white' : 'bg-white border border-gray-200'}`}>
+                            <div className="flex items-start space-x-3">
+                              {message.type === 'ai' && (
+                                <div className={`w-6 h-6 rounded-full bg-gradient-to-r ${currentRole.color} flex items-center justify-center flex-shrink-0 mt-1`}>
+                                  <Bot className="h-3 w-3 text-white" />
+                                </div>
+                              )}
+                              <div className="flex-1 min-w-0">
+                                {message.type === 'ai' && message.content.includes('"slides"') && message.content.includes('"slideNumber"') && (message.content.includes('"title"') || message.content.includes('"layout"')) ? (
+                                  <div className="space-y-4">
+                                    <p className="text-sm text-green-600 font-medium">✅ Presentation generated successfully!</p>
+                                    <PresentationDisplay messageContent={message.content} messageId={message.id} onUpdateMessage={updateMessage} />
+                                  </div>
+                                ) : (
+                                  <p className={`text-sm leading-relaxed whitespace-pre-wrap break-words ${message.type === 'user' ? 'text-white' : 'text-gray-900'}`}>{message.content}</p>
+                                )}
+                                <div className="flex items-center justify-between mt-3">
+                                  <div className="flex items-center space-x-2">
+                                    <span className={`text-xs ${message.type === 'user' ? 'text-teal-100' : 'text-gray-500'}`}>{message.timestamp.toLocaleTimeString()}</span>
+                                    {message.type === 'ai' && message.provider && (
+                                      <Badge className={`text-xs ${AI_PROVIDERS[message.provider].badgeColor} border-0`}>
+                                        {AI_PROVIDERS[message.provider].icon}
+                                        <span className="ml-1">{AI_PROVIDERS[message.provider].badge}</span>
+                                      </Badge>
+                                    )}
+                                  </div>
+                                  {message.type === 'ai' && (
+                                    <Button variant="ghost" size="sm" onClick={() => copyMessage(message.content)} className="h-6 w-6 p-0 hover:bg-gray-100 flex-shrink-0">
+                                      <Copy className="h-3 w-3" />
+                                    </Button>
                                   )}
                                 </div>
-                                {message.type === 'ai' && (
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => copyMessage(message.content)}
-                                    className="h-6 w-6 p-0 hover:bg-gray-100 flex-shrink-0"
-                                  >
-                                    <Copy className="h-3 w-3" />
-                                  </Button>
-                                )}
                               </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
-                    
-                    {isLoading && (
-                      <div className="flex justify-start">
-                        <div className="bg-white border shadow-sm rounded-lg p-4 max-w-[80%]">
-                          <div className="flex items-center space-x-2">
-                            <div className={`w-6 h-6 rounded-full bg-gradient-to-r ${currentRole.color} flex items-center justify-center`}>
-                              <Bot className="h-3 w-3 text-white" />
-                            </div>
-                            <div className="flex space-x-1">
-                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                      ))}
+                      {isLoading && (
+                        <div className="flex justify-start">
+                          <div className="bg-white border shadow-sm rounded-lg p-4 max-w-[80%]">
+                            <div className="flex items-center space-x-2">
+                              <div className={`w-6 h-6 rounded-full bg-gradient-to-r ${currentRole.color} flex items-center justify-center`}>
+                                <Bot className="h-3 w-3 text-white" />
+                              </div>
+                              <div className="flex space-x-1">
+                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    )}
-                    <div ref={messagesEndRef} />
-                  </div>
+                      )}
+                      <div ref={messagesEndRef} />
+                    </div>
+                  )}
 
                   {/* Specialized Mode Interface */}
                   <div className="border-t bg-white p-4 relative">
