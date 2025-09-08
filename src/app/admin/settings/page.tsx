@@ -35,6 +35,7 @@ import {
   Info
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { toast } from 'sonner';
 
 interface PlatformSettings {
   site_name: string;
@@ -126,15 +127,25 @@ export default function AdminSettings() {
       setLoading(true);
       const supabase = createClient();
       
-      // Try to load settings from database
+      // Try to load settings row with id=1
       const { data: settingsData, error } = await supabase
         .from('platform_settings')
         .select('*')
+        .eq('id', 1)
         .single();
 
       if (error) {
-        console.warn('Settings not found in database, using defaults:', error.message);
-        // Use default settings if none exist
+        console.warn('Settings not found in database, creating defaults (id=1):', error.message);
+        // Seed the table with a single row (id=1) using current defaults
+        const seed = { id: 1, ...settings } as any;
+        const { error: seedError } = await supabase
+          .from('platform_settings')
+          .upsert(seed, { onConflict: 'id' });
+        if (seedError) {
+          console.error('Failed to seed default settings:', seedError.message);
+        } else {
+          setSettings(prev => ({ ...prev, ...seed }));
+        }
       } else if (settingsData) {
         setSettings(prev => ({ ...prev, ...settingsData }));
       }
@@ -151,22 +162,23 @@ export default function AdminSettings() {
       setSaving(true);
       const supabase = createClient();
       
-      // Save settings to database
+      // Ensure single row id=1 and save settings to database
+      const payload = { id: 1, ...settings } as any;
       const { error } = await supabase
         .from('platform_settings')
-        .upsert(settings, { onConflict: 'id' });
+        .upsert(payload, { onConflict: 'id' });
 
       if (error) {
         console.error('Error saving settings:', error);
-        alert('Failed to save settings. Please try again.');
+        toast.error(`Failed to save settings: ${error.message}`);
       } else {
-        alert('Settings saved successfully!');
+        toast.success('Settings saved successfully!');
       }
       
       setSaving(false);
     } catch (error) {
       console.error('Error saving settings:', error);
-      alert('Failed to save settings. Please try again.');
+      toast.error('Failed to save settings. Please try again.');
       setSaving(false);
     }
   };
