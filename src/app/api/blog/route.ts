@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 // Force dynamic rendering for this API route
 export const dynamic = 'force-dynamic';
@@ -137,7 +138,6 @@ export async function POST(request: NextRequest) {
       content,
       image,
       category,
-      categories = [],
       tags,
       meta_title,
       meta_description,
@@ -153,29 +153,7 @@ export async function POST(request: NextRequest) {
     }
 
     const supabase = await createClient();
-
-    // Check if slug already exists
-    const { data: existingPost, error: slugError } = await supabase
-      .from('blog_posts')
-      .select('id')
-      .eq('slug', slug)
-      .single();
-
-    if (slugError && slugError.code !== 'PGRST116') {
-      console.error('Error checking slug:', slugError);
-      return NextResponse.json(
-        { message: 'Error checking slug uniqueness' },
-        { status: 500 }
-      );
-    }
-
-    if (existingPost) {
-      console.log('Slug already exists:', slug);
-      return NextResponse.json(
-        { message: 'A post with this slug already exists' },
-        { status: 400 }
-      );
-    }
+    const admin = createAdminClient();
 
     // Create post data with all the columns (except status for now)
     const postData = {
@@ -185,7 +163,6 @@ export async function POST(request: NextRequest) {
       content,
       image: image || '',
       category,
-      categories,
       tags: tags || [],
       author_id: user.id,
       meta_title: meta_title || title,
@@ -197,7 +174,8 @@ export async function POST(request: NextRequest) {
 
     console.log('Inserting post data:', postData);
 
-    const { data: post, error } = await supabase
+    // Use admin client to bypass RLS after verifying ADMIN role
+    const { data: post, error } = await admin
       .from('blog_posts')
       .insert([postData])
       .select()
@@ -205,6 +183,12 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error('Error creating blog post:', error);
+      if ((error as any).code === '23505') {
+        return NextResponse.json(
+          { message: 'A post with this slug already exists' },
+          { status: 400 }
+        );
+      }
       return NextResponse.json(
         { message: `Failed to create blog post: ${error.message}` },
         { status: 500 }
