@@ -150,11 +150,9 @@ export default function CreateCourse() {
 
     const reviewStep = { number: courseType === 'digital' || courseType === 'hybrid' ? 6 : 4, title: 'Review', description: 'Final review', icon: CheckCircle };
 
-    if (courseType === 'digital' || courseType === 'hybrid') {
-      return [...baseSteps, ...digitalSteps, reviewStep];
-    } else {
-      return [...baseSteps, reviewStep];
-    }
+    // Only digital shows Modules/Quiz; in-person shows Review next
+    if (courseType === 'digital') return [...baseSteps, ...digitalSteps, reviewStep];
+    return [...baseSteps, reviewStep];
   };
 
   const steps = getStepsForCourseType(formData.course_type);
@@ -263,7 +261,8 @@ export default function CreateCourse() {
       // Generate unique filename
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `course-images/${fileName}`;
+      const userFolder = (user?.id || 'public').toString();
+      const filePath = `course-images/${userFolder}/${fileName}`;
 
       // Upload to Supabase storage
       const { data, error } = await supabase.storage
@@ -286,7 +285,10 @@ export default function CreateCourse() {
         handleInputChange('image', urlData.publicUrl);
         toast.success('Image uploaded successfully!');
       } else {
-        throw new Error('Failed to get public URL');
+        // Fallback to Supabase formed URL if helper failed
+        const fallbackUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/synergies4/${filePath}`;
+        handleInputChange('image', fallbackUrl);
+        toast.success('Image uploaded (fallback URL used).');
       }
     } catch (error) {
       console.error('Error uploading image:', error);

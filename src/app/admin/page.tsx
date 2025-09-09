@@ -332,11 +332,18 @@ export default function AdminDashboard() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button className="w-full text-sm bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-300" asChild>
-                    <Link href="/admin/courses/new">
-                      Create New Course
-                    </Link>
-                  </Button>
+                  <div className="flex flex-col gap-2">
+                    <Button className="w-full text-sm bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-300" asChild>
+                      <Link href="/admin/courses/new">
+                        Create New Course
+                      </Link>
+                    </Button>
+                    <Button variant="outline" className="w-full text-sm bg-white/80 border-2 border-teal-200 text-teal-700 hover:bg-teal-50 hover:border-teal-400 hover:text-teal-800 font-medium" asChild>
+                      <Link href="/admin/courses">
+                        Manage Courses
+                      </Link>
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             </div>

@@ -349,6 +349,24 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createClient();
 
+    // Normalize possibly string fields to arrays to avoid malformed array literal errors
+    const normalizeToArray = (val: any) => {
+      if (val === null || val === undefined) return [];
+      if (Array.isArray(val)) return val;
+      if (typeof val === 'string') {
+        const trimmed = val.trim();
+        if (trimmed.length === 0) return [];
+        // Split on commas when provided as a single string
+        return trimmed.includes(',') ? trimmed.split(',').map((s) => s.trim()).filter(Boolean) : [trimmed];
+      }
+      return [];
+    };
+
+    const normalizedPrereqs = normalizeToArray(prerequisites);
+    const normalizedObjectives = normalizeToArray(learning_objectives);
+    const normalizedAudience = normalizeToArray(target_audience);
+    const normalizedTags = normalizeToArray(tags);
+
     const { data: course, error } = await supabase
       .from('courses')
       .insert({
@@ -363,10 +381,10 @@ export async function POST(request: NextRequest) {
         status,
         featured,
         instructor_id,
-        prerequisites,
-        learning_objectives,
-        target_audience,
-        tags
+        prerequisites: normalizedPrereqs,
+        learning_objectives: normalizedObjectives,
+        target_audience: normalizedAudience,
+        tags: normalizedTags
       })
       .select()
       .single();
