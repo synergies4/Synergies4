@@ -6,6 +6,7 @@ import { PerformanceOptimizer } from "@/components/PerformanceOptimizer";
 import PWAInstaller from "@/components/PWAInstaller";
 import AdminFloatingButton from "@/components/AdminFloatingButton";
 import AuthDebugger from "@/components/AuthDebugger";
+import RecoveryRedirect from "@/components/RecoveryRedirect";
 import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -132,6 +133,7 @@ export default function RootLayout({
       <body className={inter.className} suppressHydrationWarning>
         <PerformanceOptimizer />
         <AuthProvider>
+          <RecoveryRedirect />
           {children}
           <AdminFloatingButton />
           {/* PWA install prompt disabled for now */}
