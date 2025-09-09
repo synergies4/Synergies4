@@ -157,6 +157,11 @@ export default function NewBlogPostPage() {
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    if (formErrors[field]) {
+      setFormErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
+
   const toggleCategory = (value: string) => {
     setFormData(prev => {
       const exists = prev.categories.includes(value);
@@ -188,11 +193,6 @@ export default function NewBlogPostPage() {
       alert(e.message || 'Upload failed');
     } finally {
       setLoading(false);
-    }
-  };
-    
-    if (formErrors[field]) {
-      setFormErrors(prev => ({ ...prev, [field]: '' }));
     }
   };
 
