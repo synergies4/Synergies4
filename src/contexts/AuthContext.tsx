@@ -148,8 +148,8 @@ async function getOrCreateUserProfile(supabase: any, user: User): Promise<UserPr
     if (userError?.code === 'PGRST116' || userError?.message?.includes('No rows found')) {
       console.log('No user found, creating new one for user:', user.id);
       
-      // Check if user is admin
-      const isAdmin = user.email === 'admin@synergies4.com' || user.email === 'paul@antimatterai.com';
+      // Only allow explicit admin bootstrap by primary admin email
+      const isAdmin = user.email === 'admin@synergies4.com';
       
       const newUser = {
         id: user.id,
@@ -196,8 +196,8 @@ async function getOrCreateUserProfile(supabase: any, user: User): Promise<UserPr
 
     console.warn('Database not available, using temporary profile:', userError?.message);
     
-    // Check if user is admin
-    const isAdmin = user.email === 'admin@synergies4.com' || user.email === 'paul@antimatterai.com';
+    // Only allow explicit admin bootstrap by primary admin email
+    const isAdmin = user.email === 'admin@synergies4.com';
     
     // Return a default profile instead of null
     return {
@@ -214,8 +214,8 @@ async function getOrCreateUserProfile(supabase: any, user: User): Promise<UserPr
   } catch (error) {
     console.warn('Profile creation failed, using temporary profile:', error);
     
-    // Check if user is admin
-    const isAdmin = user.email === 'admin@synergies4.com' || user.email === 'paul@antimatterai.com';
+    // Only allow explicit admin bootstrap by primary admin email
+    const isAdmin = user.email === 'admin@synergies4.com';
     
     // Return a default profile instead of null
     return {

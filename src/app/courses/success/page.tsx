@@ -110,6 +110,24 @@ function CourseSuccessContent() {
       }
 
       attempts += 1;
+      if (attempts === 4 && !isCancelled) {
+        // Midway fallback: call confirm-session to create enrollment if webhook was delayed
+        try {
+          const supabase = createClient();
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session && sessionId && courseId) {
+            await fetch('/api/stripe/confirm-session', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session.access_token}`,
+              },
+              body: JSON.stringify({ sessionId, courseId }),
+            });
+          }
+        } catch {}
+      }
+
       if (attempts < 8 && !isCancelled) {
         setTimeout(pollEnrollment, 1500); // try for ~12s total
       } else {
