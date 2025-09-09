@@ -147,41 +147,7 @@ export default function HomePage() {
             </Button>
           </div>
 
-          {/* Founder/Expert Introduction with Human Photo */}
-          <div className="flex flex-col md:flex-row items-center justify-center max-w-5xl mx-auto mb-16 sm:mb-20 px-4 sm:px-0 gap-8 md:gap-12">
-            {/* Professional Photo */}
-            <div className="relative group">
-              <div className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-full overflow-hidden border-4 border-white shadow-2xl group-hover:shadow-teal-500/25 transition-all duration-300 group-hover:scale-105">
-                <Image
-                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&auto=format&q=80"
-                  alt="Paul Wallace, Founder & Lead Instructor"
-                  width={192}
-                  height={192}
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                />
-              </div>
-              {/* Trust indicators */}
-              <div className="absolute -bottom-2 -right-2 bg-teal-600 text-white rounded-full p-2 shadow-lg">
-                <Award className="w-5 h-5" />
-              </div>
-            </div>
-            
-            {/* Introduction Text */}
-            <div className="text-center md:text-left max-w-2xl">
-              <div className="mb-4">
-                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Meet Your Guide</h3>
-                <p className="text-base sm:text-lg text-gray-700 font-medium">Paul Wallace, Founder & Lead Instructor</p>
-              </div>
-              <p className="text-sm sm:text-base text-gray-600 leading-relaxed mb-4">
-                "After 15+ years helping teams and leaders transform through agile practices, I've distilled the most effective frameworks into practical, AI-enhanced learning experiences that deliver real results."
-              </p>
-              <div className="flex flex-wrap gap-2 justify-center md:justify-start">
-                <Badge variant="outline" className="text-xs font-medium">Certified Agile Coach</Badge>
-                <Badge variant="outline" className="text-xs font-medium">15+ Years Experience</Badge>
-                <Badge variant="outline" className="text-xs font-medium">10K+ Students Trained</Badge>
-              </div>
-            </div>
-          </div>
+          {/* Founder/Expert Introduction temporarily removed */}
 
           {/* Enhanced Stats with Cards - Fixed Spacing */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 max-w-4xl mx-auto mb-24 sm:mb-24 px-4 sm:px-0">
