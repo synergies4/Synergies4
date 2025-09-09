@@ -1,0 +1,25 @@
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
+
+export function middleware(request: NextRequest) {
+  const url = request.nextUrl.clone();
+  const hasCode = url.searchParams.has('code');
+
+  // If Supabase sends a recovery link to any page (often '/'),
+  // redirect to our reset-password flow while preserving query.
+  if (hasCode && url.pathname !== '/reset-password') {
+    url.pathname = '/reset-password';
+    return NextResponse.redirect(url);
+  }
+
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: [
+    // Run on all routes except static files and API
+    '/((?!_next/static|_next/image|favicon.ico|sw.js|workbox-.*|api).*)',
+  ],
+};
+
+
