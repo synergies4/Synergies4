@@ -763,11 +763,11 @@ function DashboardContent() {
                 <p className="text-gray-600 mt-1">Jump into your most important tasks</p>
               </div>
               <Button 
-                onClick={() => router.push('/onboarding')} 
+                onClick={() => router.push('/reset-password')} 
                 className="btn-modern bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white px-6 py-2 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
               >
                 <Settings className="w-4 h-4 mr-2" />
-                Update Profile
+                Reset Password
               </Button>
             </div>
 
