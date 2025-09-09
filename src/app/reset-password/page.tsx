@@ -16,6 +16,7 @@ export default function ResetPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [hasSession, setHasSession] = useState(false);
 
   useEffect(() => {
     const exchange = async () => {
@@ -24,12 +25,15 @@ export default function ResetPasswordPage() {
       try {
         const url = new URL(href);
         const code = url.searchParams.get('code');
+        const tokenHash = url.searchParams.get('token_hash');
         if (code) {
           // Prefer direct code exchange when present
           // @ts-ignore - some versions accept string code
           await supabase.auth.exchangeCodeForSession(code).catch(async () => {
             await supabase.auth.exchangeCodeForSession(href);
           });
+        } else if (tokenHash) {
+          await supabase.auth.verifyOtp({ type: 'recovery', token_hash: tokenHash });
         } else {
           await supabase.auth.exchangeCodeForSession(href);
         }
@@ -44,6 +48,24 @@ export default function ResetPasswordPage() {
           }
         } catch {}
       }
+      // Poll for session
+      let tries = 0;
+      const waitForSession = async () => {
+        const { data } = await supabase.auth.getSession();
+        if (data.session) {
+          setHasSession(true);
+          return;
+        }
+        tries += 1;
+        if (tries < 10) setTimeout(waitForSession, 300);
+      };
+      waitForSession();
+
+      const { data: listener } = supabase.auth.onAuthStateChange((_e, sess) => {
+        if (sess) setHasSession(true);
+      });
+
+      return () => listener.subscription.unsubscribe();
     };
     exchange();
   }, []);
@@ -62,6 +84,12 @@ export default function ResetPasswordPage() {
     setIsLoading(true);
     try {
       const supabase = createClient();
+      const { data: s } = await supabase.auth.getSession();
+      if (!s.session) {
+        setError('Auth session missing! Please click the newest reset link again.');
+        setIsLoading(false);
+        return;
+      }
       const { error } = await supabase.auth.updateUser({ password: newPassword });
       if (error) throw error;
       setSuccess(true);
@@ -99,6 +127,13 @@ export default function ResetPasswordPage() {
                     <AlertDescription>{error}</AlertDescription>
                   </Alert>
                 )}
+                {!hasSession && (
+                  <Alert>
+                    <AlertDescription>
+                      Verifying secure link... If this doesn’t complete, request a fresh reset email.
+                    </AlertDescription>
+                  </Alert>
+                )}
                 <div className="space-y-2">
                   <Label htmlFor="password">New Password</Label>
                   <div className="relative">
@@ -127,7 +162,7 @@ export default function ResetPasswordPage() {
                     />
                   </div>
                 </div>
-                <Button type="submit" disabled={isLoading} className="w-full h-12">
+                <Button type="submit" disabled={isLoading || !hasSession} className="w-full h-12">
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
