@@ -468,7 +468,11 @@ export default function AdminDashboard() {
                 ) : (
                   <div className="space-y-4">
                     {courses.slice(0, 5).map((course) => (
-                      <div key={course.id} className="flex items-center justify-between p-4 border-2 border-gray-200 rounded-xl bg-gradient-to-r from-gray-50 to-teal-50 hover:from-teal-50 hover:to-emerald-50 hover:border-teal-200 transition-all duration-300 group">
+                      <div 
+                        key={course.id} 
+                        className="flex items-center justify-between p-4 border-2 border-gray-200 rounded-xl bg-gradient-to-r from-gray-50 to-teal-50 hover:from-teal-50 hover:to-emerald-50 hover:border-teal-200 transition-all duration-300 group cursor-pointer"
+                        onClick={() => router.push(`/admin/courses/${course.id}`)}
+                      >
                         <div className="flex-1">
                           <h3 className="font-semibold text-gray-900 group-hover:text-teal-800 transition-colors">{course.title}</h3>
                           <div className="flex items-center gap-2 mt-2">

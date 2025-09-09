@@ -863,19 +863,37 @@ function DashboardContent() {
                 <h2 className="text-2xl font-bold text-gray-900">My Enrollments</h2>
                 <p className="text-gray-600 mt-1">Your current course enrollments and progress</p>
               </div>
-              <Button 
-                onClick={() => router.push('/courses')}
-                className="btn-modern bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white px-6 py-2 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
-              >
-                Browse Courses
-              </Button>
+              <div className="flex items-center space-x-3">
+                <Button 
+                  onClick={fetchDashboardData}
+                  variant="outline"
+                  className="btn-modern border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-xl transition-all duration-200"
+                  disabled={loading}
+                >
+                  {loading ? 'Refreshing...' : 'Refresh'}
+                </Button>
+                <Button 
+                  onClick={() => router.push('/courses')}
+                  className="btn-modern bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white px-6 py-2 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                >
+                  Browse Courses
+                </Button>
+              </div>
             </div>
 
             {enrollments.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {enrollments.map((enrollment: any, index: number) => (
                   <div key={enrollment.id || index} className="card-modern p-6 rounded-2xl hover:shadow-lg transition-all duration-200 group cursor-pointer" 
-                       onClick={() => router.push(`/courses/${createCourseSlug(enrollment.course?.title || '')}`)}>
+                       onClick={() => {
+                         const courseSlug = createCourseSlug(enrollment.course?.title || '');
+                         // For enrolled users, navigate to the learn page instead of course details
+                         if (enrollment.status === 'ACTIVE' || enrollment.status === 'COMPLETED') {
+                           router.push(`/learn/${courseSlug}`);
+                         } else {
+                           router.push(`/courses/${courseSlug}`);
+                         }
+                       }}>
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
                         <div className="flex items-center space-x-3 mb-3">
@@ -952,7 +970,9 @@ function DashboardContent() {
                     {/* Action Button */}
                     <div className="flex items-center justify-between pt-3 border-t border-gray-100">
                       <span className="text-sm text-gray-600">
-                        {enrollment.progress_percentage === 100 ? 'Completed' : 'Continue Learning'}
+                        {enrollment.progress_percentage === 100 ? 'Course Completed' : 
+                         enrollment.status === 'ACTIVE' ? 'Continue Learning' : 
+                         'View Course'}
                       </span>
                       <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 transition-all duration-200" />
                     </div>
