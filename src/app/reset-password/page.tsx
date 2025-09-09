@@ -18,14 +18,22 @@ export default function ResetPasswordPage() {
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    // Exchange the redirect code for a session when arriving from email link
     const exchange = async () => {
+      const supabase = createClient();
+      const href = window.location.href;
       try {
-        const supabase = createClient();
-        // Supabase v2: exchangeCodeForSession will handle both query and hash
-        await supabase.auth.exchangeCodeForSession(window.location.href);
-      } catch {
-        // Ignore; user may already have a session from the recovery link
+        // Try code exchange first
+        await supabase.auth.exchangeCodeForSession(href);
+      } catch (e) {
+        // If the link used hash parameters (older Supabase), copy hash -> search and retry
+        try {
+          const url = new URL(href);
+          if (url.hash && !url.search) {
+            const params = new URLSearchParams(url.hash.replace(/^#/, ''));
+            url.search = params.toString();
+            await supabase.auth.exchangeCodeForSession(url.toString());
+          }
+        } catch {}
       }
     };
     exchange();
