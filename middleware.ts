@@ -3,6 +3,13 @@ import { NextResponse } from 'next/server';
 
 export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
+  const host = request.headers.get('host') || '';
+
+  // Force www to avoid SSL/redirect inconsistencies and preserve query
+  if (host === 'synergies4ai.com') {
+    url.hostname = 'www.synergies4ai.com';
+    return NextResponse.redirect(url);
+  }
   const hasCode = url.searchParams.has('code');
   const hasAuthError = url.searchParams.has('error') || url.searchParams.has('error_code');
   const hasRecovery = url.searchParams.get('type') === 'recovery' || url.searchParams.has('token_hash');
