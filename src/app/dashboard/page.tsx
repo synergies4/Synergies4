@@ -512,6 +512,8 @@ function DashboardContent() {
         return;
       }
 
+      const base = (process.env.NEXT_PUBLIC_SITE_URL || (typeof window !== 'undefined' ? window.location.origin : 'https://www.synergies4ai.com')).replace(/\/$/, '');
+
       const response = await fetch('/api/stripe/create-subscription', {
         method: 'POST',
         headers: {
@@ -520,8 +522,8 @@ function DashboardContent() {
         },
         body: JSON.stringify({
           planId,
-          successUrl: `${window.location.origin}/dashboard?subscription=success`,
-          cancelUrl: `${window.location.origin}/dashboard`,
+          successUrl: `${base}/dashboard?subscription=success`,
+          cancelUrl: `${base}/dashboard`,
         }),
       });
 
