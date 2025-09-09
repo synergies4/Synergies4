@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle, ArrowRight, BookOpen, Award } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { createClient } from '@/lib/supabase/client';
 
 interface Course {
   id: string;
@@ -26,6 +27,8 @@ function CourseSuccessContent() {
   const sessionId = searchParams.get('session_id');
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
+  const [enrollmentReady, setEnrollmentReady] = useState(false);
+  const [checkingEnrollment, setCheckingEnrollment] = useState(true);
 
   useEffect(() => {
     const fetchCourseDetails = async () => {
@@ -58,6 +61,69 @@ function CourseSuccessContent() {
 
     fetchCourseDetails();
   }, [courseId]);
+
+  // Poll for enrollment creation from Stripe webhook and auto-enable Start Learning
+  useEffect(() => {
+    let isCancelled = false;
+    let attempts = 0;
+
+    const pollEnrollment = async () => {
+      if (!courseId) {
+        setCheckingEnrollment(false);
+        return;
+      }
+
+      try {
+        const supabase = createClient();
+        const { data: { session } } = await supabase.auth.getSession();
+
+        if (!session) {
+          setCheckingEnrollment(false);
+          return;
+        }
+
+        const res = await fetch(`/api/courses/${courseId}/enroll`, {
+          headers: { Authorization: `Bearer ${session.access_token}` },
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.enrolled) {
+            if (!isCancelled) {
+              setEnrollmentReady(true);
+              setCheckingEnrollment(false);
+              // If we already know the course title, redirect straight to learn after a short delay
+              if (course) {
+                setTimeout(() => {
+                  if (!isCancelled) {
+                    const slug = createCourseSlug(course.title);
+                    window.location.href = `/learn/${slug}`;
+                  }
+                }, 800);
+              }
+              return;
+            }
+          }
+        }
+      } catch (e) {
+        // Ignore and retry
+      }
+
+      attempts += 1;
+      if (attempts < 8 && !isCancelled) {
+        setTimeout(pollEnrollment, 1500); // try for ~12s total
+      } else {
+        if (!isCancelled) setCheckingEnrollment(false);
+      }
+    };
+
+    // start polling shortly after mount to give webhook a moment
+    const timer = setTimeout(pollEnrollment, 700);
+    return () => {
+      isCancelled = true;
+      clearTimeout(timer);
+    };
+  }, [courseId, course]);
 
   if (loading) {
     return (
@@ -131,10 +197,20 @@ function CourseSuccessContent() {
                 <Button
                   asChild
                   className="bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white font-semibold py-4 px-8 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all"
+                  disabled={!enrollmentReady}
                 >
-                  <Link href={`/learn/${createCourseSlug(course.title)}`}>
-                    Start Learning
-                    <ArrowRight className="h-5 w-5 ml-2" />
+                  <Link href={course ? `/learn/${createCourseSlug(course.title)}` : '/courses'}>
+                    {checkingEnrollment && !enrollmentReady ? (
+                      <>
+                        Verifying Enrollment...
+                        <ArrowRight className="h-5 w-5 ml-2" />
+                      </>
+                    ) : (
+                      <>
+                        Start Learning
+                        <ArrowRight className="h-5 w-5 ml-2" />
+                      </>
+                    )}
                   </Link>
                 </Button>
               )}

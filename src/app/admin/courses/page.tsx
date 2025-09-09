@@ -518,6 +518,11 @@ export default function CoursesManagement() {
                         </Link>
                       </Button>
                       <Button size="sm" variant="secondary" className="bg-white/90 hover:bg-white p-1 sm:p-2" asChild>
+                        <Link href={`/admin/courses/${course.id}/enrollments`}>
+                          <Users className="h-3 w-3" />
+                        </Link>
+                      </Button>
+                      <Button size="sm" variant="secondary" className="bg-white/90 hover:bg-white p-1 sm:p-2" asChild>
                         <Link href={`/admin/courses/${course.id}`}>
                           <Edit className="h-3 w-3" />
                         </Link>

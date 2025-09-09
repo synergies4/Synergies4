@@ -187,6 +187,7 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
 
       // If course requires payment, use Stripe checkout
       if (course.price && course.price > 0) {
+        const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_URL || (typeof window !== 'undefined' ? window.location.origin : 'https://synergies4.vercel.app')) as string;
         const response = await fetch('/api/stripe/create-checkout-session', {
           method: 'POST',
           headers: {
@@ -195,8 +196,8 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
           },
           body: JSON.stringify({
             courseId: course.id,
-            successUrl: `${process.env.NEXT_PUBLIC_URL || 'https://synergies4.vercel.app'}/courses/success?course_id=${course.id}`,
-            cancelUrl: `${process.env.NEXT_PUBLIC_URL || 'https://synergies4.vercel.app'}/courses/${slug}`
+            successUrl: `${baseUrl}/courses/success?course_id=${course.id}&session_id={CHECKOUT_SESSION_ID}`,
+            cancelUrl: `${baseUrl}/courses/${slug}`
           }),
         });
 

@@ -601,6 +601,12 @@ export default function EditCourse({ params }: { params: Promise<{ id: string }>
                   Back to Courses
                 </Link>
               </Button>
+              <Button variant="outline" asChild>
+                <Link href={`/admin/courses/${id}/enrollments`}>
+                  <Users className="w-4 h-4 mr-2" />
+                  View Enrollments
+                </Link>
+              </Button>
               <Button 
                 onClick={handleSave} 
                 disabled={saving}
