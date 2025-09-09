@@ -4,10 +4,12 @@ import { NextResponse } from 'next/server';
 export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
   const hasCode = url.searchParams.has('code');
+  const hasAuthError = url.searchParams.has('error') || url.searchParams.has('error_code');
+  const hasRecovery = url.searchParams.get('type') === 'recovery' || url.searchParams.has('token_hash');
 
   // If Supabase sends a recovery link to any page (often '/'),
   // redirect to our reset-password flow while preserving query.
-  if (hasCode && url.pathname !== '/reset-password') {
+  if ((hasCode || hasAuthError || hasRecovery) && url.pathname !== '/reset-password') {
     url.pathname = '/reset-password';
     return NextResponse.redirect(url);
   }
