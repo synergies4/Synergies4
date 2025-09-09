@@ -27,8 +27,10 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient();
 
     // Use Supabase's built-in password reset functionality
+    // Always prefer canonical www domain if env is missing/misconfigured
+    const base = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.synergies4ai.com').replace(/\/$/, '');
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/reset-password`,
+      redirectTo: `${base}/reset-password`,
     });
 
     if (error) {
@@ -54,7 +56,7 @@ export async function POST(request: NextRequest) {
       // Send our custom password reset email
       await emailService.sendPasswordReset({
         email,
-        resetLink: `${process.env.NEXT_PUBLIC_SITE_URL}/reset-password?email=${encodeURIComponent(email)}`,
+        resetLink: `${base}/reset-password?email=${encodeURIComponent(email)}`,
         userName,
       });
     } catch (emailError) {

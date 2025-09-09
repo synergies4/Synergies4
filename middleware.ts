@@ -8,7 +8,7 @@ export function middleware(request: NextRequest) {
   // Force www to avoid SSL/redirect inconsistencies and preserve query
   if (host === 'synergies4ai.com') {
     url.hostname = 'www.synergies4ai.com';
-    return NextResponse.redirect(url);
+    return NextResponse.redirect(url, { status: 308 });
   }
   const hasCode = url.searchParams.has('code');
   const hasAuthError = url.searchParams.has('error') || url.searchParams.has('error_code');
