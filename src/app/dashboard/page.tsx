@@ -970,7 +970,8 @@ function DashboardContent() {
             )}
           </div>
 
-          {/* Enhanced Recent Activity & Goals */}
+          {/* Enhanced Recent Activity & Goals - temporarily hidden */}
+          {false && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Recent Activity */}
             <div className="card-modern p-8 rounded-3xl">
@@ -1068,8 +1069,10 @@ function DashboardContent() {
               )}
             </div>
           </div>
+          )}
 
-          {/* Enhanced Learning Resources */}
+          {/* Enhanced Learning Resources - temporarily hidden */}
+          {false && (
           <div className="mt-12">
             <div className="flex items-center justify-between mb-8">
               <div>
@@ -1129,6 +1132,7 @@ function DashboardContent() {
               ))}
             </div>
           </div>
+          )}
 
 
         </div>
