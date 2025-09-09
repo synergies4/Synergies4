@@ -254,42 +254,24 @@ export default function CreateCourse() {
 
     setLoading(true);
     try {
-      // Get Supabase client
-      const { createClient } = await import('@/lib/supabase/client');
-      const supabase = createClient();
-      
-      // Generate unique filename
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const userFolder = (user?.id || 'public').toString();
-      const filePath = `course-images/${userFolder}/${fileName}`;
+      // Upload via server route using service role (bypasses RLS)
+      const form = new FormData();
+      form.append('file', file);
+      form.append('userId', user?.id || 'public');
 
-      // Upload to Supabase storage
-      const { data, error } = await supabase.storage
-        .from('synergies4')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false
-        });
+      const res = await fetch('/api/admin/upload-image', {
+        method: 'POST',
+        body: form
+      });
 
-      if (error) {
-        throw new Error(`Upload failed: ${error.message}`);
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || 'Upload failed');
       }
 
-      // Get public URL
-      const { data: urlData } = supabase.storage
-        .from('synergies4')
-        .getPublicUrl(filePath);
-
-      if (urlData.publicUrl) {
-        handleInputChange('image', urlData.publicUrl);
-        toast.success('Image uploaded successfully!');
-      } else {
-        // Fallback to Supabase formed URL if helper failed
-        const fallbackUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/synergies4/${filePath}`;
-        handleInputChange('image', fallbackUrl);
-        toast.success('Image uploaded (fallback URL used).');
-      }
+      const data = await res.json();
+      handleInputChange('image', data.url);
+      toast.success('Image uploaded successfully!');
     } catch (error) {
       console.error('Error uploading image:', error);
       toast.error(`Failed to upload image: ${error instanceof Error ? error.message : 'Unknown error'}`);
