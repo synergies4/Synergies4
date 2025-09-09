@@ -183,6 +183,8 @@ function DashboardContent() {
       if (subscriptionSuccess === 'success') {
         // Refresh subscription data after successful payment
         setTimeout(() => refreshSubscriptionData(0, true), 2000);
+        // Also refetch dashboard data (enrollments) shortly after webhook runs
+        setTimeout(() => fetchDashboardData(), 3500);
       }
     }
   }, [user, authLoading, searchParams, userProfile, isLoggingOut]);
@@ -815,40 +817,42 @@ function DashboardContent() {
                 </Button>
               </div>
 
-              {/* Other Quick Actions */}
-              <div className="space-y-6">
-                <div className="card-modern p-6 rounded-2xl hover:shadow-lg transition-all duration-200 group cursor-pointer" onClick={() => router.push('/goal-setting')}>
-                  <div className="flex items-center space-x-4 mb-4">
-                    <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
-                      <Target className="w-6 h-6 text-green-600" />
+              {/* Other Quick Actions - temporarily hidden */}
+              {false && (
+                <div className="space-y-6">
+                  <div className="card-modern p-6 rounded-2xl hover:shadow-lg transition-all duration-200 group cursor-pointer" onClick={() => router.push('/goal-setting')}>
+                    <div className="flex items-center space-x-4 mb-4">
+                      <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+                        <Target className="w-6 h-6 text-green-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900">Goal Setting</h3>
+                        <p className="text-sm text-gray-600">Define your career path</p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900">Goal Setting</h3>
-                      <p className="text-sm text-gray-600">Define your career path</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-500">{stats.totalGoals} active goals</span>
+                      <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 transition-all duration-200" />
                     </div>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">{stats.totalGoals} active goals</span>
-                    <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 transition-all duration-200" />
-                  </div>
-                </div>
 
-                <div className="card-modern p-6 rounded-2xl hover:shadow-lg transition-all duration-200 group cursor-pointer" onClick={() => router.push('/ai-interview-practice')}>
-                  <div className="flex items-center space-x-4 mb-4">
-                    <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
-                      <Video className="w-6 h-6 text-red-600" />
+                  <div className="card-modern p-6 rounded-2xl hover:shadow-lg transition-all duration-200 group cursor-pointer" onClick={() => router.push('/ai-interview-practice')}>
+                    <div className="flex items-center space-x-4 mb-4">
+                      <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+                        <Video className="w-6 h-6 text-red-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900">AI Interview Practice</h3>
+                        <p className="text-sm text-gray-600">Practice with AI coach</p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900">AI Interview Practice</h3>
-                      <p className="text-sm text-gray-600">Practice with AI coach</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-500">Build confidence</span>
+                      <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 transition-all duration-200" />
                     </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">Build confidence</span>
-                    <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 transition-all duration-200" />
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
 
