@@ -22,8 +22,17 @@ export default function ResetPasswordPage() {
       const supabase = createClient();
       const href = window.location.href;
       try {
-        // Try code exchange first
-        await supabase.auth.exchangeCodeForSession(href);
+        const url = new URL(href);
+        const code = url.searchParams.get('code');
+        if (code) {
+          // Prefer direct code exchange when present
+          // @ts-ignore - some versions accept string code
+          await supabase.auth.exchangeCodeForSession(code).catch(async () => {
+            await supabase.auth.exchangeCodeForSession(href);
+          });
+        } else {
+          await supabase.auth.exchangeCodeForSession(href);
+        }
       } catch (e) {
         // If the link used hash parameters (older Supabase), copy hash -> search and retry
         try {
