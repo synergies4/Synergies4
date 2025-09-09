@@ -57,6 +57,7 @@ export default function NewBlogPostPage() {
     content: '',
     image: '',
     category: '',
+    categories: [] as string[],
     tags: [] as string[],
     status: 'draft',
     meta_title: '',
@@ -156,6 +157,39 @@ export default function NewBlogPostPage() {
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  const toggleCategory = (value: string) => {
+    setFormData(prev => {
+      const exists = prev.categories.includes(value);
+      const updated = exists ? prev.categories.filter(v => v !== value) : [...prev.categories, value];
+      return { ...prev, categories: updated, category: updated[0] || '' };
+    });
+    if (formErrors.category) setFormErrors(prev => ({ ...prev, category: '' }));
+  };
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) return alert('Please select an image');
+    if (file.size > 10 * 1024 * 1024) return alert('Max 10MB');
+
+    setLoading(true);
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      form.append('userId', user?.id || 'public');
+      const res = await fetch('/api/admin/upload-image', { method: 'POST', body: form });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || 'Upload failed');
+      }
+      const data = await res.json();
+      setFormData(prev => ({ ...prev, image: data.url }));
+    } catch (e: any) {
+      alert(e.message || 'Upload failed');
+    } finally {
+      setLoading(false);
+    }
+  };
     
     if (formErrors[field]) {
       setFormErrors(prev => ({ ...prev, [field]: '' }));
@@ -506,27 +540,19 @@ You can use HTML tags for formatting:
               <div className="space-y-2">
                 <Label htmlFor="category" className="text-sm font-semibold text-gray-900 flex items-center">
                   <Tag className="w-4 h-4 mr-2 text-teal-600" />
-                  Category *
+                  Categories *
                 </Label>
-                <Select 
-                  value={formData.category} 
-                  onValueChange={(value) => handleInputChange('category', value)}
-                >
-                  <SelectTrigger className={`bg-white border-2 ${formErrors.category ? 'border-red-300' : 'border-gray-200'} focus:border-teal-500 text-gray-900`}>
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white">
-                    {categories.map((category) => (
-                      <SelectItem key={category.slug} value={category.name}>
-                        <div className="flex items-center">
-                          <Badge className={`${category.color} mr-2 text-xs`}>
-                            {category.name}
-                          </Badge>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className={`grid grid-cols-2 sm:grid-cols-3 gap-2 p-3 rounded-lg border-2 ${formErrors.category ? 'border-red-300' : 'border-gray-200'} bg-white`}>
+                  {categories.map((cat) => {
+                    const checked = formData.categories.includes(cat.name);
+                    return (
+                      <label key={cat.slug} className={`flex items-center gap-2 cursor-pointer rounded-md px-2 py-1 border ${checked ? 'border-teal-400 bg-teal-50' : 'border-gray-200 hover:bg-gray-50'}`}>
+                        <input type="checkbox" className="accent-teal-600" checked={checked} onChange={() => toggleCategory(cat.name)} />
+                        <Badge className={`${cat.color} text-xs`}>{cat.name}</Badge>
+                      </label>
+                    );
+                  })}
+                </div>
                 {formErrors.category && <p className="text-red-600 text-sm flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{formErrors.category}</p>}
               </div>
 
@@ -572,17 +598,26 @@ You can use HTML tags for formatting:
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="image" className="text-sm font-semibold text-gray-900 flex items-center">
+              <Label className="text-sm font-semibold text-gray-900 flex items-center">
                 <ImageIcon className="w-4 h-4 mr-2 text-purple-600" />
-                Featured Image URL
+                Featured Image
               </Label>
-              <Input
-                id="image"
-                value={formData.image}
-                onChange={(e) => handleInputChange('image', e.target.value)}
-                placeholder="https://example.com/featured-image.jpg"
-                className="bg-white border-2 border-gray-200 focus:border-teal-500 text-gray-900 placeholder-gray-500 font-medium"
-              />
+              <div className="relative">
+                <input type="file" id="featured-upload" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                <label htmlFor="featured-upload" className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors duration-200">
+                  {formData.image ? (
+                    <div className="relative w-full h-full">
+                      <img src={formData.image} alt="Featured preview" className="w-full h-full object-cover rounded-lg" />
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <ImageIcon className="w-8 h-8 mb-2 text-gray-400" />
+                      <p className="text-sm text-gray-500"><span className="font-semibold">Click to upload</span> or drag and drop</p>
+                      <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                    </div>
+                  )}
+                </label>
+              </div>
               {formData.image && (
                 <div className="mt-4 p-4 bg-gray-50 rounded-lg border-2 border-gray-200">
                   <p className="text-sm font-medium text-gray-700 mb-3">Image Preview:</p>

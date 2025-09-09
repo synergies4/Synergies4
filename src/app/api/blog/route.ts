@@ -19,15 +19,15 @@ async function getAuthenticatedUser(request: NextRequest) {
       return null;
     }
 
-    // Get user data to check role
+    // Get user data to check role (our app stores auth_user_id on users table)
     const { data: userData } = await supabase
       .from('users')
-      .select('role')
-      .eq('id', user.id)
+      .select('id, role, auth_user_id')
+      .eq('auth_user_id', user.id)
       .single();
 
     return {
-      id: user.id,
+      id: userData?.id || user.id,
       role: userData?.role || 'USER'
     };
   } catch (error) {
@@ -137,6 +137,7 @@ export async function POST(request: NextRequest) {
       content,
       image,
       category,
+      categories = [],
       tags,
       meta_title,
       meta_description,
@@ -184,6 +185,7 @@ export async function POST(request: NextRequest) {
       content,
       image: image || '',
       category,
+      categories,
       tags: tags || [],
       author_id: user.id,
       meta_title: meta_title || title,
