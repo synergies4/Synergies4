@@ -358,11 +358,11 @@ export default function Signup() {
             <div className="lg:hidden text-center mb-8">
               <Link href="/" className="inline-block">
                 <Image
-                  src="/synergies4_logo.svg"
+                  src="/s4.png"
                   alt="Synergies4"
                   width={320}
                   height={80}
-                  className="h-16 w-auto mx-auto"
+                  className="w-40 mx-auto"
                 />
               </Link>
             </div>

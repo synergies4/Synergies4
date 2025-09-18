@@ -4,7 +4,7 @@ let resend: Resend | null = null;
 
 // Initialize Resend only when we have an API key
 function getResendClient() {
-  if (!resend && process.env.RESEND_API_KEY) {
+  if (!resend && process.env.RESEND_API_KEY && process.env.RESEND_API_KEY !== 'your_resend_api_key_here') {
     resend = new Resend(process.env.RESEND_API_KEY);
   }
   if (!resend) {
