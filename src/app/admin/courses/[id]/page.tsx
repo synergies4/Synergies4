@@ -28,6 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { ImageUpload } from '@/components/ui/image-upload';
 import { 
   Loader2, 
   BookOpen, 
@@ -755,11 +756,10 @@ export default function EditCourse({ params }: { params: Promise<{ id: string }>
               </div>
 
               <div>
-                <Label htmlFor="image">Course Image URL</Label>
-                <Input
-                  id="image"
+                <Label htmlFor="image">Course Image</Label>
+                <ImageUpload
                   value={course.image || ''}
-                  onChange={(e) => setCourse(prev => prev ? { ...prev, image: e.target.value } : null)}
+                  onChange={(url) => setCourse(prev => prev ? { ...prev, image: url } : null)}
                   className="mt-1"
                 />
               </div>
