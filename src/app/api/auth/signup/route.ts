@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
 
 export async function POST(request: NextRequest) {
   console.log('🚀 Signup API called');
@@ -35,16 +36,67 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // For now, just return success to test if the API route is working
     console.log('✅ Basic validation passed');
+
+    // Create user in Supabase Auth
+    const supabase = await createClient();
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: name,
+        }
+      }
+    });
+
+    if (authError) {
+      console.error('❌ Supabase auth error:', authError);
+      return NextResponse.json(
+        { error: authError.message },
+        { status: 400 }
+      );
+    }
+
+    if (!authData.user) {
+      console.error('❌ No user returned from Supabase');
+      return NextResponse.json(
+        { error: 'Failed to create user account' },
+        { status: 500 }
+      );
+    }
+
+    console.log('✅ User created in Supabase Auth:', authData.user.id);
+
+    // Create user profile in our users table
+    const { data: profileData, error: profileError } = await supabase
+      .from('users')
+      .insert({
+        auth_user_id: authData.user.id,
+        name: name,
+        email: email,
+        role: 'USER'
+      })
+      .select()
+      .single();
+
+    if (profileError) {
+      console.error('❌ Error creating user profile:', profileError);
+      // Don't fail the signup if profile creation fails - user is still created in auth
+      console.warn('⚠️ User created in auth but profile creation failed');
+    } else {
+      console.log('✅ User profile created:', profileData.id);
+    }
     
     return NextResponse.json(
       { 
-        message: 'Account creation validation passed. Supabase integration temporarily disabled for testing.',
+        message: 'Account created successfully',
         user: {
-          email: email,
+          id: authData.user.id,
+          email: authData.user.email,
           name: name
-        }
+        },
+        needsConfirmation: !authData.user.email_confirmed_at
       },
       { status: 200 }
     );
