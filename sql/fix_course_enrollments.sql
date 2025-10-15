@@ -61,7 +61,7 @@ SELECT
     u.email as user_email,
     c.title as course_title
 FROM public.course_enrollments ce
-LEFT JOIN public.users u ON u.auth_user_id = ce.user_id
+LEFT JOIN public.users u ON u.auth_user_id::text = ce.user_id
 LEFT JOIN public.courses c ON c.id = ce.course_id
 LIMIT 10;
 
