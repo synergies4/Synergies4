@@ -64,7 +64,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Create if missing
-    const { error } = await supabase
+    console.log('Creating new enrollment:', {
+      user_id: user.id,
+      course_id: courseId,
+      payment_status: 'PAID',
+      payment_id: session.payment_intent,
+      payment_amount: (session.amount_total || 0) / 100
+    });
+
+    const { data: newEnrollment, error } = await supabase
       .from('course_enrollments')
       .insert({
         user_id: user.id,
@@ -74,11 +82,17 @@ export async function POST(request: NextRequest) {
         payment_amount: (session.amount_total || 0) / 100,
         status: 'ACTIVE',
         enrolled_at: new Date().toISOString(),
-      });
+      })
+      .select()
+      .single();
 
-    if (error) return NextResponse.json({ message: error.message }, { status: 500 });
+    if (error) {
+      console.error('Error creating enrollment:', error);
+      return NextResponse.json({ message: error.message }, { status: 500 });
+    }
 
-    return NextResponse.json({ ok: true, enrolled: true });
+    console.log('Successfully created enrollment:', newEnrollment);
+    return NextResponse.json({ ok: true, enrolled: true, enrollment: newEnrollment });
   } catch (e) {
     return NextResponse.json({ message: 'Internal error' }, { status: 500 });
   }
