@@ -11,6 +11,8 @@ import { UserAvatar } from '@/components/UserAvatar';
 import { useAuth } from '@/contexts/AuthContext';
 import PageLayout from '@/components/shared/PageLayout';
 import CourseROIWidget from '@/components/CourseROIWidget';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { 
   ArrowLeft,
   ArrowRight, 
@@ -478,7 +480,25 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                 <div className="animate-fade-in-up">
                   <h2 className="text-3xl font-bold text-gray-900 mb-6">Course Overview</h2>
                   <div className="prose prose-lg max-w-none text-gray-700">
-                    <p className="text-lg leading-relaxed">{course.description}</p>
+                    <ReactMarkdown 
+                      remarkPlugins={[remarkGfm]}
+                      className="text-lg leading-relaxed"
+                      components={{
+                        h1: ({node, ...props}) => <h1 className="text-3xl font-bold mt-8 mb-4" {...props} />,
+                        h2: ({node, ...props}) => <h2 className="text-2xl font-bold mt-6 mb-3" {...props} />,
+                        h3: ({node, ...props}) => <h3 className="text-xl font-bold mt-4 mb-2" {...props} />,
+                        p: ({node, ...props}) => <p className="mb-4" {...props} />,
+                        ul: ({node, ...props}) => <ul className="list-disc pl-6 mb-4" {...props} />,
+                        ol: ({node, ...props}) => <ol className="list-decimal pl-6 mb-4" {...props} />,
+                        li: ({node, ...props}) => <li className="mb-2" {...props} />,
+                        strong: ({node, ...props}) => <strong className="font-bold" {...props} />,
+                        em: ({node, ...props}) => <em className="italic" {...props} />,
+                        code: ({node, ...props}) => <code className="bg-gray-100 px-2 py-1 rounded text-sm" {...props} />,
+                        blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-gray-300 pl-4 italic my-4" {...props} />,
+                      }}
+                    >
+                      {course.description}
+                    </ReactMarkdown>
                   </div>
                 </div>
 

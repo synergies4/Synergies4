@@ -19,7 +19,7 @@ interface Enrollment {
     name: string;
     email: string;
   };
-  course: {
+  course?: {
     id: string;
     title: string;
     price: number;
@@ -159,19 +159,116 @@ export default function AdminEnrollmentsPage() {
     );
   }
 
+  // Calculate stats
+  const totalEnrollments = enrollments.reduce((sum, c) => sum + c.total_enrollments, 0);
+  const totalRevenue = enrollments.reduce((sum, c) => sum + c.total_revenue, 0);
+  const paidEnrollments = enrollments.reduce((sum, c) => 
+    sum + c.enrollments.filter((e: Enrollment) => e.payment_status === 'PAID').length, 0);
+  
+  // Get recent enrollments (last 7 days)
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  const recentEnrollments = enrollments.flatMap(c => c.enrollments)
+    .filter((e: Enrollment) => new Date(e.enrolled_at) > sevenDaysAgo)
+    .sort((a: Enrollment, b: Enrollment) => 
+      new Date(b.enrolled_at).getTime() - new Date(a.enrolled_at).getTime()
+    )
+    .slice(0, 10);
+
   return (
     <PageLayout>
       <div className="max-w-7xl mx-auto px-4 py-10">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Course Enrollments</h1>
-            <p className="text-gray-600">View all enrollments across all courses</p>
+            <p className="text-gray-600">Track and manage all student enrollments</p>
           </div>
           <Button onClick={loadEnrollments} variant="outline">
             <Users className="h-4 w-4 mr-2" />
             Refresh
           </Button>
         </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-gray-600">Total Enrollments</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-gray-900">{totalEnrollments}</div>
+              <p className="text-xs text-gray-500 mt-1">All time</p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-gray-600">Paid Enrollments</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-green-600">{paidEnrollments}</div>
+              <p className="text-xs text-gray-500 mt-1">Completed payments</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-gray-600">Total Revenue</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-blue-600">{formatPrice(totalRevenue)}</div>
+              <p className="text-xs text-gray-500 mt-1">All time</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-gray-600">Recent (7 days)</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-purple-600">{recentEnrollments.length}</div>
+              <p className="text-xs text-gray-500 mt-1">New enrollments</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Recent Enrollments Section */}
+        {recentEnrollments.length > 0 && (
+          <Card className="mb-8 border-2 border-blue-200 bg-blue-50/50">
+            <CardHeader>
+              <CardTitle className="flex items-center text-blue-900">
+                <Calendar className="h-5 w-5 mr-2" />
+                Recent Enrollments (Last 7 Days)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {recentEnrollments.map((enrollment: any) => (
+                  <div key={enrollment.id} className="bg-white rounded-lg p-4 shadow-sm border border-blue-100">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-1">
+                          <span className="font-semibold text-gray-900">{enrollment.user.name}</span>
+                          {getPaymentStatusBadge(enrollment.payment_status)}
+                        </div>
+                        <p className="text-sm text-gray-600">{enrollment.user.email}</p>
+                        <p className="text-sm text-gray-500 mt-1">
+                          Course: <span className="font-medium">{enrollment.course?.title || 'Unknown'}</span>
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-green-600">
+                          {formatPrice(enrollment.payment_amount)}
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">{formatDate(enrollment.enrolled_at)}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {enrollments.length === 0 ? (
           <Card>

@@ -457,7 +457,12 @@ function FeaturedCoursesSection() {
     }
   ];
 
-  const displayCourses = courses.length > 0 ? courses : fallbackCourses;
+  // Generate random ratings and student counts for courses that don't have them
+  const displayCourses = (courses.length > 0 ? courses : fallbackCourses).map(course => ({
+    ...course,
+    rating: course.rating || (4.5 + Math.random() * 0.5),
+    students: course.students || (Math.floor(Math.random() * 3000) + 500)
+  }));
 
   return (
     <section className="py-24 bg-gradient-to-br from-slate-800 via-gray-800 to-slate-700 relative overflow-hidden">
@@ -581,15 +586,19 @@ function FeaturedCoursesSection() {
                           {[...Array(5)].map((_, i) => (
                             <Star 
                               key={i} 
-                              className={`h-4 w-4 ${i < Math.floor(course.rating || 4.8) ? 'text-yellow-400 fill-current' : 'text-gray-400'}`} 
+                              className={`h-4 w-4 ${i < Math.floor(course.rating) ? 'text-yellow-400 fill-current' : 'text-gray-400'}`} 
                             />
                           ))}
                         </div>
-                        <span className="text-gray-700 font-medium ml-1">{course.rating || '4.8'}</span>
+                        <span className="text-gray-700 font-medium ml-1">
+                          {course.rating.toFixed(1)}
+                        </span>
                       </div>
                       <div className="flex items-center text-gray-600 group-hover:text-gray-700 transition-colors">
                         <Users className="h-4 w-4 mr-1" />
-                        <span>{course.students || '1,200'}+</span>
+                        <span>
+                          {course.students.toLocaleString()}+
+                        </span>
                       </div>
                     </div>
 

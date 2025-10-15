@@ -182,14 +182,19 @@ function CourseDirectorySection() {
     }
   };
 
-  // Filter courses based on search, category, and type
+  // Filter courses and add random ratings/students
   const filteredCourses = courses.filter(course => {
     const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          course.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'All' || course.category === selectedCategory;
     const matchesType = selectedType === 'All' || course.course_type === selectedType;
     return matchesSearch && matchesCategory && matchesType;
-  });
+  }).map((course, index) => ({
+    ...course,
+    // Use course ID hash to generate consistent random values
+    _rating: 4.5 + ((parseInt(course.id.substring(0, 8), 36) % 50) / 100),
+    _students: 500 + ((parseInt(course.id.substring(8, 16), 36) % 3000))
+  }));
 
   // Get unique categories and types
   const categories = ['All', ...Array.from(new Set(courses.map(course => course.category)))];
@@ -444,16 +449,19 @@ function CourseDirectorySection() {
                           {[...Array(5)].map((_, i) => (
                             <Star 
                               key={i} 
-                              className={`h-4 w-4 ${i < 4 ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} 
+                              className={`h-4 w-4 ${i < Math.floor(course._rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} 
                             />
                           ))}
                         </div>
-                        <span className="text-gray-600 font-medium ml-1">4.8</span>
+                        <span className="text-gray-600 font-medium ml-1">
+                          {course._rating.toFixed(1)}
+                        </span>
                       </div>
                       <div className="flex items-center text-gray-500">
                         <Users className="h-4 w-4 mr-1" />
                         <span>{course.course_type === 'in_person' && course.max_participants ? 
-                          `${course.current_participants || 0}/${course.max_participants}` : '1,200+'}</span>
+                          `${course.current_participants || 0}/${course.max_participants}` : 
+                          `${course._students.toLocaleString()}+`}</span>
                       </div>
                     </div>
 

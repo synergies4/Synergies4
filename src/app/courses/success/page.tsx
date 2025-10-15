@@ -171,21 +171,63 @@ function CourseSuccessContent() {
             </div>
 
             {/* Success Message */}
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
               Payment Successful!
             </h1>
+            
+            <p className="text-xl text-gray-600 mb-8">
+              You're all set! Your course enrollment is now active.
+            </p>
 
-            {/* Action Button */}
-            <div className="flex justify-center">
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
                 asChild
-                className="bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white font-semibold py-4 px-12 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all"
+                className="bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white font-semibold py-4 px-8 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all"
+              >
+                <Link href="/courses/my">
+                  <BookOpen className="h-5 w-5 mr-2" />
+                  View My Courses
+                </Link>
+              </Button>
+              
+              <Button
+                asChild
+                variant="outline"
+                className="border-2 border-blue-600 text-blue-600 hover:bg-blue-50 font-semibold py-4 px-8 text-lg rounded-xl transition-all"
               >
                 <Link href="/dashboard">
                   Go to Dashboard
                   <ArrowRight className="h-5 w-5 ml-2" />
                 </Link>
               </Button>
+            </div>
+            
+            {/* Additional Info */}
+            <div className="mt-12 pt-8 border-t border-gray-200">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                <div className="flex flex-col items-center">
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-3">
+                    <CheckCircle className="h-8 w-8 text-green-600" />
+                  </div>
+                  <h3 className="font-semibold text-gray-900 mb-1">Enrolled</h3>
+                  <p className="text-sm text-gray-600">Access to all course materials</p>
+                </div>
+                <div className="flex flex-col items-center">
+                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-3">
+                    <BookOpen className="h-8 w-8 text-blue-600" />
+                  </div>
+                  <h3 className="font-semibold text-gray-900 mb-1">Learn</h3>
+                  <p className="text-sm text-gray-600">Start learning at your own pace</p>
+                </div>
+                <div className="flex flex-col items-center">
+                  <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-3">
+                    <Award className="h-8 w-8 text-purple-600" />
+                  </div>
+                  <h3 className="font-semibold text-gray-900 mb-1">Certificate</h3>
+                  <p className="text-sm text-gray-600">Earn upon completion</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>

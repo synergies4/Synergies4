@@ -831,44 +831,6 @@ export default function CreateCourse() {
       case 3:
         return (
           <div className="space-y-6">
-            {/* AI Content Generation */}
-            <Card className="bg-gradient-to-r from-purple-50 to-indigo-50 border-2 border-purple-200">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-lg font-bold text-purple-900 flex items-center">
-                  <Sparkles className="w-5 h-5 mr-2" />
-                  AI Content Generator
-                </CardTitle>
-                <CardDescription className="text-purple-700">
-                  Let AI help you create compelling course descriptions and content
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => generateAIContent('description')}
-                    className="w-full bg-white text-purple-700 border-purple-300 hover:bg-purple-50"
-                  >
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    Generate Description
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => generateAIContent('shortDesc')}
-                    className="w-full bg-white text-purple-700 border-purple-300 hover:bg-purple-50"
-                  >
-                    <Star className="w-4 h-4 mr-2" />
-                    Generate Short Description
-                  </Button>
-                </div>
-                <div className="text-xs text-purple-600 bg-purple-100 p-3 rounded-lg">
-                  💡 AI will use your course title, category, and level to create tailored content
-                </div>
-              </CardContent>
-            </Card>
-
             <div className="space-y-2">
               <Label htmlFor="description" className="text-sm font-semibold text-gray-900 flex items-center">
                 <FileText className="w-4 h-4 mr-2 text-teal-600" />

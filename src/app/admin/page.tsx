@@ -60,18 +60,40 @@ export default function AdminDashboard() {
     console.log('Admin Dashboard - canAccessAdmin:', canAccessAdmin);
     console.log('Admin Dashboard - canAccessAdminArea:', canAccessAdminArea);
     
-    if (authLoading) return;
+    // Always wait for auth to complete loading before doing anything
+    if (authLoading) {
+      console.log('Admin Dashboard - Still loading auth, waiting...');
+      return;
+    }
     
-    // If userProfile is null, wait for it to load
+    // If no user is found after auth loading is complete, redirect
+    if (!user) {
+      console.log('Admin Dashboard - No user found, redirecting to home');
+      window.location.href = '/';
+      return;
+    }
+    
+    // If userProfile is still null after auth loading, wait a bit more
+    // This handles cases where the profile fetch is slightly delayed
     if (!userProfile) {
       console.log('Admin Dashboard - Waiting for user profile to load');
-      return;
+      // Set a fallback timeout to prevent infinite waiting
+      const timeout = setTimeout(() => {
+        if (!userProfile) {
+          console.log('Admin Dashboard - Profile timeout, redirecting');
+          window.location.href = '/';
+        }
+      }, 3000); // Wait max 3 seconds for profile
+      return () => clearTimeout(timeout);
     }
 
     // Only fetch data if user can access admin area
     if (canAccessAdminArea) {
       console.log('Admin Dashboard - Admin user confirmed, fetching courses');
       fetchDashboardData();
+    } else {
+      console.log('Admin Dashboard - User cannot access admin, redirecting');
+      window.location.href = '/dashboard';
     }
   }, [user, userProfile, authLoading, isAdmin, canAccessAdmin, canAccessAdminArea]);
 
