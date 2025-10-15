@@ -106,6 +106,8 @@ export async function GET(request: NextRequest) {
     const hasPrev = page > 1;
 
     // Build main query with pagination
+    // Note: We fetch enrollments and their related course data
+    // User data will be fetched separately because of the FK relationship mismatch
     let query = supabase
       .from('course_enrollments')
       .select(`
@@ -127,13 +129,6 @@ export async function GET(request: NextRequest) {
           level,
           duration,
           price
-        ),
-        user:users(
-          id,
-          name,
-          email,
-          role,
-          created_at
         )
       `)
       .order('enrolled_at', { ascending: false })
@@ -168,15 +163,47 @@ export async function GET(request: NextRequest) {
     }
 
     const enrollmentsData = enrollments || [];
-    const countPage = enrollmentsData.length;
+    
+    // Fetch user data separately and merge it with enrollments
+    // This is necessary because course_enrollments.user_id references auth.users.id (UUID)
+    // but we need to join with public.users using auth_user_id
+    const uniqueUserIds = [...new Set(enrollmentsData.map(e => e.user_id))];
+    
+    let usersMap: Record<string, any> = {};
+    
+    if (uniqueUserIds.length > 0) {
+      const { data: users, error: usersError } = await supabase
+        .from('users')
+        .select('id, auth_user_id, name, email, role, created_at')
+        .in('auth_user_id', uniqueUserIds);
+      
+      if (!usersError && users) {
+        // Create a map of auth_user_id -> user data
+        users.forEach(u => {
+          if (u.auth_user_id) {
+            usersMap[u.auth_user_id] = u;
+          }
+        });
+      } else {
+        console.error('Error fetching users:', usersError);
+      }
+    }
+    
+    // Merge user data into enrollments
+    const enrichedEnrollments = enrollmentsData.map(enrollment => ({
+      ...enrollment,
+      user: usersMap[enrollment.user_id] || null
+    }));
+
+    const countPage = enrichedEnrollments.length;
 
     return NextResponse.json({
-      enrollments: enrollmentsData,
+      enrollments: enrichedEnrollments,
       pagination: {
         has_next: hasNext,
         has_prev: hasPrev,
         count_total: totalCountNum,
-        count_queried: enrollmentsData.length,
+        count_queried: enrichedEnrollments.length,
         count_page: countPage,
         page: page,
         per_page: per_page,
