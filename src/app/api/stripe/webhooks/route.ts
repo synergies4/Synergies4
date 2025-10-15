@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
           await handleCoursePayment(supabase, session);
         } else if (metadata?.type === 'subscription') {
           console.log(`📅 [${webhookId}] Processing subscription payment for plan: ${metadata.planId}, user: ${metadata.userId}`);
-          await handleSubscriptionPayment(supabase, session);
+          await handleSubscriptionPayment(stripe, supabase, session);
         } else {
           console.warn(`⚠️ [${webhookId}] Unknown metadata type: ${metadata?.type}`);
         }
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
         
         if (subscriptionId && typeof subscriptionId === 'string') {
           console.log(`🔄 [${webhookId}] Processing subscription renewal for: ${subscriptionId}`);
-          await handleSubscriptionRenewal(supabase, invoice);
+          await handleSubscriptionRenewal(stripe, supabase, invoice);
         } else {
           console.warn(`⚠️ [${webhookId}] No valid subscription ID found in invoice`);
         }
@@ -285,7 +285,7 @@ async function handleCoursePayment(supabase: any, session: Stripe.Checkout.Sessi
   }
 }
 
-async function handleSubscriptionPayment(supabase: any, session: Stripe.Checkout.Session) {
+async function handleSubscriptionPayment(stripe: Stripe, supabase: any, session: Stripe.Checkout.Session) {
   const { metadata } = session;
   const userId = metadata?.userId;
   const planId = metadata?.planId;
@@ -354,7 +354,7 @@ async function handleSubscriptionPayment(supabase: any, session: Stripe.Checkout
   }
 }
 
-async function handleSubscriptionRenewal(supabase: any, invoice: Stripe.Invoice) {
+async function handleSubscriptionRenewal(stripe: Stripe, supabase: any, invoice: Stripe.Invoice) {
   try {
     const subscriptionId = (invoice as any).subscription;
     if (subscriptionId && typeof subscriptionId === 'string') {
