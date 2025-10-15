@@ -236,6 +236,17 @@ function CourseSuccessContent() {
               <Button
                 asChild
                 variant="outline"
+                className="border-2 border-blue-500 hover:border-blue-600 text-blue-600 hover:text-blue-700 hover:bg-blue-50 font-semibold py-4 px-8 text-lg rounded-xl transition-all"
+              >
+                <Link href="/courses/my">
+                  <BookOpen className="h-5 w-5 mr-2" />
+                  View All My Courses
+                </Link>
+              </Button>
+              
+              <Button
+                asChild
+                variant="outline"
                 className="border-2 border-gray-300 hover:border-gray-400 text-gray-700 hover:text-gray-900 font-semibold py-4 px-8 text-lg rounded-xl transition-all"
               >
                 <Link href="/dashboard">

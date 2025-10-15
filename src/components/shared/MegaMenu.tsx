@@ -60,7 +60,12 @@ const menuCategories: MenuCategory[] = [
         href: '/courses',
         icon: BookOpen
       },
-      
+      {
+        title: 'My Courses',
+        description: 'View your enrolled courses and progress',
+        href: '/courses/my',
+        icon: GraduationCap
+      }
     ]
   },
   {
@@ -170,8 +175,8 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
         console.log('🔍 MegaMenu - Found access token, fetching user data...');
         setFastUserRole(prev => ({ ...prev, loading: true }));
 
-        // Fetch user data directly from API
-        const response = await fetch('/api/users', {
+        // Fetch user data directly from API (lightweight endpoint)
+        const response = await fetch('/api/users/me', {
           headers: {
             'Authorization': `Bearer ${tokenData.access_token}`,
             'Content-Type': 'application/json'
@@ -311,9 +316,9 @@ export default function MegaMenu({ isScrolled, onSearchOpen }: MegaMenuProps) {
 
   // Get conditional href based on authentication and item
   const getConditionalHref = (item: any) => {
-    if (item.title === 'My Learning' || item.title === 'Certificates') {
-      // If user is logged in, go to dashboard/certificates, otherwise go to contact page for plans/pricing
-      return user ? item.href : '/contact#plans-pricing';
+    if (item.title === 'My Learning' || item.title === 'Certificates' || item.title === 'My Courses') {
+      // If user is logged in, go to the actual page, otherwise go to login with redirect
+      return user ? item.href : `/login?redirect=${encodeURIComponent(item.href)}`;
     }
     return item.href;
   };

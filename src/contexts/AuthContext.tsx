@@ -57,12 +57,12 @@ async function fetchUserData(supabase: any, user: User): Promise<UserProfile | n
       return null;
     }
 
-    // Fetch user data from our API endpoint with timeout
+    // Fetch user data from our lightweight API endpoint with timeout
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
     
     try {
-      const response = await fetch('/api/users', {
+      const response = await fetch('/api/users/me', {
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json',
