@@ -2,7 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
+function getStripeClient() {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error('STRIPE_SECRET_KEY is not configured');
+  }
+  return new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2024-12-18.acacia' as any,
+  });
+}
 
 async function getAuthenticatedUser(request: NextRequest) {
   try {
@@ -53,6 +60,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Fetch active subscriptions from Stripe
+    const stripe = getStripeClient();
     const subscriptions = await stripe.subscriptions.list({
       customer: customerData.stripe_customer_id,
       status: 'active',
