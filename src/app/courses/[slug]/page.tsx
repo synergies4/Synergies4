@@ -479,10 +479,9 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                 {/* Description */}
                 <div className="animate-fade-in-up">
                   <h2 className="text-3xl font-bold text-gray-900 mb-6">Course Overview</h2>
-                  <div className="prose prose-lg max-w-none text-gray-700">
+                  <div className="prose prose-lg max-w-none text-gray-700 text-lg leading-relaxed">
                     <ReactMarkdown 
                       remarkPlugins={[remarkGfm]}
-                      className="text-lg leading-relaxed"
                       components={{
                         h1: ({node, ...props}) => <h1 className="text-3xl font-bold mt-8 mb-4" {...props} />,
                         h2: ({node, ...props}) => <h2 className="text-2xl font-bold mt-6 mb-3" {...props} />,
