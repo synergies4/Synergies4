@@ -100,6 +100,7 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
   } | null>(null);
   const [enrolling, setEnrolling] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const [purchaseError, setPurchaseError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchCourseData();
@@ -177,39 +178,66 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
 
     try {
       setEnrolling(true);
+      setPurchaseError(null);
+      
       const { createClient } = await import('@/lib/supabase/client');
       const supabase = createClient();
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
-        // Redirect to login with redirect param
-        window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+        // Store intended purchase in localStorage for post-login redirect
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('pendingCourseId', course.id);
+          localStorage.setItem('pendingCourseSlug', slug);
+        }
+        // Redirect to signup (not login) for better conversion, with clear redirect
+        window.location.href = `/signup?redirect=${encodeURIComponent(window.location.pathname)}`;
         return;
       }
 
       // If course requires payment, use Stripe checkout
       if (course.price && course.price > 0) {
         const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_URL || (typeof window !== 'undefined' ? window.location.origin : 'https://synergies4.vercel.app')) as string;
-        const response = await fetch('/api/stripe/create-checkout-session', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${session.access_token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            courseId: course.id,
-            successUrl: `${baseUrl}/courses/success?course_id=${course.id}&session_id={CHECKOUT_SESSION_ID}`,
-            cancelUrl: `${baseUrl}/courses/${slug}`
-          }),
-        });
+        
+        // Add timeout to prevent infinite loading
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+        
+        try {
+          const response = await fetch('/api/stripe/create-checkout-session', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${session.access_token}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              courseId: course.id,
+              successUrl: `${baseUrl}/courses/success?course_id=${course.id}&session_id={CHECKOUT_SESSION_ID}`,
+              cancelUrl: `${baseUrl}/courses/${slug}`
+            }),
+            signal: controller.signal
+          });
 
-        const checkoutData = await response.json();
+          clearTimeout(timeoutId);
 
-        if (response.ok && checkoutData.url) {
-          // Redirect to Stripe checkout
-          window.location.href = checkoutData.url;
-        } else {
-          alert(checkoutData.message || 'Failed to create checkout session');
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to create checkout session');
+          }
+
+          const checkoutData = await response.json();
+
+          if (checkoutData.url) {
+            // Redirect to Stripe checkout
+            window.location.href = checkoutData.url;
+          } else {
+            throw new Error('No checkout URL received');
+          }
+        } catch (fetchError: any) {
+          if (fetchError.name === 'AbortError') {
+            throw new Error('Payment request timed out. Please check your internet connection and try again.');
+          }
+          throw fetchError;
         }
       } else {
         // Free course - use original enrollment flow
@@ -225,23 +253,23 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
 
         if (response.ok) {
           // Create a better success experience
-          const successMessage = course.price && course.price > 0 
-            ? 'Successfully enrolled! You can now start the course.'
-            : 'Successfully enrolled in this free course! You can now start learning.';
-          
-          // Show success toast instead of alert
-          alert(successMessage);
           await checkEnrollmentStatus(course.id);
+          
+          // Redirect to learning page after a brief moment
+          setTimeout(() => {
+            window.location.href = `/learn/${createCourseSlug(course.title)}`;
+          }, 1500);
         } else {
           // Better error handling
           console.error('Enrollment failed:', data);
-          const errorMessage = data.message || 'Failed to enroll in course. Please try again.';
-          alert(errorMessage);
+          throw new Error(data.message || 'Failed to enroll in course. Please try again.');
         }
       }
     } catch (error) {
       console.error('Error enrolling:', error);
-      alert('Failed to enroll in course. Please try again.');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to process your request. Please try again.';
+      setPurchaseError(errorMessage);
+      alert(errorMessage);
     } finally {
       setEnrolling(false);
     }
@@ -260,7 +288,7 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
         );
       } else {
         return (
-          <Button size="lg" asChild>
+          <Button size="lg" asChild className="bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700">
             <Link href={`/learn/${createCourseSlug(course.title)}`}>
               Continue Learning
               <ArrowRight className="ml-2 h-5 w-5" />
@@ -270,16 +298,26 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
       }
     }
 
+    // Show different text for paid vs free courses
+    const isPaidCourse = course.price && course.price > 0;
+    const buttonText = isPaidCourse ? 'Buy Now' : 'Enroll Free';
+    const loadingText = isPaidCourse ? 'Processing...' : 'Enrolling...';
+
     return (
-      <Button size="lg" onClick={handleEnrollment} disabled={enrolling}>
+      <Button 
+        size="lg" 
+        onClick={handleEnrollment} 
+        disabled={enrolling}
+        className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+      >
         {enrolling ? (
           <>
             <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-            Enrolling...
+            {loadingText}
           </>
         ) : (
           <>
-            Enroll Now
+            {buttonText}
             <ArrowRight className="ml-2 h-5 w-5" />
           </>
         )}
@@ -442,11 +480,18 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6">
-                  <div className="text-3xl font-bold">
-                    {formatPrice(course.price)}
+                <div className="space-y-4">
+                  {purchaseError && (
+                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                      <p className="font-medium">{purchaseError}</p>
+                    </div>
+                  )}
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6">
+                    <div className="text-3xl font-bold">
+                      {formatPrice(course.price)}
+                    </div>
+                    {getEnrollmentButton()}
                   </div>
-                  {getEnrollmentButton()}
                 </div>
               </div>
 
@@ -718,6 +763,11 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                           <div className="text-2xl font-bold text-white mb-3">
                             {formatPrice(course.price)}
                           </div>
+                          {purchaseError && (
+                            <div className="bg-white/90 border border-red-300 text-red-700 px-3 py-2 rounded-lg mb-3 text-sm">
+                              <p className="font-medium">{purchaseError}</p>
+                            </div>
+                          )}
                           <div className="space-y-3">
                             {getEnrollmentButton()}
                           </div>

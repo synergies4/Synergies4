@@ -71,7 +71,15 @@ export default function Signup() {
     if (!loading && user && userProfile) {
       console.log('🔄 Signup - User authenticated, redirecting...');
       
-      if (redirectUrl) {
+      // Check for pending course purchase
+      const pendingCourseSlug = typeof window !== 'undefined' ? localStorage.getItem('pendingCourseSlug') : null;
+      
+      if (pendingCourseSlug) {
+        console.log('🔄 Signup - Found pending course, redirecting to:', pendingCourseSlug);
+        localStorage.removeItem('pendingCourseSlug');
+        localStorage.removeItem('pendingCourseId');
+        window.location.href = `/courses/${pendingCourseSlug}`;
+      } else if (redirectUrl) {
         console.log('🔄 Signup - Redirecting to:', redirectUrl);
         window.location.href = redirectUrl;
       } else if (userProfile.role === 'ADMIN') {

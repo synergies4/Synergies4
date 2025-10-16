@@ -14,10 +14,16 @@ export function middleware(request: NextRequest) {
   const hasAuthError = url.searchParams.has('error') || url.searchParams.has('error_code');
   const hasRecovery = url.searchParams.get('type') === 'recovery' || url.searchParams.has('token_hash');
 
-  // If Supabase sends a recovery link to any page (often '/'),
-  // redirect to our reset-password flow while preserving query.
-  if ((hasCode || hasAuthError || hasRecovery) && url.pathname !== '/reset-password') {
+  // ONLY redirect to reset-password if it's explicitly a recovery/reset link
+  // DO NOT redirect email verification callbacks (which also have 'code' param)
+  if (hasRecovery && url.pathname !== '/reset-password') {
     url.pathname = '/reset-password';
+    return NextResponse.redirect(url);
+  }
+  
+  // If there's an auth error, redirect to login with error message
+  if (hasAuthError && url.pathname !== '/login') {
+    url.pathname = '/login';
     return NextResponse.redirect(url);
   }
 
